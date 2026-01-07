@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - IArmy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #111111;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-decoration: none;
+            color: #111;
+        }
+
+        .logo span {
+            color: #00D4FF;
+        }
+
+        /* Container */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 120px 20px 60px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        /* Progress */
+        .progress {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active {
+            background: #00D4FF;
+        }
+
+        .progress-step.done {
+            background: #111;
+        }
+
+        /* Steps */
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: #00D4FF;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #111;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #00D4FF;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #111;
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #eee;
+        }
+
+        .btn-telegram {
+            background: #0088cc;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-telegram:hover {
+            background: #006699;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: #f9f9f9;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .instructions h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .copy-box {
+            background: #111;
+            color: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #333;
+            border: none;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #00D4FF;
+            color: #000;
+        }
+
+        /* Success */
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            text-align: center;
+        }
+
+        .success-message h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Status */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        /* Code liaison */
+        .code-display {
+            text-align: center;
+            padding: 30px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .code-display .code {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #00D4FF;
+            margin: 20px 0;
+        }
+
+        .code-display p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .container {
+                padding: 100px 20px 40px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo"><span>IA</span>rmy</a>
+    </nav>
+
+    <div class="container">
+        <div class="progress">
+            <div class="progress-step active" id="prog1"></div>
+            <div class="progress-step" id="prog2"></div>
+            <div class="progress-step" id="prog3"></div>
+        </div>
+
+        <!-- ÉTAPE 1 : Email & Resto -->
+        <div class="step active" id="step1">
+            <h1>Créer votre compte</h1>
+            <p class="subtitle">Commencez à utiliser IArmy Compta</p>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="vous@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Nom du restaurant</label>
+                <input type="text" id="resto" placeholder="Mon Restaurant">
+            </div>
+
+            <button class="btn btn-primary" onclick="goToStep(2)">Continuer →</button>
+        </div>
+
+        <!-- ÉTAPE 2 : Google Sheet -->
+        <div class="step" id="step2">
+            <h1>Connecter Google Sheets</h1>
+            <p class="subtitle">Pour sauvegarder votre comptabilité</p>
+
+            <div class="instructions">
+                <h3>📋 3 étapes simples :</h3>
+                <ol>
+                    <li>Créez un <a href="https://sheets.new" target="_blank">nouveau Google Sheet</a></li>
+                    <li>Cliquez sur <strong>Partager</strong> (en haut à droite)</li>
+                    <li>Ajoutez cette adresse en <strong>Éditeur</strong> :</li>
+                </ol>
+                <div class="copy-box">
+                    <span id="serviceEmail">iaarmy@gen-lang-client-0210481484.iam.gserviceaccount.com</span>
+                    <button class="copy-btn" onclick="copyEmail()">Copier</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>URL de votre Google Sheet</label>
+                <input type="url" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/...">
+            </div>
+
+            <button class="btn btn-primary" onclick="goToStep(3)">Continuer →</button>
+            <button class="btn btn-secondary" onclick="goToStep(1)">← Retour</button>
+        </div>
+
+        <!-- ÉTAPE 3 : Telegram -->
+        <div class="step" id="step3">
+            <h1>Connecter Telegram</h1>
+            <p class="subtitle">Pour envoyer vos recettes quotidiennes</p>
+
+            <div class="code-display">
+                <p>Votre code de connexion :</p>
+                <div class="code" id="userCode">------</div>
+                <p>Envoyez ce code au bot Telegram</p>
+            </div>
+
+            <a href="" id="telegramLink" target="_blank" class="btn btn-telegram">
+                📱 Ouvrir IArmy sur Telegram
+            </a>
+
+            <div class="status pending" id="connectionStatus" style="margin-top: 20px;">
+                <span>⏳</span>
+                <span>En attente de connexion...</span>
+            </div>
+
+            <button class="btn btn-secondary" onclick="goToStep(2)">← Retour</button>
+            <button class="btn btn-primary" onclick="checkConnection()" style="margin-top: 12px;">Vérifier la connexion</button>
+        </div>
+
+        <!-- ÉTAPE 4 : Succès -->
+        <div class="step" id="step4">
+            <div class="success-message">
+                <div class="success-icon">🎉</div>
+                <h2>C'est prêt !</h2>
+                <p>Votre bot IArmy Compta est configuré.<br>Allez sur Telegram et envoyez votre première recette !</p>
+                
+                <a href="" id="finalTelegramLink" target="_blank" class="btn btn-telegram">
+                    📱 Ouvrir Telegram
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Génération d'un code unique
+        function generateCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Variables
+        let currentStep = 1;
+        let userCode = generateCode();
+        const botUsername = 'IArmy_compta_bot'; // À remplacer par ton vrai bot
+
+        // Initialisation
+        document.getElementById('userCode').textContent = userCode;
+        document.getElementById('telegramLink').href = `https://t.me/${botUsername}?start=${userCode}`;
+        document.getElementById('finalTelegramLink').href = `https://t.me/${botUsername}`;
+
+        // Navigation entre étapes
+        function goToStep(step) {
+            // Validation
+            if (step === 2) {
+                const email = document.getElementById('email').value;
+                const resto = document.getElementById('resto').value;
+                if (!email || !email.includes('@')) {
+                    alert('Veuillez entrer un email valide');
+                    return;
+                }
+                if (!resto) {
+                    alert('Veuillez entrer le nom de votre restaurant');
+                    return;
+                }
+                // Sauvegarder les données
+                localStorage.setItem('iarmy_email', email);
+                localStorage.setItem('iarmy_resto', resto);
+            }
+
+            if (step === 3) {
+                const sheetUrl = document.getElementById('sheetUrl').value;
+                if (!sheetUrl || !sheetUrl.includes('docs.google.com/spreadsheets')) {
+                    alert('Veuillez entrer une URL Google Sheets valide');
+                    return;
+                }
+                // Extraire l'ID du Sheet
+                const match = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (match) {
+                    localStorage.setItem('iarmy_sheet_id', match[1]);
+                }
+            }
+
+            // Changer d'étape
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+
+            // Mettre à jour la progress bar
+            for (let i = 1; i <= 3; i++) {
+                const prog = document.getElementById('prog' + i);
+                prog.classList.remove('active', 'done');
+                if (i < step) prog.classList.add('done');
+                if (i === step) prog.classList.add('active');
+            }
+
+            currentStep = step;
+        }
+
+        // Copier l'email du service account
+        function copyEmail() {
+            const email = document.getElementById('serviceEmail').textContent;
+            navigator.clipboard.writeText(email);
+            document.querySelector('.copy-btn').textContent = 'Copié !';
+            setTimeout(() => {
+                document.querySelector('.copy-btn').textContent = 'Copier';
+            }, 2000);
+        }
+
+        // Vérifier la connexion Telegram (simulation)
+        function checkConnection() {
+            // Dans la vraie version, on appellerait une API
+            // Pour l'instant, on simule
+            const status = document.getElementById('connectionStatus');
+            status.innerHTML = '<span>✅</span><span>Connecté !</span>';
+            status.classList.remove('pending');
+            status.classList.add('success');
+
+            // Sauvegarder toutes les données
+            const userData = {
+                email: localStorage.getItem('iarmy_email'),
+                resto: localStorage.getItem('iarmy_resto'),
+                sheetId: localStorage.getItem('iarmy_sheet_id'),
+                code: userCode,
+                createdAt: new Date().toISOString()
+            };
+            console.log('Données utilisateur:', userData);
+
+            // Passer à l'étape finale après 1 seconde
+            setTimeout(() => {
+                goToStep(4);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
