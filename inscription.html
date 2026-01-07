@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration - IArmy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-300: #d4d4d4;
+            --gray-400: #a3a3a3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --green: #22c55e;
+            --green-light: #dcfce7;
+            --red: #ef4444;
+            --red-light: #fee2e2;
+            --blue: #3b82f6;
+            --blue-light: #dbeafe;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--gray-50);
+            color: var(--black);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logo {
+            font-size: 24px;
+            letter-spacing: -1px;
+            text-decoration: none;
+            color: var(--black);
+        }
+
+        .logo-bold { font-weight: 700; }
+        .logo-light { font-weight: 300; }
+
+        /* Progress Steps */
+        .progress {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active {
+            background: var(--black);
+        }
+
+        .progress-step.done {
+            background: var(--green);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 24px 60px;
+        }
+
+        /* Steps */
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: var(--black);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 32px;
+            margin-bottom: 16px;
+        }
+
+        .step h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+
+        .step-subtitle {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 16px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--black);
+        }
+
+        .btn-google {
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--gray-200);
+            width: 100%;
+            padding: 18px 32px;
+            font-size: 16px;
+        }
+
+        .btn-google:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+        }
+
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-telegram {
+            background: #0088cc;
+            color: var(--white);
+        }
+
+        .btn-telegram:hover {
+            background: #006699;
+        }
+
+        /* Ticket Input */
+        .ticket-input-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .ticket-option {
+            border: 2px dashed var(--gray-200);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ticket-option:hover {
+            border-color: var(--black);
+            background: var(--gray-50);
+        }
+
+        .ticket-option.active {
+            border-color: var(--black);
+            border-style: solid;
+            background: var(--gray-50);
+        }
+
+        .ticket-option-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .ticket-option-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .ticket-option-desc {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        /* Text Input */
+        .text-input-area {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .text-input-area.active {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        .text-hint {
+            margin-top: 8px;
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        /* File Upload */
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .file-preview.active {
+            display: block;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* Interactive Table Editor */
+        .table-editor {
+            overflow-x: auto;
+        }
+
+        .sheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+
+        .sheet-table th {
+            background: var(--black);
+            color: var(--white);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            min-width: 120px;
+        }
+
+        .sheet-table th:hover {
+            background: #1a1a1a;
+        }
+
+        .sheet-table th.editing {
+            padding: 0;
+        }
+
+        .sheet-table th input {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: var(--black);
+            color: var(--white);
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+        }
+
+        .sheet-table th input:focus {
+            outline: 2px solid var(--blue);
+            outline-offset: -2px;
+        }
+
+        .sheet-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            background: var(--white);
+        }
+
+        .sheet-table tr:nth-child(even) td {
+            background: var(--gray-50);
+        }
+
+        .sheet-table td.total {
+            font-weight: 600;
+            background: var(--gray-100) !important;
+        }
+
+        .sheet-table td input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: inherit;
+            background: transparent;
+        }
+
+        .sheet-table td input:hover {
+            background: var(--gray-100);
+        }
+
+        .sheet-table td input:focus {
+            outline: none;
+            border-color: var(--black);
+            background: var(--white);
+        }
+
+        .col-actions {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .sheet-table th:hover .col-actions {
+            opacity: 1;
+        }
+
+        .col-action-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .col-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .col-action-btn.delete:hover {
+            background: var(--red);
+        }
+
+        /* Add Column Button */
+        .add-column-cell {
+            background: var(--gray-100) !important;
+            border: 2px dashed var(--gray-300);
+            cursor: pointer;
+            text-align: center;
+            color: var(--gray-500);
+            min-width: 60px !important;
+        }
+
+        .add-column-cell:hover {
+            background: var(--gray-200) !important;
+            color: var(--black);
+        }
+
+        /* Table Controls */
+        .table-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .table-controls button {
+            padding: 10px 16px;
+            font-size: 13px;
+        }
+
+        /* Column Config Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--black);
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            background: var(--gray-50);
+        }
+
+        .radio-option.selected {
+            border-color: var(--black);
+            background: var(--gray-50);
+        }
+
+        .radio-option input {
+            display: none;
+        }
+
+        .radio-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .radio-option.selected .radio-circle {
+            border-color: var(--black);
+        }
+
+        .radio-option.selected .radio-circle::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: var(--black);
+            border-radius: 50%;
+        }
+
+        /* Checkbox list for calculation */
+        .checkbox-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Status badges */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: var(--green-light);
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Actions Footer */
+        .actions-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Success Page */
+        .success-content {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+        }
+
+        .success-content h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .success-content p {
+            color: var(--gray-600);
+            margin-bottom: 32px;
+        }
+
+        /* Import Section */
+        .import-section {
+            background: var(--blue-light);
+            border: 1px solid #93c5fd;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .import-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .import-section p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .container {
+                padding: 100px 16px 40px;
+            }
+
+            .ticket-input-area {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .step h1 {
+                font-size: 28px;
+            }
+
+            .sheet-table {
+                font-size: 12px;
+            }
+
+            .sheet-table th, .sheet-table td {
+                padding: 8px 12px;
+            }
+
+            .actions-footer {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .actions-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo"><span class="logo-bold">IA</span><span class="logo-light">rmy</span></a>
+        <div class="progress">
+            <div class="progress-step active" id="prog1"></div>
+            <div class="progress-step" id="prog2"></div>
+            <div class="progress-step" id="prog3"></div>
+            <div class="progress-step" id="prog4"></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ÉTAPE 1 : Connexion Google -->
+        <div class="step active" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h1>Connectez-vous avec Google</h1>
+                <p class="step-subtitle">Pour créer votre Google Sheet personnalisé</p>
+            </div>
+
+            <div class="card" style="max-width: 500px; margin: 0 auto;">
+                <button class="btn btn-google" onclick="connectGoogle()">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Se connecter avec Google
+                </button>
+
+                <p style="text-align: center; margin-top: 24px; color: var(--gray-500); font-size: 13px;">
+                    Nous créerons automatiquement un Google Sheet dans votre Drive.
+                    <br>Vos données vous appartiennent.
+                </p>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 : Configuration du tableau -->
+        <div class="step" id="step2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h1>Configurez votre tableau</h1>
+                <p class="step-subtitle">Montrez-nous à quoi ressemble votre recette du jour</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📝 Votre recette type</div>
+                
+                <div class="ticket-input-area">
+                    <div class="ticket-option" onclick="selectTicketOption('photo')" id="option-photo">
+                        <div class="ticket-option-icon">📸</div>
+                        <div class="ticket-option-title">Envoyer une photo</div>
+                        <div class="ticket-option-desc">Photo de votre ticket ou Z de caisse</div>
+                    </div>
+                    <div class="ticket-option" onclick="selectTicketOption('text')" id="option-text">
+                        <div class="ticket-option-icon">✍️</div>
+                        <div class="ticket-option-title">Écrire un exemple</div>
+                        <div class="ticket-option-desc">Décrivez vos différents moyens de paiement</div>
+                    </div>
+                </div>
+
+                <div class="file-preview" id="file-preview">
+                    <img id="preview-image" src="" alt="Aperçu">
+                </div>
+                <input type="file" id="file-input" class="file-input" accept="image/*" onchange="handleFileUpload(event)">
+
+                <div class="text-input-area" id="text-input-area">
+                    <textarea id="ticket-text" placeholder="Exemple : CB 1200, Espèces 500, Tickets resto 150, Uber Eats 300..."></textarea>
+                    <div class="text-hint">💡 Listez tous les moyens de paiement que vous utilisez</div>
+                </div>
+
+                <div style="margin-top: 24px; text-align: center;">
+                    <button class="btn btn-primary" onclick="analyzeTicket()" id="analyze-btn" disabled>
+                        Analyser et générer le tableau
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 : Éditeur interactif -->
+        <div class="step" id="step3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h1>Personnalisez votre tableau</h1>
+                <p class="step-subtitle">Cliquez sur les colonnes pour les modifier</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Prévisualisation de votre Google Sheet</div>
+                
+                <div class="table-editor">
+                    <table class="sheet-table" id="sheet-table">
+                        <thead>
+                            <tr id="header-row">
+                                <!-- Generated dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-controls">
+                    <button class="btn btn-secondary" onclick="addColumn()">
+                        <span>+</span> Ajouter une colonne
+                    </button>
+                    <button class="btn btn-secondary" onclick="addRow()">
+                        <span>+</span> Ajouter une ligne
+                    </button>
+                </div>
+
+                <div class="import-section">
+                    <h4>📁 Importer vos données existantes</h4>
+                    <p>Vous avez déjà des données pour 2026 ? Importez-les pour ne pas repartir de zéro.</p>
+                    <button class="btn btn-secondary" onclick="showImportModal()">
+                        Importer depuis un fichier
+                    </button>
+                </div>
+            </div>
+
+            <div class="actions-footer">
+                <button class="btn btn-secondary" onclick="goToStep(2)">← Retour</button>
+                <button class="btn btn-primary" onclick="goToStep(4)">
+                    Valider et créer mon Sheet
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 : Telegram -->
+        <div class="step" id="step4">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h1>Connectez Telegram</h1>
+                <p class="step-subtitle">Pour envoyer vos recettes quotidiennes</p>
+            </div>
+
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+                <div style="font-size: 64px; margin-bottom: 24px;">📱</div>
+                
+                <p style="margin-bottom: 24px; color: var(--gray-600);">
+                    Cliquez sur le bouton ci-dessous pour ouvrir Telegram et connecter votre compte.
+                </p>
+
+                <a href="https://t.me/IArmy_compta_bot?start=USER_CODE" target="_blank" class="btn btn-telegram" style="width: 100%; margin-bottom: 24px;">
+                    Ouvrir IArmy sur Telegram
+                </a>
+
+                <div class="status status-pending" id="telegram-status">
+                    ⏳ En attente de connexion...
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="checkTelegramConnection()" style="width: 100%;">
+                        Vérifier la connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 5 : Succès -->
+        <div class="step" id="step5">
+            <div class="card">
+                <div class="success-content">
+                    <div class="success-icon">🎉</div>
+                    <h2>C'est prêt !</h2>
+                    <p>Votre bot IArmy Compta est configuré.<br>Envoyez votre première recette sur Telegram !</p>
+                    
+                    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://t.me/IArmy_compta_bot" target="_blank" class="btn btn-telegram">
+                            📱 Ouvrir Telegram
+                        </a>
+                        <a href="compte.html" class="btn btn-secondary">
+                            Mon compte
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajout Colonne -->
+    <div class="modal-overlay" id="column-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Nouvelle colonne</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+
+            <div class="form-group">
+                <label>Nom de la colonne</label>
+                <input type="text" id="new-col-name" placeholder="Ex: Uber Eats, Chèques, Non déclaré...">
+            </div>
+
+            <div class="form-group">
+                <label>Type de colonne</label>
+                <div class="radio-group">
+                    <label class="radio-option selected" onclick="selectColType('manual')">
+                        <input type="radio" name="col-type" value="manual" checked>
+                        <span class="radio-circle"></span>
+                        <div>
+                            <div style="font-weight: 500;">Saisie manuelle</div>
+                            <div style="font-size: 13px; color: var(--gray-500);">Vous entrez la valeur chaque jour</div>
+                        </div>
+                    </label>
+                    <label class="radio-option" onclick="selectColType('calculated')">
+                        <input type="radio" name="col-type" value="calculated">
+                        <span class="radio-circle"></span>
+                        <div>
+                            <div style="font-weight: 500;">Calcul automatique</div>
+                            <div style="font-size: 13px; color: var(--gray-500);">Somme ou différence d'autres colonnes</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="calc-options" style="display: none;">
+                <div class="form-group">
+                    <label>Colonnes à inclure dans le calcul</label>
+                    <div class="checkbox-list" id="calc-checkboxes">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">Annuler</button>
+                <button class="btn btn-primary" onclick="confirmAddColumn()" style="flex: 1;">Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentStep = 1;
+        let ticketOption = null;
+        let columns = [];
+        let rows = [];
+        let editingColumn = null;
+        let newColType = 'manual';
+
+        // Sample data for preview
+        const sampleData = {
+            date: new Date().toLocaleDateString('fr-FR'),
+            values: {}
+        };
+
+        // Navigation
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+
+            for (let i = 1; i <= 5; i++) {
+                const prog = document.getElementById('prog' + i);
+                if (prog) {
+                    prog.classList.remove('active', 'done');
+                    if (i < step) prog.classList.add('done');
+                    if (i === step) prog.classList.add('active');
+                }
+            }
+
+            currentStep = step;
+            window.scrollTo(0, 0);
+        }
+
+        // Google OAuth (placeholder)
+        function connectGoogle() {
+            // Simulate Google connection
+            // In production, this would redirect to Google OAuth
+            setTimeout(() => {
+                goToStep(2);
+            }, 500);
+        }
+
+        // Ticket input
+        function selectTicketOption(option) {
+            ticketOption = option;
+            document.querySelectorAll('.ticket-option').forEach(el => el.classList.remove('active'));
+            document.getElementById('option-' + option).classList.add('active');
+
+            if (option === 'photo') {
+                document.getElementById('file-input').click();
+                document.getElementById('text-input-area').classList.remove('active');
+            } else {
+                document.getElementById('text-input-area').classList.add('active');
+                document.getElementById('file-preview').classList.remove('active');
+            }
+
+            updateAnalyzeButton();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-image').src = e.target.result;
+                    document.getElementById('file-preview').classList.add('active');
+                    updateAnalyzeButton();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('ticket-text').addEventListener('input', updateAnalyzeButton);
+
+        function updateAnalyzeButton() {
+            const btn = document.getElementById('analyze-btn');
+            const hasPhoto = document.getElementById('file-preview').classList.contains('active');
+            const hasText = document.getElementById('ticket-text').value.trim().length > 0;
+            btn.disabled = !(hasPhoto || hasText);
+        }
+
+        // Analyze ticket and generate table
+        function analyzeTicket() {
+            const text = document.getElementById('ticket-text').value;
+            
+            // Parse the input (simplified - in production, this would use AI)
+            columns = [
+                { id: 'date', name: 'Date', type: 'date', locked: true },
+            ];
+
+            // Extract payment methods from text
+            const patterns = [
+                { regex: /cb|carte|card/i, name: 'CB' },
+                { regex: /esp[eè]ces?|cash|liquide/i, name: 'Espèces' },
+                { regex: /tr|ticket.?resto|titre.?resto/i, name: 'TR' },
+                { regex: /uber/i, name: 'Uber Eats' },
+                { regex: /deliveroo/i, name: 'Deliveroo' },
+                { regex: /ch[eè]que/i, name: 'Chèques' },
+            ];
+
+            patterns.forEach((p, i) => {
+                if (p.regex.test(text)) {
+                    const match = text.match(new RegExp(p.regex.source + '\\s*(\\d+)', 'i'));
+                    const value = match ? parseInt(match[1]) : Math.floor(Math.random() * 1000) + 100;
+                    columns.push({
+                        id: 'col' + i,
+                        name: p.name,
+                        type: 'manual',
+                        locked: false
+                    });
+                    sampleData.values['col' + i] = value;
+                }
+            });
+
+            // If nothing detected, add default columns
+            if (columns.length === 1) {
+                columns.push(
+                    { id: 'cb', name: 'CB', type: 'manual', locked: false },
+                    { id: 'esp', name: 'Espèces', type: 'manual', locked: false }
+                );
+                sampleData.values['cb'] = 1200;
+                sampleData.values['esp'] = 500;
+            }
+
+            // Add total column
+            columns.push({
+                id: 'total',
+                name: 'TOTAL',
+                type: 'calculated',
+                formula: columns.filter(c => c.type === 'manual').map(c => c.id),
+                locked: true
+            });
+
+            // Generate sample rows
+            rows = [];
+            for (let i = 0; i < 3; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const row = { date: date.toLocaleDateString('fr-FR') };
+                columns.forEach(col => {
+                    if (col.type === 'manual') {
+                        row[col.id] = Math.floor(Math.random() * 1000) + 100;
+                    }
+                });
+                rows.push(row);
+            }
+
+            renderTable();
+            goToStep(3);
+        }
+
+        // Render table
+        function renderTable() {
+            const headerRow = document.getElementById('header-row');
+            const tableBody = document.getElementById('table-body');
+
+            // Headers
+            headerRow.innerHTML = columns.map(col => `
+                <th onclick="${col.locked ? '' : 'editColumnName(\'' + col.id + '\')'}" class="${col.locked ? 'locked' : ''}">
+                    <span class="col-name">${col.name}</span>
+                    ${!col.locked ? `
+                        <div class="col-actions">
+                            <button class="col-action-btn delete" onclick="event.stopPropagation(); deleteColumn('${col.id}')" title="Supprimer">×</button>
+                        </div>
+                    ` : ''}
+                </th>
+            `).join('') + '<th class="add-column-cell" onclick="addColumn()">+</th>';
+
+            // Body
+            tableBody.innerHTML = rows.map((row, rowIndex) => `
+                <tr>
+                    ${columns.map(col => {
+                        if (col.type === 'date') {
+                            return `<td>${row.date}</td>`;
+                        } else if (col.type === 'calculated') {
+                            const total = calculateTotal(row, col);
+                            return `<td class="total">${formatCurrency(total)}</td>`;
+                        } else {
+                            return `<td>
+                                <input type="text" value="${formatCurrency(row[col.id] || 0)}" 
+                                    onchange="updateCell(${rowIndex}, '${col.id}', this.value)"
+                                    onfocus="this.value = '${row[col.id] || 0}'"
+                                    onblur="this.value = formatCurrency(parseFloat(this.value) || 0)">
+                            </td>`;
+                        }
+                    }).join('')}
+                    <td class="add-column-cell"></td>
+                </tr>
+            `).join('');
+        }
+
+        function calculateTotal(row, col) {
+            if (!col.formula) return 0;
+            return col.formula.reduce((sum, colId) => sum + (row[colId] || 0), 0);
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value);
+        }
+
+        function updateCell(rowIndex, colId, value) {
+            const numValue = parseFloat(value.replace(/[^\d.-]/g, '')) || 0;
+            rows[rowIndex][colId] = numValue;
+            renderTable();
+        }
+
+        // Column management
+        function editColumnName(colId) {
+            const col = columns.find(c => c.id === colId);
+            if (!col || col.locked) return;
+
+            const newName = prompt('Nouveau nom de la colonne:', col.name);
+            if (newName && newName.trim()) {
+                col.name = newName.trim();
+                renderTable();
+            }
+        }
+
+        function deleteColumn(colId) {
+            if (confirm('Supprimer cette colonne ?')) {
+                columns = columns.filter(c => c.id !== colId);
+                rows.forEach(row => delete row[colId]);
+                
+                // Update total formula
+                const totalCol = columns.find(c => c.id === 'total');
+                if (totalCol) {
+                    totalCol.formula = columns.filter(c => c.type === 'manual').map(c => c.id);
+                }
+                
+                renderTable();
+            }
+        }
+
+        function addColumn() {
+            document.getElementById('column-modal').classList.add('active');
+            document.getElementById('new-col-name').value = '';
+            document.getElementById('new-col-name').focus();
+            
+            // Reset form
+            selectColType('manual');
+            
+            // Generate checkboxes for calculated columns
+            const container = document.getElementById('calc-checkboxes');
+            container.innerHTML = columns
+                .filter(c => c.type === 'manual')
+                .map(col => `
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="${col.id}" checked>
+                        ${col.name}
+                    </label>
+                `).join('');
+        }
+
+        function selectColType(type) {
+            newColType = type;
+            document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`input[value="${type}"]`).closest('.radio-option').classList.add('selected');
+            document.getElementById('calc-options').style.display = type === 'calculated' ? 'block' : 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('column-modal').classList.remove('active');
+        }
+
+        function confirmAddColumn() {
+            const name = document.getElementById('new-col-name').value.trim();
+            if (!name) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+
+            const newId = 'col_' + Date.now();
+            
+            if (newColType === 'manual') {
+                // Insert before TOTAL
+                const totalIndex = columns.findIndex(c => c.id === 'total');
+                columns.splice(totalIndex, 0, {
+                    id: newId,
+                    name: name,
+                    type: 'manual',
+                    locked: false
+                });
+                
+                // Add to rows
+                rows.forEach(row => row[newId] = 0);
+                
+                // Update total formula
+                const totalCol = columns.find(c => c.id === 'total');
+                if (totalCol) {
+                    totalCol.formula.push(newId);
+                }
+            } else {
+                // Calculated column
+                const selectedCols = Array.from(document.querySelectorAll('#calc-checkboxes input:checked'))
+                    .map(input => input.value);
+                
+                // Insert before TOTAL
+                const totalIndex = columns.findIndex(c => c.id === 'total');
+                columns.splice(totalIndex, 0, {
+                    id: newId,
+                    name: name,
+                    type: 'calculated',
+                    formula: selectedCols,
+                    locked: false
+                });
+            }
+
+            closeModal();
+            renderTable();
+        }
+
+        function addRow() {
+            const lastDate = rows.length > 0 ? new Date(rows[rows.length - 1].date.split('/').reverse().join('-')) : new Date();
+            lastDate.setDate(lastDate.getDate() + 1);
+            
+            const newRow = { date: lastDate.toLocaleDateString('fr-FR') };
+            columns.forEach(col => {
+                if (col.type === 'manual') {
+                    newRow[col.id] = 0;
+                }
+            });
+            rows.push(newRow);
+            renderTable();
+        }
+
+        // Telegram connection
+        function checkTelegramConnection() {
+            // Simulate connection check
+            const status = document.getElementById('telegram-status');
+            status.innerHTML = '⏳ Vérification...';
+            
+            setTimeout(() => {
+                status.className = 'status status-success';
+                status.innerHTML = '✅ Connecté !';
+                
+                setTimeout(() => {
+                    goToStep(5);
+                }, 1000);
+            }, 1500);
+        }
+
+        // Import modal
+        function showImportModal() {
+            alert('Fonctionnalité d\'import à venir ! Pour l\'instant, vous pouvez ajouter vos données manuellement.');
+        }
+
+        // Make formatCurrency available globally
+        window.formatCurrency = formatCurrency;
+    </script>
+</body>
+</html>
