@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #0a0a0a;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #e5e5e5;
+      --input-bg: #f5f5f5;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0a;
+        --bg-secondary: #111111;
+        --text: #ffffff;
+        --text-secondary: rgba(255,255,255,0.6);
+        --text-muted: rgba(255,255,255,0.4);
+        --border: rgba(255,255,255,0.1);
+        --input-bg: rgba(255,255,255,0.05);
+      }
+    }
+    
+    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    .logo-i {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: white;
+    }
+    
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #FF6B35;
+      transition: width 0.3s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255,107,53,0.3);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 500;
+      width: 100%;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .input-field {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      width: 60px;
+      text-align: center;
+    }
+    .input-field:focus { outline: none; border-color: #FF6B35; }
+    
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover {
+      border-color: #FF6B35;
+    }
+    
+    .step { display: none; }
+    .step.active { display: block; }
+    
+    .field-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .field-row:last-child { border-bottom: none; }
+    
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.3s ease-out forwards; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="px-6 py-4 flex items-center justify-between border-b" style="border-color: var(--border);">
+    <a href="index.html" class="flex items-center gap-2">
+      <div class="logo-i">i</div>
+      <span class="font-bold">iArmy</span>
+    </a>
+    <a href="compte.html" style="color: var(--text-muted);" class="text-sm">Annuler</a>
+  </header>
+  
+  <!-- Progress -->
+  <div class="max-w-md mx-auto px-6 pt-6">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress" style="width: 33%"></div>
+    </div>
+  </div>
+  
+  <!-- Content -->
+  <main class="max-w-md mx-auto px-6 py-12">
+    
+    <!-- Step 1: Upload -->
+    <div class="step active" id="step-1">
+      <div class="text-center mb-8 fade-up">
+        <span class="text-4xl mb-4 block">📊</span>
+        <h1 class="text-2xl font-bold mb-2">Ton fichier Excel</h1>
+        <p style="color: var(--text-muted);">Upload ou connecte Google Sheets</p>
+      </div>
+      
+      <div class="upload-zone mb-4 fade-up" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFile(this)">
+        <span class="text-3xl block mb-2">📁</span>
+        <p style="color: var(--text-muted);" class="text-sm">Glisse ton fichier ici</p>
+      </div>
+      
+      <div id="file-info" class="hidden text-center p-3 rounded-lg mb-4" style="background: rgba(34,197,94,0.1); color: #22c55e;">
+        <span id="file-name"></span>
+      </div>
+      
+      <button class="btn-primary" id="btn-1" onclick="nextStep()" disabled>Continuer</button>
+    </div>
+    
+    <!-- Step 2: Keywords -->
+    <div class="step" id="step-2">
+      <div class="text-center mb-8 fade-up">
+        <h1 class="text-2xl font-bold mb-2">Tes mots-clés</h1>
+        <p style="color: var(--text-muted);">Personnalise comme tu veux</p>
+      </div>
+      
+      <div class="mb-6 fade-up">
+        <div class="field-row">
+          <span>💳 Carte bleue</span>
+          <input type="text" class="input-field keyword" value="cb">
+        </div>
+        <div class="field-row">
+          <span>💵 Espèces</span>
+          <input type="text" class="input-field keyword" value="esp">
+        </div>
+        <div class="field-row">
+          <span>🎫 Tickets resto</span>
+          <input type="text" class="input-field keyword" value="tr">
+        </div>
+      </div>
+      
+      <button class="btn-primary" onclick="nextStep()">Continuer</button>
+    </div>
+    
+    <!-- Step 3: Done -->
+    <div class="step" id="step-3">
+      <div class="text-center fade-up">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background: rgba(34,197,94,0.15);">
+          <svg class="w-8 h-8" style="color: #22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold mb-2">C'est prêt ! 🎉</h1>
+        <p style="color: var(--text-muted);" class="mb-8">Ton bot est actif</p>
+        
+        <a href="compte.html" class="btn-primary block text-center mb-3">Voir mon compte</a>
+        <a href="https://t.me/iArmyBot" target="_blank" class="btn-secondary block text-center">Ouvrir Telegram</a>
+      </div>
+    </div>
+    
+  </main>
+
+  <script>
+    const DB = {
+      getCurrentUser: () => JSON.parse(localStorage.getItem('iarmy_current_user') || 'null'),
+      setCurrentUser: (u) => localStorage.setItem('iarmy_current_user', JSON.stringify(u)),
+      getUsers: () => JSON.parse(localStorage.getItem('iarmy_users') || '[]'),
+      saveUsers: (u) => localStorage.setItem('iarmy_users', JSON.stringify(u))
+    };
+    
+    const USER = DB.getCurrentUser();
+    if (!USER) window.location.href = 'connexion.html';
+    
+    let step = 1;
+    let fileName = '';
+    
+    function handleFile(input) {
+      if (input.files && input.files[0]) {
+        fileName = input.files[0].name;
+        document.getElementById('file-name').textContent = '✓ ' + fileName;
+        document.getElementById('file-info').classList.remove('hidden');
+        document.getElementById('btn-1').disabled = false;
+      }
+    }
+    
+    function nextStep() {
+      document.getElementById('step-' + step).classList.remove('active');
+      step++;
+      document.getElementById('step-' + step).classList.add('active');
+      document.getElementById('progress').style.width = (step * 33) + '%';
+      
+      if (step === 3) saveBot();
+    }
+    
+    function saveBot() {
+      const keywords = Array.from(document.querySelectorAll('.keyword')).map(i => i.value);
+      const bot = {
+        id: 'bot_' + Date.now(),
+        module: 'compta',
+        fileName,
+        keywords,
+        active: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      const user = DB.getCurrentUser();
+      if (!user.bots) user.bots = [];
+      user.bots.push(bot);
+      DB.setCurrentUser(user);
+      
+      const users = DB.getUsers();
+      const idx = users.findIndex(u => u.id === user.id);
+      if (idx >= 0) { users[idx] = user; DB.saveUsers(users); }
+    }
+  </script>
+</body>
+</html>
