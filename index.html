@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iArmy - Tes bots business</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-shake { animation: shake 0.4s ease-out; }
+    
+    /* Header logo hover */
+    .header-logo {
+      transition: all 0.3s ease;
+    }
+    .header-logo:hover {
+      transform: rotate(-5deg) scale(1.1);
+      box-shadow: 0 0 25px rgba(255, 107, 53, 0.5);
+    }
+    
+    /* Bot cards animation */
+    .bot-card-animated {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    }
+    .bot-card-animated.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .bot-card-animated.disabled.visible {
+      opacity: 0.6;
+    }
+    
+    .bot-card {
+      transition: box-shadow 0.4s ease, transform 0.4s ease;
+    }
+    .bot-card:not(.disabled):hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px rgba(255, 107, 53, 0.15);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #FF6B35, #ff9966);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .blurred-row {
+      filter: blur(1px);
+      opacity: 0.3;
+    }
+    
+    .total-row {
+      filter: blur(0.5px);
+      opacity: 0.6;
+    }
+    
+    /* Notify form */
+    .notify-input {
+      transition: all 0.3s ease;
+    }
+    .notify-input:focus {
+      outline: none;
+      border-color: rgba(255, 107, 53, 0.5);
+    }
+    .notify-input.error {
+      border-color: #ef4444;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0a] text-white">
+  
+  <!-- Transition Overlay -->
+  <div id="transition-overlay" style="position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;">
+    <div id="transition-logo" style="width:60px;height:60px;background:linear-gradient(135deg,#FF6B35,#ff8f6a);border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;color:white;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1),border-radius 0.5s ease;">i</div>
+  </div>
+
+  <!-- Background Effects -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#FF6B35]/10 rounded-full blur-[150px]"></div>
+    <div class="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-[#FF6B35]/5 rounded-full blur-[120px]"></div>
+    <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE4MTgxOCIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 px-8 py-6 flex items-center justify-between border-b border-white/5">
+    <a href="#" class="flex items-center gap-3 cursor-pointer">
+      <div class="header-logo w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-xl flex items-center justify-center font-black text-lg shadow-lg shadow-[#FF6B35]/20">
+        i
+      </div>
+      <span class="font-bold text-xl tracking-tight">iArmy</span>
+    </a>
+    
+    <button class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white/70 hover:text-white transition-all text-sm font-medium">
+      Connexion
+    </button>
+  </header>
+
+  <main class="relative z-10 max-w-6xl mx-auto px-8 py-12">
+    
+    <!-- Hero -->
+    <div class="text-center mb-12 animate-fadeIn">
+      <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+        <span class="bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent">Automatise ton business.</span>
+        <br>
+        <span class="gradient-text">Sans effort.</span>
+      </h1>
+      <p class="text-xl text-white/40 max-w-xl mx-auto">
+        Envoie tes recettes par message, ta compta se remplit toute seule.
+      </p>
+    </div>
+
+    <!-- MAIN ANIMATION -->
+    <div id="animation-container" class="mb-16 animate-fadeIn" style="animation-delay: 0.2s; opacity: 0;">
+      <div class="bg-white/[0.02] border border-white/10 rounded-3xl p-6 md:p-10">
+        
+        <!-- Animation Container -->
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-6 mb-8">
+          
+          <!-- Telegram -->
+          <div class="w-full max-w-[280px]">
+            <div class="bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+              <!-- Header -->
+              <div class="bg-[#0088cc] px-4 py-2.5 flex items-center gap-2">
+                <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+                <span class="text-white text-sm font-medium">iArmy · Telegram</span>
+              </div>
+              
+              <!-- Chat Area -->
+              <div class="p-4 min-h-[120px] flex flex-col justify-end gap-2">
+                <!-- Bot welcome -->
+                <div class="flex justify-start">
+                  <div class="bg-white/10 rounded-2xl rounded-bl-sm px-3 py-2 max-w-[90%]">
+                    <p class="text-white/70 text-xs">Envoie ta recette du jour 👇</p>
+                  </div>
+                </div>
+                
+                <!-- User message -->
+                <div id="message-container" class="flex justify-end">
+                  <div id="message-bubble" class="bg-[#2b5278] rounded-2xl rounded-br-sm px-3 py-2 max-w-[90%] opacity-0">
+                    <p class="text-white text-sm">500 esp, 1200 CB, 150 TR</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Input Bar -->
+              <div class="px-3 pb-3">
+                <div class="bg-white/5 rounded-full px-4 py-2.5 flex items-center gap-2">
+                  <div class="flex-1 text-sm overflow-hidden flex items-center h-5">
+                    <span id="typing-container" class="flex items-center">
+                      <span id="typing-text" class="text-white/70 overflow-hidden whitespace-nowrap" style="max-width: 0;">500 esp, 1200 CB, 150 TR</span>
+                      <span id="typing-cursor" class="inline-block w-0.5 h-4 bg-[#FF6B35] ml-0.5"></span>
+                    </span>
+                    <span id="input-placeholder" class="text-white/30 hidden">Message...</span>
+                  </div>
+                  <div class="w-7 h-7 bg-[#0088cc] rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transfer Lines + Logo -->
+          <div class="flex items-center gap-3">
+            <!-- Line 1 -->
+            <div class="hidden lg:block w-12 h-1 bg-white/10 rounded-full relative overflow-hidden">
+              <div id="data-dot-1" class="absolute w-2.5 h-2.5 bg-[#FF6B35] rounded-full top-1/2 -translate-y-1/2 opacity-0" style="left: 0;"></div>
+            </div>
+            
+            <!-- Logo -->
+            <div class="flex flex-col items-center">
+              <div id="logo-box" class="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-2xl flex items-center justify-center font-black text-2xl lg:text-3xl shadow-2xl shadow-[#FF6B35]/30">
+                i
+              </div>
+            </div>
+            
+            <!-- Line 2 -->
+            <div class="hidden lg:block w-12 h-1 bg-white/10 rounded-full relative overflow-hidden">
+              <div id="data-dot-2" class="absolute w-2.5 h-2.5 bg-[#FF6B35] rounded-full top-1/2 -translate-y-1/2 opacity-0" style="left: 0;"></div>
+            </div>
+          </div>
+
+          <!-- Excel -->
+          <div class="w-full max-w-[280px]">
+            <div class="bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+              <!-- Header -->
+              <div class="bg-[#217346] px-4 py-2.5 flex items-center gap-2">
+                <!-- Excel icon with X -->
+                <div class="w-5 h-5 bg-white rounded-sm flex items-center justify-center">
+                  <span class="text-[#217346] font-bold text-xs">X</span>
+                </div>
+                <span class="text-white text-sm font-medium">Ma_Compta.xlsx</span>
+              </div>
+              
+              <!-- Excel Grid -->
+              <div class="p-3">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="text-white/50">
+                      <th class="border border-white/10 bg-white/5 px-2 py-1.5 text-left font-medium">Date</th>
+                      <th class="border border-white/10 bg-white/5 px-2 py-1.5 text-left font-medium">CB</th>
+                      <th class="border border-white/10 bg-white/5 px-2 py-1.5 text-left font-medium">Esp</th>
+                      <th class="border border-white/10 bg-white/5 px-2 py-1.5 text-left font-medium">TR</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="blurred-row">
+                      <td class="border border-white/5 px-2 py-1.5">06/01</td>
+                      <td class="border border-white/5 px-2 py-1.5">980</td>
+                      <td class="border border-white/5 px-2 py-1.5">650</td>
+                      <td class="border border-white/5 px-2 py-1.5">120</td>
+                    </tr>
+                    <tr class="blurred-row">
+                      <td class="border border-white/5 px-2 py-1.5">07/01</td>
+                      <td class="border border-white/5 px-2 py-1.5">1100</td>
+                      <td class="border border-white/5 px-2 py-1.5">720</td>
+                      <td class="border border-white/5 px-2 py-1.5">90</td>
+                    </tr>
+                    <!-- Active row -->
+                    <tr>
+                      <td class="border border-[#FF6B35]/30 bg-[#FF6B35]/10 px-2 py-1.5 text-[#FF6B35] font-semibold">08/01</td>
+                      <td id="cell-1" class="border border-[#FF6B35]/30 px-2 py-1.5" style="color: transparent;">1200</td>
+                      <td id="cell-2" class="border border-[#FF6B35]/30 px-2 py-1.5" style="color: transparent;">500</td>
+                      <td id="cell-3" class="border border-[#FF6B35]/30 px-2 py-1.5" style="color: transparent;">150</td>
+                    </tr>
+                    <!-- Total row -->
+                    <tr class="total-row">
+                      <td class="border border-white/10 bg-white/5 px-2 py-1.5 font-semibold text-white/50">TOTAL</td>
+                      <td id="total-1" class="border border-white/10 bg-white/5 px-2 py-1.5" style="color: rgba(255,255,255,0.3);">3280</td>
+                      <td id="total-2" class="border border-white/10 bg-white/5 px-2 py-1.5" style="color: rgba(255,255,255,0.3);">1870</td>
+                      <td id="total-3" class="border border-white/10 bg-white/5 px-2 py-1.5" style="color: rgba(255,255,255,0.3);">360</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Timer & Success -->
+        <div class="text-center">
+          <div class="inline-flex items-center gap-3 px-6 py-3 bg-white/5 rounded-full mb-4">
+            <span class="text-white/50">⏱</span>
+            <span id="timer" class="text-2xl font-bold font-mono gradient-text">0 sec</span>
+          </div>
+          
+          <div id="success-container" class="opacity-0">
+            <div class="inline-flex items-center gap-2 px-6 py-3 bg-green-500/10 border border-green-500/20 rounded-full">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-green-400 font-semibold">Recette du jour envoyée !</span>
+            </div>
+          </div>
+          
+          <!-- Before text -->
+          <div id="before-text" class="mt-4 opacity-0">
+            <p class="text-white/30 text-sm">
+              😴 Avant : 10 min à tout recopier
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Privacy Badge -->
+    <div class="mb-20 animate-fadeIn flex justify-center" style="animation-delay: 0.4s; opacity: 0;">
+      <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full text-white/40 text-sm">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+        </svg>
+        Tes données restent 100% privées
+      </div>
+    </div>
+
+    <!-- Bots Section -->
+    <div class="mb-12">
+      <h2 class="text-3xl font-bold text-center mb-4">Choisis ton bot</h2>
+      <p class="text-center text-white/40 mb-12">Configure en 2 minutes, c'est parti</p>
+      
+      <div id="bots-grid" class="grid md:grid-cols-3 gap-6">
+        
+        <!-- Bot 1: Compta -->
+        <a href="#" onclick="goToOnboarding(); return false;" class="bot-card bot-card-animated bg-white/[0.03] border border-white/10 hover:border-[#FF6B35]/50 rounded-2xl p-6 cursor-pointer group block" data-delay="0">
+          <div class="w-14 h-14 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg shadow-[#FF6B35]/20">
+            <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-2 py-1 bg-white/10 rounded text-[10px] font-medium text-white/60">RESTAURANT</span>
+            <span class="px-2 py-1 bg-white/10 rounded text-[10px] font-medium text-white/60">COMMERCE</span>
+            <span class="px-2 py-1 bg-white/10 rounded text-[10px] font-medium text-white/60">BAR</span>
+          </div>
+
+          <h3 class="text-xl font-semibold mb-3">Compta Express</h3>
+          
+          <div class="bg-[#1a1a1a] rounded-lg p-3 mb-4">
+            <p class="text-xs text-white/50 mb-1">💬 Tu écris :</p>
+            <p class="text-sm text-white/90 italic">"500 espèces, 1200 CB"</p>
+            <p class="text-xs text-white/50 mt-2">📊 → Ton Excel est rempli</p>
+          </div>
+          
+          <div class="flex items-center gap-2 text-white/40 text-xs mb-4">
+            <svg class="w-4 h-4 text-[#0088cc]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+            </svg>
+            <span>Telegram</span>
+            <span class="text-white/20">→</span>
+            <div class="w-4 h-4 bg-[#217346] rounded-sm flex items-center justify-center">
+              <span class="text-white font-bold text-[8px]">X</span>
+            </div>
+            <span>Google Sheets</span>
+          </div>
+          
+          <div class="flex items-center justify-between pt-4 border-t border-white/10">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-2xl font-bold text-[#FF6B35]">69€</span>
+              <span class="text-white/40 text-sm">/mois</span>
+              <span class="text-white/20">·</span>
+              <span class="text-orange-400 text-sm flex items-center gap-1">🔥 7 jours offerts</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span class="text-white/30 text-sm group-hover:text-[#FF6B35] transition-colors flex items-center gap-1">
+              Configurer 
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Bot 2: Planning -->
+        <div class="bot-card bot-card-animated disabled bg-white/[0.02] border border-white/5 rounded-2xl p-6" data-delay="150">
+          <div class="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-2 py-1 bg-white/5 rounded text-[10px] font-medium text-white/30">RESTAURANT</span>
+            <span class="px-2 py-1 bg-white/5 rounded text-[10px] font-medium text-white/30">HÔTEL</span>
+          </div>
+
+          <h3 class="text-xl font-semibold mb-3 text-white/40">Planning Auto</h3>
+          
+          <div class="bg-white/5 rounded-lg p-3 mb-4">
+            <p class="text-xs text-white/30 mb-1">💬 Tu écris :</p>
+            <p class="text-sm text-white/50 italic">"Marco congé lundi"</p>
+            <p class="text-xs text-white/30 mt-2">📅 → Planning mis à jour</p>
+          </div>
+          
+          <div class="pt-4 border-t border-white/5">
+            <span class="inline-block px-3 py-1 bg-white/5 rounded-full text-white/30 text-xs">Bientôt disponible</span>
+          </div>
+        </div>
+
+        <!-- Bot 3: Stock -->
+        <div class="bot-card bot-card-animated disabled bg-white/[0.02] border border-white/5 rounded-2xl p-6" data-delay="300">
+          <div class="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center mb-5">
+            <svg class="w-7 h-7 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-2 py-1 bg-white/5 rounded text-[10px] font-medium text-white/30">COMMERCE</span>
+            <span class="px-2 py-1 bg-white/5 rounded text-[10px] font-medium text-white/30">RESTAURANT</span>
+          </div>
+
+          <h3 class="text-xl font-semibold mb-3 text-white/40">Stock & Commandes</h3>
+          
+          <div class="bg-white/5 rounded-lg p-3 mb-4">
+            <p class="text-xs text-white/30 mb-1">💬 Tu écris :</p>
+            <p class="text-sm text-white/50 italic">"Plus de tomates"</p>
+            <p class="text-xs text-white/30 mt-2">📦 → Commande envoyée</p>
+          </div>
+          
+          <div class="pt-4 border-t border-white/5">
+            <span class="inline-block px-3 py-1 bg-white/5 rounded-full text-white/30 text-xs">Bientôt disponible</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Notify Section -->
+    <div id="notify-section" class="mb-20">
+      <div class="max-w-md mx-auto">
+        
+        <!-- State 1: Button -->
+        <div id="notify-button" class="text-center">
+          <button onclick="showNotifyForm()" class="inline-flex items-center gap-2 px-6 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white/50 hover:text-white/70 hover:border-white/20 transition-all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            Me prévenir des prochains bots
+          </button>
+        </div>
+        
+        <!-- State 2: Form -->
+        <div id="notify-form" class="hidden">
+          <div id="notify-form-inner" class="flex gap-2">
+            <input 
+              type="email" 
+              id="notify-email" 
+              placeholder="ton@email.com" 
+              class="notify-input flex-1 px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white placeholder-white/30 text-sm"
+            >
+            <button 
+              onclick="submitNotify()" 
+              class="px-5 py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] rounded-xl text-white text-sm font-medium transition-colors"
+            >
+              Envoyer
+            </button>
+          </div>
+        </div>
+        
+        <!-- State 3: Confirmed -->
+        <div id="notify-confirmed" class="hidden text-center">
+          <p class="text-white/30 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-green-500/50" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Je serai prévenu des prochains bots
+          </p>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="text-center">
+      
+      <!-- Army Visual -->
+      <div class="flex items-center justify-center gap-3 mb-8">
+        <div class="w-12 h-12 bg-gradient-to-br from-[#FF6B35]/80 to-[#ff8f6a]/80 rounded-xl flex items-center justify-center text-xl animate-float" style="animation-delay: 0s;">🤖</div>
+        <div class="w-12 h-12 bg-gradient-to-br from-[#FF6B35]/60 to-[#ff8f6a]/60 rounded-xl flex items-center justify-center text-xl animate-float" style="animation-delay: 0.2s;">🤖</div>
+        <div class="w-12 h-12 bg-gradient-to-br from-[#FF6B35]/40 to-[#ff8f6a]/40 rounded-xl flex items-center justify-center text-xl animate-float" style="animation-delay: 0.4s;">🤖</div>
+        <div class="w-12 h-12 bg-gradient-to-br from-[#FF6B35]/30 to-[#ff8f6a]/30 rounded-xl flex items-center justify-center text-xl animate-float" style="animation-delay: 0.6s;">🤖</div>
+        <div class="w-12 h-12 bg-white/10 border border-dashed border-white/20 rounded-xl flex items-center justify-center text-white/30 text-xl animate-float" style="animation-delay: 0.8s;">+</div>
+      </div>
+
+      <h2 class="text-2xl font-bold mb-4">
+        Une armée de bots boostés à l'IA
+      </h2>
+      
+      <p class="text-white/40 max-w-lg mx-auto mb-8 leading-relaxed">
+        Simple. Efficace. Minimaliste.
+        <br>Gagne un maximum de temps, on s'occupe du reste.
+      </p>
+
+      <div class="flex items-center justify-center gap-8 text-sm text-white/30 flex-wrap">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#FF6B35]" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+          Config en 2 min
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#FF6B35]" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+          Zéro prise de tête
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#FF6B35]" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+          Annule quand tu veux
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-white/5 px-8 py-6 mt-12">
+    <div class="max-w-5xl mx-auto flex items-center justify-between text-sm text-white/30">
+      <span>© 2026 iArmy</span>
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-white/50 transition-colors">CGU</a>
+        <a href="#" class="hover:text-white/50 transition-colors">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Elements
+    const animContainer = document.getElementById('animation-container');
+    const typingText = document.getElementById('typing-text');
+    const typingCursor = document.getElementById('typing-cursor');
+    const typingContainer = document.getElementById('typing-container');
+    const inputPlaceholder = document.getElementById('input-placeholder');
+    const messageBubble = document.getElementById('message-bubble');
+    const logoBox = document.getElementById('logo-box');
+    const dataDot1 = document.getElementById('data-dot-1');
+    const dataDot2 = document.getElementById('data-dot-2');
+    const cell1 = document.getElementById('cell-1');
+    const cell2 = document.getElementById('cell-2');
+    const cell3 = document.getElementById('cell-3');
+    const total1 = document.getElementById('total-1');
+    const total2 = document.getElementById('total-2');
+    const total3 = document.getElementById('total-3');
+    const timerEl = document.getElementById('timer');
+    const successContainer = document.getElementById('success-container');
+    const beforeText = document.getElementById('before-text');
+    
+    let timerInterval = null;
+    let animationTimeout = null;
+    let hasPlayedOnce = false;
+    let isAnimating = false;
+    
+    // Reset all animations to initial state
+    function resetAnimation() {
+      if (timerInterval) clearInterval(timerInterval);
+      if (animationTimeout) clearTimeout(animationTimeout);
+      
+      isAnimating = false;
+      
+      // Reset timer
+      timerEl.textContent = '0 sec';
+      timerEl.style.transform = 'scale(1)';
+      
+      // Reset typing
+      typingText.style.maxWidth = '0';
+      typingText.style.transition = 'none';
+      typingCursor.style.opacity = '1';
+      typingContainer.classList.remove('hidden');
+      inputPlaceholder.classList.add('hidden');
+      
+      // Reset message
+      messageBubble.style.opacity = '0';
+      messageBubble.style.transform = 'scale(0.8) translateY(10px)';
+      
+      // Reset logo
+      logoBox.style.transform = 'scale(1)';
+      logoBox.style.boxShadow = '0 25px 50px -12px rgba(255, 107, 53, 0.3)';
+      
+      // Reset data dots
+      dataDot1.style.opacity = '0';
+      dataDot1.style.left = '0';
+      dataDot2.style.opacity = '0';
+      dataDot2.style.left = '0';
+      
+      // Reset cells
+      [cell1, cell2, cell3].forEach(cell => {
+        cell.style.background = 'transparent';
+        cell.style.color = 'transparent';
+        cell.style.transition = 'none';
+      });
+      
+      // Reset totals
+      [total1, total2, total3].forEach(cell => {
+        cell.style.background = 'transparent';
+        cell.style.color = 'rgba(255,255,255,0.3)';
+        cell.style.transition = 'none';
+      });
+      
+      // Reset success
+      successContainer.style.opacity = '0';
+      successContainer.style.transform = 'scale(0.5)';
+      
+      // Reset before text
+      beforeText.style.opacity = '0';
+    }
+    
+    // Run the animation sequence
+    function startAnimation() {
+      if (isAnimating) return;
+      
+      resetAnimation();
+      isAnimating = true;
+      
+      // Force reflow
+      void typingText.offsetWidth;
+      
+      let seconds = 0;
+      
+      // Start timer immediately
+      timerInterval = setInterval(() => {
+        seconds++;
+        timerEl.textContent = `${seconds} sec`;
+        if (seconds >= 8) {
+          clearInterval(timerInterval);
+        }
+      }, 500);
+      
+      // Step 1: Typing (0ms - 1500ms)
+      typingText.style.transition = 'max-width 1.5s steps(25)';
+      typingText.style.maxWidth = '300px';
+      
+      // Cursor blink
+      let cursorBlink = setInterval(() => {
+        typingCursor.style.opacity = typingCursor.style.opacity === '0' ? '1' : '0';
+      }, 500);
+      
+      // Step 2: Message pop (1700ms)
+      setTimeout(() => {
+        messageBubble.style.transition = 'all 0.4s ease-out';
+        messageBubble.style.opacity = '1';
+        messageBubble.style.transform = 'scale(1) translateY(0)';
+        
+        // Clear input
+        setTimeout(() => {
+          clearInterval(cursorBlink);
+          typingContainer.classList.add('hidden');
+          inputPlaceholder.classList.remove('hidden');
+        }, 200);
+      }, 1700);
+      
+      // Step 3: Logo pulse (2300ms)
+      setTimeout(() => {
+        logoBox.style.transition = 'all 0.4s ease-out';
+        logoBox.style.transform = 'scale(1.15)';
+        logoBox.style.boxShadow = '0 0 40px 15px rgba(255, 107, 53, 0.4)';
+        
+        setTimeout(() => {
+          logoBox.style.transform = 'scale(1)';
+          logoBox.style.boxShadow = '0 25px 50px -12px rgba(255, 107, 53, 0.3)';
+        }, 400);
+      }, 2300);
+      
+      // Step 4: Data dot 1 (2300ms)
+      setTimeout(() => {
+        dataDot1.style.transition = 'all 0.5s ease-out';
+        dataDot1.style.opacity = '1';
+        dataDot1.style.left = 'calc(100% - 10px)';
+        setTimeout(() => { dataDot1.style.opacity = '0'; }, 400);
+      }, 2300);
+      
+      // Step 5: Data dot 2 (2900ms)
+      setTimeout(() => {
+        dataDot2.style.transition = 'all 0.5s ease-out';
+        dataDot2.style.opacity = '1';
+        dataDot2.style.left = 'calc(100% - 10px)';
+        setTimeout(() => { dataDot2.style.opacity = '0'; }, 400);
+      }, 2900);
+      
+      // Step 6: Cells fill (3100ms, 3400ms, 3700ms)
+      setTimeout(() => {
+        cell1.style.transition = 'all 0.4s ease-out';
+        cell1.style.background = 'rgba(255, 107, 53, 0.15)';
+        cell1.style.color = 'white';
+      }, 3100);
+      
+      setTimeout(() => {
+        cell2.style.transition = 'all 0.4s ease-out';
+        cell2.style.background = 'rgba(255, 107, 53, 0.15)';
+        cell2.style.color = 'white';
+      }, 3400);
+      
+      setTimeout(() => {
+        cell3.style.transition = 'all 0.4s ease-out';
+        cell3.style.background = 'rgba(255, 107, 53, 0.15)';
+        cell3.style.color = 'white';
+      }, 3700);
+      
+      // Step 7: Total updates (4000ms)
+      setTimeout(() => {
+        [total1, total2, total3].forEach((cell, i) => {
+          setTimeout(() => {
+            cell.style.transition = 'all 0.4s ease-out';
+            cell.style.background = 'rgba(34, 197, 94, 0.1)';
+            cell.style.color = 'rgba(255,255,255,0.7)';
+          }, i * 100);
+        });
+      }, 4000);
+      
+      // Step 8: Success + Timer grow (4700ms)
+      setTimeout(() => {
+        timerEl.style.transition = 'transform 0.3s ease-out';
+        timerEl.style.transform = 'scale(1.3)';
+        
+        successContainer.style.transition = 'all 0.5s ease-out';
+        successContainer.style.opacity = '1';
+        successContainer.style.transform = 'scale(1)';
+      }, 4700);
+      
+      // Step 9: Before text (5200ms)
+      setTimeout(() => {
+        beforeText.style.transition = 'opacity 0.5s ease-out';
+        beforeText.style.opacity = '1';
+        
+        isAnimating = false;
+      }, 5200);
+    }
+    
+    // Intersection Observer for main animation
+    const animObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !isAnimating) {
+          if (!hasPlayedOnce) {
+            // First time: wait 2 seconds
+            animationTimeout = setTimeout(startAnimation, 2000);
+            hasPlayedOnce = true;
+          } else {
+            // Subsequent times: start after small delay
+            animationTimeout = setTimeout(startAnimation, 500);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    animObserver.observe(animContainer);
+    
+    // Intersection Observer for bot cards
+    const botsGrid = document.getElementById('bots-grid');
+    const botCards = document.querySelectorAll('.bot-card-animated');
+    let botsAnimated = false;
+    
+    const botsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !botsAnimated) {
+          botsAnimated = true;
+          botCards.forEach(card => {
+            const delay = parseInt(card.dataset.delay) || 0;
+            setTimeout(() => {
+              card.classList.add('visible');
+            }, delay);
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+    
+    botsObserver.observe(botsGrid);
+    
+    // Notify form functions
+    function showNotifyForm() {
+      document.getElementById('notify-button').classList.add('hidden');
+      document.getElementById('notify-form').classList.remove('hidden');
+      document.getElementById('notify-email').focus();
+    }
+    
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+    
+    function submitNotify() {
+      const emailInput = document.getElementById('notify-email');
+      const formInner = document.getElementById('notify-form-inner');
+      const email = emailInput.value.trim();
+      
+      if (!email || !isValidEmail(email)) {
+        // Shake animation
+        emailInput.classList.add('error');
+        formInner.classList.add('animate-shake');
+        
+        // Remove classes after animation
+        setTimeout(() => {
+          formInner.classList.remove('animate-shake');
+        }, 400);
+        
+        setTimeout(() => {
+          emailInput.classList.remove('error');
+        }, 1500);
+        
+        return;
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('iarmy-notify-email', email);
+      
+      // Show confirmed state
+      document.getElementById('notify-form').classList.add('hidden');
+      document.getElementById('notify-confirmed').classList.remove('hidden');
+    }
+    
+    // Check localStorage on load
+    if (localStorage.getItem('iarmy-notify-email')) {
+      document.getElementById('notify-button').classList.add('hidden');
+      document.getElementById('notify-confirmed').classList.remove('hidden');
+    }
+    
+    // Enter key for email input
+    document.getElementById('notify-email').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') submitNotify();
+    });
+    
+    // Transition to onboarding
+    function goToOnboarding() {
+      const overlay = document.getElementById('transition-overlay');
+      const logo = document.getElementById('transition-logo');
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'all';
+      logo.style.transform = 'scale(1.5)';
+      logo.style.borderRadius = '24px';
+      setTimeout(function() {
+        window.location.href = 'onboarding.html';
+      }, 600);
+    }
+  </script>
+
+</body>
+</html>
