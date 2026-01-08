@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iArmy - Ta compta en 30 secondes</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.3); } 50% { box-shadow: 0 0 40px rgba(255,107,53,0.5); } }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-glow { animation: glow 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0a] text-white">
+  
+  <div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#FF6B35]/10 rounded-full blur-[150px]"></div>
+    <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#FF6B35]/5 rounded-full blur-[100px]"></div>
+  </div>
+
+  <header class="relative z-10 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-xl flex items-center justify-center font-black text-base shadow-lg shadow-[#FF6B35]/20">i</div>
+      <span class="font-bold text-lg">iArmy</span>
+    </div>
+    <a href="onboarding.html" class="px-4 py-2 bg-[#FF6B35] hover:bg-[#ff7a4a] rounded-lg text-sm font-medium transition-all">
+      Commencer
+    </a>
+  </header>
+
+  <main class="relative z-10 px-6 pt-16 pb-24">
+    <div class="max-w-4xl mx-auto text-center">
+      
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/60 mb-8">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        Pour restaurateurs
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+        Ta compta en<br>
+        <span class="text-[#FF6B35]">30 secondes</span> par jour
+      </h1>
+      
+      <p class="text-white/50 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+        Envoie tes chiffres sur Telegram, je remplis ton Excel.<br>
+        C'est tout.
+      </p>
+      
+      <a href="onboarding.html" class="inline-flex items-center gap-2 px-8 py-4 bg-[#FF6B35] hover:bg-[#ff7a4a] rounded-xl text-lg font-semibold shadow-xl shadow-[#FF6B35]/20 animate-glow transition-all">
+        Configurer mon bot
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+      
+      <p class="text-white/30 text-sm mt-4">7 jours gratuits · 69€/mois</p>
+      
+    </div>
+    
+    <div class="max-w-3xl mx-auto mt-20">
+      <div class="bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8">
+        
+        <div class="flex items-start gap-4 mb-6">
+          <div class="w-10 h-10 bg-[#0088cc] rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-white/40 text-xs mb-1">Toi, chaque soir :</p>
+            <div class="bg-[#0088cc]/20 border border-[#0088cc]/30 rounded-lg px-4 py-2 inline-block">
+              <p class="text-white font-mono">"500 espèces, 100 CB"</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-center my-4">
+          <svg class="w-6 h-6 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+        
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-full flex items-center justify-center flex-shrink-0 animate-float">
+            <span class="text-white font-bold">i</span>
+          </div>
+          <div class="flex-1">
+            <p class="text-white/40 text-xs mb-2">iArmy remplit ton Excel :</p>
+            <div class="overflow-x-auto">
+              <table class="border-collapse text-sm">
+                <tr>
+                  <th class="border border-white/10 px-4 py-2 text-left text-white/50 bg-white/5">Date</th>
+                  <th class="border border-white/10 px-4 py-2 text-left text-[#FF6B35] bg-[#FF6B35]/10">Espèces</th>
+                  <th class="border border-white/10 px-4 py-2 text-left text-blue-400 bg-blue-500/10">CB</th>
+                  <th class="border border-white/10 px-4 py-2 text-left text-green-400 bg-green-500/10">Total</th>
+                </tr>
+                <tr>
+                  <td class="border border-white/10 px-4 py-2 text-white/60">08/01</td>
+                  <td class="border border-white/10 px-4 py-2 text-[#FF6B35] font-medium">500 €</td>
+                  <td class="border border-white/10 px-4 py-2 text-blue-400 font-medium">100 €</td>
+                  <td class="border border-white/10 px-4 py-2 text-green-400 font-medium">600 €</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto mt-24 grid md:grid-cols-3 gap-6">
+      
+      <div class="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+        <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-1">30 secondes</h3>
+        <p class="text-white/40 text-sm">Un message et c'est fait. Pas de formulaire, pas d'app à ouvrir.</p>
+      </div>
+      
+      <div class="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+        <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-1">Ton fichier</h3>
+        <p class="text-white/40 text-sm">Je remplis TON Excel, celui que tu connais déjà. Rien à changer.</p>
+      </div>
+      
+      <div class="bg-white/[0.02] border border-white/10 rounded-xl p-5">
+        <div class="w-10 h-10 bg-[#FF6B35]/20 rounded-lg flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-[#FF6B35]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-1">100% privé</h3>
+        <p class="text-white/40 text-sm">Tes données restent les tiennes. Rien n'est stocké ni partagé.</p>
+      </div>
+      
+    </div>
+    
+    <div class="max-w-md mx-auto mt-24 bg-white/[0.02] border border-white/10 rounded-2xl p-6 text-center">
+      <p class="text-white/40 text-sm mb-2">Simple et transparent</p>
+      <p class="text-4xl font-bold text-[#FF6B35] mb-1">69€<span class="text-lg font-normal text-white/40">/mois</span></p>
+      <p class="text-green-400 text-sm mb-4">🔥 7 jours offerts</p>
+      <a href="onboarding.html" class="block w-full py-3 bg-[#FF6B35] hover:bg-[#ff7a4a] rounded-lg font-medium transition-all">
+        Commencer gratuitement
+      </a>
+      <p class="text-white/30 text-xs mt-3">Annule quand tu veux</p>
+    </div>
+    
+  </main>
+
+  <footer class="relative z-10 px-6 py-8 border-t border-white/5">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 bg-gradient-to-br from-[#FF6B35] to-[#ff8f6a] rounded-lg flex items-center justify-center font-black text-sm">i</div>
+        <span class="font-semibold">iArmy</span>
+      </div>
+      <p class="text-white/30 text-sm">© 2025 iArmy. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
