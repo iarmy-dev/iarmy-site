@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon compte - iArmy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; }
+    
+    /* Logo effect */
+    .logo-i {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .logo-i:hover {
+      transform: scale(1.1) rotate(-5deg);
+      box-shadow: 0 0 30px rgba(255,107,53,0.5);
+    }
+    
+    /* Animations */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.5s ease-out forwards; }
+    
+    /* Cards */
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    
+    /* Bot card */
+    .bot-card {
+      background: linear-gradient(145deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.02) 100%);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .bot-card:hover {
+      border-color: rgba(34,197,94,0.4);
+      transform: translateY(-2px);
+    }
+    
+    /* Module cards */
+    .module-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .module-card:hover {
+      border-color: rgba(255,107,53,0.4);
+      background: rgba(255,107,53,0.05);
+      transform: translateY(-2px);
+    }
+    .module-card.coming-soon {
+      opacity: 0.5;
+    }
+    .module-card.coming-soon.blurred {
+      opacity: 0.3;
+      filter: blur(1px);
+    }
+    .module-card.coming-soon:hover {
+      opacity: 0.7;
+      filter: none;
+    }
+    
+    /* Tags */
+    .tag {
+      padding: 3px 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Category buttons */
+    .cat-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .cat-btn:hover { color: white; }
+    .cat-btn.active {
+      background: rgba(255,107,53,0.15);
+      border-color: rgba(255,107,53,0.3);
+      color: #FF6B35;
+    }
+    
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(255,107,53,0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    
+    /* Status */
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Suggestion box */
+    .suggestion-box {
+      background: linear-gradient(145deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%);
+      border: 1px solid rgba(255,107,53,0.2);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    
+    /* Nav */
+    .nav-tab {
+      padding: 10px 16px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .nav-tab:hover { color: white; }
+    .nav-tab.active { color: #FF6B35; background: rgba(255,107,53,0.1); }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    /* Input */
+    .input-field {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: white;
+      width: 100%;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #FF6B35;
+    }
+    
+    /* Toggle */
+    .toggle {
+      width: 44px;
+      height: 24px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle.active { background: #22c55e; }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.2s;
+    }
+    .toggle.active::after { left: 23px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b border-white/10">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="logo-i">i</div>
+          <span class="font-semibold text-lg">iArmy</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-1">
+          <button class="nav-tab active" data-tab="bots">Mes bots</button>
+          <button class="nav-tab" data-tab="settings">Paramètres</button>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="user-name" class="text-white/50 text-sm hidden md:block"></span>
+        <button onclick="logout()" class="text-white/40 hover:text-white text-sm">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8">
+    
+    <!-- Tab: Mes Bots -->
+    <div id="tab-bots" class="tab-content fade-up">
+      
+      <!-- Ton armée -->
+      <section class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <h2 class="text-xl font-semibold">Ton armée</h2>
+          <span id="army-count" class="text-white/30 text-sm">0 soldat</span>
+        </div>
+        
+        <div id="bots-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Bots injectés ici -->
+        </div>
+        
+        <div id="no-bots" class="text-center py-12 text-white/30 hidden">
+          <p class="text-4xl mb-3">🪖</p>
+          <p>Ton armée est vide. Recrute ton premier soldat ci-dessous !</p>
+        </div>
+      </section>
+      
+      <!-- Recruter -->
+      <section>
+        <div class="mb-2">
+          <h2 class="text-xl font-semibold">Recruter un nouveau soldat</h2>
+        </div>
+        <p class="text-white/40 text-sm mb-6">Choisis un module pour l'ajouter à ton armée</p>
+        
+        <!-- Categories -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button class="cat-btn active" data-cat="all">Tous</button>
+          <button class="cat-btn" data-cat="restaurant">🍽️ Restaurant</button>
+          <button class="cat-btn" data-cat="bar">🍺 Bar</button>
+          <button class="cat-btn" data-cat="commerce">🛒 Commerce</button>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="modules-grid">
+          <!-- Compta -->
+          <div class="module-card" data-cat="restaurant,bar,commerce" onclick="activateModule('compta')">
+            <div class="text-3xl mb-3">📊</div>
+            <h3 class="font-semibold mb-1">Compta Express</h3>
+            <p class="text-white/40 text-sm mb-3">Remplis ta compta Excel via Telegram</p>
+            <div class="flex flex-wrap gap-1 mb-3">
+              <span class="tag">Restaurant</span>
+              <span class="tag">Bar</span>
+              <span class="tag">Commerce</span>
+            </div>
+            <span class="text-green-400 text-sm">✓ Disponible</span>
+          </div>
+          
+          <!-- Stock -->
+          <div class="module-card coming-soon" data-cat="restaurant,bar,commerce" onclick="notifyModule('stock')">
+            <div class="text-3xl mb-3">📦</div>
+            <h3 class="font-semibold mb-1">Gestion Stock</h3>
+            <p class="text-white/40 text-sm mb-3">Suis tes entrées/sorties</p>
+            <div class="flex flex-wrap gap-1 mb-3">
+              <span class="tag">Restaurant</span>
+              <span class="tag">Commerce</span>
+            </div>
+            <span class="text-white/30 text-sm">Bientôt</span>
+          </div>
+          
+          <!-- Réservations -->
+          <div class="module-card coming-soon" data-cat="restaurant,bar" onclick="notifyModule('reservations')">
+            <div class="text-3xl mb-3">📅</div>
+            <h3 class="font-semibold mb-1">Réservations</h3>
+            <p class="text-white/40 text-sm mb-3">Gère tes réservations clients</p>
+            <div class="flex flex-wrap gap-1 mb-3">
+              <span class="tag">Restaurant</span>
+              <span class="tag">Bar</span>
+            </div>
+            <span class="text-white/30 text-sm">Bientôt</span>
+          </div>
+          
+          <!-- RH -->
+          <div class="module-card coming-soon blurred" data-cat="restaurant,bar,commerce" onclick="notifyModule('rh')">
+            <div class="text-3xl mb-3">👥</div>
+            <h3 class="font-semibold mb-1">RH & Planning</h3>
+            <p class="text-white/40 text-sm">Gère les heures équipe</p>
+          </div>
+          
+          <!-- Factures -->
+          <div class="module-card coming-soon blurred" data-cat="commerce" onclick="notifyModule('factures')">
+            <div class="text-3xl mb-3">🧾</div>
+            <h3 class="font-semibold mb-1">Factures</h3>
+            <p class="text-white/40 text-sm">Génère tes factures</p>
+          </div>
+          
+          <!-- Analytics -->
+          <div class="module-card coming-soon blurred" data-cat="restaurant,bar,commerce" onclick="notifyModule('analytics')">
+            <div class="text-3xl mb-3">📈</div>
+            <h3 class="font-semibold mb-1">Analytics</h3>
+            <p class="text-white/40 text-sm">Tableaux de bord auto</p>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Suggestion -->
+      <div class="suggestion-box mt-8" id="suggestion-box">
+        <div class="flex items-start gap-4">
+          <div class="text-2xl">💡</div>
+          <div class="flex-1">
+            <h3 class="font-semibold mb-1">Recommandé pour toi</h3>
+            <p class="text-white/50 text-sm mb-3" id="suggestion-text">
+              Les restaurateurs ajoutent souvent <strong class="text-orange-400">Stock</strong> pour suivre leurs achats.
+            </p>
+            <button class="btn-secondary text-sm" onclick="notifyModule('stock')">📦 M'alerter pour Stock</button>
+          </div>
+          <button onclick="document.getElementById('suggestion-box').style.display='none'" class="text-white/30 hover:text-white">✕</button>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Tab: Paramètres -->
+    <div id="tab-settings" class="tab-content hidden fade-up">
+      <div class="max-w-lg">
+        <div class="card p-6 mb-6">
+          <h3 class="font-semibold mb-6">Profil</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-white/50 text-sm mb-2">Nom</label>
+              <input type="text" id="settings-name" class="input-field">
+            </div>
+            <div>
+              <label class="block text-white/50 text-sm mb-2">Email</label>
+              <input type="email" id="settings-email" class="input-field" disabled>
+            </div>
+          </div>
+          <button class="btn-primary mt-6" onclick="saveSettings()">Enregistrer</button>
+        </div>
+        
+        <div class="card p-6">
+          <h3 class="font-semibold mb-6">Notifications</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Confirmation par email</p>
+                <p class="text-white/40 text-xs">Email après chaque saisie</p>
+              </div>
+              <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Rappel quotidien</p>
+                <p class="text-white/40 text-xs">Si pas de saisie à 22h</p>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('active')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+
+  <!-- Modal Config Bot -->
+  <div class="modal-overlay" id="config-modal">
+    <div class="modal">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-semibold text-lg">Configuration</h3>
+        <button onclick="closeModal()" class="text-white/40 hover:text-white">✕</button>
+      </div>
+      <div id="config-content">
+        <!-- Contenu dynamique -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-green-500 text-white px-5 py-3 rounded-lg shadow-lg z-50 opacity-0 transition-opacity"></div>
+
+  <script>
+    // Database
+    const DB = {
+      getUsers: () => JSON.parse(localStorage.getItem('iarmy_users') || '[]'),
+      saveUsers: (users) => localStorage.setItem('iarmy_users', JSON.stringify(users)),
+      getCurrentUser: () => JSON.parse(localStorage.getItem('iarmy_current_user') || 'null'),
+      setCurrentUser: (user) => localStorage.setItem('iarmy_current_user', JSON.stringify(user)),
+      updateUser: (updates) => {
+        const user = DB.getCurrentUser();
+        if (!user) return;
+        const updated = { ...user, ...updates };
+        DB.setCurrentUser(updated);
+        const users = DB.getUsers();
+        const idx = users.findIndex(u => u.id === user.id);
+        if (idx >= 0) { users[idx] = updated; DB.saveUsers(users); }
+        return updated;
+      }
+    };
+    
+    let USER = null;
+    
+    // Init
+    function init() {
+      USER = DB.getCurrentUser();
+      if (!USER) { window.location.href = 'connexion.html'; return; }
+      if (!USER.bots) { USER.bots = []; DB.updateUser({ bots: [] }); }
+      
+      document.getElementById('user-name').textContent = USER.name;
+      document.getElementById('settings-name').value = USER.name;
+      document.getElementById('settings-email').value = USER.email;
+      
+      renderBots();
+      updateSuggestion();
+    }
+    
+    // Render bots
+    function renderBots() {
+      const container = document.getElementById('bots-container');
+      const noBots = document.getElementById('no-bots');
+      const count = document.getElementById('army-count');
+      
+      if (USER.bots.length === 0) {
+        container.innerHTML = '';
+        noBots.classList.remove('hidden');
+        count.textContent = '0 soldat';
+        return;
+      }
+      
+      noBots.classList.add('hidden');
+      count.textContent = USER.bots.length + ' soldat' + (USER.bots.length > 1 ? 's' : '');
+      
+      container.innerHTML = USER.bots.map(bot => `
+        <div class="bot-card">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">${getModuleIcon(bot.module)}</span>
+              <div>
+                <h3 class="font-semibold">${getModuleName(bot.module)}</h3>
+                <p class="text-white/40 text-xs">${bot.fileName || 'Configuré'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="status-dot"></div>
+              <span class="text-green-400 text-xs">Actif</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn-secondary flex-1 text-xs" onclick="configBot('${bot.id}')">⚙️ Config</button>
+            <a href="https://t.me/iArmyBot" target="_blank" class="btn-secondary text-xs px-3">💬</a>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function getModuleIcon(m) {
+      const icons = { compta: '📊', stock: '📦', reservations: '📅', rh: '👥', factures: '🧾', analytics: '📈' };
+      return icons[m] || '📊';
+    }
+    
+    function getModuleName(m) {
+      const names = { compta: 'Compta Express', stock: 'Gestion Stock', reservations: 'Réservations', rh: 'RH & Planning', factures: 'Factures', analytics: 'Analytics' };
+      return names[m] || m;
+    }
+    
+    // Activate module
+    function activateModule(moduleId) {
+      if (USER.bots.find(b => b.module === moduleId)) {
+        toast('Tu as déjà ce module !');
+        return;
+      }
+      
+      // Redirect to onboarding
+      localStorage.setItem('iarmy_pending_module', moduleId);
+      window.location.href = 'onboarding.html';
+    }
+    
+    // Notify for module
+    function notifyModule(moduleId) {
+      let notifs = JSON.parse(localStorage.getItem('iarmy_notifs') || '[]');
+      if (!notifs.includes(moduleId)) {
+        notifs.push(moduleId);
+        localStorage.setItem('iarmy_notifs', JSON.stringify(notifs));
+      }
+      toast('Tu seras alerté quand ' + getModuleName(moduleId) + ' sera dispo !');
+    }
+    
+    // Update suggestion
+    function updateSuggestion() {
+      const box = document.getElementById('suggestion-box');
+      if (USER.bots.length === 0) {
+        box.style.display = 'none';
+      }
+    }
+    
+    // Config bot
+    function configBot(botId) {
+      const bot = USER.bots.find(b => b.id === botId);
+      if (!bot) return;
+      
+      document.getElementById('config-content').innerHTML = `
+        <p class="text-white/50 text-sm mb-4">Configuration de ${getModuleName(bot.module)}</p>
+        <div class="space-y-3">
+          ${(bot.fields || []).map(f => `
+            <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+              <span>${f.name}</span>
+              <span class="text-white/40 text-sm">mot-clé: ${f.keyword}</span>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn-primary w-full mt-6" onclick="closeModal()">Fermer</button>
+      `;
+      document.getElementById('config-modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('config-modal').classList.remove('active');
+    }
+    
+    // Tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById('tab-' + tab.dataset.tab).classList.remove('hidden');
+      });
+    });
+    
+    // Category filter
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.cat;
+        document.querySelectorAll('.module-card').forEach(card => {
+          card.style.display = (cat === 'all' || (card.dataset.cat || '').includes(cat)) ? '' : 'none';
+        });
+      });
+    });
+    
+    // Settings
+    function saveSettings() {
+      const name = document.getElementById('settings-name').value.trim();
+      if (name) {
+        USER = DB.updateUser({ name });
+        document.getElementById('user-name').textContent = name;
+        toast('Enregistré !');
+      }
+    }
+    
+    // Logout
+    function logout() {
+      localStorage.removeItem('iarmy_current_user');
+      window.location.href = 'connexion.html';
+    }
+    
+    // Toast
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.opacity = '1';
+      setTimeout(() => t.style.opacity = '0', 3000);
+    }
+    
+    init();
+  </script>
+</body>
+</html>

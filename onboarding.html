@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration - iArmy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; }
+    
+    .logo-i {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .logo-i:hover {
+      transform: scale(1.1) rotate(-5deg);
+      box-shadow: 0 0 30px rgba(255,107,53,0.5);
+    }
+    
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.4s ease-out forwards; }
+    
+    .step { display: none; }
+    .step.active { display: block; }
+    
+    .card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 32px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(255,107,53,0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    
+    .input-field {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: white;
+      width: 100%;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #FF6B35;
+    }
+    
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover {
+      border-color: #FF6B35;
+      background: rgba(255,107,53,0.05);
+    }
+    .upload-zone.dragover {
+      border-color: #FF6B35;
+      background: rgba(255,107,53,0.1);
+    }
+    
+    .field-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .field-item input {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 14px;
+      width: 80px;
+      text-align: center;
+    }
+    .field-item input:focus { outline: none; }
+    
+    .progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FF6B35, #FF8B5E);
+      transition: width 0.3s;
+    }
+    
+    .telegram-demo {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 16px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .msg-bot {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px 16px 16px 4px;
+      padding: 12px 16px;
+      max-width: 80%;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .msg-user {
+      background: #0088cc;
+      border-radius: 16px 16px 4px 16px;
+      padding: 12px 16px;
+      max-width: 80%;
+      margin-left: auto;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="border-b border-white/10">
+      <div class="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="logo-i">i</div>
+          <span class="font-semibold">iArmy</span>
+        </a>
+        <a href="compte.html" class="text-white/40 hover:text-white text-sm">Annuler</a>
+      </div>
+    </header>
+    
+    <!-- Progress -->
+    <div class="max-w-2xl mx-auto w-full px-6 pt-6">
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progress" style="width: 25%"></div>
+      </div>
+      <p class="text-white/30 text-xs mt-2">Étape <span id="step-num">1</span>/4</p>
+    </div>
+    
+    <!-- Content -->
+    <main class="flex-1 flex items-center justify-center p-6">
+      <div class="w-full max-w-lg">
+        
+        <!-- Step 1: Upload -->
+        <div class="step active" id="step-1">
+          <div class="text-center mb-8 fade-up">
+            <div class="text-5xl mb-4">📊</div>
+            <h1 class="text-2xl font-bold mb-2">Connecte ton Excel</h1>
+            <p class="text-white/50">Upload ton fichier de compta</p>
+          </div>
+          
+          <div class="upload-zone fade-up" id="upload-zone" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFile(this)">
+            <div class="text-4xl mb-3">📁</div>
+            <p class="text-white/60 mb-2">Glisse ton fichier ici</p>
+            <p class="text-white/30 text-sm">ou clique pour parcourir</p>
+          </div>
+          
+          <div id="file-info" class="hidden mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-center">
+            <span class="text-green-400" id="file-name"></span>
+          </div>
+          
+          <button class="btn-primary mt-6" id="btn-step-1" onclick="nextStep()" disabled>Continuer</button>
+        </div>
+        
+        <!-- Step 2: Colonnes -->
+        <div class="step" id="step-2">
+          <div class="text-center mb-8 fade-up">
+            <h1 class="text-2xl font-bold mb-2">Configure tes colonnes</h1>
+            <p class="text-white/50">Choisis les mots-clés pour chaque type</p>
+          </div>
+          
+          <div class="fade-up" id="fields-container">
+            <div class="field-item">
+              <span>💳 Carte bleue</span>
+              <input type="text" value="cb" class="field-keyword">
+            </div>
+            <div class="field-item">
+              <span>💵 Espèces</span>
+              <input type="text" value="esp" class="field-keyword">
+            </div>
+            <div class="field-item">
+              <span>🎫 Tickets resto</span>
+              <input type="text" value="tr" class="field-keyword">
+            </div>
+            <div class="field-item">
+              <span>📉 Dépenses</span>
+              <input type="text" value="dep" class="field-keyword">
+            </div>
+          </div>
+          
+          <button class="btn-primary mt-6" onclick="nextStep()">Continuer</button>
+        </div>
+        
+        <!-- Step 3: Test -->
+        <div class="step" id="step-3">
+          <div class="text-center mb-8 fade-up">
+            <h1 class="text-2xl font-bold mb-2">Voilà ce que ça donne</h1>
+            <p class="text-white/50">Un message = ta compta remplie</p>
+          </div>
+          
+          <div class="telegram-demo fade-up">
+            <div class="msg-bot">Envoie-moi tes chiffres ! 📊</div>
+            <div class="msg-user" id="demo-msg">cb 2300 esp 450 tr 120</div>
+            <div class="msg-bot">
+              ✅ C'est noté !<br>
+              <span class="text-white/50 text-xs">CB: 2300€ • ESP: 450€ • TR: 120€</span>
+            </div>
+          </div>
+          
+          <button class="btn-primary mt-8" onclick="nextStep()">C'est parfait !</button>
+          <button class="btn-secondary w-full mt-3" onclick="prevStep()">Modifier les mots-clés</button>
+        </div>
+        
+        <!-- Step 4: Done -->
+        <div class="step" id="step-4">
+          <div class="text-center fade-up">
+            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h1 class="text-2xl font-bold mb-2">C'est prêt ! 🎉</h1>
+            <p class="text-white/50 mb-8">Ton bot est configuré et actif</p>
+            
+            <div class="flex flex-col gap-3">
+              <a href="compte.html" class="btn-primary text-center">Voir mon compte</a>
+              <a href="https://t.me/iArmyBot" target="_blank" class="btn-secondary w-full text-center flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                Ouvrir Telegram
+              </a>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Database
+    const DB = {
+      getCurrentUser: () => JSON.parse(localStorage.getItem('iarmy_current_user') || 'null'),
+      setCurrentUser: (user) => localStorage.setItem('iarmy_current_user', JSON.stringify(user)),
+      getUsers: () => JSON.parse(localStorage.getItem('iarmy_users') || '[]'),
+      saveUsers: (users) => localStorage.setItem('iarmy_users', JSON.stringify(users))
+    };
+    
+    let currentStep = 1;
+    let fileName = '';
+    
+    // Check auth
+    const USER = DB.getCurrentUser();
+    if (!USER) { window.location.href = 'connexion.html'; }
+    
+    // File handling
+    const uploadZone = document.getElementById('upload-zone');
+    
+    uploadZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile({ files: e.dataTransfer.files });
+      }
+    });
+    
+    function handleFile(input) {
+      if (input.files && input.files[0]) {
+        fileName = input.files[0].name;
+        document.getElementById('file-name').textContent = '✓ ' + fileName;
+        document.getElementById('file-info').classList.remove('hidden');
+        document.getElementById('btn-step-1').disabled = false;
+      }
+    }
+    
+    // Navigation
+    function nextStep() {
+      if (currentStep < 4) {
+        document.getElementById('step-' + currentStep).classList.remove('active');
+        currentStep++;
+        document.getElementById('step-' + currentStep).classList.add('active');
+        document.getElementById('progress').style.width = (currentStep * 25) + '%';
+        document.getElementById('step-num').textContent = currentStep;
+        
+        // Update demo message
+        if (currentStep === 3) {
+          const keywords = Array.from(document.querySelectorAll('.field-keyword')).map(i => i.value);
+          document.getElementById('demo-msg').textContent = `${keywords[0]} 2300 ${keywords[1]} 450 ${keywords[2]} 120`;
+        }
+        
+        // Save bot on step 4
+        if (currentStep === 4) {
+          saveBot();
+        }
+      }
+    }
+    
+    function prevStep() {
+      if (currentStep > 1) {
+        document.getElementById('step-' + currentStep).classList.remove('active');
+        currentStep--;
+        document.getElementById('step-' + currentStep).classList.add('active');
+        document.getElementById('progress').style.width = (currentStep * 25) + '%';
+        document.getElementById('step-num').textContent = currentStep;
+      }
+    }
+    
+    // Save bot
+    function saveBot() {
+      const moduleId = localStorage.getItem('iarmy_pending_module') || 'compta';
+      const keywords = Array.from(document.querySelectorAll('.field-keyword')).map(i => i.value);
+      
+      const newBot = {
+        id: 'bot_' + Date.now(),
+        module: moduleId,
+        fileName: fileName,
+        fields: [
+          { name: 'Carte bleue', keyword: keywords[0] },
+          { name: 'Espèces', keyword: keywords[1] },
+          { name: 'Tickets resto', keyword: keywords[2] },
+          { name: 'Dépenses', keyword: keywords[3] }
+        ],
+        active: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      // Update user
+      const user = DB.getCurrentUser();
+      if (!user.bots) user.bots = [];
+      user.bots.push(newBot);
+      DB.setCurrentUser(user);
+      
+      // Update users list
+      const users = DB.getUsers();
+      const idx = users.findIndex(u => u.id === user.id);
+      if (idx >= 0) { users[idx] = user; DB.saveUsers(users); }
+      
+      localStorage.removeItem('iarmy_pending_module');
+    }
+  </script>
+</body>
+</html>
