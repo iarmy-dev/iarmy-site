@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; }
+    
+    .logo-i {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .logo-i:hover {
+      transform: scale(1.1) rotate(-5deg);
+      box-shadow: 0 0 30px rgba(255,107,53,0.5);
+    }
+    
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.5s ease-out forwards; }
+    
+    .input-field {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: white;
+      width: 100%;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #FF6B35;
+      background: rgba(255,107,53,0.05);
+    }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 10px 40px rgba(255,107,53,0.3); 
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-social {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .btn-social:hover { 
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.2s;
+      color: rgba(255,255,255,0.5);
+      flex: 1;
+      text-align: center;
+    }
+    .tab-btn:hover { color: white; }
+    .tab-btn.active {
+      background: rgba(255,107,53,0.15);
+      color: #FF6B35;
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: rgba(255,255,255,0.3);
+      font-size: 13px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+      color: #ef4444;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+    
+    .loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    .spinner.show { display: inline-block; }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-sm fade-up">
+      
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center justify-center gap-3 mb-8">
+        <div class="logo-i">i</div>
+        <span class="font-semibold text-xl">iArmy</span>
+      </a>
+      
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-8 bg-white/5 p-1.5 rounded-xl">
+        <button class="tab-btn active" data-tab="login">Connexion</button>
+        <button class="tab-btn" data-tab="register">Inscription</button>
+      </div>
+      
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form">
+        <div class="error-msg mb-4" id="login-error"></div>
+        
+        <div class="space-y-3 mb-6">
+          <button class="btn-social" onclick="signInWithGoogle()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google
+          </button>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="btn-social" onclick="signInWithFacebook()">
+              <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Facebook
+            </button>
+            <button class="btn-social" onclick="signInWithApple()">
+              <svg class="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Apple
+            </button>
+          </div>
+        </div>
+        
+        <div class="divider mb-6">ou par email</div>
+        
+        <form onsubmit="handleLogin(event)">
+          <div class="space-y-4">
+            <input type="email" id="login-email" class="input-field" placeholder="Email" required>
+            <input type="password" id="login-password" class="input-field" placeholder="Mot de passe" required>
+          </div>
+          <button type="submit" class="btn-primary mt-6" id="login-btn">
+            <span id="login-text">Se connecter</span>
+            <div class="spinner" id="login-spinner"></div>
+          </button>
+        </form>
+        
+        <p class="text-center text-white/30 text-sm mt-6">
+          <a href="reset-password.html" class="text-orange-400 hover:underline">Mot de passe oublié ?</a>
+        </p>
+      </div>
+      
+      <!-- Register Form -->
+      <div id="register-form" class="auth-form hidden">
+        <div class="error-msg mb-4" id="register-error"></div>
+        
+        <div class="space-y-3 mb-6">
+          <button class="btn-social" onclick="signInWithGoogle()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            S'inscrire avec Google
+          </button>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="btn-social" onclick="signInWithFacebook()">
+              <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Facebook
+            </button>
+            <button class="btn-social" onclick="signInWithApple()">
+              <svg class="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              Apple
+            </button>
+          </div>
+        </div>
+        
+        <div class="divider mb-6">ou par email</div>
+        
+        <form onsubmit="handleRegister(event)">
+          <div class="space-y-4">
+            <input type="text" id="register-name" class="input-field" placeholder="Nom complet" required>
+            <input type="email" id="register-email" class="input-field" placeholder="Email" required>
+            <input type="password" id="register-password" class="input-field" placeholder="Mot de passe (6 car. min)" required minlength="6">
+          </div>
+          <button type="submit" class="btn-primary mt-6" id="register-btn">
+            <span id="register-text">Créer mon compte</span>
+            <div class="spinner" id="register-spinner"></div>
+          </button>
+        </form>
+        
+        <p class="text-center text-white/30 text-sm mt-6">
+          En créant un compte, tu acceptes les <a href="#" class="text-orange-400">CGU</a>
+        </p>
+      </div>
+      
+      <p class="text-center text-white/20 text-xs mt-8">© 2026 iArmy</p>
+    </div>
+  </div>
+
+  <script>
+    // ===========================================
+    // SUPABASE CONFIG - REPLACE THESE VALUES
+    // ===========================================
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // ===========================================
+    // CHECK IF ALREADY LOGGED IN
+    // ===========================================
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        window.location.href = 'compte.html';
+      }
+    });
+    
+    // ===========================================
+    // TABS
+    // ===========================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+        document.getElementById(btn.dataset.tab + '-form').classList.remove('hidden');
+        document.querySelectorAll('.error-msg').forEach(m => m.classList.remove('show'));
+      });
+    });
+    
+    // Check hash for register
+    if (window.location.hash === '#register') {
+      document.querySelector('[data-tab="register"]').click();
+    }
+    
+    // ===========================================
+    // LOGIN
+    // ===========================================
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+      const spinner = document.getElementById('login-spinner');
+      const text = document.getElementById('login-text');
+      
+      errorEl.classList.remove('show');
+      btn.classList.add('loading');
+      spinner.classList.add('show');
+      text.textContent = 'Connexion...';
+      
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (error) throw error;
+        
+        window.location.href = 'compte.html';
+        
+      } catch (error) {
+        console.error('Login error:', error);
+        errorEl.textContent = error.message === 'Invalid login credentials' 
+          ? 'Email ou mot de passe incorrect' 
+          : error.message;
+        errorEl.classList.add('show');
+        
+        btn.classList.remove('loading');
+        spinner.classList.remove('show');
+        text.textContent = 'Se connecter';
+      }
+    }
+    
+    // ===========================================
+    // REGISTER
+    // ===========================================
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const errorEl = document.getElementById('register-error');
+      const btn = document.getElementById('register-btn');
+      const spinner = document.getElementById('register-spinner');
+      const text = document.getElementById('register-text');
+      
+      errorEl.classList.remove('show');
+      btn.classList.add('loading');
+      spinner.classList.add('show');
+      text.textContent = 'Création...';
+      
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { name }
+          }
+        });
+        
+        if (error) throw error;
+        
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          errorEl.textContent = '✓ Vérifie ton email pour confirmer ton compte';
+          errorEl.style.background = 'rgba(34,197,94,0.1)';
+          errorEl.style.borderColor = 'rgba(34,197,94,0.2)';
+          errorEl.style.color = '#22c55e';
+          errorEl.classList.add('show');
+          
+          btn.classList.remove('loading');
+          spinner.classList.remove('show');
+          text.textContent = 'Email envoyé !';
+          btn.disabled = true;
+        } else {
+          window.location.href = 'compte.html';
+        }
+        
+      } catch (error) {
+        console.error('Register error:', error);
+        errorEl.textContent = error.message === 'User already registered'
+          ? 'Ce compte existe déjà'
+          : error.message;
+        errorEl.classList.add('show');
+        
+        btn.classList.remove('loading');
+        spinner.classList.remove('show');
+        text.textContent = 'Créer mon compte';
+      }
+    }
+    
+    // ===========================================
+    // SOCIAL AUTH
+    // ===========================================
+    async function signInWithGoogle() {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/compte.html'
+        }
+      });
+      if (error) console.error('Google auth error:', error);
+    }
+    
+    async function signInWithFacebook() {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo: window.location.origin + '/compte.html'
+        }
+      });
+      if (error) console.error('Facebook auth error:', error);
+    }
+    
+    async function signInWithApple() {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: window.location.origin + '/compte.html'
+        }
+      });
+      if (error) console.error('Apple auth error:', error);
+    }
+  </script>
+</body>
+</html>
