@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon compte - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; }
+    
+    .logo-i {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      transition: transform 0.3s;
+    }
+    .logo-i:hover { transform: scale(1.1) rotate(-5deg); }
+    
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fade-up 0.4s ease-out forwards; }
+    
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    
+    .bot-card {
+      background: linear-gradient(145deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.02) 100%);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .bot-card:hover {
+      border-color: rgba(34,197,94,0.4);
+    }
+    
+    .module-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .module-card:hover {
+      border-color: rgba(255,107,53,0.4);
+      background: rgba(255,107,53,0.05);
+    }
+    .module-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(255,107,53,0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .loading-skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b border-white/10">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="logo-i">i</div>
+        <span class="font-semibold">iArmy</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <span id="user-name" class="text-white/50 text-sm"></span>
+        <button onclick="logout()" class="text-white/40 hover:text-white text-sm">Déconnexion</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-8">
+    
+    <!-- Loading state -->
+    <div id="loading" class="space-y-6">
+      <div class="loading-skeleton h-8 w-32"></div>
+      <div class="loading-skeleton h-24 w-full"></div>
+      <div class="loading-skeleton h-8 w-48 mt-8"></div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="loading-skeleton h-32"></div>
+        <div class="loading-skeleton h-32"></div>
+      </div>
+    </div>
+    
+    <!-- Content (hidden until loaded) -->
+    <div id="content" class="hidden">
+      
+      <!-- Mes bots -->
+      <section class="mb-10 fade-up">
+        <h2 class="text-xl font-semibold mb-4">Mes bots</h2>
+        
+        <div id="bots-container">
+          <!-- Bots injectés ici -->
+        </div>
+        
+        <div id="no-bots" class="card p-8 text-center hidden">
+          <p class="text-3xl mb-3">🤖</p>
+          <p class="text-white/50">Aucun bot actif</p>
+          <p class="text-white/30 text-sm mt-2">Ajoute ton premier bot ci-dessous</p>
+        </div>
+      </section>
+      
+      <!-- Lier Telegram -->
+      <section id="telegram-section" class="mb-10 hidden">
+        <div class="card p-6 border-orange-500/30 bg-orange-500/5">
+          <div class="flex items-start gap-4">
+            <div class="text-2xl">📱</div>
+            <div class="flex-1">
+              <h3 class="font-semibold mb-1">Lie ton Telegram</h3>
+              <p class="text-white/50 text-sm mb-4">Pour recevoir et envoyer des messages</p>
+              <div id="telegram-code-container" class="hidden">
+                <p class="text-sm text-white/60 mb-2">Envoie ce code au bot :</p>
+                <div class="flex items-center gap-3">
+                  <code id="telegram-code" class="text-2xl font-mono font-bold text-orange-400 bg-white/5 px-4 py-2 rounded-lg"></code>
+                  <button onclick="copyCode()" class="btn-secondary text-xs">Copier</button>
+                </div>
+                <a href="https://t.me/iArmyBot" target="_blank" class="inline-flex items-center gap-2 text-sm text-orange-400 mt-3 hover:underline">
+                  Ouvrir @iArmyBot →
+                </a>
+              </div>
+              <button id="generate-code-btn" class="btn-primary text-sm" onclick="generateTelegramCode()">
+                Générer un code
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Ajouter un bot -->
+      <section class="fade-up">
+        <h2 class="text-xl font-semibold mb-4">Ajouter un bot</h2>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+          <!-- Compta -->
+          <div class="module-card" onclick="addBot('compta')" id="module-compta">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">📊</span>
+              <div>
+                <h3 class="font-semibold">Compta Express</h3>
+                <p class="text-white/40 text-sm">Message → Excel automatique</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-green-400 text-sm">✓ Disponible</span>
+              <span class="text-orange-400 font-semibold">69€/mois</span>
+            </div>
+          </div>
+          
+          <!-- Stock -->
+          <div class="module-card disabled" onclick="joinWaitlist('stock')">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">📦</span>
+              <div>
+                <h3 class="font-semibold">Gestion Stock</h3>
+                <p class="text-white/40 text-sm">Bientôt disponible</p>
+              </div>
+            </div>
+            <span class="text-white/30 text-sm">M'alerter →</span>
+          </div>
+          
+          <!-- Réservations -->
+          <div class="module-card disabled" onclick="joinWaitlist('reservations')">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">📅</span>
+              <div>
+                <h3 class="font-semibold">Réservations</h3>
+                <p class="text-white/40 text-sm">Bientôt disponible</p>
+              </div>
+            </div>
+            <span class="text-white/30 text-sm">M'alerter →</span>
+          </div>
+          
+          <!-- Planning -->
+          <div class="module-card disabled" onclick="joinWaitlist('planning')">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-3xl">👥</span>
+              <div>
+                <h3 class="font-semibold">Planning RH</h3>
+                <p class="text-white/40 text-sm">Bientôt disponible</p>
+              </div>
+            </div>
+            <span class="text-white/30 text-sm">M'alerter →</span>
+          </div>
+        </div>
+      </section>
+      
+    </div>
+  </main>
+
+  <!-- Modal Telegram Link -->
+  <div class="modal-overlay" id="telegram-modal">
+    <div class="modal">
+      <h3 class="font-semibold text-lg mb-4">Lier Telegram</h3>
+      <p class="text-white/60 text-sm mb-6">Pour utiliser ton bot, lie ton compte Telegram.</p>
+      <button class="btn-primary w-full" onclick="showTelegramSection()">Continuer</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-white/10 backdrop-blur text-white px-5 py-3 rounded-lg shadow-lg opacity-0 transition-opacity text-sm"></div>
+
+  <script>
+    // ===========================================
+    // SUPABASE CONFIG - REPLACE THESE VALUES
+    // ===========================================
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const API_URL = 'YOUR_BACKEND_URL';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let USER = null;
+    let PROFILE = null;
+    let BOTS = [];
+    
+    // ===========================================
+    // INIT
+    // ===========================================
+    async function init() {
+      // Check auth
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        window.location.href = 'connexion.html';
+        return;
+      }
+      
+      USER = user;
+      
+      // Get profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      PROFILE = profile;
+      
+      // Update UI
+      document.getElementById('user-name').textContent = profile?.name || user.email;
+      
+      // Load bots
+      await loadBots();
+      
+      // Check telegram link
+      const { data: telegramLink } = await supabase
+        .from('telegram_links')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (!telegramLink && BOTS.length > 0) {
+        document.getElementById('telegram-section').classList.remove('hidden');
+      }
+      
+      // Show content
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('content').classList.remove('hidden');
+    }
+    
+    // ===========================================
+    // BOTS
+    // ===========================================
+    async function loadBots() {
+      const { data: bots, error } = await supabase
+        .from('bots')
+        .select('*')
+        .eq('user_id', USER.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error loading bots:', error);
+        return;
+      }
+      
+      BOTS = bots || [];
+      renderBots();
+    }
+    
+    function renderBots() {
+      const container = document.getElementById('bots-container');
+      const noBots = document.getElementById('no-bots');
+      const moduleCompta = document.getElementById('module-compta');
+      
+      if (BOTS.length === 0) {
+        container.innerHTML = '';
+        noBots.classList.remove('hidden');
+        return;
+      }
+      
+      noBots.classList.add('hidden');
+      
+      // Hide compta module if already added
+      if (BOTS.find(b => b.module === 'compta')) {
+        moduleCompta.style.display = 'none';
+      }
+      
+      container.innerHTML = BOTS.map(bot => `
+        <div class="bot-card mb-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <span class="text-3xl">${getModuleIcon(bot.module)}</span>
+              <div>
+                <h3 class="font-semibold">${getModuleName(bot.module)}</h3>
+                <div class="flex items-center gap-2 mt-1">
+                  <div class="status-dot"></div>
+                  <span class="text-green-400 text-sm">Actif</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-secondary text-sm" onclick="configBot('${bot.id}')">⚙️ Config</button>
+              <a href="https://t.me/iArmyBot" target="_blank" class="btn-secondary text-sm">💬 Telegram</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function getModuleIcon(m) {
+      const icons = { compta: '📊', stock: '📦', reservations: '📅', planning: '👥' };
+      return icons[m] || '🤖';
+    }
+    
+    function getModuleName(m) {
+      const names = { compta: 'Compta Express', stock: 'Gestion Stock', reservations: 'Réservations', planning: 'Planning RH' };
+      return names[m] || m;
+    }
+    
+    async function addBot(module) {
+      if (BOTS.find(b => b.module === module)) {
+        toast('Tu as déjà ce bot !');
+        return;
+      }
+      
+      // Redirect to onboarding
+      window.location.href = `onboarding.html?module=${module}`;
+    }
+    
+    function configBot(botId) {
+      toast('Configuration à venir...');
+    }
+    
+    // ===========================================
+    // TELEGRAM
+    // ===========================================
+    async function generateTelegramCode() {
+      try {
+        const session = await supabase.auth.getSession();
+        if (!session.data.session) {
+          toast('Erreur de session');
+          return;
+        }
+        
+        // Generate code
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        // Save to profile
+        await supabase
+          .from('profiles')
+          .update({ 
+            telegram_link_code: code,
+            telegram_link_expires: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+          })
+          .eq('id', USER.id);
+        
+        document.getElementById('telegram-code').textContent = code;
+        document.getElementById('telegram-code-container').classList.remove('hidden');
+        document.getElementById('generate-code-btn').classList.add('hidden');
+        
+      } catch (error) {
+        console.error('Error generating code:', error);
+        toast('Erreur, réessaie');
+      }
+    }
+    
+    function copyCode() {
+      const code = document.getElementById('telegram-code').textContent;
+      navigator.clipboard.writeText('/link ' + code);
+      toast('Code copié !');
+    }
+    
+    function showTelegramSection() {
+      document.getElementById('telegram-modal').classList.remove('active');
+      document.getElementById('telegram-section').classList.remove('hidden');
+      document.getElementById('telegram-section').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // ===========================================
+    // WAITLIST
+    // ===========================================
+    async function joinWaitlist(module) {
+      try {
+        await supabase
+          .from('waitlist')
+          .upsert({ 
+            email: USER.email, 
+            module 
+          }, { onConflict: 'email,module' });
+        
+        toast('Tu seras notifié quand ' + getModuleName(module) + ' sera dispo !');
+      } catch (error) {
+        console.error('Waitlist error:', error);
+      }
+    }
+    
+    // ===========================================
+    // LOGOUT
+    // ===========================================
+    async function logout() {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
+    }
+    
+    // ===========================================
+    // TOAST
+    // ===========================================
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.opacity = '1';
+      setTimeout(() => t.style.opacity = '0', 3000);
+    }
+    
+    // Init
+    init();
+  </script>
+</body>
+</html>
