@@ -145,6 +145,9 @@
     let finalConfig = null;
     let isWaitingForAI = false;
     
+    // Keywords to detect headers
+    const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'dépense', 'depense', 'espèce', 'espece', 'carte', 'ticket', 'chèque', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
+    
     const uploadZone = document.getElementById('upload-zone');
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
     uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
@@ -155,6 +158,28 @@
     });
     
     function handleFileSelect(event) { if (event.target.files[0]) handleFile(event.target.files[0]); }
+    
+    function detectHeaderRow(rows) {
+      let bestRow = null;
+      let bestScore = 0;
+      
+      rows.forEach(row => {
+        if (row.row === '...') return;
+        let score = 0;
+        row.cells.forEach(cell => {
+          const val = String(cell.val).toLowerCase();
+          HEADER_KEYWORDS.forEach(kw => {
+            if (val.includes(kw)) score++;
+          });
+        });
+        if (score > bestScore) {
+          bestScore = score;
+          bestRow = row;
+        }
+      });
+      
+      return bestRow;
+    }
     
     async function handleFile(file) {
       const ext = '.' + file.name.split('.').pop().toLowerCase();
@@ -173,9 +198,8 @@
             if (!sheet['!ref']) return;
             const range = XLSX.utils.decode_range(sheet['!ref']);
             
-            // Only read full data for first sheet
             if (sheetIndex > 0) {
-              excelData.sheets.push({ name: sheetName, allRows: [], rowCount: range.e.r, colCount: range.e.c + 1, formulas: {} });
+              excelData.sheets.push({ name: sheetName, allRows: [], rowCount: range.e.r, colCount: range.e.c + 1, formulas: {}, detectedHeaders: null });
               return;
             }
             
@@ -198,13 +222,11 @@
               return rowData;
             };
             
-            // Read first 15 rows
             for (let row = 0; row <= Math.min(15, range.e.r); row++) {
               const rowData = readRow(row);
               if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData });
             }
             
-            // Read last 10 rows if file has more than 20 rows
             if (range.e.r > 20) {
               allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes masquées)' }] });
               for (let row = Math.max(16, range.e.r - 10); row <= range.e.r; row++) {
@@ -213,7 +235,14 @@
               }
             }
             
-            // Get formulas (limit to 20)
+            // Detect header row
+            const headerRow = detectHeaderRow(allRows);
+            const detectedHeaders = headerRow ? {
+              rowNumber: headerRow.row,
+              columns: headerRow.cells.map(c => ({ letter: c.col, name: c.val }))
+            } : null;
+            
+            // Get formulas
             const formulas = {};
             let formulaCount = 0;
             for (let cellRef in sheet) {
@@ -223,7 +252,7 @@
               }
             }
             
-            excelData.sheets.push({ name: sheetName, allRows, rowCount: range.e.r, colCount: range.e.c + 1, formulas });
+            excelData.sheets.push({ name: sheetName, allRows, rowCount: range.e.r, colCount: range.e.c + 1, formulas, detectedHeaders });
           });
           
           console.log('Excel parsed:', excelData);
