@@ -14,13 +14,13 @@
     .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: 0.15; animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
-    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; animation-delay: 0s; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; }
     .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; animation-delay: -7s; }
     .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 40%; left: 40%; opacity: 0.08; animation-delay: -3s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
     .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
-    .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(255, 255, 255, 0.02); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 107, 53, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+    .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 50%, #FFB088 100%); border-radius: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25); }
     .logo-i::before { content: ''; position: absolute; inset: -2px; border-radius: 13px; background: linear-gradient(135deg, #FF6B35, #FF8B5E, #FFB088, #FF6B35); background-size: 300% 300%; z-index: -1; opacity: 0; transition: opacity 0.3s ease; animation: borderGlow 4s ease infinite; }
     @keyframes borderGlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -56,8 +56,8 @@
     .chat-messages::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
     .chat-msg { margin-bottom: 20px; animation: slideIn 0.3s ease-out; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .chat-msg-bot { display: flex; gap: 12px; }
-    .chat-msg-user { display: flex; gap: 12px; flex-direction: row-reverse; }
+    .chat-msg-bot { display: flex; gap: 12px; align-items: flex-start; }
+    .chat-msg-user { display: flex; gap: 12px; flex-direction: row-reverse; align-items: flex-start; }
     .chat-avatar { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
     .chat-avatar-bot { background: linear-gradient(135deg, #FF6B35, #FF8B5E); box-shadow: 0 2px 10px rgba(255, 107, 53, 0.25); }
     .chat-avatar-user { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 107, 53, 0.2); color: #FF8B5E; font-size: 11px; }
@@ -85,6 +85,23 @@
     .close-btn:hover { background: rgba(255, 255, 255, 0.08); transform: rotate(90deg); }
     .file-badge { padding: 8px 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; font-size: 13px; color: rgba(255, 255, 255, 0.4); transition: all 0.3s ease; }
     .upload-zone:hover .file-badge { border-color: rgba(255, 107, 53, 0.2); color: rgba(255, 255, 255, 0.6); }
+    .btn-glow { background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; padding: 16px 32px; color: white; font-weight: 600; cursor: pointer; position: relative; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25); width: 100%; font-size: 15px; }
+    .btn-glow::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s ease; }
+    .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4); }
+    .btn-glow:hover::before { left: 100%; }
+    .btn-google { background: rgba(255, 255, 255, 0.95); color: #333; padding: 14px 28px; border-radius: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; font-size: 15px; }
+    .btn-google:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); }
+    .input-glass { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 16px 20px; color: white; font-size: 15px; width: 100%; transition: all 0.3s ease; }
+    .input-glass:focus { outline: none; border-color: rgba(255, 107, 53, 0.4); background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1); }
+    .input-glass::placeholder { color: rgba(255, 255, 255, 0.25); }
+    .divider { display: flex; align-items: center; gap: 16px; color: rgba(255, 255, 255, 0.3); font-size: 14px; margin: 20px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+    .check-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #22c55e, #4ade80); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: 0 auto 20px; }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    .feature-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+    .feature-check { width: 20px; height: 20px; background: rgba(34, 197, 94, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4ade80; font-size: 11px; }
+    .price-tag { background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.05)); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 8px 20px; display: inline-flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
+    .security-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); border-radius: 20px; padding: 6px 12px; font-size: 12px; color: rgba(255, 255, 255, 0.6); }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
   </style>
 </head>
@@ -105,6 +122,8 @@
     </aside>
     <main class="main-content">
       <a href="index.html" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
+      
+      <!-- Step 1: Upload -->
       <div class="step-content active" id="step-1">
         <div class="mb-2"><span class="text-white/30 text-sm">Étape 1/4</span></div>
         <h1 class="text-3xl font-bold mb-3">Envoie-moi ton fichier</h1>
@@ -118,6 +137,8 @@
         <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
         <div class="security-notice mt-6"><span>🔒</span><span>Tes données restent confidentielles. Personne n'y a accès.</span></div>
       </div>
+      
+      <!-- Step 2: Chat -->
       <div class="step-content" id="step-2">
         <div class="mb-2"><span class="text-white/30 text-sm">Étape 2/4</span></div>
         <h1 class="text-3xl font-bold mb-3">Parlons de ton fichier</h1>
@@ -131,20 +152,77 @@
           </div>
         </div>
       </div>
-      <div class="step-content" id="step-3"><div class="mb-2"><span class="text-white/30 text-sm">Étape 3/4</span></div><h1 class="text-3xl font-bold mb-3">Crée ton compte</h1><p class="text-white/40 mb-8">Pour sauvegarder ta configuration.</p></div>
-      <div class="step-content" id="step-4"><div class="mb-2"><span class="text-white/30 text-sm">Étape 4/4</span></div><h1 class="text-3xl font-bold mb-3">Connecte Telegram</h1><p class="text-white/40 mb-8">Dernière étape !</p></div>
+      
+      <!-- Step 3: Account -->
+      <div class="step-content" id="step-3">
+        <div class="text-center mb-8">
+          <div class="check-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h1 class="text-3xl font-bold mb-2">Ton robot est prêt ! 🎉</h1>
+          <p class="text-white/40">Plus qu'à créer ton compte pour l'activer</p>
+        </div>
+        
+        <div class="glass-card p-5 mb-6 max-w-md mx-auto">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-content-center text-xl">📊</div>
+            <div>
+              <h3 class="font-semibold">Configuration détectée</h3>
+              <p class="text-xs text-white/40" id="config-filename">Ton fichier Excel</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="feature-item"><div class="feature-check">✓</div><span id="config-columns">Colonnes détectées</span></div>
+            <div class="feature-item"><div class="feature-check">✓</div><span id="config-sheets">Onglets configurés</span></div>
+            <div class="feature-item"><div class="feature-check">✓</div><span>Calculs automatiques activés</span></div>
+          </div>
+        </div>
+        
+        <div class="text-center mb-6">
+          <div class="price-tag"><span class="text-2xl font-bold">29€</span><span class="text-white/50">/mois</span></div>
+          <p class="text-xs text-white/30">Sans engagement • Annulable à tout moment</p>
+        </div>
+        
+        <div class="glass-card p-6 max-w-md mx-auto">
+          <button class="btn-google mb-4" onclick="signInWithGoogle()">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuer avec Google
+          </button>
+          <div class="divider">ou</div>
+          <div class="space-y-3 mb-5">
+            <input type="email" class="input-glass" id="signup-email" placeholder="📧  Ton email">
+            <input type="password" class="input-glass" id="signup-password" placeholder="🔒  Choisis un mot de passe">
+          </div>
+          <button class="btn-glow" onclick="signUpWithEmail()">Créer mon compte</button>
+          <div class="flex justify-center gap-3 mt-4">
+            <div class="security-badge"><span>🔒</span><span>Paiement sécurisé</span></div>
+            <div class="security-badge"><span>⚡</span><span>Activation instantanée</span></div>
+          </div>
+        </div>
+        <p class="text-center text-xs text-white/20 mt-6">En créant ton compte, tu acceptes les conditions d'utilisation</p>
+      </div>
+      
+      <!-- Step 4: Telegram -->
+      <div class="step-content" id="step-4">
+        <div class="mb-2"><span class="text-white/30 text-sm">Étape 4/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">Connecte Telegram</h1>
+        <p class="text-white/40 mb-8">Dernière étape !</p>
+      </div>
     </main>
   </div>
+  
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false;
     const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'dépense', 'depense', 'espèce', 'espece', 'carte', 'ticket', 'chèque', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
+    
     const uploadZone = document.getElementById('upload-zone');
     uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
     uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
     uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+    
     function handleFileSelect(event) { if (event.target.files[0]) handleFile(event.target.files[0]); }
+    
     function detectHeaderRow(rows) {
       let bestRow = null, bestScore = 0;
       rows.forEach(row => {
@@ -158,6 +236,7 @@
       });
       return bestRow;
     }
+    
     async function handleFile(file) {
       const ext = '.' + file.name.split('.').pop().toLowerCase();
       if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
@@ -199,6 +278,7 @@
       };
       reader.readAsArrayBuffer(file);
     }
+    
     function addBotMessage(text) {
       const container = document.getElementById('chat-messages');
       const typing = document.getElementById('typing-indicator');
@@ -210,6 +290,7 @@
       container.scrollTop = container.scrollHeight;
       chatHistory.push({ role: 'assistant', content: text });
     }
+    
     function addUserMessage(text) {
       const container = document.getElementById('chat-messages');
       const msgDiv = document.createElement('div');
@@ -219,6 +300,7 @@
       container.scrollTop = container.scrollHeight;
       chatHistory.push({ role: 'user', content: text });
     }
+    
     function showTyping() {
       const container = document.getElementById('chat-messages');
       const typingDiv = document.createElement('div');
@@ -228,6 +310,7 @@
       container.appendChild(typingDiv);
       container.scrollTop = container.scrollHeight;
     }
+    
     async function callAPI(mode) {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/clever-processor`, {
         method: 'POST',
@@ -238,6 +321,7 @@
       if (result.error) throw new Error(result.error);
       return result.response;
     }
+    
     async function startAnalysis() {
       showTyping();
       isWaitingForAI = true;
@@ -245,6 +329,7 @@
       catch (err) { console.error(err); addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?"); }
       isWaitingForAI = false;
     }
+    
     async function sendMessage() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
@@ -260,12 +345,26 @@
         if (cleanResponse.startsWith('{')) {
           finalConfig = JSON.parse(cleanResponse);
           console.log('Config saved:', finalConfig);
-          addBotMessage("Parfait ! J'ai tout compris. On passe à la création de ton compte ?");
-          setTimeout(() => goToStep(3), 2000);
+          updateStep3UI();
+          addBotMessage("Parfait ! J'ai tout compris. On passe à la création de ton compte !");
+          setTimeout(() => goToStep(3), 1500);
         } else { addBotMessage(response); }
       } catch (err) { console.error(err); addBotMessage("Désolé, j'ai eu un problème. Tu peux répéter ?"); }
       isWaitingForAI = false;
     }
+    
+    function updateStep3UI() {
+      if (excelData) {
+        document.getElementById('config-filename').textContent = excelData.fileName;
+      }
+      if (finalConfig) {
+        const cols = finalConfig.colonnes_a_remplir?.map(c => c.nom).join(', ') || 'Colonnes détectées';
+        document.getElementById('config-columns').innerHTML = `<strong style="color:white">${cols}</strong> détectés`;
+        const sheets = finalConfig.onglets?.liste?.length || excelData?.sheets?.length || 0;
+        document.getElementById('config-sheets').textContent = `${sheets} onglets configurés`;
+      }
+    }
+    
     function goToStep(step) {
       document.querySelectorAll('.step-item').forEach((item, i) => {
         item.classList.remove('active', 'completed', 'upcoming');
@@ -276,6 +375,29 @@
       document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
       document.getElementById(`step-${step}`).classList.add('active');
     }
+    
+    async function signInWithGoogle() {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/compta.html?step=4' }
+      });
+      if (error) { alert('Erreur: ' + error.message); }
+    }
+    
+    async function signUpWithEmail() {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      if (!email || !password) { alert('Remplis tous les champs'); return; }
+      if (password.length < 6) { alert('Le mot de passe doit faire au moins 6 caractères'); return; }
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) { alert('Erreur: ' + error.message); return; }
+      alert('Compte créé ! Vérifie tes emails pour confirmer.');
+      goToStep(4);
+    }
+    
+    // Check URL params on load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('step') === '4') { goToStep(4); }
   </script>
 </body>
 </html>
