@@ -260,7 +260,11 @@
       isWaitingForAI = true;
       try {
         const response = await callAPI('chat');
-        if (response.trim().startsWith('{')) { finalConfig = JSON.parse(response.trim()); addBotMessage("Parfait ! J'ai tout compris. On passe à la suite ?"); }
+  let cleanResponse = response.trim();
+if (cleanResponse.includes('```json')) {
+  cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+}
+if (cleanResponse.startsWith('{')) { finalConfig = JSON.parse(cleanResponse); addBotMessage("Parfait ! J'ai tout compris. On passe à la suite ?"); }
         else { addBotMessage(response); }
       } catch (err) { console.error(err); addBotMessage("Désolé, j'ai eu un problème. Tu peux répéter ?"); }
       isWaitingForAI = false;
