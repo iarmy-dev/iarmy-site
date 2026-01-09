@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compta Express - Configuration | iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', sans-serif; }
+    body { background: #050505; color: white; min-height: 100vh; }
+    
+    .logo-i {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      padding: 14px 28px; border-radius: 12px; font-weight: 600;
+      transition: all 0.3s; border: none; color: white; cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,53,0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      padding: 14px 28px; border-radius: 12px; font-weight: 500;
+      transition: all 0.3s; color: white; cursor: pointer;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+    
+    .btn-google {
+      background: white; color: #333;
+      padding: 14px 28px; border-radius: 12px; font-weight: 500;
+      transition: all 0.3s; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,0.1); }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes typing { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    @keyframes cardPop { 
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes highlight {
+      0% { box-shadow: 0 0 0 0 rgba(255,107,53,0.5); }
+      50% { box-shadow: 0 0 20px 5px rgba(255,107,53,0.3); }
+      100% { box-shadow: 0 0 0 0 rgba(255,107,53,0); }
+    }
+    
+    .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+    .animate-slide-in { animation: slideIn 0.5s ease-out; }
+    .animate-pulse { animation: pulse 1.5s infinite; }
+    .animate-card-pop { animation: cardPop 0.4s ease-out forwards; }
+    .animate-highlight { animation: highlight 1s ease-out; }
+    
+    /* Sidebar */
+    .sidebar {
+      background: rgba(255,255,255,0.02);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      width: 280px;
+      min-height: 100vh;
+      padding: 24px;
+      position: fixed;
+      left: 0; top: 0;
+    }
+    
+    .step-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 12px;
+      margin-bottom: 8px; transition: all 0.3s;
+    }
+    .step-item.active { background: rgba(255,107,53,0.1); }
+    .step-item.completed { opacity: 0.5; }
+    .step-item.upcoming { opacity: 0.3; }
+    
+    .step-number {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+    }
+    .step-item.active .step-number {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-color: #FF6B35;
+    }
+    .step-item.completed .step-number { background: #22c55e; border-color: #22c55e; }
+    
+    .step-label { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.6); }
+    .step-item.active .step-label { color: white; }
+    
+    /* Main */
+    .main-content {
+      margin-left: 280px;
+      padding: 40px;
+      max-width: 800px;
+    }
+    
+    .step-content { display: none; }
+    .step-content.active { display: block; animation: slideIn 0.4s ease-out; }
+    
+    /* Upload */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 60px 40px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: rgba(255,255,255,0.02);
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #FF6B35;
+      background: rgba(255,107,53,0.05);
+    }
+    .upload-zone.dragover { transform: scale(1.02); }
+    
+    .upload-icon {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 24px;
+    }
+    
+    /* Chat */
+    .chat-container {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .chat-messages {
+      padding: 24px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .chat-msg {
+      margin-bottom: 16px;
+      animation: slideIn 0.3s ease-out;
+    }
+    .chat-msg-bot {
+      display: flex; gap: 12px;
+    }
+    .chat-msg-user {
+      display: flex; gap: 12px;
+      flex-direction: row-reverse;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .chat-avatar-bot {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+    }
+    .chat-avatar-user {
+      background: rgba(255,255,255,0.1);
+    }
+    .chat-bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      max-width: 80%;
+      line-height: 1.5;
+    }
+    .chat-bubble-bot {
+      background: rgba(255,255,255,0.05);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble-user {
+      background: rgba(255,107,53,0.15);
+      border-bottom-right-radius: 4px;
+    }
+    .chat-input-container {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; gap: 12px;
+    }
+    .chat-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: white;
+      font-size: 15px;
+    }
+    .chat-input:focus { outline: none; border-color: #FF6B35; }
+    .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+    .chat-send {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chat-send:hover { transform: scale(1.05); }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    
+    .typing-indicator {
+      display: flex; gap: 6px; padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px; width: fit-content;
+    }
+    .typing-indicator span {
+      width: 8px; height: 8px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 50%;
+      animation: typing 1s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    
+    /* Result Cards */
+    .result-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .result-card.user-input {
+      border-color: rgba(255,107,53,0.3);
+      background: rgba(255,107,53,0.05);
+    }
+    .result-card.auto {
+      border-color: rgba(255,255,255,0.1);
+      opacity: 0.6;
+    }
+    .result-card-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .result-card-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 6px;
+    }
+    .result-card-value {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .result-card-tag {
+      margin-top: 10px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .result-card.user-input .result-card-tag {
+      background: rgba(255,107,53,0.2);
+      color: #FF8B5E;
+    }
+    .result-card.auto .result-card-tag {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Phone Preview */
+    .phone-preview {
+      background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+      border-radius: 32px;
+      padding: 8px;
+      width: 220px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .phone-screen {
+      background: #000;
+      border-radius: 26px;
+      overflow: hidden;
+    }
+    .phone-notch {
+      width: 80px; height: 24px;
+      background: #000;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto;
+    }
+    .phone-header {
+      background: #1c1c1e;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .phone-avatar {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px;
+    }
+    .phone-name { font-size: 14px; font-weight: 600; }
+    .phone-status { font-size: 11px; color: #0a84ff; }
+    .phone-messages {
+      padding: 16px;
+      min-height: 200px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .phone-msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .phone-msg-user {
+      background: #0a84ff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .phone-msg-bot {
+      background: #2c2c2e;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    
+    /* Close */
+    .close-btn {
+      position: fixed;
+      top: 24px; right: 24px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      color: white; z-index: 100;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.1); transform: rotate(90deg); }
+    
+    /* Detected Items */
+    .detected-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .detected-item-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .detected-item-icon {
+      font-size: 24px;
+    }
+    .detected-item-title {
+      font-weight: 600;
+    }
+    .detected-item-desc {
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    
+    /* Security Notice */
+    .security-notice {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(34,197,94,0.05);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+    .security-notice-icon {
+      font-size: 18px;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a href="index.html" class="flex items-center gap-3 mb-10">
+        <div class="logo-i">i</div>
+        <span class="font-semibold">iArmy</span>
+      </a>
+      
+      <div class="mb-6">
+        <span class="text-xs text-white/40 uppercase tracking-wider">Configuration</span>
+      </div>
+      
+      <div id="steps-nav">
+        <div class="step-item active" data-step="1">
+          <div class="step-number">1</div>
+          <span class="step-label">Ton fichier</span>
+        </div>
+        <div class="step-item upcoming" data-step="2">
+          <div class="step-number">2</div>
+          <span class="step-label">On comprend</span>
+        </div>
+        <div class="step-item upcoming" data-step="3">
+          <div class="step-number">3</div>
+          <span class="step-label">Ton compte</span>
+        </div>
+        <div class="step-item upcoming" data-step="4">
+          <div class="step-number">4</div>
+          <span class="step-label">Telegram</span>
+        </div>
+      </div>
+      
+      <div class="mt-auto pt-10">
+        <div class="text-xs text-white/30">
+          🧾 Compta Express<br>
+          <span class="text-white/20">v1.0</span>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main -->
+    <main class="main-content">
+      <a href="index.html" class="close-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </a>
+      
+      <!-- Step 1: Upload -->
+      <div class="step-content active" id="step-1">
+        <div class="mb-2">
+          <span class="text-white/40 text-sm">Étape 1/4</span>
+        </div>
+        <h1 class="text-3xl font-bold mb-3">Comment tu gères ta compta ?</h1>
+        <p class="text-white/50 mb-8">Envoie-nous ton fichier Excel, on s'adapte à toi.</p>
+        
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">📁</div>
+          <p class="text-lg font-medium mb-2">Glisse ton fichier ici</p>
+          <p class="text-white/40 text-sm mb-4">ou clique pour parcourir</p>
+          <div class="flex justify-center gap-3">
+            <span class="px-4 py-2 bg-white/5 rounded-full text-sm text-white/50">.xlsx</span>
+            <span class="px-4 py-2 bg-white/5 rounded-full text-sm text-white/50">.xls</span>
+            <span class="px-4 py-2 bg-white/5 rounded-full text-sm text-white/50">.csv</span>
+          </div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
+        
+        <div class="flex items-center gap-4 my-8">
+          <div class="flex-1 h-px bg-white/10"></div>
+          <span class="text-white/30 text-sm">ou</span>
+          <div class="flex-1 h-px bg-white/10"></div>
+        </div>
+        
+        <button class="btn-google w-full" onclick="connectGoogle()">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Connecter Google Sheets
+        </button>
+        
+        <div class="security-notice mt-6">
+          <span class="security-notice-icon">🔒</span>
+          <span>Tes données restent confidentielles. On analyse la structure, pas les montants.</span>
+        </div>
+      </div>
+      
+      <!-- Step 2: Analyse + Chat -->
+      <div class="step-content" id="step-2">
+        <div class="mb-2">
+          <span class="text-white/40 text-sm">Étape 2/4</span>
+        </div>
+        <h1 class="text-3xl font-bold mb-3" id="step2-title">Analyse en cours...</h1>
+        <p class="text-white/50 mb-8" id="step2-subtitle">Je regarde comment ton fichier est structuré.</p>
+        
+        <!-- Analyse Phase -->
+        <div id="analysis-phase">
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+              <!-- Messages will be added here -->
+            </div>
+            <div class="chat-input-container" id="chat-input-area" style="display: none;">
+              <input type="text" class="chat-input" id="chat-input" placeholder="Ta réponse..." onkeypress="if(event.key==='Enter')sendUserMessage()">
+              <button class="chat-send" onclick="sendUserMessage()">Envoyer</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Result Phase (hidden initially) -->
+        <div id="result-phase" style="display: none;">
+          <!-- Will be populated after analysis -->
+        </div>
+      </div>
+      
+      <!-- Step 3: Account -->
+      <div class="step-content" id="step-3">
+        <div class="mb-2">
+          <span class="text-white/40 text-sm">Étape 3/4</span>
+        </div>
+        <h1 class="text-3xl font-bold mb-3">Crée ton compte</h1>
+        <p class="text-white/50 mb-8">Pour sauvegarder ta configuration.</p>
+        <!-- Account form will go here -->
+      </div>
+      
+      <!-- Step 4: Telegram -->
+      <div class="step-content" id="step-4">
+        <div class="mb-2">
+          <span class="text-white/40 text-sm">Étape 4/4</span>
+        </div>
+        <h1 class="text-3xl font-bold mb-3">Connecte Telegram</h1>
+        <p class="text-white/50 mb-8">Dernière étape !</p>
+        <!-- Telegram connection will go here -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Config storage
+    let robotConfig = {
+      quotidien: { colonnes: [] },
+      hebdo: [],
+      mensuel: [],
+      onglets: { type: 'single', list: [] },
+      vocabulaire: {}
+    };
+    
+    let excelData = null;
+    let chatHistory = [];
+    let awaitingUserInput = false;
+    let pendingCallback = null;
+    
+    // ==================== UPLOAD ====================
+    
+    const uploadZone = document.getElementById('upload-zone');
+    
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    
+    function handleFileSelect(event) {
+      if (event.target.files[0]) {
+        handleFile(event.target.files[0]);
+      }
+    }
+    
+    async function handleFile(file) {
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (!['.xlsx', '.xls', '.csv'].includes(ext)) {
+        alert('Format non supporté. Utilise .xlsx, .xls ou .csv');
+        return;
+      }
+      
+      // Go directly to analysis (no continue button)
+      goToStep(2);
+      
+      // Read and parse Excel
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          // Extract data from all sheets
+          excelData = {
+            fileName: file.name,
+            sheets: []
+          };
+          
+          workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+            
+            // Detect formulas
+            const formulas = {};
+            for (let cell in sheet) {
+              if (cell[0] !== '!' && sheet[cell].f) {
+                formulas[cell] = sheet[cell].f;
+              }
+            }
+            
+            excelData.sheets.push({
+              name: sheetName,
+              headers: json[0] || [],
+              sampleRows: json.slice(1, 6), // 5 sample rows
+              rowCount: json.length - 1,
+              formulas: formulas
+            });
+          });
+          
+          // Start AI analysis
+          await startAnalysis();
+          
+        } catch (err) {
+          console.error('Error reading file:', err);
+          addBotMessage("Hmm, j'ai eu un problème pour lire ton fichier. Tu peux réessayer ?");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    
+    function connectGoogle() {
+      alert('Connexion Google Sheets bientôt disponible !');
+    }
+    
+    // ==================== CHAT ====================
+    
+    function addBotMessage(text, isTyping = false) {
+      const container = document.getElementById('chat-messages');
+      
+      if (isTyping) {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-msg chat-msg-bot';
+        typingDiv.id = 'typing-indicator';
+        typingDiv.innerHTML = `
+          <div class="chat-avatar chat-avatar-bot">i</div>
+          <div class="typing-indicator">
+            <span></span><span></span><span></span>
+          </div>
+        `;
+        container.appendChild(typingDiv);
+        container.scrollTop = container.scrollHeight;
+        return;
+      }
+      
+      // Remove typing indicator if exists
+      const typing = document.getElementById('typing-indicator');
+      if (typing) typing.remove();
+      
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-bot';
+      msgDiv.innerHTML = `
+        <div class="chat-avatar chat-avatar-bot">i</div>
+        <div class="chat-bubble chat-bubble-bot">${text}</div>
+      `;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      
+      chatHistory.push({ role: 'assistant', content: text });
+    }
+    
+    function addUserMessage(text) {
+      const container = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-user';
+      msgDiv.innerHTML = `
+        <div class="chat-avatar chat-avatar-user">👤</div>
+        <div class="chat-bubble chat-bubble-user">${text}</div>
+      `;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      
+      chatHistory.push({ role: 'user', content: text });
+    }
+    
+    function showChatInput() {
+      document.getElementById('chat-input-area').style.display = 'flex';
+      document.getElementById('chat-input').focus();
+      awaitingUserInput = true;
+    }
+    
+    function hideChatInput() {
+      document.getElementById('chat-input-area').style.display = 'none';
+      awaitingUserInput = false;
+    }
+    
+    async function sendUserMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      input.value = '';
+      addUserMessage(text);
+      hideChatInput();
+      
+      if (pendingCallback) {
+        const callback = pendingCallback;
+        pendingCallback = null;
+        await callback(text);
+      }
+    }
+    
+    // ==================== AI ANALYSIS ====================
+    
+    async function startAnalysis() {
+      // Initial message
+      addBotMessage("Je regarde ton fichier...", true);
+      await delay(1500);
+      
+      // Call Edge Function
+      try {
+        const response = await callAnalyzeAPI('analyze');
+        const analysis = JSON.parse(extractJSON(response));
+        
+        // Process analysis
+        await processAnalysis(analysis);
+        
+      } catch (err) {
+        console.error('Analysis error:', err);
+        addBotMessage("J'ai eu un souci avec l'analyse. On va faire ça ensemble !");
+        await manualAnalysis();
+      }
+    }
+    
+    function buildAnalysisPrompt() {
+      const sheetsInfo = excelData.sheets.map(s => {
+        return `
+Onglet "${s.name}":
+- Colonnes: ${s.headers.join(', ')}
+- Lignes de données: ${s.rowCount}
+- Exemples de données (premières lignes):
+${s.sampleRows.slice(0, 3).map((row, i) => `  Ligne ${i+1}: ${row.join(' | ')}`).join('\n')}
+- Formules détectées: ${Object.keys(s.formulas).length > 0 ? Object.entries(s.formulas).slice(0, 5).map(([cell, f]) => `${cell}=${f}`).join(', ') : 'Aucune'}
+`;
+      }).join('\n');
+      
+      return `Tu es un assistant qui analyse des fichiers Excel de comptabilité pour un petit commerce/restaurant.
+
+FICHIER: ${excelData.fileName}
+${sheetsInfo}
+
+Analyse ce fichier et réponds en JSON avec cette structure exacte:
+{
+  "compris": true/false,
+  "colonnes": [
+    {
+      "nom": "nom exact dans le fichier",
+      "type": "entree_argent|sortie|info|calcul_auto|mensuel|hebdo|inconnu",
+      "saisie_utilisateur": true/false,
+      "synonymes_suggeres": ["mot1", "mot2"],
+      "colonne_lettre": "A/B/C..."
+    }
+  ],
+  "onglets": {
+    "type": "unique|par_mois|autre",
+    "liste": ["nom1", "nom2"],
+    "actif_suggere": "nom"
+  },
+  "questions": ["question 1 si besoin", "question 2 si besoin"],
+  "message_quotidien_exemple": "cb 1200 esp 350",
+  "resume": "phrase courte décrivant ce que tu as compris"
+}
+
+RÈGLES:
+- Utilise EXACTEMENT les noms de colonnes du fichier (pas de traduction)
+- "saisie_utilisateur" = true si l'utilisateur doit entrer cette donnée (pas une formule)
+- Pour les synonymes, mets des mots courants que l'utilisateur pourrait dire
+- Si une colonne semble être du "black" ou "non déclaré", utilise le nom EXACT du fichier
+- "questions" = liste des points pas clairs (ex: colonne au nom bizarre)
+- Si plusieurs onglets avec noms de mois = type "par_mois"`;
+    }
+    
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    
+    async function callAnalyzeAPI(mode, data = {}) {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/clever-processor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+          excelData: excelData,
+          chatHistory: chatHistory,
+          mode: mode,
+          ...data
+        })
+      });
+      
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      return result.response;
+    }
+    
+    function extractJSON(text) {
+      const match = text.match(/\{[\s\S]*\}/);
+      return match ? match[0] : '{}';
+    }
+    
+    async function processAnalysis(analysis) {
+      addBotMessage(analysis.resume || "J'ai analysé ton fichier !");
+      await delay(1000);
+      
+      // Store in config
+      robotConfig.quotidien.colonnes = analysis.colonnes.filter(c => 
+        c.saisie_utilisateur && (c.type === 'entree_argent' || c.type === 'sortie' || c.type === 'info')
+      ).map(c => ({
+        nom: c.nom,
+        colonne: c.colonne_lettre,
+        synonymes: c.synonymes_suggeres || []
+      }));
+      
+      robotConfig.mensuel = analysis.colonnes.filter(c => c.type === 'mensuel');
+      robotConfig.hebdo = analysis.colonnes.filter(c => c.type === 'hebdo');
+      robotConfig.onglets = analysis.onglets;
+      
+      // If there are questions, ask them
+      if (analysis.questions && analysis.questions.length > 0) {
+        for (const question of analysis.questions) {
+          await askQuestion(question);
+        }
+      }
+      
+      // Show result
+      await showResult(analysis);
+    }
+    
+    async function askQuestion(question) {
+      await delay(500);
+      addBotMessage(question);
+      showChatInput();
+      
+      return new Promise((resolve) => {
+        pendingCallback = async (answer) => {
+          addBotMessage("Ok, c'est noté ! 👍", true);
+          await delay(800);
+          addBotMessage("Ok, c'est noté ! 👍");
+          resolve(answer);
+        };
+      });
+    }
+    
+    async function showResult(analysis) {
+      document.getElementById('step2-title').textContent = "J'ai compris ta compta !";
+      document.getElementById('step2-subtitle').textContent = "Voilà ce que tu m'enverras chaque soir :";
+      
+      // Build example message using user's terms
+      const colonnesQuotidiennes = robotConfig.quotidien.colonnes;
+      const exempleMessage = colonnesQuotidiennes.map(c => {
+        const shortName = c.synonymes[0] || c.nom.toLowerCase().substring(0, 3);
+        return `${shortName} 500`;
+      }).join(' ');
+      
+      // Build result HTML
+      const resultPhase = document.getElementById('result-phase');
+      resultPhase.innerHTML = `
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+          <!-- Phone Preview -->
+          <div class="phone-preview flex-shrink-0">
+            <div class="phone-screen">
+              <div class="phone-notch"></div>
+              <div class="phone-header">
+                <span style="color:#0a84ff;font-size:18px;">‹</span>
+                <div class="phone-avatar">i</div>
+                <div>
+                  <div class="phone-name">iArmy Bot</div>
+                  <div class="phone-status">en ligne</div>
+                </div>
+              </div>
+              <div class="phone-messages" id="demo-messages">
+                <div class="phone-msg phone-msg-user" id="demo-user-msg">${exempleMessage}</div>
+                <div class="phone-msg phone-msg-bot">✅ Noté !</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Cards -->
+          <div class="flex-1">
+            <p class="text-white/50 text-sm mb-4">Et moi je remplis :</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="result-cards">
+              ${colonnesQuotidiennes.map((c, i) => `
+                <div class="result-card user-input animate-card-pop" style="animation-delay: ${i * 0.1}s">
+                  <div class="result-card-icon">${getIconForColumn(c.nom)}</div>
+                  <div class="result-card-label">${c.nom}</div>
+                  <div class="result-card-value" id="card-value-${i}">500 €</div>
+                  <div class="result-card-tag">🟧 toi</div>
+                </div>
+              `).join('')}
+              ${analysis.colonnes.filter(c => c.type === 'calcul_auto').map((c, i) => `
+                <div class="result-card auto animate-card-pop" style="animation-delay: ${(colonnesQuotidiennes.length + i) * 0.1}s">
+                  <div class="result-card-icon">📊</div>
+                  <div class="result-card-label">${c.nom}</div>
+                  <div class="result-card-value">auto</div>
+                  <div class="result-card-tag">se calcule</div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <p class="text-white/40 text-sm mt-4">
+              💡 Pas besoin de tout mettre ! Envoie juste ce que t'as.
+            </p>
+            
+            ${robotConfig.mensuel.length > 0 || (analysis.onglets.type === 'par_mois') ? `
+              <div class="mt-8">
+                <p class="text-white/50 text-sm mb-3">📌 On a aussi détecté :</p>
+                ${analysis.onglets.type === 'par_mois' ? `
+                  <div class="detected-item">
+                    <div class="detected-item-header">
+                      <span class="detected-item-icon">📑</span>
+                      <span class="detected-item-title">Onglets par mois</span>
+                    </div>
+                    <p class="detected-item-desc">Tu as ${analysis.onglets.liste.join(', ')}...</p>
+                    <p class="text-white/40 text-sm">→ À configurer dans les réglages</p>
+                  </div>
+                ` : ''}
+                ${robotConfig.mensuel.map(c => `
+                  <div class="detected-item">
+                    <div class="detected-item-header">
+                      <span class="detected-item-icon">📅</span>
+                      <span class="detected-item-title">${c.nom}</span>
+                    </div>
+                    <p class="detected-item-desc">Donnée mensuelle détectée</p>
+                    <p class="text-white/40 text-sm">→ À configurer dans les réglages</p>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+            
+            <div class="security-notice mt-6">
+              <span class="security-notice-icon">🔒</span>
+              <span>Tes données restent sur ton fichier. Personne n'y a accès à part toi.</span>
+            </div>
+            
+            <div class="flex gap-4 mt-8">
+              <button class="btn-primary" onclick="goToStep(3)">C'est bon ! →</button>
+              <button class="btn-secondary" onclick="openClarification()">💬 Y'a un truc qui va pas</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Hide analysis phase, show result
+      document.getElementById('analysis-phase').style.display = 'none';
+      resultPhase.style.display = 'block';
+    }
+    
+    function getIconForColumn(name) {
+      const n = name.toLowerCase();
+      if (n.includes('cb') || n.includes('carte') || n.includes('tpe')) return '💳';
+      if (n.includes('esp') || n.includes('cash') || n.includes('liquide')) return '💵';
+      if (n.includes('chèque') || n.includes('cheque')) return '📝';
+      if (n.includes('ticket') || n.includes('tr')) return '🎫';
+      if (n.includes('deliveroo') || n.includes('uber') || n.includes('livraison')) return '🛵';
+      if (n.includes('total')) return '📊';
+      if (n.includes('date')) return '📅';
+      if (n.includes('comment')) return '💬';
+      return '📦';
+    }
+    
+    async function openClarification() {
+      // Reset to chat mode
+      document.getElementById('result-phase').style.display = 'none';
+      document.getElementById('analysis-phase').style.display = 'block';
+      document.getElementById('step2-title').textContent = "Dis-moi ce qui va pas";
+      document.getElementById('step2-subtitle').textContent = "Je corrige !";
+      
+      addBotMessage("Qu'est-ce qui va pas ? Dis-moi et je corrige 👇");
+      showChatInput();
+      
+      pendingCallback = async (answer) => {
+        addBotMessage("Je réfléchis...", true);
+        await delay(1000);
+        
+        // Send to Edge Function for clarification
+        try {
+          const response = await callAnalyzeAPI('clarify');
+          addBotMessage(response);
+          
+          await delay(1500);
+          addBotMessage("On continue ?");
+          
+          showChatInput();
+          pendingCallback = async () => {
+            hideChatInput();
+            // Return to results
+            document.getElementById('analysis-phase').style.display = 'none';
+            document.getElementById('result-phase').style.display = 'block';
+            document.getElementById('step2-title').textContent = "J'ai compris ta compta !";
+            document.getElementById('step2-subtitle').textContent = "Voilà ce que tu m'enverras chaque soir :";
+          };
+          
+        } catch (err) {
+          addBotMessage("C'est noté ! On continue ?");
+          showChatInput();
+        }
+      };
+    }
+    
+    async function manualAnalysis() {
+      // Fallback if AI fails
+      addBotMessage("Je vois ton fichier mais j'ai besoin d'aide. C'est quoi les colonnes que tu remplis chaque jour ?");
+      showChatInput();
+      
+      pendingCallback = async (answer) => {
+        addBotMessage("Ok ! Et comment tu appelles ces données ? (ex: CB, espèces, etc.)");
+        showChatInput();
+        
+        pendingCallback = async (terms) => {
+          addBotMessage("Parfait, c'est noté ! 👍");
+          await delay(1000);
+          
+          // Create basic config from user input
+          const termsList = terms.split(/[,\s]+/).filter(t => t.length > 1);
+          robotConfig.quotidien.colonnes = termsList.map((t, i) => ({
+            nom: t,
+            colonne: String.fromCharCode(65 + i),
+            synonymes: [t.toLowerCase()]
+          }));
+          
+          // Show simple result
+          await showResult({
+            colonnes: robotConfig.quotidien.colonnes.map(c => ({
+              ...c,
+              type: 'entree_argent',
+              saisie_utilisateur: true
+            })),
+            onglets: { type: 'unique', liste: excelData.sheets.map(s => s.name) },
+            questions: [],
+            resume: "Configuration manuelle terminée"
+          });
+        };
+      };
+    }
+    
+    // ==================== NAVIGATION ====================
+    
+    function goToStep(step) {
+      document.querySelectorAll('.step-item').forEach((item, i) => {
+        item.classList.remove('active', 'completed', 'upcoming');
+        if (i + 1 < step) item.classList.add('completed');
+        else if (i + 1 === step) item.classList.add('active');
+        else item.classList.add('upcoming');
+      });
+      
+      document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(`step-${step}`).classList.add('active');
+    }
+    
+    // ==================== UTILS ====================
+    
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>
