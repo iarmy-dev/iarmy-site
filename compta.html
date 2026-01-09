@@ -384,7 +384,7 @@
         const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password });
         if (authError) throw authError;
         const userId = authData.user?.id || '';
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/bright-worker`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'apikey': SUPABASE_ANON_KEY },
           body: JSON.stringify({ email, userId })
