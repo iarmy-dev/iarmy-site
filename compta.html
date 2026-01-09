@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compta Express - Configuration | iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', sans-serif; }
+    body { background: #050505; color: white; min-height: 100vh; }
+    
+    .logo-i {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px;
+    }
+    
+    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes logoSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes logoPulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
+    @keyframes progressBar { 0% { width: 0%; } 100% { width: 100%; } }
+    @keyframes pageTransition { 
+      0% { opacity: 0; transform: translateX(20px); } 
+      100% { opacity: 1; transform: translateX(0); } 
+    }
+    
+    .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    .animate-page { animation: pageTransition 0.4s ease-out; }
+    
+    .sidebar {
+      background: rgba(255,255,255,0.02);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      width: 280px;
+      min-height: 100vh;
+      padding: 24px;
+      position: fixed;
+      left: 0; top: 0;
+    }
+    
+    .step-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .step-item.active { background: rgba(255,107,53,0.1); }
+    .step-item.completed { opacity: 0.5; }
+    .step-item.upcoming { opacity: 0.3; }
+    
+    .step-number {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .step-item.active .step-number {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-color: #FF6B35;
+    }
+    .step-item.completed .step-number { background: #22c55e; border-color: #22c55e; }
+    
+    .step-label { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.6); }
+    .step-item.active .step-label { color: white; }
+    
+    .main-content {
+      margin-left: 280px;
+      padding: 40px;
+      max-width: 900px;
+    }
+    
+    .step-content { 
+      display: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .step-content.active { display: block; }
+    
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 60px 40px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: rgba(255,255,255,0.02);
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: #FF6B35;
+      background: rgba(255,107,53,0.05);
+    }
+    
+    .upload-icon {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 24px;
+    }
+    
+    .chat-container {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      overflow: hidden;
+      max-width: 700px;
+    }
+    .chat-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .chat-header-avatar {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
+    
+    .chat-messages {
+      padding: 24px;
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .chat-msg { margin-bottom: 20px; animation: slideIn 0.3s ease-out; }
+    .chat-msg-bot { display: flex; gap: 12px; }
+    .chat-msg-user { display: flex; gap: 12px; flex-direction: row-reverse; }
+    
+    .chat-avatar {
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .chat-avatar-bot { background: linear-gradient(135deg, #FF6B35, #FF8B5E); }
+    .chat-avatar-user { 
+      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      border: 2px solid rgba(255,107,53,0.3);
+      color: #FF8B5E;
+      font-size: 12px;
+    }
+    
+    .chat-bubble {
+      padding: 16px 20px;
+      border-radius: 20px;
+      max-width: 85%;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    .chat-bubble-bot {
+      background: rgba(255,255,255,0.05);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble-bot strong { color: #FF8B5E; font-weight: 600; }
+    .chat-bubble-user {
+      background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1));
+      border: 1px solid rgba(255,107,53,0.2);
+      border-bottom-right-radius: 4px;
+    }
+    
+    .chat-input-container {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; gap: 12px;
+    }
+    .chat-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px 20px;
+      color: white;
+      font-size: 15px;
+    }
+    .chat-input:focus { outline: none; border-color: #FF6B35; }
+    .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+    
+    .chat-send {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border: none;
+      border-radius: 14px;
+      padding: 16px 24px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .chat-send:hover { transform: scale(1.05); }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* Loading indicator iArmy style */
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      width: fit-content;
+      border-bottom-left-radius: 4px;
+    }
+    .loading-logo {
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px;
+      animation: logoPulse 1.2s ease-in-out infinite;
+    }
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .loading-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+    .loading-bar-container {
+      width: 100px; height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loading-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #FF6B35, #FF8B5E);
+      border-radius: 2px;
+      animation: progressBar 2s ease-in-out infinite;
+    }
+    
+    .result-container {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 700px;
+    }
+    .result-section {
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .result-section-title {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    
+    .column-tag {
+      display: inline-flex;
+      align-items: center; gap: 8px;
+      background: rgba(255,107,53,0.1);
+      border: 1px solid rgba(255,107,53,0.3);
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin: 4px;
+      font-weight: 500;
+    }
+    .column-tag-auto {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .message-example {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 20px;
+      font-family: monospace;
+      font-size: 18px;
+      color: #FF8B5E;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-weight: 600;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,53,0.3); }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 16px 32px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .security-notice {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(34,197,94,0.05);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+    }
+    
+    .close-btn {
+      position: fixed;
+      top: 24px; right: 24px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: white; z-index: 100;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <aside class="sidebar">
+      <a href="index.html" class="flex items-center gap-3 mb-10">
+        <div class="logo-i">i</div>
+        <span class="font-semibold">iArmy</span>
+      </a>
+      <div class="mb-6"><span class="text-xs text-white/40 uppercase tracking-wider">Configuration</span></div>
+      <div id="steps-nav">
+        <div class="step-item active"><div class="step-number">1</div><span class="step-label">Ton fichier</span></div>
+        <div class="step-item upcoming"><div class="step-number">2</div><span class="step-label">On discute</span></div>
+        <div class="step-item upcoming"><div class="step-number">3</div><span class="step-label">Ton compte</span></div>
+        <div class="step-item upcoming"><div class="step-number">4</div><span class="step-label">Telegram</span></div>
+      </div>
+    </aside>
+    
+    <main class="main-content">
+      <a href="index.html" class="close-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </a>
+      
+      <div class="step-content active" id="step-1">
+        <div class="mb-2"><span class="text-white/40 text-sm">Étape 1/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">Envoie-moi ton fichier</h1>
+        <p class="text-white/50 mb-8">Je vais l'analyser et comprendre comment tu fais ta compta.</p>
+        
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">📊</div>
+          <p class="text-lg font-medium mb-2">Glisse ton fichier Excel ici</p>
+          <p class="text-white/40 text-sm mb-4">ou clique pour parcourir</p>
+          <div class="flex justify-center gap-3">
+            <span class="px-4 py-2 bg-white/5 rounded-full text-sm text-white/50">.xlsx</span>
+            <span class="px-4 py-2 bg-white/5 rounded-full text-sm text-white/50">.xls</span>
+          </div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFileSelect(event)">
+        
+        <div class="security-notice mt-6">
+          <span>🔒</span>
+          <span>Tes données restent confidentielles. Personne n'y a accès à part toi.</span>
+        </div>
+      </div>
+      
+      <div class="step-content" id="step-2">
+        <div class="mb-2"><span class="text-white/40 text-sm">Étape 2/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">Parlons de ton fichier</h1>
+        <p class="text-white/50 mb-8">Je vais te poser quelques questions pour bien comprendre.</p>
+        
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-header-avatar">i</div>
+            <div>
+              <h3 class="font-semibold">iArmy</h3>
+              <p class="text-sm text-white/40">Analyse ton fichier...</p>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ta réponse..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button class="chat-send" onclick="sendMessage()">Envoyer</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-content" id="step-2b">
+        <div class="mb-2"><span class="text-white/40 text-sm">Étape 2/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">J'ai compris ta compta !</h1>
+        <p class="text-white/50 mb-8">Voilà ce que je vais faire pour toi chaque soir.</p>
+        <div class="result-container" id="result-container"></div>
+        <div class="flex gap-4 mt-6">
+          <button class="btn-primary" onclick="goToStep(3)">C'est bon ! →</button>
+          <button class="btn-secondary" onclick="backToChat()">💬 Je veux modifier</button>
+        </div>
+      </div>
+      
+      <div class="step-content" id="step-3">
+        <div class="mb-2"><span class="text-white/40 text-sm">Étape 3/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">Crée ton compte</h1>
+        <p class="text-white/50 mb-8">Pour sauvegarder ta configuration.</p>
+      </div>
+      
+      <div class="step-content" id="step-4">
+        <div class="mb-2"><span class="text-white/40 text-sm">Étape 4/4</span></div>
+        <h1 class="text-3xl font-bold mb-3">Connecte Telegram</h1>
+        <p class="text-white/50 mb-8">Dernière étape !</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    
+    let excelData = null;
+    let chatHistory = [];
+    let finalConfig = null;
+    let isWaitingForAI = false;
+    
+    const uploadZone = document.getElementById('upload-zone');
+    
+    uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+    
+    function handleFileSelect(event) { if (event.target.files[0]) handleFile(event.target.files[0]); }
+    
+    async function handleFile(file) {
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
+      
+      goToStep(2);
+      
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array', cellFormula: true });
+          
+          excelData = { fileName: file.name, sheets: [] };
+          
+          workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+            if (!sheet['!ref']) return;
+            
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            
+            // Read ALL headers (row 0) from first column to last
+            const headers = [];
+            for (let col = 0; col <= range.e.c; col++) {
+              const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+              const cell = sheet[cellAddress];
+              headers.push(cell ? String(cell.v || '') : '');
+            }
+            
+            // Read sample rows (rows 1-6)
+            const sampleRows = [];
+            for (let row = 1; row <= Math.min(6, range.e.r); row++) {
+              const rowData = [];
+              for (let col = 0; col <= range.e.c; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                const cell = sheet[cellAddress];
+                if (cell) {
+                  // If it's a number, format it nicely
+                  if (typeof cell.v === 'number') {
+                    rowData.push(cell.v % 1 === 0 ? cell.v.toString() : cell.v.toFixed(2));
+                  } else {
+                    rowData.push(String(cell.v || ''));
+                  }
+                } else {
+                  rowData.push('');
+                }
+              }
+              sampleRows.push(rowData);
+            }
+            
+            // Get formulas
+            const formulas = {};
+            for (let cellRef in sheet) {
+              if (cellRef[0] !== '!' && sheet[cellRef].f) {
+                formulas[cellRef] = sheet[cellRef].f;
+              }
+            }
+            
+            excelData.sheets.push({
+              name: sheetName,
+              headers: headers,
+              sampleRows: sampleRows,
+              rowCount: range.e.r,
+              formulas: formulas,
+              colCount: range.e.c + 1
+            });
+          });
+          
+          console.log('Excel parsed:', excelData);
+          await startAnalysis();
+        } catch (err) {
+          console.error(err);
+          addBotMessage("Hmm, j'ai eu un problème. Tu peux réessayer ?");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    
+    function addBotMessage(text) {
+      const container = document.getElementById('chat-messages');
+      const typing = document.getElementById('typing-indicator');
+      if (typing) typing.remove();
+      
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-bot animate-slide-in';
+      
+      // Convert markdown to HTML
+      let formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
+        .replace(/\n/g, '<br>');  // newlines
+      
+      msgDiv.innerHTML = `
+        <div class="chat-avatar chat-avatar-bot">i</div>
+        <div class="chat-bubble chat-bubble-bot">${formattedText}</div>
+      `;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      chatHistory.push({ role: 'assistant', content: text });
+    }
+    
+    function addUserMessage(text) {
+      const container = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-user animate-slide-in';
+      msgDiv.innerHTML = `
+        <div class="chat-avatar chat-avatar-user">Toi</div>
+        <div class="chat-bubble chat-bubble-user">${text}</div>
+      `;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      chatHistory.push({ role: 'user', content: text });
+    }
+    
+    function showTyping() {
+      const container = document.getElementById('chat-messages');
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'chat-msg chat-msg-bot';
+      typingDiv.id = 'typing-indicator';
+      typingDiv.innerHTML = `
+        <div class="chat-avatar chat-avatar-bot">i</div>
+        <div class="loading-indicator">
+          <div class="loading-logo">i</div>
+          <div class="loading-content">
+            <span class="loading-text">Analyse en cours...</span>
+            <div class="loading-bar-container">
+              <div class="loading-bar"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.appendChild(typingDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || isWaitingForAI) return;
+      
+      input.value = '';
+      addUserMessage(text);
+      await continueChat();
+    }
+    
+    async function callAPI(mode) {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/clever-processor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ excelData, chatHistory, mode })
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      return result.response;
+    }
+    
+    async function startAnalysis() {
+      showTyping();
+      isWaitingForAI = true;
+      try {
+        const response = await callAPI('analyze');
+        addBotMessage(response);
+      } catch (err) {
+        console.error(err);
+        addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?");
+      }
+      isWaitingForAI = false;
+    }
+    
+    async function continueChat() {
+      showTyping();
+      isWaitingForAI = true;
+      try {
+        const response = await callAPI('chat');
+        
+        // Check if response contains JSON (finalization)
+        // Handle both raw JSON and markdown code blocks
+        let jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+          finalConfig = JSON.parse(jsonMatch[1]);
+          showResult();
+        } else if (response.trim().startsWith('{')) {
+          finalConfig = JSON.parse(response.trim());
+          showResult();
+        } else {
+          addBotMessage(response);
+        }
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Désolé, j'ai eu un problème. Tu peux répéter ?");
+      }
+      isWaitingForAI = false;
+    }
+    
+    function showResult() {
+      document.getElementById('step-2').classList.remove('active');
+      document.getElementById('step-2b').classList.add('active');
+      
+      const container = document.getElementById('result-container');
+      const colonnes = finalConfig.colonnes_a_remplir || [];
+      const colonnesAuto = finalConfig.colonnes_auto || [];
+      const exemple = finalConfig.message_exemple || 'cb 1200 esp 350';
+      const logique = finalConfig.logique_detectee || '';
+      
+      // Parse exemple to get values
+      const values = {};
+      exemple.split(' ').forEach((part, i, arr) => {
+        if (i % 2 === 0 && arr[i+1]) {
+          values[part.toLowerCase()] = arr[i+1];
+        }
+      });
+      
+      container.innerHTML = `
+        <style>
+          @keyframes phoneType { 
+            0% { width: 0; } 
+            100% { width: 100%; } 
+          }
+          @keyframes arrowPulse {
+            0%, 100% { transform: translateX(0); opacity: 0.5; }
+            50% { transform: translateX(10px); opacity: 1; }
+          }
+          @keyframes cellFill {
+            0% { background: transparent; color: transparent; }
+            50% { background: rgba(255,107,53,0.3); }
+            100% { background: rgba(255,107,53,0.1); color: #FF8B5E; }
+          }
+          @keyframes cellAuto {
+            0% { opacity: 0; }
+            100% { opacity: 1; color: rgba(255,255,255,0.4); }
+          }
+          .phone-container {
+            background: linear-gradient(145deg, #1c1c1e, #0d0d0d);
+            border-radius: 28px;
+            padding: 6px;
+            width: 200px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+          }
+          .phone-inner {
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+          }
+          .phone-notch {
+            width: 60px; height: 20px;
+            background: #000;
+            border-radius: 0 0 12px 12px;
+            margin: 0 auto;
+            position: relative;
+          }
+          .phone-notch::after {
+            content: '';
+            position: absolute;
+            width: 8px; height: 8px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            top: 6px; right: 12px;
+          }
+          .phone-header {
+            background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
+            padding: 10px 12px;
+            display: flex; align-items: center; gap: 8px;
+          }
+          .phone-avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+          }
+          .phone-name { font-size: 13px; font-weight: 600; }
+          .phone-status { font-size: 10px; color: #0a84ff; }
+          .phone-chat {
+            padding: 12px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+          .phone-msg {
+            padding: 8px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            max-width: 90%;
+            line-height: 1.3;
+          }
+          .phone-msg-user {
+            background: #0a84ff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+          .phone-msg-user span {
+            display: inline-block;
+            animation: phoneType 2s ease-out forwards;
+            overflow: hidden;
+          }
+          .phone-msg-bot {
+            background: #2c2c2e;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            opacity: 0;
+            animation: cellAuto 0.5s ease-out 2.5s forwards;
+          }
+          
+          .arrow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+          }
+          .arrow {
+            font-size: 24px;
+            color: #FF6B35;
+            animation: arrowPulse 1.5s ease-in-out infinite;
+          }
+          
+          .excel-container {
+            background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+            border-radius: 16px;
+            padding: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            flex: 1;
+            max-width: 350px;
+          }
+          .excel-inner {
+            background: #0a0a0a;
+            border-radius: 14px;
+            overflow: hidden;
+          }
+          .excel-header {
+            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .excel-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+          }
+          .excel-dot-red { background: #ff5f57; }
+          .excel-dot-yellow { background: #febc2e; }
+          .excel-dot-green { background: #28c840; }
+          .excel-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-left: 8px;
+          }
+          .excel-grid {
+            display: grid;
+            grid-template-columns: 50px repeat(${colonnes.length + 1}, 1fr);
+            font-size: 11px;
+          }
+          .excel-cell {
+            padding: 10px 6px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            white-space: nowrap;
+            overflow: hidden;
+          }
+          .excel-cell-header {
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            font-size: 10px;
+          }
+          .excel-cell-date {
+            color: rgba(255,255,255,0.3);
+            font-size: 10px;
+          }
+          .excel-cell-value {
+            color: transparent;
+          }
+          .excel-cell-auto {
+            color: transparent;
+          }
+          ${colonnes.map((c, i) => `
+            .excel-cell-value-${i} {
+              animation: cellFill 0.6s ease-out ${1 + i * 0.4}s forwards;
+            }
+          `).join('')}
+          .excel-cell-total {
+            animation: cellAuto 0.5s ease-out ${1 + colonnes.length * 0.4 + 0.5}s forwards;
+            font-style: italic;
+          }
+          
+          .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            justify-content: center;
+          }
+          .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+          }
+          .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 3px;
+          }
+          .legend-dot-user { background: rgba(255,107,53,0.5); }
+          .legend-dot-auto { background: rgba(255,255,255,0.1); }
+        </style>
+        
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-content-center text-2xl" style="display:flex;align-items:center;justify-content:center;">✓</div>
+          <div>
+            <h2 class="text-xl font-bold">Configuration prête</h2>
+            <p class="text-white/50 text-sm">${logique}</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 flex-wrap justify-center">
+          <!-- Phone -->
+          <div class="phone-container">
+            <div class="phone-inner">
+              <div class="phone-notch"></div>
+              <div class="phone-header">
+                <div class="phone-avatar">i</div>
+                <div>
+                  <div class="phone-name">iArmy</div>
+                  <div class="phone-status">en ligne</div>
+                </div>
+              </div>
+              <div class="phone-chat">
+                <div class="phone-msg phone-msg-user">
+                  <span>${exemple}</span>
+                </div>
+                <div class="phone-msg phone-msg-bot">✅ Noté pour le ${new Date().toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'})} !</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Arrow -->
+          <div class="arrow-container">
+            <span class="arrow">→</span>
+          </div>
+          
+          <!-- Excel -->
+          <div class="excel-container">
+            <div class="excel-inner">
+              <div class="excel-header">
+                <div class="excel-dot excel-dot-red"></div>
+                <div class="excel-dot excel-dot-yellow"></div>
+                <div class="excel-dot excel-dot-green"></div>
+                <span class="excel-title">Compta.xlsx</span>
+              </div>
+              <div class="excel-grid">
+                <!-- Header row -->
+                <div class="excel-cell excel-cell-header">Date</div>
+                ${colonnes.map(c => `<div class="excel-cell excel-cell-header">${getShortName(c.nom)}</div>`).join('')}
+                <div class="excel-cell excel-cell-header">Total</div>
+                
+                <!-- Data row -->
+                <div class="excel-cell excel-cell-date">${new Date().toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'})}</div>
+                ${colonnes.map((c, i) => {
+                  const key = c.synonymes?.[0] || c.nom.toLowerCase();
+                  const val = values[key] || values[c.nom.toLowerCase()] || Math.floor(Math.random() * 500 + 200);
+                  return `<div class="excel-cell excel-cell-value excel-cell-value-${i}">${val} €</div>`;
+                }).join('')}
+                <div class="excel-cell excel-cell-auto excel-cell-total">auto</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-dot legend-dot-user"></div>
+            <span>Tu me donnes</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot legend-dot-auto"></div>
+            <span>Se calcule</span>
+          </div>
+        </div>
+        
+        <div class="security-notice mt-6">
+          <span>🔒</span>
+          <span>Tes données restent sur ton fichier. Personne n'y a accès.</span>
+        </div>
+      `;
+      
+      // Restart animations on view
+      setTimeout(() => {
+        container.querySelectorAll('[style*="animation"]').forEach(el => {
+          el.style.animation = 'none';
+          el.offsetHeight; // Trigger reflow
+          el.style.animation = null;
+        });
+      }, 100);
+    }
+    
+    function getShortName(name) {
+      // Get short display name from column name
+      const n = name.toLowerCase();
+      if (n.includes('recette')) return 'Rec.';
+      if (n.includes('depense') || n.includes('dépense')) return 'Dép.';
+      if (n.includes('cb') || n.includes('carte')) return 'CB';
+      if (n.includes('esp')) return 'ESP';
+      if (n.includes('tr') || n.includes('ticket')) return 'TR';
+      // Return first word, max 6 chars
+      return name.split(/[\s(]/)[0].substring(0, 6);
+    }
+    
+    function getIcon(name) {
+      const n = name.toLowerCase();
+      if (n.includes('cb') || n.includes('carte')) return '💳';
+      if (n.includes('esp')) return '💵';
+      if (n.includes('tr') || n.includes('ticket')) return '🎫';
+      if (n.includes('dep') || n.includes('dép')) return '📤';
+      if (n.includes('recette')) return '📥';
+      return '📦';
+    }
+    
+    function backToChat() {
+      document.getElementById('step-2b').classList.remove('active');
+      document.getElementById('step-2').classList.add('active');
+      addBotMessage("Ok, qu'est-ce que tu veux modifier ?");
+    }
+    
+    function goToStep(step) {
+      // Update sidebar
+      document.querySelectorAll('.step-item').forEach((item, i) => {
+        item.classList.remove('active', 'completed', 'upcoming');
+        if (i < step - 1) item.classList.add('completed');
+        else if (i === step - 1) item.classList.add('active');
+        else item.classList.add('upcoming');
+      });
+      
+      // Animate page transition
+      const currentStep = document.querySelector('.step-content.active');
+      const nextStep = document.getElementById(`step-${step}`);
+      
+      if (currentStep) {
+        currentStep.style.opacity = '0';
+        currentStep.style.transform = 'translateX(-20px)';
+        setTimeout(() => {
+          currentStep.classList.remove('active');
+          currentStep.style.opacity = '';
+          currentStep.style.transform = '';
+          
+          nextStep.classList.add('active');
+          nextStep.style.animation = 'pageTransition 0.4s ease-out';
+        }, 200);
+      } else {
+        nextStep.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
