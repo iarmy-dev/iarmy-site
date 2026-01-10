@@ -10,8 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #030303; color: white; min-height: 100vh; }
+    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
     
+    /* Background gradient */
     .bg-gradient-animate { 
       background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); 
       background-size: 400% 400%; 
@@ -23,6 +24,7 @@
       100% { background-position: 0% 50%; } 
     }
     
+    /* Orbes */
     .orb { 
       position: fixed; 
       border-radius: 50%; 
@@ -31,22 +33,24 @@
       pointer-events: none; 
       z-index: 0; 
     }
-    .orb-1 { width: 400px; height: 400px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -200px; right: -100px; opacity: 0.15; }
-    .orb-2 { width: 300px; height: 300px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -150px; left: -100px; opacity: 0.15; animation-delay: -7s; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.18; }
+    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
+    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
     
+    /* Glass */
     .glass { 
       background: rgba(255, 255, 255, 0.02); 
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.05); 
     }
-    
     .glass-card { 
       background: rgba(255, 255, 255, 0.02); 
       border: 1px solid rgba(255, 255, 255, 0.06); 
       border-radius: 24px; 
-      transition: all 0.3s ease; 
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
+      transition: all 0.4s ease; 
     }
     .glass-card:hover { 
       background: rgba(255, 255, 255, 0.04); 
@@ -54,6 +58,7 @@
       transform: translateY(-4px); 
     }
     
+    /* Logo with pulse animation */
     .logo-i { 
       width: 40px; 
       height: 40px; 
@@ -64,32 +69,59 @@
       justify-content: center; 
       font-weight: 800; 
       font-size: 20px; 
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      cursor: pointer;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .logo-i:hover { 
+      transform: scale(1.2) rotate(-15deg); 
+      box-shadow: 0 12px 40px rgba(255,107,53,0.6); 
+      animation: none;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+      50% { box-shadow: 0 0 20px 8px rgba(255, 107, 53, 0); }
     }
     
+    /* Buttons */
     .btn-primary { 
       background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
-      padding: 12px 24px; 
-      border-radius: 12px; 
+      padding: 14px 28px; 
+      border-radius: 14px; 
       font-weight: 600; 
-      transition: all 0.3s; 
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
       border: none; 
       color: white; 
       cursor: pointer; 
+      position: relative; 
+      overflow: hidden;
       text-decoration: none;
       display: inline-block;
+      text-align: center;
+    }
+    .btn-primary::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: -100%; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); 
+      transition: left 0.5s; 
     }
     .btn-primary:hover { 
-      transform: translateY(-2px); 
-      box-shadow: 0 12px 24px rgba(255,107,53,0.3); 
+      transform: translateY(-3px); 
+      box-shadow: 0 12px 32px rgba(255,107,53,0.4); 
     }
+    .btn-primary:hover::before { left: 100%; }
     
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       padding: 12px 24px;
       border-radius: 12px;
       font-weight: 600;
       transition: all 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: white;
       cursor: pointer;
       text-decoration: none;
@@ -97,9 +129,11 @@
     }
     .btn-secondary:hover {
       background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
     }
     
+    /* Status badges */
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -109,39 +143,62 @@
       font-size: 13px;
       font-weight: 600;
     }
-    
     .status-active {
-      background: rgba(34, 197, 94, 0.1);
+      background: rgba(34, 197, 94, 0.12);
       color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.25);
     }
-    
     .status-inactive {
-      background: rgba(156, 163, 175, 0.1);
+      background: rgba(156, 163, 175, 0.12);
       color: #9ca3af;
-      border: 1px solid rgba(156, 163, 175, 0.2);
+      border: 1px solid rgba(156, 163, 175, 0.25);
     }
-    
     .dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
+      animation: dot-pulse 2s ease-in-out infinite;
+    }
+    .dot-green { background: #22c55e; }
+    .dot-gray { background: #9ca3af; animation: none; }
+    
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
-    .dot-green { background: #22c55e; }
-    .dot-gray { background: #9ca3af; }
-    
+    /* Stat cards */
     .stat-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 20px;
+      border-radius: 20px;
+      padding: 24px;
+      transition: all 0.3s ease;
     }
+    .stat-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Code box */
+    .code-box {
+      background: rgba(255,107,53,0.08);
+      border: 2px dashed rgba(255,107,53,0.25);
+      border-radius: 16px;
+      padding: 20px 28px;
+      backdrop-filter: blur(10px);
+    }
+    
+    /* Fade in animations */
+    .animate-fade-in { animation: fadeIn 0.8s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body class="bg-gradient-animate">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
   <!-- Nav -->
   <nav class="glass fixed top-0 left-0 right-0 z-50">
@@ -150,7 +207,7 @@
         <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
-      <button onclick="logout()" class="text-white/60 hover:text-white text-sm">Déconnexion</button>
+      <button onclick="logout()" class="text-white/60 hover:text-white text-sm transition-colors">Déconnexion</button>
     </div>
   </nav>
 
@@ -159,40 +216,40 @@
     <div class="max-w-5xl mx-auto">
       
       <!-- Header -->
-      <div class="mb-12">
-        <h1 class="text-3xl font-bold mb-2">Bienvenue, <span id="user-name">...</span></h1>
-        <p class="text-white/50" id="user-email">...</p>
+      <div class="mb-12 animate-fade-in">
+        <h1 class="text-4xl font-bold mb-2">Bienvenue, <span id="user-name" class="text-[#FF8B5E]">...</span></h1>
+        <p class="text-white/50 text-lg" id="user-email">...</p>
       </div>
 
       <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12 animate-fade-in" style="animation-delay: 0.1s;">
         <div class="stat-card">
-          <p class="text-white/50 text-sm mb-1">Bots actifs</p>
-          <p class="text-3xl font-bold text-[#FF6B35]" id="bots-count">1</p>
+          <p class="text-white/50 text-sm mb-2">Bots actifs</p>
+          <p class="text-4xl font-bold text-[#FF6B35]" id="bots-count">1</p>
         </div>
         <div class="stat-card">
-          <p class="text-white/50 text-sm mb-1">Entrées ce mois</p>
-          <p class="text-3xl font-bold" id="entries-count">0</p>
+          <p class="text-white/50 text-sm mb-2">Entrées ce mois</p>
+          <p class="text-4xl font-bold" id="entries-count">0</p>
         </div>
         <div class="stat-card">
-          <p class="text-white/50 text-sm mb-1">Total</p>
-          <p class="text-3xl font-bold text-[#FF6B35]" id="total-amount">0€</p>
+          <p class="text-white/50 text-sm mb-2">Total</p>
+          <p class="text-4xl font-bold text-[#FF6B35]" id="total-amount">0€</p>
         </div>
       </div>
 
       <!-- Bots Section -->
-      <div class="mb-12">
+      <div class="mb-12 animate-fade-in" style="animation-delay: 0.2s;">
         <h2 class="text-2xl font-bold mb-6">Mes Bots</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           <!-- Compta Express -->
-          <div class="glass-card p-6">
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center gap-3">
-                <div style="width:48px; height:48px; background:rgba(255,107,53,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px;">📊</div>
+          <div class="glass-card p-8">
+            <div class="flex items-start justify-between mb-6">
+              <div class="flex items-center gap-4">
+                <div style="width:56px; height:56px; background:rgba(255,107,53,0.12); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px;">📊</div>
                 <div>
-                  <h3 class="font-bold text-lg">Compta Express</h3>
+                  <h3 class="font-bold text-xl mb-2">Compta Express</h3>
                   <span class="status-badge status-inactive" id="compta-status">
                     <span class="dot dot-gray"></span>
                     Non configuré
@@ -201,20 +258,20 @@
               </div>
             </div>
             
-            <p class="text-white/60 text-sm mb-6">Enregistre tes recettes quotidiennes via Telegram.</p>
+            <p class="text-white/60 text-sm mb-6 leading-relaxed">Enregistre tes recettes quotidiennes via Telegram.</p>
             
-            <a href="compta.html" class="btn-primary block text-center">
-              Configurer →
+            <a href="compta.html" class="btn-primary w-full">
+              Configurer maintenant →
             </a>
           </div>
 
           <!-- Task Manager (Coming Soon) -->
-          <div class="glass-card p-6 opacity-50">
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center gap-3">
-                <div style="width:48px; height:48px; background:rgba(107,53,255,0.1); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px;">✅</div>
+          <div class="glass-card p-8 opacity-50">
+            <div class="flex items-start justify-between mb-6">
+              <div class="flex items-center gap-4">
+                <div style="width:56px; height:56px; background:rgba(107,53,255,0.12); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px;">✅</div>
                 <div>
-                  <h3 class="font-bold text-lg">Task Manager</h3>
+                  <h3 class="font-bold text-xl mb-2">Task Manager</h3>
                   <span class="status-badge status-inactive">
                     <span class="dot dot-gray"></span>
                     Bientôt disponible
@@ -223,9 +280,9 @@
               </div>
             </div>
             
-            <p class="text-white/60 text-sm mb-6">Gère tes tâches et rappels depuis Telegram.</p>
+            <p class="text-white/60 text-sm mb-6 leading-relaxed">Gère tes tâches et rappels depuis Telegram.</p>
             
-            <button class="btn-secondary block w-full text-center" disabled>
+            <button class="btn-secondary w-full" disabled>
               Prochainement
             </button>
           </div>
@@ -234,18 +291,27 @@
       </div>
 
       <!-- Telegram Link Code -->
-      <div class="glass-card p-6">
-        <h3 class="font-bold text-lg mb-4">🔗 Lier ton compte Telegram</h3>
-        <p class="text-white/60 text-sm mb-4">Pour utiliser les bots, lie ton compte Telegram avec ce code :</p>
-        
-        <div class="flex items-center gap-4">
-          <div style="background:rgba(255,107,53,0.1); border:2px dashed rgba(255,107,53,0.3); border-radius:12px; padding:16px 24px;">
-            <span class="text-2xl font-mono font-bold text-[#FF6B35]" id="telegram-code">--------</span>
+      <div class="glass-card p-8 animate-fade-in" style="animation-delay: 0.3s;">
+        <div class="flex items-start gap-4 mb-6">
+          <div style="width:48px; height:48px; background:rgba(255,107,53,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🔗</div>
+          <div class="flex-1">
+            <h3 class="font-bold text-xl mb-2">Lier ton compte Telegram</h3>
+            <p class="text-white/60 text-sm leading-relaxed">Pour utiliser les bots, lie ton compte Telegram avec ce code :</p>
           </div>
-          <button onclick="copyCode()" class="btn-secondary">📋 Copier</button>
         </div>
         
-        <p class="text-white/40 text-xs mt-4">Envoie <code style="background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">/link CODE</code> au bot sur Telegram</p>
+        <div class="flex items-center gap-4 flex-wrap">
+          <div class="code-box flex-1 min-w-[200px]">
+            <span class="text-3xl font-mono font-bold text-[#FF6B35] tracking-wider" id="telegram-code">--------</span>
+          </div>
+          <button onclick="copyCode()" class="btn-secondary whitespace-nowrap">
+            📋 Copier
+          </button>
+        </div>
+        
+        <p class="text-white/40 text-xs mt-6">
+          Envoie <code style="background:rgba(255,255,255,0.06); padding:4px 8px; border-radius:6px; font-family:monospace;">/link CODE</code> au bot sur Telegram
+        </p>
       </div>
 
     </div>
@@ -291,7 +357,21 @@
     function copyCode() {
       const code = document.getElementById('telegram-code').textContent;
       navigator.clipboard.writeText(code);
-      alert('Code copié ! 📋');
+      
+      // Visual feedback
+      const btn = event.target;
+      const originalText = btn.textContent;
+      btn.textContent = '✅ Copié !';
+      btn.style.background = 'rgba(34, 197, 94, 0.15)';
+      btn.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+      btn.style.color = '#22c55e';
+      
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 2000);
     }
 
     loadUserData();
