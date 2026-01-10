@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration Compta - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
+    
+    .bg-gradient-animate { 
+      background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); 
+      background-size: 400% 400%; 
+      animation: gradientShift 20s ease infinite; 
+    }
+    @keyframes gradientShift { 
+      0% { background-position: 0% 50%; } 
+      50% { background-position: 100% 50%; } 
+      100% { background-position: 0% 50%; } 
+    }
+    
+    .orb { 
+      position: fixed; 
+      border-radius: 50%; 
+      filter: blur(100px); 
+      animation: float 15s ease-in-out infinite; 
+      pointer-events: none; 
+      z-index: 0; 
+    }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.18; }
+    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
+    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
+    
+    .glass { 
+      background: rgba(255, 255, 255, 0.02); 
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05); 
+    }
+    .glass-card { 
+      background: rgba(255, 255, 255, 0.02); 
+      border: 1px solid rgba(255, 255, 255, 0.06); 
+      border-radius: 24px; 
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
+      transition: all 0.4s ease; 
+    }
+    
+    .logo-i { 
+      width: 40px; 
+      height: 40px; 
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
+      border-radius: 12px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 800; 
+      font-size: 20px; 
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      cursor: pointer;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .logo-i:hover { 
+      transform: scale(1.2) rotate(-15deg); 
+      box-shadow: 0 12px 40px rgba(255,107,53,0.6); 
+      animation: none;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
+      50% { box-shadow: 0 0 20px 8px rgba(255, 107, 53, 0); }
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
+      padding: 14px 28px; 
+      border-radius: 14px; 
+      font-weight: 600; 
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      border: none; 
+      color: white; 
+      cursor: pointer; 
+      position: relative; 
+      overflow: hidden;
+    }
+    .btn-primary::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: -100%; 
+      width: 100%; 
+      height: 100%; 
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); 
+      transition: left 0.5s; 
+    }
+    .btn-primary:hover { 
+      transform: translateY(-3px); 
+      box-shadow: 0 12px 32px rgba(255,107,53,0.4); 
+    }
+    .btn-primary:hover::before { left: 100%; }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .upload-zone {
+      border: 2px dashed rgba(255, 107, 53, 0.3);
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: rgba(255, 107, 53, 0.03);
+    }
+    .upload-zone:hover {
+      border-color: rgba(255, 107, 53, 0.5);
+      background: rgba(255, 107, 53, 0.06);
+      transform: translateY(-2px);
+    }
+    .upload-zone.dragging {
+      border-color: #FF6B35;
+      background: rgba(255, 107, 53, 0.1);
+    }
+    
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #FF6B35;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .column-select {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px;
+      color: white;
+      width: 100%;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .column-select:focus {
+      outline: none;
+      border-color: #FF6B35;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    
+    .stepper {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 40px;
+      justify-content: center;
+    }
+    
+    .stepper-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .stepper-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .stepper-item.active .stepper-number {
+      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+      border-color: #FF6B35;
+      color: white;
+    }
+    
+    .stepper-item.completed .stepper-number {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+  </style>
+</head>
+<body class="bg-gradient-animate">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Nav -->
+  <nav class="glass fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="compte.html" class="flex items-center gap-3">
+        <div class="logo-i">i</div>
+        <span class="font-semibold text-lg">iArmy</span>
+      </a>
+      <a href="compte.html" class="text-white/60 hover:text-white text-sm transition-colors">← Retour</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="pt-32 pb-20 px-6 relative z-10">
+    <div class="max-w-4xl mx-auto">
+      
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4">Configuration Compta Express 📊</h1>
+        <p class="text-white/60">Configure ton robot en 3 étapes simples</p>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="stepper-item active" id="stepper-1">
+          <div class="stepper-number">1</div>
+          <span class="text-sm hidden sm:inline">Upload</span>
+        </div>
+        <div style="width:40px; height:2px; background:rgba(255,255,255,0.1); margin-top:20px;"></div>
+        <div class="stepper-item" id="stepper-2">
+          <div class="stepper-number">2</div>
+          <span class="text-sm hidden sm:inline">Colonnes</span>
+        </div>
+        <div style="width:40px; height:2px; background:rgba(255,255,255,0.1); margin-top:20px;"></div>
+        <div class="stepper-item" id="stepper-3">
+          <div class="stepper-number">3</div>
+          <span class="text-sm hidden sm:inline">Terminé</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Upload Excel -->
+      <div class="step active" id="step-1">
+        <div class="glass-card p-8">
+          <h2 class="text-2xl font-bold mb-6 text-center">📄 Upload ton fichier Excel</h2>
+          
+          <div class="upload-zone" id="upload-zone">
+            <div class="text-6xl mb-4">📊</div>
+            <h3 class="text-xl font-bold mb-2">Glisse ton fichier ici</h3>
+            <p class="text-white/60 mb-4">ou clique pour sélectionner</p>
+            <p class="text-white/40 text-sm">Formats acceptés: .xlsx, .xls, .csv</p>
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none;">
+          </div>
+
+          <div id="file-info" class="mt-6 text-center" style="display:none;">
+            <div class="inline-block bg-white/5 px-6 py-3 rounded-xl">
+              <span class="text-[#FF6B35] font-bold" id="file-name"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Analyzing -->
+      <div class="step" id="step-analyzing">
+        <div class="glass-card p-12 text-center">
+          <div class="spinner mb-6"></div>
+          <h2 class="text-2xl font-bold mb-4">🤖 Analyse en cours...</h2>
+          <p class="text-white/60">Claude AI analyse ton fichier Excel</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: Column Mapping -->
+      <div class="step" id="step-2">
+        <div class="glass-card p-8">
+          <h2 class="text-2xl font-bold mb-6 text-center">🎯 Configure tes colonnes</h2>
+          
+          <div class="space-y-6" id="column-mapping">
+            <!-- Will be populated dynamically -->
+          </div>
+
+          <div class="flex gap-4 mt-8">
+            <button onclick="prevStep()" class="btn-secondary flex-1">← Retour</button>
+            <button onclick="saveConfig()" class="btn-primary flex-1">Sauvegarder →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Success -->
+      <div class="step" id="step-3">
+        <div class="glass-card p-12 text-center">
+          <div class="text-6xl mb-6">🎉</div>
+          <h2 class="text-3xl font-bold mb-4">Configuration réussie !</h2>
+          <p class="text-white/60 mb-8">Ton robot Compta Express est prêt à fonctionner</p>
+          
+          <div class="flex gap-4 justify-center">
+            <a href="compte.html" class="btn-secondary">← Tableau de bord</a>
+            <button onclick="testBot()" class="btn-primary">Tester le bot →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const ANTHROPIC_API_KEY = 'sk-ant-api03-yD3UJT_p0mRtqmKZheLrfGd8-RgWk0aaIGX9tJjgjExCxp0Rl0s5vZJ0djgREO8v7lSh_BUvY9fKDzaQag-PEYCPgAA';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let currentUser = null;
+    let uploadedFile = null;
+    let excelColumns = [];
+    let excelData = null;
+    let currentStep = 1;
+
+    // Check auth on load
+    async function checkAuth() {
+      const { data: { user }, error } = await supabaseClient.auth.getUser();
+      if (error || !user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+    }
+
+    // Upload zone interactions
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragging');
+    });
+    
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragging');
+    });
+    
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    async function handleFile(file) {
+      if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+        alert('Format non supporté. Utilise .xlsx, .xls ou .csv');
+        return;
+      }
+
+      uploadedFile = file;
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-info').style.display = 'block';
+
+      // Read file
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          excelData = XLSX.utils.sheet_to_json(firstSheet);
+          
+          // Extract columns
+          if (excelData.length > 0) {
+            excelColumns = Object.keys(excelData[0]);
+            console.log('Columns found:', excelColumns);
+            
+            // Analyze with Claude
+            setTimeout(() => analyzeExcel(), 1500);
+          }
+        } catch (error) {
+          alert('Erreur lecture fichier: ' + error.message);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function analyzeExcel() {
+      showStep('analyzing');
+      updateStepper(2);
+
+      try {
+        // Call Claude API to analyze Excel structure
+        const sampleData = excelData.slice(0, 5);
+        
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 1024,
+            messages: [{
+              role: 'user',
+              content: `Analyse ce fichier Excel de comptabilité restaurant. Colonnes: ${excelColumns.join(', ')}. Données exemple: ${JSON.stringify(sampleData)}. 
+
+Identifie quelle colonne correspond à:
+- Date
+- Type de paiement CB (carte bancaire)
+- Montant CB
+- Type de paiement ESP (espèces)
+- Montant ESP
+- Type de paiement TR (tickets restaurant)
+- Montant TR
+- Dépenses
+
+Réponds UNIQUEMENT en JSON: {"date":"nom_colonne","cb_type":"nom_colonne","cb_amount":"nom_colonne",...}`
+            }]
+          })
+        });
+
+        const result = await response.json();
+        const mapping = JSON.parse(result.content[0].text);
+        
+        // Show column mapping step
+        displayColumnMapping(mapping);
+        
+      } catch (error) {
+        console.error('Erreur analyse:', error);
+        alert('Erreur analyse. On continue manuellement.');
+        displayColumnMapping({});
+      }
+    }
+
+    function displayColumnMapping(suggestedMapping) {
+      showStep(2);
+      
+      const fields = [
+        { id: 'date', label: 'Date', suggested: suggestedMapping.date },
+        { id: 'cb_amount', label: 'Montant CB', suggested: suggestedMapping.cb_amount },
+        { id: 'esp_amount', label: 'Montant Espèces', suggested: suggestedMapping.esp_amount },
+        { id: 'tr_amount', label: 'Montant TR', suggested: suggestedMapping.tr_amount },
+        { id: 'expense_amount', label: 'Dépenses', suggested: suggestedMapping.expense_amount }
+      ];
+
+      const html = fields.map(field => `
+        <div>
+          <label class="block text-sm font-semibold mb-2">${field.label}</label>
+          <select class="column-select" id="field-${field.id}">
+            <option value="">-- Sélectionne --</option>
+            ${excelColumns.map(col => `
+              <option value="${col}" ${col === field.suggested ? 'selected' : ''}>${col}</option>
+            `).join('')}
+          </select>
+        </div>
+      `).join('');
+
+      document.getElementById('column-mapping').innerHTML = html;
+    }
+
+    async function saveConfig() {
+      const config = {
+        user_id: currentUser.id,
+        module: 'compta',
+        excel_columns: {
+          date: document.getElementById('field-date').value,
+          cb_amount: document.getElementById('field-cb_amount').value,
+          esp_amount: document.getElementById('field-esp_amount').value,
+          tr_amount: document.getElementById('field-tr_amount').value,
+          expense_amount: document.getElementById('field-expense_amount').value
+        },
+        file_name: uploadedFile.name
+      };
+
+      try {
+        const { error } = await supabaseClient
+          .from('user_configs')
+          .upsert(config);
+
+        if (error) throw error;
+
+        showStep(3);
+        updateStepper(3);
+        
+      } catch (error) {
+        alert('Erreur sauvegarde: ' + error.message);
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      if (step === 'analyzing') {
+        document.getElementById('step-analyzing').classList.add('active');
+      } else {
+        document.getElementById(`step-${step}`).classList.add('active');
+      }
+      currentStep = step;
+    }
+
+    function updateStepper(step) {
+      for (let i = 1; i <= 3; i++) {
+        const item = document.getElementById(`stepper-${i}`);
+        item.classList.remove('active', 'completed');
+        if (i < step) item.classList.add('completed');
+        if (i === step) item.classList.add('active');
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        showStep(currentStep - 1);
+        updateStepper(currentStep);
+      }
+    }
+
+    function testBot() {
+      window.open('https://t.me/IArmybot', '_blank');
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>
