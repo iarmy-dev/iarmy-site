@@ -126,6 +126,572 @@
 .btn-logout:hover{background:linear-gradient(135deg,rgba(239,68,68,.25),rgba(239,68,68,.1));border-color:rgba(239,68,68,.5);transform:translateY(-2px);box-shadow:0 8px 20px rgba(239,68,68,.3);color:#f87171}
 .close-btn{transition:all .3s ease}
 .close-btn:hover{background:rgba(255,255,255,.08);transform:translateY(-2px) rotate(90deg);box-shadow:0 4px 12px rgba(255,255,255,.1)}
+  
+/* ============================================ */
+/* CSS COMPLET POUR OAUTH + LISTE SHEETS */
+/* À AJOUTER DANS LE <style> EXISTANT */
+/* ============================================ */
+
+/* MODAL D'AUTHENTIFICATION */
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.auth-modal-backdrop.show {
+  opacity: 1;
+}
+
+.auth-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(20, 20, 20, 0.98);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 32px;
+  padding: 48px 40px;
+  width: 90%;
+  max-width: 440px;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.9),
+              0 0 0 1px rgba(255,107,53,0.2),
+              inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.auth-modal.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.auth-modal-content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.auth-modal-content p {
+  color: rgba(255,255,255,0.5);
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.btn-google-complete {
+  width: 100%;
+  background: white;
+  color: #3c4043;
+  border: none;
+  border-radius: 16px;
+  padding: 18px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 20px rgba(255,255,255,0.15);
+  font-family: 'Space Grotesk', sans-serif;
+  margin-bottom: 16px;
+}
+
+.btn-google-complete:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255,255,255,0.25);
+}
+
+.btn-google-complete div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.btn-google-complete small {
+  font-size: 11px;
+  font-weight: 400;
+  color: #5f6368;
+  margin-top: 2px;
+}
+
+.auth-separator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+}
+
+.auth-separator span {
+  color: rgba(255,255,255,0.3);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-email-auth {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  border-radius: 16px;
+  padding: 16px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-email-auth:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* ANIMATION DE BIENVENUE */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.welcome-overlay.show {
+  opacity: 1;
+}
+
+.welcome-card {
+  text-align: center;
+  animation: slideUpWelcome 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUpWelcome {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: waveHand 1s ease-in-out;
+}
+
+@keyframes waveHand {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30%, 50%, 70%, 90% { transform: rotate(14deg); }
+  20%, 40%, 60%, 80% { transform: rotate(-14deg); }
+}
+
+.welcome-card h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.welcome-card p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #FF6B35;
+  border-radius: 50%;
+  animation: bounceDot 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounceDot {
+  0%, 80%, 100% { 
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* SÉLECTEUR DE SHEETS */
+.sheets-selector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 40px 20px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.sheets-selector-overlay.show {
+  opacity: 1;
+}
+
+.sheets-selector-content {
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sheets-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.sheets-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.sheets-header p {
+  color: rgba(255,255,255,0.5);
+  font-size: 16px;
+}
+
+.sheets-grid {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.sheet-item-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sheet-item-card:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,107,53,0.4);
+  transform: translateX(8px);
+}
+
+.sheet-item-icon {
+  font-size: 40px;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15,157,88,0.1);
+  border-radius: 16px;
+}
+
+.sheet-item-info {
+  flex: 1;
+}
+
+.sheet-item-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: white;
+}
+
+.sheet-item-info p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+}
+
+.sheet-item-arrow {
+  font-size: 24px;
+  color: rgba(255,255,255,0.3);
+  transition: all 0.3s;
+}
+
+.sheet-item-card:hover .sheet-item-arrow {
+  color: #FF6B35;
+  transform: translateX(4px);
+}
+
+.btn-refresh-sheets {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 16px 24px;
+  border-radius: 16px;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-refresh-sheets:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* PAS DE SHEETS */
+.no-sheets-content {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-sheets-icon {
+  font-size: 80px;
+  margin-bottom: 32px;
+  opacity: 0.3;
+}
+
+.btn-create-new-sheet {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #0f9d58, #0a7e3e);
+  padding: 18px 32px;
+  border-radius: 16px;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 20px rgba(15,157,88,0.3);
+  margin-bottom: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-create-new-sheet:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(15,157,88,0.5);
+}
+
+/* LOADER GLOBAL */
+.global-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.global-loader.show {
+  opacity: 1;
+}
+
+.loader-content {
+  text-align: center;
+}
+
+.loader-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255,107,53,0.2);
+  border-top-color: #FF6B35;
+  border-radius: 50%;
+  animation: spinLoader 0.8s linear infinite;
+  margin: 0 auto 24px;
+}
+
+@keyframes spinLoader {
+  to { transform: rotate(360deg); }
+}
+
+.loader-content p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* SUCCESS TOAST */
+.success-toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow: 0 8px 30px rgba(34,197,94,0.4);
+  z-index: 10002;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.success-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* NAV AVEC PRÉNOM */
+.nav-user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.nav-profile:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+}
+
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,107,53,0.3);
+}
+
+.btn-logout {
+  background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
+  border: 1px solid rgba(239,68,68,0.3);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.btn-logout:hover {
+  background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1));
+  border-color: rgba(239,68,68,0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239,68,68,0.3);
+  color: #f87171;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .auth-modal {
+    padding: 36px 28px;
+    max-width: 90%;
+  }
+  
+  .sheets-selector-content {
+    padding: 20px;
+  }
+  
+  .sheets-header h2 {
+    font-size: 24px;
+  }
+  
+  .sheet-item-card {
+    padding: 16px;
+  }
+  
+  .sheet-item-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 32px;
+  }
+  
+  .nav-user-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn-logout {
+    justify-content: center;
+  }
+}
+
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -894,6 +1460,467 @@
     async function handleGoogleAuthPopup(){try{const btn=document.querySelector('.btn-google-popup');if(btn){btn.classList.add('loading');const span=btn.querySelector('span');if(span)span.textContent='Connexion...'}const GOOGLE_CLIENT_ID='550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';const REDIRECT_URI=window.location.origin+window.location.pathname;const SCOPES=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/userinfo.email'].join(' ');const authUrl=new URL('https://accounts.google.com/o/oauth2/v2/auth');authUrl.searchParams.set('client_id',GOOGLE_CLIENT_ID);authUrl.searchParams.set('redirect_uri',REDIRECT_URI);authUrl.searchParams.set('response_type','code');authUrl.searchParams.set('scope',SCOPES);authUrl.searchParams.set('access_type','offline');authUrl.searchParams.set('prompt','consent');authUrl.searchParams.set('state','google_sheets');window.location.href=authUrl.toString()}catch(error){console.error('Google auth error:',error);alert('Erreur: '+error.message)}}
     
     async function handleOAuthCallback(){const urlParams=new URLSearchParams(window.location.search);const code=urlParams.get('code');const state=urlParams.get('state');if(!code||state!=='google_sheets')return;console.log('[OAUTH] Processing...');try{const{data:{session}}=await supabaseClient.auth.getSession();if(!session){alert('Session expirée.');window.location.href='index.html';return}const btn=document.querySelector('button[onclick="connectGoogleSheets()"]');if(btn){btn.disabled=true;btn.textContent='Connexion...'}const response=await fetch(`${SUPABASE_URL}/functions/v1/smooth-endpoint`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':SUPABASE_ANON_KEY},body:JSON.stringify({code:code,redirect_uri:window.location.origin+window.location.pathname})});const result=await response.json();if(!result.success){throw new Error(result.error||'Failed')}console.log('[OAUTH] Connected!');window.history.replaceState({},document.title,window.location.pathname);closeOAuthPopup();alert('✅ Google Sheets connecté !');if(btn){btn.disabled=false;btn.textContent='✓ Connecté';btn.style.background='linear-gradient(135deg, #22c55e, #4ade80)'}}catch(error){console.error('[OAUTH] Error:',error);alert('Erreur: '+error.message);window.history.replaceState({},document.title,window.location.pathname);const btn=document.querySelector('button[onclick="connectGoogleSheets()"]');if(btn){btn.disabled=false;btn.textContent='Se connecter'}}}
+
+  
+// ============================================
+// CODE JAVASCRIPT COMPLET POUR COMPTA.HTML
+// À AJOUTER DANS LE <script> EXISTANT
+// ============================================
+
+// CONSTANTES
+const GOOGLE_CLIENT_ID = '550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
+const GOOGLE_SCOPES = [
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/spreadsheets',
+  'https://www.googleapis.com/auth/drive.readonly'
+].join(' ');
+
+// INITIALISATION COMPTA
+async function initCompta() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  if (!session) {
+    // Pas connecté → Afficher modal de connexion
+    showLoginModal();
+  } else {
+    // Connecté → Vérifier si Sheet déjà connecté
+    await checkSheetConnection();
+  }
+}
+
+// MODAL DE CONNEXION
+function showLoginModal() {
+  // Créer backdrop
+  const backdrop = document.createElement('div');
+  backdrop.className = 'auth-modal-backdrop';
+  backdrop.id = 'auth-modal-backdrop';
+  
+  // Créer modal
+  const modal = document.createElement('div');
+  modal.className = 'auth-modal';
+  modal.id = 'auth-modal';
+  modal.innerHTML = `
+    <div class="auth-modal-content">
+      <h2>👋 Bienvenue !</h2>
+      <p>Connecte-toi pour configurer ton robot</p>
+      
+      <button onclick="signInWithGoogleComplete()" class="btn-google-complete">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <div>
+          <div>Continuer avec Google</div>
+          <small>Recommandé - Configuration en 1 clic</small>
+        </div>
+      </button>
+      
+      <div class="auth-separator">
+        <span>ou</span>
+      </div>
+      
+      <button onclick="showEmailAuthForm()" class="btn-email-auth">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Email / Password
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(backdrop);
+  document.body.appendChild(modal);
+  
+  setTimeout(() => {
+    backdrop.classList.add('show');
+    modal.classList.add('show');
+  }, 50);
+}
+
+function closeLoginModal() {
+  const backdrop = document.getElementById('auth-modal-backdrop');
+  const modal = document.getElementById('auth-modal');
+  
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    setTimeout(() => backdrop.remove(), 300);
+  }
+  
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => modal.remove(), 300);
+  }
+}
+
+// CONNEXION GOOGLE COMPLÈTE
+async function signInWithGoogleComplete() {
+  const REDIRECT_URI = window.location.origin + window.location.pathname;
+  
+  const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+  authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+  authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', GOOGLE_SCOPES);
+  authUrl.searchParams.set('access_type', 'offline');
+  authUrl.searchParams.set('prompt', 'consent');
+  authUrl.searchParams.set('state', 'google_complete');
+  
+  // Afficher loader
+  closeLoginModal();
+  showGlobalLoader('Redirection vers Google...');
+  
+  // Redirection après petit délai (pour voir le loader)
+  setTimeout(() => {
+    window.location.href = authUrl.toString();
+  }, 300);
+}
+
+// CALLBACK OAUTH
+async function handleOAuthCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  const state = urlParams.get('state');
+  
+  if (!code || state !== 'google_complete') return;
+  
+  console.log('[OAUTH] Processing callback...');
+  
+  try {
+    // Afficher animation de bienvenue
+    showWelcomeAnimation();
+    
+    // Appeler l'Edge Function
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/google-oauth-complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY
+      },
+      body: JSON.stringify({
+        code: code,
+        redirect_uri: window.location.origin + window.location.pathname
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Échec de la connexion');
+    }
+    
+    console.log('[OAUTH] Success!', result);
+    
+    // Nettoyer l'URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    
+    // Stocker les données user
+    localStorage.setItem('user_data', JSON.stringify(result.user));
+    
+    // Se connecter à Supabase avec le session token
+    if (result.session_token) {
+      await supabaseClient.auth.setSession({
+        access_token: result.session_token,
+        refresh_token: result.session_token
+      });
+    }
+    
+    // Mettre à jour l'animation avec le prénom
+    updateWelcomeWithName(result.user.first_name);
+    
+    // Attendre 2 secondes
+    setTimeout(() => {
+      hideWelcomeAnimation();
+      
+      // Afficher liste des Sheets
+      if (result.sheets && result.sheets.length > 0) {
+        showSheetsList(result.sheets);
+      } else {
+        showNoSheetsMessage();
+      }
+    }, 2000);
+    
+  } catch (error) {
+    console.error('[OAUTH] Error:', error);
+    hideWelcomeAnimation();
+    alert('Erreur lors de la connexion: ' + error.message);
+    window.location.href = 'index.html';
+  }
+}
+
+// ANIMATION DE BIENVENUE
+function showWelcomeAnimation() {
+  const welcome = document.createElement('div');
+  welcome.id = 'welcome-animation';
+  welcome.className = 'welcome-overlay';
+  welcome.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-icon">👋</div>
+      <h2 id="welcome-title">Bienvenue !</h2>
+      <p>Configuration de ton compte...</p>
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(welcome);
+  setTimeout(() => welcome.classList.add('show'), 100);
+}
+
+function updateWelcomeWithName(firstName) {
+  const title = document.getElementById('welcome-title');
+  if (title) {
+    title.innerHTML = `Bienvenue ${firstName} ! 🎉`;
+  }
+  
+  const subtitle = document.querySelector('.welcome-card p');
+  if (subtitle) {
+    subtitle.textContent = 'Chargement de tes fichiers...';
+  }
+}
+
+function hideWelcomeAnimation() {
+  const welcome = document.getElementById('welcome-animation');
+  if (welcome) {
+    welcome.classList.remove('show');
+    setTimeout(() => welcome.remove(), 500);
+  }
+}
+
+// LISTE DES SHEETS
+function showSheetsList(sheets) {
+  // Créer container
+  const container = document.createElement('div');
+  container.className = 'sheets-selector-overlay';
+  container.id = 'sheets-selector';
+  container.innerHTML = `
+    <div class="sheets-selector-content">
+      <div class="sheets-header">
+        <h2>Choisis ton fichier compta</h2>
+        <p>Sélectionne le Google Sheet où le bot écrira automatiquement</p>
+      </div>
+      <div class="sheets-grid" id="sheets-grid"></div>
+      <button onclick="refreshSheets()" class="btn-refresh-sheets">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Rafraîchir la liste
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(container);
+  setTimeout(() => container.classList.add('show'), 100);
+  
+  // Remplir la grille
+  const grid = document.getElementById('sheets-grid');
+  
+  sheets.forEach(sheet => {
+    const card = document.createElement('div');
+    card.className = 'sheet-item-card';
+    card.onclick = () => selectSheet(sheet);
+    card.innerHTML = `
+      <div class="sheet-item-icon">📊</div>
+      <div class="sheet-item-info">
+        <h3>${sheet.name}</h3>
+        <p>📅 Modifié ${formatDate(sheet.modifiedTime)}</p>
+      </div>
+      <div class="sheet-item-arrow">→</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function showNoSheetsMessage() {
+  const container = document.createElement('div');
+  container.className = 'sheets-selector-overlay show';
+  container.id = 'sheets-selector';
+  container.innerHTML = `
+    <div class="sheets-selector-content">
+      <div class="sheets-header">
+        <h2>Aucun Google Sheet trouvé</h2>
+        <p>Crée un nouveau fichier pour commencer</p>
+      </div>
+      <div class="no-sheets-content">
+        <div class="no-sheets-icon">📊</div>
+        <a href="https://sheets.google.com/create" target="_blank" class="btn-create-new-sheet">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Créer un nouveau Google Sheet
+        </a>
+        <button onclick="refreshSheets()" class="btn-refresh-sheets">
+          Rafraîchir ensuite
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(container);
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+  
+  if (diff === 0) return "aujourd'hui";
+  if (diff === 1) return "hier";
+  if (diff < 7) return `il y a ${diff} jours`;
+  if (diff < 30) return `il y a ${Math.floor(diff / 7)} semaines`;
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// SÉLECTION DU SHEET
+async function selectSheet(sheet) {
+  try {
+    // Masquer la liste
+    const selector = document.getElementById('sheets-selector');
+    if (selector) {
+      selector.classList.remove('show');
+      setTimeout(() => selector.remove(), 300);
+    }
+    
+    // Afficher loader
+    showGlobalLoader(`Connexion à ${sheet.name}...`);
+    
+    // Sauvegarder dans Supabase
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    const { error } = await supabaseClient
+      .from('google_credentials')
+      .update({
+        sheet_id: sheet.id,
+        sheet_name: sheet.name,
+        sheet_url: sheet.webViewLink
+      })
+      .eq('user_id', session.user.id);
+    
+    if (error) throw error;
+    
+    // Succès !
+    hideGlobalLoader();
+    showSuccessMessage(`✅ ${sheet.name} connecté !`);
+    
+    // Passer à l'étape suivante
+    setTimeout(() => {
+      goToStep(2); // Étape "On discute"
+    }, 1500);
+    
+  } catch (error) {
+    console.error('Sheet selection error:', error);
+    hideGlobalLoader();
+    alert('Erreur lors de la sélection: ' + error.message);
+  }
+}
+
+// RAFRAÎCHIR LA LISTE
+async function refreshSheets() {
+  try {
+    showGlobalLoader('Chargement des fichiers...');
+    
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    // Récupérer le refresh_token
+    const { data: credentials } = await supabaseClient
+      .from('google_credentials')
+      .select('refresh_token')
+      .eq('user_id', session.user.id)
+      .single();
+    
+    if (!credentials || !credentials.refresh_token) {
+      throw new Error('Pas de connexion Google active');
+    }
+    
+    // TODO: Appeler Edge Function pour rafraîchir les Sheets
+    // Pour l'instant, recharger la page
+    hideGlobalLoader();
+    window.location.reload();
+    
+  } catch (error) {
+    console.error('Refresh error:', error);
+    hideGlobalLoader();
+    alert('Erreur: ' + error.message);
+  }
+}
+
+// VÉRIFIER CONNEXION SHEET
+async function checkSheetConnection() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  
+  const { data: credentials } = await supabaseClient
+    .from('google_credentials')
+    .select('sheet_id, sheet_name')
+    .eq('user_id', session.user.id)
+    .single();
+  
+  if (credentials && credentials.sheet_id) {
+    // Sheet déjà connecté → Continuer le flow normal
+    console.log('Sheet déjà connecté:', credentials.sheet_name);
+    // Ne rien faire, laisser le flow normal de compta.html
+  } else {
+    // Pas de Sheet → Demander de connecter
+    showConnectSheetPrompt();
+  }
+}
+
+function showConnectSheetPrompt() {
+  // Afficher un message pour connecter le Sheet
+  // Ou directement appeler signInWithGoogleComplete() si pas encore de tokens
+}
+
+// LOADERS & MESSAGES
+function showGlobalLoader(message) {
+  const loader = document.createElement('div');
+  loader.id = 'global-loader';
+  loader.className = 'global-loader';
+  loader.innerHTML = `
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <p>${message}</p>
+    </div>
+  `;
+  document.body.appendChild(loader);
+  setTimeout(() => loader.classList.add('show'), 50);
+}
+
+function hideGlobalLoader() {
+  const loader = document.getElementById('global-loader');
+  if (loader) {
+    loader.classList.remove('show');
+    setTimeout(() => loader.remove(), 300);
+  }
+}
+
+function showSuccessMessage(message) {
+  const success = document.createElement('div');
+  success.className = 'success-toast show';
+  success.textContent = message;
+  document.body.appendChild(success);
+  
+  setTimeout(() => {
+    success.classList.remove('show');
+    setTimeout(() => success.remove(), 300);
+  }, 2000);
+}
+
+// INITIALISER AU CHARGEMENT
+document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier callback OAuth
+  handleOAuthCallback();
+  
+  // Si pas de callback, vérifier si user connecté
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.get('code')) {
+    initCompta();
+  }
+});
 
   </script>
 <div class="oauth-popup-backdrop" id="oauth-popup-backdrop" onclick="closeOAuthPopup()"></div>
