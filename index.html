@@ -913,7 +913,7 @@
         <div style="display:flex; align-items:center; gap:24px; font-size:14px; color:rgba(255,255,255,0.4);">
           <a href="index.html" style="color:inherit; text-decoration:none;">Accueil</a>
           <a href="compte.html" style="color:inherit; text-decoration:none;">Mon compte</a>
-          <a href="/cdn-cgi/l/email-protection#15767a7b61747661557c7467786c3b7367" style="color:inherit; text-decoration:none;">Contact</a>
+          <a href="mailto:contact@iarmy.fr" style="color:inherit; text-decoration:none;">Contact</a>
         </div>
         <p style="color:rgba(255,255,255,0.3); font-size:13px;">© 2026 iArmy</p>
       </div>
@@ -967,10 +967,11 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     let currentUser = null;
 
     function runDemo() {
@@ -1063,19 +1064,95 @@
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
+    // NOUVELLE FONCTION GOOGLE OAUTH
     async function handleGoogleAuth() {
       try {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin + '/compte.html'
-          }
-        });
-        if (error) throw error;
+        const GOOGLE_CLIENT_ID = '550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        
+        const SCOPES = [
+          'https://www.googleapis.com/auth/spreadsheets',
+          'https://www.googleapis.com/auth/userinfo.email'
+        ].join(' ');
+        
+        const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+        authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+        authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+        authUrl.searchParams.set('response_type', 'code');
+        authUrl.searchParams.set('scope', SCOPES);
+        authUrl.searchParams.set('access_type', 'offline');
+        authUrl.searchParams.set('prompt', 'consent');
+        authUrl.searchParams.set('state', 'google_auth');
+        
+        window.location.href = authUrl.toString();
+        
       } catch (error) {
-        alert('Erreur de connexion Google: ' + error.message);
+        console.error('Google auth error:', error);
+        alert('Erreur lors de la connexion Google: ' + error.message);
       }
     }
+
+    // NOUVELLE FONCTION CALLBACK OAUTH
+    async function handleOAuthCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      
+      if (!code || state !== 'google_auth') return;
+      
+      console.log('[OAUTH] Processing callback...');
+      
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          const { data: authData, error: authError } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin + '/compte.html',
+              scopes: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email'
+            }
+          });
+          
+          if (authError) throw authError;
+          return;
+        }
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/smooth-endpoint`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            code: code,
+            redirect_uri: window.location.origin + window.location.pathname
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to connect Google account');
+        }
+        
+        console.log('[OAUTH] Success!');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        alert('✅ Google Sheets connecté avec succès !');
+        window.location.href = 'compte.html';
+        
+      } catch (error) {
+        console.error('[OAUTH] Callback error:', error);
+        alert('Erreur: ' + error.message);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    // CHECK CALLBACK AU CHARGEMENT
+    window.addEventListener('DOMContentLoaded', () => {
+      handleOAuthCallback();
+    });
 
     function switchTab(tab) {
       const loginForm = document.getElementById('login-form');
@@ -1084,11 +1161,9 @@
       const registerTab = document.getElementById('tab-register');
       const indicator = document.getElementById('tab-indicator');
       
-      // Update tab buttons
       loginTab.classList.toggle('active', tab === 'login');
       registerTab.classList.toggle('active', tab === 'register');
       
-      // Animate sliding indicator
       if (tab === 'register') {
         indicator.classList.add('slide-right');
       } else {
@@ -1096,7 +1171,6 @@
       }
       
       if (tab === 'login') {
-        // Going to login: slide register out right, slide login in left
         if (registerForm.style.display !== 'none') {
           registerForm.classList.add('slide-out-right');
           setTimeout(() => {
@@ -1110,7 +1184,6 @@
           loginForm.style.display = 'block';
         }
       } else {
-        // Going to register: slide login out left, slide register in right
         if (loginForm.style.display !== 'none') {
           loginForm.classList.add('slide-out-left');
           setTimeout(() => {
