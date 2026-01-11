@@ -989,7 +989,7 @@
           return;
         }
         
-        const GOOGLE_CLIENT_ID = '550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
+        const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
         const REDIRECT_URI = window.location.origin + window.location.pathname;
         
         const SCOPES = [
@@ -1457,7 +1457,7 @@
     function openOAuthPopup(){document.getElementById('oauth-popup-backdrop').classList.add('active');document.getElementById('oauth-popup').classList.add('active');document.body.style.overflow='hidden'}
     function closeOAuthPopup(){document.getElementById('oauth-popup-backdrop').classList.remove('active');document.getElementById('oauth-popup').classList.remove('active');document.body.style.overflow=''}
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOAuthPopup()});
-    async function handleGoogleAuthPopup(){try{const btn=document.querySelector('.btn-google-popup');if(btn){btn.classList.add('loading');const span=btn.querySelector('span');if(span)span.textContent='Connexion...'}const GOOGLE_CLIENT_ID='550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';const REDIRECT_URI=window.location.origin+window.location.pathname;const SCOPES=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/userinfo.email'].join(' ');const authUrl=new URL('https://accounts.google.com/o/oauth2/v2/auth');authUrl.searchParams.set('client_id',GOOGLE_CLIENT_ID);authUrl.searchParams.set('redirect_uri',REDIRECT_URI);authUrl.searchParams.set('response_type','code');authUrl.searchParams.set('scope',SCOPES);authUrl.searchParams.set('access_type','offline');authUrl.searchParams.set('prompt','consent');authUrl.searchParams.set('state','google_sheets');window.location.href=authUrl.toString()}catch(error){console.error('Google auth error:',error);alert('Erreur: '+error.message)}}
+    async function handleGoogleAuthPopup(){try{const btn=document.querySelector('.btn-google-popup');if(btn){btn.classList.add('loading');const span=btn.querySelector('span');if(span)span.textContent='Connexion...'}const GOOGLE_CLIENT_ID='550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';const REDIRECT_URI=window.location.origin+window.location.pathname;const SCOPES=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/userinfo.email'].join(' ');const authUrl=new URL('https://accounts.google.com/o/oauth2/v2/auth');authUrl.searchParams.set('client_id',GOOGLE_CLIENT_ID);authUrl.searchParams.set('redirect_uri',REDIRECT_URI);authUrl.searchParams.set('response_type','code');authUrl.searchParams.set('scope',SCOPES);authUrl.searchParams.set('access_type','offline');authUrl.searchParams.set('prompt','consent');authUrl.searchParams.set('state','google_sheets');window.location.href=authUrl.toString()}catch(error){console.error('Google auth error:',error);alert('Erreur: '+error.message)}}
     
     async function handleOAuthCallback(){const urlParams=new URLSearchParams(window.location.search);const code=urlParams.get('code');const state=urlParams.get('state');if(!code||state!=='google_sheets')return;console.log('[OAUTH] Processing...');try{const{data:{session}}=await supabaseClient.auth.getSession();if(!session){alert('Session expirée.');window.location.href='index.html';return}const btn=document.querySelector('button[onclick="connectGoogleSheets()"]');if(btn){btn.disabled=true;btn.textContent='Connexion...'}const response=await fetch(`${SUPABASE_URL}/functions/v1/smooth-endpoint`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':SUPABASE_ANON_KEY},body:JSON.stringify({code:code,redirect_uri:window.location.origin+window.location.pathname})});const result=await response.json();if(!result.success){throw new Error(result.error||'Failed')}console.log('[OAUTH] Connected!');window.history.replaceState({},document.title,window.location.pathname);closeOAuthPopup();alert('✅ Google Sheets connecté !');if(btn){btn.disabled=false;btn.textContent='✓ Connecté';btn.style.background='linear-gradient(135deg, #22c55e, #4ade80)'}}catch(error){console.error('[OAUTH] Error:',error);alert('Erreur: '+error.message);window.history.replaceState({},document.title,window.location.pathname);const btn=document.querySelector('button[onclick="connectGoogleSheets()"]');if(btn){btn.disabled=false;btn.textContent='Se connecter'}}}
 
@@ -1468,7 +1468,7 @@
 // ============================================
 
 // CONSTANTES
-const GOOGLE_CLIENT_ID = '550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
 const GOOGLE_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.profile',
   'https://www.googleapis.com/auth/userinfo.email',
