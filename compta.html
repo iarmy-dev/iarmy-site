@@ -369,22 +369,17 @@
         localStorage.clear();
         sessionStorage.clear();
         
-        // Mettre à jour l'état local
         currentUser = null;
         isLoggedIn = false;
         
-        // Réinitialiser l'UI
         const authButtons = document.getElementById('auth-buttons');
         authButtons.innerHTML = `<a href="index.html" class="btn-secondary text-sm px-5 py-2.5 mr-2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; font-weight: 500; color: white; text-decoration: none; display: inline-block;">Retour</a>`;
         
-        // Rebuilder la sidebar
         totalSteps = 4;
         buildSidebar();
         
-        // Retour à l'étape 1
         goToStep(1);
         
-        // Message de confirmation
         alert('✅ Déconnexion réussie !');
         
       } catch (error) {
@@ -393,8 +388,110 @@
       }
     }
     
-    function connectGoogleSheets() {
-      alert('🚧 Connexion Google Sheets bientôt disponible !\n\nUtilise l\'upload Excel pour l\'instant.');
+    // ============================================
+    // NOUVELLE FONCTION GOOGLE SHEETS
+    // ============================================
+    async function connectGoogleSheets() {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          alert('Tu dois être connecté pour lier Google Sheets');
+          return;
+        }
+        
+        const GOOGLE_CLIENT_ID = '550060390462-snigimurfjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+        
+        const SCOPES = [
+          'https://www.googleapis.com/auth/spreadsheets',
+          'https://www.googleapis.com/auth/userinfo.email'
+        ].join(' ');
+        
+        const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+        authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+        authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+        authUrl.searchParams.set('response_type', 'code');
+        authUrl.searchParams.set('scope', SCOPES);
+        authUrl.searchParams.set('access_type', 'offline');
+        authUrl.searchParams.set('prompt', 'consent');
+        authUrl.searchParams.set('state', 'google_sheets');
+        
+        window.location.href = authUrl.toString();
+        
+      } catch (error) {
+        console.error('Google Sheets connection error:', error);
+        alert('Erreur lors de la connexion Google Sheets: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // NOUVELLE FONCTION CALLBACK OAUTH
+    // ============================================
+    async function handleOAuthCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      
+      if (!code || state !== 'google_sheets') return;
+      
+      console.log('[OAUTH] Processing Google Sheets callback...');
+      
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          alert('Session expirée. Connecte-toi à nouveau.');
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        const btn = document.querySelector('button[onclick="connectGoogleSheets()"]');
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = 'Connexion en cours...';
+        }
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/smooth-endpoint`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            code: code,
+            redirect_uri: window.location.origin + window.location.pathname
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to connect Google Sheets');
+        }
+        
+        console.log('[OAUTH] Google Sheets connected!');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        alert('✅ Google Sheets connecté avec succès ! Tu peux maintenant continuer.');
+        
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '✓ Connecté';
+          btn.style.background = 'linear-gradient(135deg, #22c55e, #4ade80)';
+        }
+        
+      } catch (error) {
+        console.error('[OAUTH] Callback error:', error);
+        alert('Erreur: ' + error.message);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        const btn = document.querySelector('button[onclick="connectGoogleSheets()"]');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Se connecter avec Google';
+        }
+      }
     }
     
     document.addEventListener('DOMContentLoaded', function() {
@@ -420,6 +517,9 @@
       if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
       if (chatSendBtn) chatSendBtn.addEventListener('click', sendMessage);
       if (signupBtn) signupBtn.addEventListener('click', signUpAndPay);
+      
+      // CHECK OAUTH CALLBACK
+      handleOAuthCallback();
     });
     
     function detectHeaderRow(rows) {
@@ -623,7 +723,6 @@
         if (authError) throw authError;
         const userId = authData.user?.id || '';
         
-        // Mettre à jour la session
         currentUser = authData.user;
         isLoggedIn = true;
         
@@ -663,7 +762,7 @@
         }
         
         const token = crypto.randomUUID();
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 heures pour tests
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         
         const { error: tokenError } = await supabaseClient
           .from('connection_tokens')
@@ -733,7 +832,7 @@
           btn.disabled = false;
           btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>Connecter Telegram';
         }
-      }, 24 * 60 * 60 * 1000); // 24 heures
+      }, 24 * 60 * 60 * 1000);
     }
     
     function showTelegramConnected() {
