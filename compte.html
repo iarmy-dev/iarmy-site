@@ -130,116 +130,186 @@
       border: 4px solid rgba(255,107,53,0.3);
       margin-bottom: 24px;
     }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255,107,53,0.1);
+      border-top-color: #FF6B35;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body class="bg-gradient-animate">
-  <nav class="glass fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="logo-i">i</div>
-        <span class="font-semibold text-lg">iArmy</span>
-      </a>
-      <div id="auth-buttons"></div>
-    </div>
-  </nav>
+  <div id="loading-screen" class="loading">
+    <div class="spinner"></div>
+    <p class="text-white/70">Chargement de votre compte...</p>
+  </div>
 
-  <section class="min-h-screen pt-32 px-6">
-    <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-12">
-        <img id="profile-avatar" class="profile-avatar-large mx-auto" src="" alt="Avatar">
-        <h1 class="text-4xl font-bold mb-2" id="profile-name">Mon Compte</h1>
-        <p class="text-white/50" id="profile-email"></p>
+  <div id="main-content" style="display: none;">
+    <nav class="glass fixed top-0 left-0 right-0 z-50">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="logo-i">i</div>
+          <span class="font-semibold text-lg">iArmy</span>
+        </a>
+        <div id="auth-buttons"></div>
       </div>
-      
-      <div class="card">
-        <h2 class="text-2xl font-bold mb-6">Mes modules</h2>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-            <div>
-              <h3 class="font-semibold">🤖 Compta Express</h3>
-              <p class="text-sm text-white/50">Robot comptable Telegram</p>
+    </nav>
+
+    <section class="min-h-screen pt-32 px-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+          <img id="profile-avatar" class="profile-avatar-large mx-auto" src="" alt="Avatar">
+          <h1 class="text-4xl font-bold mb-2" id="profile-name">Mon Compte</h1>
+          <p class="text-white/50" id="profile-email"></p>
+        </div>
+        
+        <div class="card">
+          <h2 class="text-2xl font-bold mb-6">Mes modules</h2>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+              <div>
+                <h3 class="font-semibold">🤖 Compta Express</h3>
+                <p class="text-sm text-white/50">Robot comptable Telegram</p>
+              </div>
+              <a href="compta.html" class="btn-primary text-sm px-6 py-2">
+                Configurer →
+              </a>
             </div>
-            <a href="compta.html" class="btn-primary text-sm px-6 py-2">
-              Configurer →
-            </a>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="text-2xl font-bold mb-6">Paramètres</h2>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+              <div>
+                <h3 class="font-semibold">Connexion Google</h3>
+                <p class="text-sm text-white/50" id="google-status">Non connecté</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      
-      <div class="card">
-        <h2 class="text-2xl font-bold mb-6">Paramètres</h2>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-            <div>
-              <h3 class="font-semibold">Connexion Google</h3>
-              <p class="text-sm text-white/50" id="google-status">Non connecté</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <script>
+    console.log('[COMPTE] 🚀 Initialisation...');
+    
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     async function updateNavBar() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      console.log('[COMPTE] 🔍 Vérification session...');
       
-      const authButtons = document.getElementById('auth-buttons');
+      // ATTENDRE que la session soit établie (max 5 secondes)
+      let session = null;
+      let attempts = 0;
+      
+      while (!session && attempts < 10) {
+        const { data } = await supabaseClient.auth.getSession();
+        session = data.session;
+        
+        if (!session) {
+          console.log(`[COMPTE] ⏳ Attente session... tentative ${attempts + 1}/10`);
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+        }
+      }
       
       if (!session) {
+        console.log('[COMPTE] ❌ Pas de session après 5 secondes, redirection...');
         window.location.href = 'index.html';
         return;
       }
       
-      const { data: profile } = await supabaseClient
+      console.log('[COMPTE] ✅ Session trouvée !', session.user.email);
+      
+      // Masquer loading, afficher contenu
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+      
+      const authButtons = document.getElementById('auth-buttons');
+      
+      // Récupérer le profil
+      console.log('[COMPTE] 🔍 Recherche profil...');
+      const { data: profile, error: profileError } = await supabaseClient
         .from('profiles')
-        .select('first_name, last_name, email, avatar_url')
-        .eq('user_id', session.user.id)
+        .select('name, email')
+        .eq('id', session.user.id)
         .single();
       
-      if (profile) {
-        document.getElementById('profile-avatar').src = profile.avatar_url || 'https://ui-avatars.com/api/?name=' + profile.first_name;
-        document.getElementById('profile-name').textContent = `${profile.first_name} ${profile.last_name || ''}`;
-        document.getElementById('profile-email').textContent = profile.email;
+      if (profileError) {
+        console.log('[COMPTE] ⚠️ Profil non trouvé:', profileError.message);
+        console.log('[COMPTE] 🆕 Création du profil...');
         
-        authButtons.innerHTML = `
-          <div class="nav-user-section">
-            <a href="compte.html" class="nav-profile">
-              <img src="${profile.avatar_url}" class="nav-avatar">
-              <span>${profile.first_name}</span>
-            </a>
-            <button onclick="signOut()" class="btn-logout">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              <span>Déconnexion</span>
-            </button>
-          </div>
-        `;
+        // Créer le profil
+        const { error: insertError } = await supabaseClient
+          .from('profiles')
+          .insert({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+            plan: 'free'
+          });
         
-        // Vérifier connexion Google
-        const { data: googleCreds } = await supabaseClient
-          .from('google_credentials')
-          .select('sheet_name')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        if (googleCreds && googleCreds.sheet_name) {
-          document.getElementById('google-status').innerHTML = `
-            ✅ Connecté<br>
-            <span class="text-xs">Sheet: ${googleCreds.sheet_name}</span>
-          `;
+        if (insertError) {
+          console.error('[COMPTE] ❌ Erreur création profil:', insertError);
+          alert('Erreur lors de la création du profil. Veuillez réessayer.');
+          return;
         }
+        
+        console.log('[COMPTE] ✅ Profil créé ! Rechargement...');
+        window.location.reload();
+        return;
       }
+      
+      console.log('[COMPTE] ✅ Profil trouvé:', profile);
+      
+      // Afficher le profil
+      const avatarUrl = session.user.user_metadata.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=FF6B35&color=fff`;
+      
+      document.getElementById('profile-avatar').src = avatarUrl;
+      document.getElementById('profile-name').textContent = profile.name;
+      document.getElementById('profile-email').textContent = profile.email;
+      
+      authButtons.innerHTML = `
+        <div class="nav-user-section">
+          <a href="compte.html" class="nav-profile">
+            <img src="${avatarUrl}" class="nav-avatar">
+            <span>${profile.name}</span>
+          </a>
+          <button onclick="signOut()" class="btn-logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      `;
     }
     
     async function signOut() {
+      console.log('[COMPTE] 👋 Déconnexion...');
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
