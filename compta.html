@@ -294,7 +294,7 @@
 
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYyNTI1MzYsImV4cCI6MjA1MTgyODUzNn0.KuukoefSsqJIEPLHR1BfwC8m83tB1m7lZvP9RkLUPK4';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     let currentUser = null;
@@ -638,7 +638,6 @@
           return;
         }
         
-        // CORRIGÉ: Utiliser le bon nom de bot
         const telegramLink = `https://t.me/IArmyBOT?start=${token}`;
         
         document.getElementById('telegram-initial').style.display = 'none';
@@ -658,7 +657,6 @@
     }
     
     function startConnectionCheck() {
-      // CORRIGÉ: Vérifier telegram_links au lieu de telegram_sessions
       connectionCheckInterval = setInterval(async () => {
         try {
           const { data, error } = await supabaseClient
@@ -699,7 +697,6 @@
       document.getElementById('telegram-connected').style.display = 'block';
     }
     
-    // CORRIGÉ: Vérifier telegram_links au lieu de telegram_sessions
     async function checkExistingTelegramConnection() {
       if (!currentUser) return;
       
