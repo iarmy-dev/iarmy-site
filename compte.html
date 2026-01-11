@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mon espace - iArmy</title>
+  <title>Mon Compte - iArmy</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
+    body { background: #030303; color: white; min-height: 100vh; }
     
-    /* Background gradient */
     .bg-gradient-animate { 
       background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); 
       background-size: 400% 400%; 
@@ -24,41 +23,12 @@
       100% { background-position: 0% 50%; } 
     }
     
-    /* Orbes */
-    .orb { 
-      position: fixed; 
-      border-radius: 50%; 
-      filter: blur(100px); 
-      animation: float 15s ease-in-out infinite; 
-      pointer-events: none; 
-      z-index: 0; 
-    }
-    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.18; }
-    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
-    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
-    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
-    
-    /* Glass */
     .glass { 
       background: rgba(255, 255, 255, 0.02); 
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.05); 
     }
-    .glass-card { 
-      background: rgba(255, 255, 255, 0.02); 
-      border: 1px solid rgba(255, 255, 255, 0.06); 
-      border-radius: 24px; 
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
-      transition: all 0.4s ease; 
-    }
-    .glass-card:hover { 
-      background: rgba(255, 255, 255, 0.04); 
-      border-color: rgba(255, 255, 255, 0.1); 
-      transform: translateY(-4px); 
-    }
     
-    /* Logo with pulse animation */
     .logo-i { 
       width: 40px; 
       height: 40px; 
@@ -69,312 +39,212 @@
       justify-content: center; 
       font-weight: 800; 
       font-size: 20px; 
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      cursor: pointer;
-      animation: pulse 3s ease-in-out infinite;
-    }
-    .logo-i:hover { 
-      transform: scale(1.2) rotate(-15deg); 
-      box-shadow: 0 12px 40px rgba(255,107,53,0.6); 
-      animation: none;
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); }
-      50% { box-shadow: 0 0 20px 8px rgba(255, 107, 53, 0); }
     }
     
-    /* Buttons */
-    .btn-primary { 
-      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
-      padding: 14px 28px; 
-      border-radius: 14px; 
-      font-weight: 600; 
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      border: none; 
-      color: white; 
-      cursor: pointer; 
-      position: relative; 
-      overflow: hidden;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
+    .nav-user-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .btn-primary::before { 
-      content: ''; 
-      position: absolute; 
-      top: 0; 
-      left: -100%; 
-      width: 100%; 
-      height: 100%; 
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); 
-      transition: left 0.5s; 
-    }
-    .btn-primary:hover { 
-      transform: translateY(-3px); 
-      box-shadow: 0 12px 32px rgba(255,107,53,0.4); 
-    }
-    .btn-primary:hover::before { left: 100%; }
     
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.04);
-      padding: 12px 24px;
+    .nav-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px;
-      font-weight: 600;
+      text-decoration: none;
+      color: white;
       transition: all 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 500;
+    }
+    
+    .nav-profile:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+    }
+    
+    .nav-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,107,53,0.3);
+    }
+    
+    .btn-logout {
+      background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));
+      border: 1px solid rgba(239,68,68,0.3);
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      color: #ef4444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .btn-logout:hover {
+      background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1));
+      border-color: rgba(239,68,68,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239,68,68,0.3);
+      color: #f87171;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-weight: 600;
+      border: none;
       color: white;
       cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateY(-2px);
+      transition: all 0.4s;
     }
     
-    /* Status badges */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(255,107,53,0.5);
     }
-    .status-active {
-      background: rgba(34, 197, 94, 0.12);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.25);
+    
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 24px;
     }
-    .status-inactive {
-      background: rgba(156, 163, 175, 0.12);
-      color: #9ca3af;
-      border: 1px solid rgba(156, 163, 175, 0.25);
-    }
-    .dot {
-      width: 8px;
-      height: 8px;
+    
+    .profile-avatar-large {
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      animation: dot-pulse 2s ease-in-out infinite;
+      object-fit: cover;
+      border: 4px solid rgba(255,107,53,0.3);
+      margin-bottom: 24px;
     }
-    .dot-green { background: #22c55e; }
-    .dot-gray { background: #9ca3af; animation: none; }
-    
-    @keyframes dot-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    /* Stat cards */
-    .stat-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      padding: 24px;
-      transition: all 0.3s ease;
-    }
-    .stat-card:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    /* Code box */
-    .code-box {
-      background: rgba(255,107,53,0.08);
-      border: 2px dashed rgba(255,107,53,0.25);
-      border-radius: 16px;
-      padding: 20px 28px;
-      backdrop-filter: blur(10px);
-    }
-    
-    /* Fade in animations */
-    .animate-fade-in { animation: fadeIn 0.8s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body class="bg-gradient-animate">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <!-- Nav -->
   <nav class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
         <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
-      <button onclick="logout()" class="text-white/60 hover:text-white text-sm transition-colors">Déconnexion</button>
+      <div id="auth-buttons"></div>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <main class="pt-32 pb-20 px-6 relative z-10">
-    <div class="max-w-5xl mx-auto">
+  <section class="min-h-screen pt-32 px-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <img id="profile-avatar" class="profile-avatar-large mx-auto" src="" alt="Avatar">
+        <h1 class="text-4xl font-bold mb-2" id="profile-name">Mon Compte</h1>
+        <p class="text-white/50" id="profile-email"></p>
+      </div>
       
-      <!-- Header -->
-      <div class="mb-12 animate-fade-in">
-        <h1 class="text-4xl font-bold mb-2">Bienvenue, <span id="user-name" class="text-[#FF8B5E]">...</span></h1>
-        <p class="text-white/50 text-lg" id="user-email">...</p>
-      </div>
-
-      <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12 animate-fade-in" style="animation-delay: 0.1s;">
-        <div class="stat-card">
-          <p class="text-white/50 text-sm mb-2">Bots actifs</p>
-          <p class="text-4xl font-bold text-[#FF6B35]" id="bots-count">1</p>
-        </div>
-        <div class="stat-card">
-          <p class="text-white/50 text-sm mb-2">Entrées ce mois</p>
-          <p class="text-4xl font-bold" id="entries-count">0</p>
-        </div>
-        <div class="stat-card">
-          <p class="text-white/50 text-sm mb-2">Total</p>
-          <p class="text-4xl font-bold text-[#FF6B35]" id="total-amount">0€</p>
-        </div>
-      </div>
-
-      <!-- Bots Section -->
-      <div class="mb-12 animate-fade-in" style="animation-delay: 0.2s;">
-        <h2 class="text-2xl font-bold mb-6">Mes Bots</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <!-- Compta Express -->
-          <div class="glass-card p-8">
-            <div class="flex items-start justify-between mb-6">
-              <div class="flex items-center gap-4">
-                <div style="width:56px; height:56px; background:rgba(255,107,53,0.12); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px;">📊</div>
-                <div>
-                  <h3 class="font-bold text-xl mb-2">Compta Express</h3>
-                  <span class="status-badge status-inactive" id="compta-status">
-                    <span class="dot dot-gray"></span>
-                    Non configuré
-                  </span>
-                </div>
-              </div>
+      <div class="card">
+        <h2 class="text-2xl font-bold mb-6">Mes modules</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+            <div>
+              <h3 class="font-semibold">🤖 Compta Express</h3>
+              <p class="text-sm text-white/50">Robot comptable Telegram</p>
             </div>
-            
-            <p class="text-white/60 text-sm mb-6 leading-relaxed">Enregistre tes recettes quotidiennes via Telegram.</p>
-            
-            <a href="compta.html" class="btn-primary w-full">
-              Configurer maintenant →
+            <a href="compta.html" class="btn-primary text-sm px-6 py-2">
+              Configurer →
             </a>
           </div>
-
-          <!-- Task Manager (Coming Soon) -->
-          <div class="glass-card p-8 opacity-50">
-            <div class="flex items-start justify-between mb-6">
-              <div class="flex items-center gap-4">
-                <div style="width:56px; height:56px; background:rgba(107,53,255,0.12); border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:28px;">✅</div>
-                <div>
-                  <h3 class="font-bold text-xl mb-2">Task Manager</h3>
-                  <span class="status-badge status-inactive">
-                    <span class="dot dot-gray"></span>
-                    Bientôt disponible
-                  </span>
-                </div>
-              </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2 class="text-2xl font-bold mb-6">Paramètres</h2>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+            <div>
+              <h3 class="font-semibold">Connexion Google</h3>
+              <p class="text-sm text-white/50" id="google-status">Non connecté</p>
             </div>
-            
-            <p class="text-white/60 text-sm mb-6 leading-relaxed">Gère tes tâches et rappels depuis Telegram.</p>
-            
-            <button class="btn-secondary w-full" disabled>
-              Prochainement
-            </button>
           </div>
-
         </div>
       </div>
-
-      <!-- Telegram Link Code -->
-      <div class="glass-card p-8 animate-fade-in" style="animation-delay: 0.3s;">
-        <div class="flex items-start gap-4 mb-6">
-          <div style="width:48px; height:48px; background:rgba(255,107,53,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🔗</div>
-          <div class="flex-1">
-            <h3 class="font-bold text-xl mb-2">Lier ton compte Telegram</h3>
-            <p class="text-white/60 text-sm leading-relaxed">Pour utiliser les bots, lie ton compte Telegram avec ce code :</p>
-          </div>
-        </div>
-        
-        <div class="flex items-center gap-4 flex-wrap">
-          <div class="code-box flex-1 min-w-[200px]">
-            <span class="text-3xl font-mono font-bold text-[#FF6B35] tracking-wider" id="telegram-code">--------</span>
-          </div>
-          <button onclick="copyCode()" class="btn-secondary whitespace-nowrap">
-            📋 Copier
-          </button>
-        </div>
-        
-        <p class="text-white/40 text-xs mt-6">
-          Envoie <code style="background:rgba(255,255,255,0.06); padding:4px 8px; border-radius:6px; font-family:monospace;">/link CODE</code> au bot sur Telegram
-        </p>
-      </div>
-
     </div>
-  </main>
+  </section>
 
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    let currentUser = null;
-
-    async function loadUserData() {
-      try {
-        const { data: { user }, error } = await supabaseClient.auth.getUser();
-        
-        if (error || !user) {
-          window.location.href = 'index.html';
-          return;
-        }
-        
-        currentUser = user;
-        
-        // Display user info
-        document.getElementById('user-name').textContent = user.user_metadata?.name || user.email.split('@')[0];
-        document.getElementById('user-email').textContent = user.email;
-        
-        // Generate simple telegram code (8 chars)
-        const code = user.id.substring(0, 8).toUpperCase();
-        document.getElementById('telegram-code').textContent = code;
-        
-      } catch (error) {
-        console.error('Error loading user:', error);
+    async function updateNavBar() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      const authButtons = document.getElementById('auth-buttons');
+      
+      if (!session) {
         window.location.href = 'index.html';
+        return;
+      }
+      
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('first_name, last_name, email, avatar_url')
+        .eq('user_id', session.user.id)
+        .single();
+      
+      if (profile) {
+        document.getElementById('profile-avatar').src = profile.avatar_url || 'https://ui-avatars.com/api/?name=' + profile.first_name;
+        document.getElementById('profile-name').textContent = `${profile.first_name} ${profile.last_name || ''}`;
+        document.getElementById('profile-email').textContent = profile.email;
+        
+        authButtons.innerHTML = `
+          <div class="nav-user-section">
+            <a href="compte.html" class="nav-profile">
+              <img src="${profile.avatar_url}" class="nav-avatar">
+              <span>${profile.first_name}</span>
+            </a>
+            <button onclick="signOut()" class="btn-logout">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Déconnexion</span>
+            </button>
+          </div>
+        `;
+        
+        // Vérifier connexion Google
+        const { data: googleCreds } = await supabaseClient
+          .from('google_credentials')
+          .select('sheet_name')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (googleCreds && googleCreds.sheet_name) {
+          document.getElementById('google-status').innerHTML = `
+            ✅ Connecté<br>
+            <span class="text-xs">Sheet: ${googleCreds.sheet_name}</span>
+          `;
+        }
       }
     }
-
-    async function logout() {
+    
+    async function signOut() {
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
-
-    function copyCode() {
-      const code = document.getElementById('telegram-code').textContent;
-      navigator.clipboard.writeText(code);
-      
-      // Visual feedback
-      const btn = event.target;
-      const originalText = btn.textContent;
-      btn.textContent = '✅ Copié !';
-      btn.style.background = 'rgba(34, 197, 94, 0.15)';
-      btn.style.borderColor = 'rgba(34, 197, 94, 0.3)';
-      btn.style.color = '#22c55e';
-      
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        btn.style.color = '';
-      }, 2000);
-    }
-
-    loadUserData();
+    
+    document.addEventListener('DOMContentLoaded', updateNavBar);
   </script>
 </body>
 </html>
