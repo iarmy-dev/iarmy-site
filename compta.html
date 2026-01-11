@@ -583,6 +583,10 @@
         if (authError) throw authError;
         const userId = authData.user?.id || '';
         
+        // Mettre à jour la session
+        currentUser = authData.user;
+        isLoggedIn = true;
+        
         if (finalConfig) {
           const { error: configError } = await supabaseClient
             .from('user_configs')
