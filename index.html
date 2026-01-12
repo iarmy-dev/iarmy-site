@@ -376,7 +376,7 @@
         <div style="display:flex; align-items:center; gap:24px; font-size:14px; color:rgba(255,255,255,0.4);">
           <a href="index.html">Accueil</a>
           <a href="compte.html">Mon compte</a>
-          <a href="mailto:contact@iarmy.fr">Contact</a>
+          <a href="/cdn-cgi/l/email-protection#a3c0cccdd7c2c0d7e3cac2d1ceda8dc5d1">Contact</a>
         </div>
         <p style="color:rgba(255,255,255,0.3); font-size:13px;">© 2026 iArmy</p>
       </div>
@@ -430,7 +430,7 @@
     </div>
   </div>
   
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -448,11 +448,18 @@
       document.getElementById('welcome-overlay').classList.remove('active');
     }
     
+    let isRedirecting = false;
+    
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('[CALLBACK] 🔔 Auth event:', event);
       
-      if (event === 'SIGNED_IN' && session) {
-        console.log('[CALLBACK] ✅ Connexion réussie !', session.user.email);
+      // Seulement rediriger si c'est un callback OAuth (présence de # dans l'URL)
+      const isOAuthCallback = window.location.hash.includes('access_token') || 
+                              window.location.search.includes('code=');
+      
+      if (event === 'SIGNED_IN' && session && isOAuthCallback && !isRedirecting) {
+        isRedirecting = true;
+        console.log('[CALLBACK] ✅ Connexion OAuth réussie !', session.user.email);
         
         const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || 
                          session.user.user_metadata?.name?.split(' ')[0] ||
@@ -486,6 +493,9 @@
         
       } else if (event === 'SIGNED_OUT') {
         console.log('[CALLBACK] 👋 Déconnexion');
+        updateNavBar();
+      } else {
+        // Juste mettre à jour la navbar
         updateNavBar();
       }
     });
@@ -781,10 +791,4 @@
       window.location.reload();
     }
     
-    window.addEventListener('DOMContentLoaded', async () => {
-      console.log('[INIT] 📱 Page chargée');
-      await updateNavBar();
-    });
-  </script>
-</body>
-</html>
+    window.addEventListener
