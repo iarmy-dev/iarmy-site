@@ -18,15 +18,15 @@
     .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
     .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
     .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
-    .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
+    .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; }
     .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
     .btn-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: white; cursor: pointer; }
-    .btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
     .btn-logout { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 20px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; }
-    .btn-logout:hover { background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.1)); border-color: rgba(239, 68, 68, 0.5); transform: translateY(-2px); }
+    .btn-logout:hover { background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.1)); transform: translateY(-2px); }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -41,7 +41,6 @@
     .iphone-screen { background: #000; border-radius: 28px; overflow: hidden; }
     .iphone-notch { width: 90px; height: 24px; background: #000; border-radius: 0 0 16px 16px; margin: 0 auto; }
     .telegram-header { background: #1c1c1e; padding: 8px 12px; display: flex; align-items: center; gap: 10px; }
-    .telegram-back { color: #0a84ff; font-size: 20px; }
     .telegram-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
     .telegram-name { font-size: 14px; font-weight: 600; }
     .telegram-status { font-size: 11px; color: #0a84ff; }
@@ -58,7 +57,6 @@
     .sheet-grid th, .sheet-grid td { padding: 8px 12px; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
     .sheet-grid th { background: rgba(255,255,255,0.03); font-weight: 500; color: rgba(255,255,255,0.5); }
     .sheet-grid .amount { color: #4ade80; font-weight: 600; }
-    .sheet-grid .empty-row { color: rgba(255,255,255,0.2); }
     .glide-container { position: relative; width: 120px; height: 40px; }
     .glide-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); }
     .glide-logo { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; opacity: 0; box-shadow: 0 0 30px rgba(255,107,53,0.6); }
@@ -72,10 +70,10 @@
     .wave2 { animation: pulseWave 2s ease-out infinite 0.3s; }
     .wave3 { animation: pulseWave 2s ease-out infinite 0.6s; }
     .wave4 { animation: pulseWave 2s ease-out infinite 0.9s; }
-    @keyframes pulseWave { 0% { left: 0; opacity: 0; transform: scale(1); } 15% { opacity: 1; } 70% { opacity: 0.5; } 100% { left: 40px; opacity: 0; transform: scale(0.5); } }
+    @keyframes pulseWave { 0% { left: 0; opacity: 0; } 15% { opacity: 1; } 100% { left: 40px; opacity: 0; } }
     .logo-spreadsheet-xl { animation: pulseSpreadsheet 2s ease-in-out infinite; }
     @keyframes pulseSpreadsheet { 0%, 30%, 100% { transform: scale(1); } 75%, 85% { transform: scale(1.1); } }
-    .cell-fill { animation-duration: 2s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+    .cell-fill { animation-duration: 2s; animation-iteration-count: infinite; }
     .cell-fill-1 { animation-name: fillCell1; }
     .cell-fill-2 { animation-name: fillCell2; }
     .cell-fill-3 { animation-name: fillCell3; }
@@ -84,37 +82,35 @@
     @keyframes fillCell2 { 0%, 45% { opacity: 0; } 55%, 100% { opacity: 0.9; } }
     @keyframes fillCell3 { 0%, 50% { opacity: 0; } 60%, 100% { opacity: 0.9; } }
     @keyframes fillCell4 { 0%, 55% { opacity: 0; } 65%, 100% { opacity: 0.9; } }
-    .module-card { background: linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%); border: 2px solid rgba(255,107,53,0.2); border-radius: 24px; padding: 24px; min-width: 280px; max-width: 320px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .module-card { background: linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%); border: 2px solid rgba(255,107,53,0.2); border-radius: 24px; padding: 24px; min-width: 280px; max-width: 320px; transition: all 0.4s; cursor: pointer; }
     .module-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,107,53,0.4); box-shadow: 0 16px 48px rgba(255,107,53,0.3); }
-    .badge-new { background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,139,94,0.2)); color: #FF8B5E; border: 1px solid rgba(255,107,53,0.5); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; animation: badgeGlow 2s ease-in-out infinite; }
+    .badge-new { background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,139,94,0.2)); color: #FF8B5E; border: 1px solid rgba(255,107,53,0.5); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; animation: badgeGlow 2s ease-in-out infinite; }
     @keyframes badgeGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.4); } 50% { box-shadow: 0 0 35px rgba(255,107,53,0.7); } }
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); z-index: 100; opacity: 0; pointer-events: none; transition: all 0.4s ease; }
     .modal-backdrop.active { opacity: 1; pointer-events: all; }
-    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 40px; width: 90%; max-width: 440px; z-index: 101; opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 40px; width: 90%; max-width: 440px; z-index: 101; opacity: 0; pointer-events: none; transition: all 0.5s; }
     .modal-content.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
     .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
     .modal-close:hover { background: rgba(255,255,255,0.12); transform: rotate(90deg); }
-    .input-field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; color: white; width: 100%; font-size: 15px; transition: all 0.3s; }
-    .input-field:focus { outline: none; border-color: rgba(255,107,53,0.5); background: rgba(255,255,255,0.06); }
+    .input-field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; color: white; width: 100%; font-size: 15px; }
+    .input-field:focus { outline: none; border-color: rgba(255,107,53,0.5); }
     .input-field::placeholder { color: rgba(255,255,255,0.3); }
     .tab-container { display: flex; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 5px; margin-bottom: 28px; position: relative; }
-    .tab-indicator { position: absolute; top: 5px; left: 5px; width: calc(50% - 5px); height: calc(100% - 10px); background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 11px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); z-index: 0; }
+    .tab-indicator { position: absolute; top: 5px; left: 5px; width: calc(50% - 5px); height: calc(100% - 10px); background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 11px; transition: transform 0.3s; z-index: 0; }
     .tab-indicator.slide-right { transform: translateX(calc(100% + 5px)); }
-    .tab-btn { flex: 1; padding: 12px; border-radius: 11px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); background: transparent; border: none; cursor: pointer; transition: color 0.3s; z-index: 1; position: relative; }
+    .tab-btn { flex: 1; padding: 12px; border-radius: 11px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); background: transparent; border: none; cursor: pointer; z-index: 1; position: relative; }
     .tab-btn.active { color: white; }
     .error-msg { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 12px 16px; color: #ef4444; font-size: 13px; display: none; }
     .error-msg.show { display: block; }
-    .robot-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s; cursor: default; }
-    .robot-card:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.1); transform: translateY(-4px); }
+    .robot-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s; }
+    .robot-card:hover { background: rgba(255, 255, 255, 0.04); transform: translateY(-4px); }
     .robot-emoji { animation: floatRobot 3s ease-in-out infinite; filter: grayscale(0.3) opacity(0.7); }
     @keyframes floatRobot { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
     .robot-plus-card { background: rgba(255, 107, 53, 0.05); border-color: rgba(255, 107, 53, 0.2); }
-    .cell-filled { animation: fillCell 0.8s ease-out; }
-    @keyframes fillCell { 0% { background: rgba(255, 107, 53, 0.5); } 100% { background: transparent; } }
-    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: all 0.3s ease; }
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
     footer a:hover { color: #FF8B5E; }
     .nav-user-section { display: flex; align-items: center; gap: 12px; }
-    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; transition: all 0.3s; font-weight: 500; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
     .nav-profile:hover { background: rgba(255,255,255,0.08); }
     .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
     .welcome-overlay { position: fixed; inset: 0; background: rgba(3, 3, 3, 0.98); backdrop-filter: blur(30px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
@@ -128,7 +124,7 @@
     .welcome-dot:nth-child(2) { animation-delay: 0.2s; }
     .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
-    @media (max-width: 768px) { .hero-demo { flex-direction: column !important; align-items: center; gap: 20px; } .iphone, .sheet { width: 200px; } .module-card { min-width: 260px; } .robot-card { width: 48px; height: 48px; font-size: 24px; } }
+    @media (max-width: 768px) { .hero-demo { flex-direction: column !important; } .iphone, .sheet { width: 200px; } .module-card { min-width: 260px; } }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -166,7 +162,7 @@
           <div class="iphone-screen">
             <div class="iphone-notch"></div>
             <div class="telegram-header">
-              <span class="telegram-back">‹</span>
+              <span style="color:#0a84ff; font-size:20px;">‹</span>
               <div class="telegram-avatar">i</div>
               <div class="text-left">
                 <div class="telegram-name">iArmy Bot</div>
@@ -190,8 +186,8 @@
             <tbody id="spreadsheet-body">
               <tr><td>08/01</td><td>CB</td><td class="amount">850</td></tr>
               <tr><td>08/01</td><td>ESP</td><td class="amount">120</td></tr>
-              <tr class="empty-row" id="empty-1"><td>-</td><td>-</td><td>-</td></tr>
-              <tr class="empty-row" id="empty-2"><td>-</td><td>-</td><td>-</td></tr>
+              <tr id="empty-1"><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td></tr>
+              <tr id="empty-2"><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td></tr>
             </tbody>
           </table>
         </div>
@@ -286,7 +282,6 @@
         <input type="password" id="login-password" class="input-field mb-4" placeholder="Mot de passe" required>
         <button type="submit" class="btn-primary" style="width:100%;" id="login-btn">Se connecter</button>
       </form>
-      <p style="text-align:center; margin-top:16px;"><a href="reset-password.html" style="color:rgba(255,255,255,0.4); font-size:14px; text-decoration:none;">Mot de passe oublié ?</a></p>
     </div>
     <div id="register-form" style="display:none;">
       <div class="error-msg mb-4" id="register-error"></div>
@@ -304,42 +299,93 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    console.log('[INIT] 🚀 iArmy');
+    console.log('[INDEX] 🚀 Init');
 
-    function showWelcomeScreen(firstName) {
+    function showWelcome(firstName) {
       document.getElementById('welcome-title').textContent = `Bienvenue ${firstName} ! 👋`;
       document.getElementById('welcome-overlay').classList.add('active');
     }
 
-    // Gère UNIQUEMENT le callback OAuth (retour de Google)
-    const isOAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
-    
-    if (isOAuthCallback) {
-      console.log('[CALLBACK] 🔄 Callback OAuth détecté');
-      supabaseClient.auth.getSession().then(async ({ data: { session } }) => {
-        if (session) {
-          console.log('[CALLBACK] ✅ Session OAuth:', session.user.email);
-          const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || 
-                           session.user.user_metadata?.name?.split(' ')[0] ||
-                           session.user.email?.split('@')[0] || 'toi';
-          showWelcomeScreen(firstName);
-          
-          // Créer profil si nécessaire
-          try {
-            const { error } = await supabaseClient.from('profiles').select('id').eq('id', session.user.id).single();
-            if (error && error.code === 'PGRST116') {
-              await supabaseClient.from('profiles').insert({
-                id: session.user.id,
-                email: session.user.email,
-                name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
-                plan: 'free'
-              });
-            }
-          } catch (e) { console.log('[CALLBACK] ⚠️', e.message); }
-          
-          setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
+    function showLoggedInNav(user) {
+      const authButtons = document.getElementById('auth-buttons');
+      const userName = user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || 'Compte';
+      const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+      authButtons.innerHTML = `
+        <div class="nav-user-section">
+          <a href="compte.html" class="nav-profile">
+            <img src="${userAvatar}" class="nav-avatar" alt="Avatar">
+            <span>${userName}</span>
+          </a>
+          <button onclick="signOut()" class="btn-logout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function showLoggedOutNav() {
+      const authButtons = document.getElementById('auth-buttons');
+      authButtons.innerHTML = `
+        <button onclick="openModal('login')" class="btn-secondary text-sm px-5 py-2.5 mr-2 hidden sm:inline-block">Connexion</button>
+        <button onclick="openModal('register')" class="btn-primary text-sm px-5 py-2.5">Inscription</button>
+      `;
+    }
+
+    async function handleOAuthCallback() {
+      const hasToken = window.location.hash.includes('access_token');
+      if (!hasToken) return false;
+      
+      console.log('[INDEX] 🔄 Callback OAuth détecté');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        console.log('[INDEX] ❌ Pas de session après callback');
+        return false;
+      }
+      
+      console.log('[INDEX] ✅ Session OAuth:', session.user.email);
+      const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || session.user.user_metadata?.name?.split(' ')[0] || session.user.email?.split('@')[0] || 'toi';
+      
+      showLoggedInNav(session.user);
+      showWelcome(firstName);
+      
+      try {
+        const { error } = await supabaseClient.from('profiles').select('id').eq('id', session.user.id).single();
+        if (error && error.code === 'PGRST116') {
+          await supabaseClient.from('profiles').insert({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+            plan: 'free'
+          });
         }
-      });
+      } catch (e) { console.log('[INDEX] Profil déjà existant'); }
+      
+      setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
+      return true;
+    }
+
+    async function checkSession() {
+      console.log('[INDEX] 🔍 Vérification session...');
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          console.log('[INDEX] ✅ Connecté:', session.user.email);
+          showLoggedInNav(session.user);
+        } else {
+          console.log('[INDEX] ❌ Non connecté');
+          showLoggedOutNav();
+        }
+      } catch (e) {
+        console.log('[INDEX] ⚠️ Erreur session:', e);
+        showLoggedOutNav();
+      }
     }
 
     function runDemo() {
@@ -351,8 +397,8 @@
       
       container.innerHTML = '';
       glideLogo?.classList.remove('animate');
-      if (empty1) empty1.innerHTML = '<td>-</td><td>-</td><td>-</td>';
-      if (empty2) empty2.innerHTML = '<td>-</td><td>-</td><td>-</td>';
+      if (empty1) empty1.innerHTML = '<td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td>';
+      if (empty2) empty2.innerHTML = '<td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td>';
       
       setTimeout(() => {
         const msg1 = document.createElement('div');
@@ -373,24 +419,22 @@
       }, 2500);
       
       setTimeout(() => {
-        if (empty1) { empty1.innerHTML = '<td>09/01</td><td>CB</td><td class="amount">1 200</td>'; empty1.classList.add('cell-filled'); }
-        setTimeout(() => { if (empty2) { empty2.innerHTML = '<td>09/01</td><td>ESP</td><td class="amount">350</td>'; empty2.classList.add('cell-filled'); } }, 300);
+        if (empty1) empty1.innerHTML = '<td>09/01</td><td>CB</td><td class="amount">1 200</td>';
+        setTimeout(() => {
+          if (empty2) empty2.innerHTML = '<td>09/01</td><td>ESP</td><td class="amount">350</td>';
+        }, 300);
       }, 2800);
     }
-    
-    setTimeout(runDemo, 1000);
-    setInterval(runDemo, 8000);
 
     async function launchRobot() {
-      let session = null;
       try {
-        const { data } = await supabaseClient.auth.getSession();
-        session = data?.session;
-      } catch (e) { console.log('[LAUNCH] ⚠️', e.message); }
-      
-      if (session) {
-        window.location.href = 'compta.html';
-      } else {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          window.location.href = 'compta.html';
+        } else {
+          openModal('login');
+        }
+      } catch (e) {
         openModal('login');
       }
     }
@@ -411,59 +455,23 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     function switchTab(tab) {
-      const loginForm = document.getElementById('login-form');
-      const registerForm = document.getElementById('register-form');
+      document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
       document.getElementById('tab-register').classList.toggle('active', tab === 'register');
       document.getElementById('tab-indicator').classList.toggle('slide-right', tab === 'register');
-      loginForm.style.display = tab === 'login' ? 'block' : 'none';
-      registerForm.style.display = tab === 'register' ? 'block' : 'none';
-    }
-
-    async function updateNavBar() {
-      console.log('[AUTH] 🔍 Vérification session...');
-      const authButtons = document.getElementById('auth-buttons');
-      
-      let session = null;
-      try {
-        const { data } = await supabaseClient.auth.getSession();
-        session = data?.session;
-      } catch (e) { console.log('[AUTH] ⚠️', e.message); return; }
-      
-      if (!session) {
-        console.log('[AUTH] ❌ Pas connecté');
-        return; // Boutons déjà dans le HTML
-      }
-      
-      console.log('[AUTH] ✅ Connecté:', session.user.email);
-      const userName = session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'User';
-      const userAvatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
-      
-      authButtons.innerHTML = `
-        <div class="nav-user-section">
-          <a href="compte.html" class="nav-profile">
-            <img src="${userAvatar}" class="nav-avatar" alt="${userName}">
-            <span>${userName}</span>
-          </a>
-          <button onclick="signOut()" class="btn-logout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            <span>Déconnexion</span>
-          </button>
-        </div>
-      `;
     }
 
     async function handleGoogleAuth() {
-      console.log('[OAUTH] 🚀 Google...');
+      console.log('[INDEX] 🚀 Google OAuth...');
       closeModal();
       try {
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: window.location.origin + '/' }
+          options: { redirectTo: window.location.origin + '/index.html' }
         });
         if (error) throw error;
       } catch (error) {
-        console.error('[OAUTH] ❌', error);
         alert('Erreur: ' + error.message);
       }
     }
@@ -475,16 +483,15 @@
       err.classList.remove('show');
       btn.textContent = 'Connexion...';
       btn.disabled = true;
-      
       try {
         const { data, error } = await supabaseClient.auth.signInWithPassword({
           email: document.getElementById('login-email').value.trim(),
           password: document.getElementById('login-password').value
         });
         if (error) throw error;
-        
         closeModal();
-        showWelcomeScreen(data.user?.user_metadata?.name?.split(' ')[0] || 'toi');
+        showLoggedInNav(data.user);
+        showWelcome(data.user?.user_metadata?.name?.split(' ')[0] || 'toi');
         setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect' : error.message;
@@ -501,18 +508,16 @@
       err.classList.remove('show');
       btn.textContent = 'Création...';
       btn.disabled = true;
-      
       try {
         const name = document.getElementById('register-name').value.trim();
-        const { error } = await supabaseClient.auth.signUp({
+        const { data, error } = await supabaseClient.auth.signUp({
           email: document.getElementById('register-email').value.trim(),
           password: document.getElementById('register-password').value,
           options: { data: { name, full_name: name } }
         });
         if (error) throw error;
-        
         closeModal();
-        showWelcomeScreen(name.split(' ')[0]);
+        showWelcome(name.split(' ')[0]);
         setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
@@ -523,14 +528,23 @@
     }
 
     async function signOut() {
-      try { await supabaseClient.auth.signOut(); } catch (e) {}
-      window.location.reload();
+      console.log('[INDEX] 👋 Déconnexion...');
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {}
+      showLoggedOutNav();
     }
 
-    // Init
-    if (!isOAuthCallback) {
-      updateNavBar();
-    }
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('[INDEX] 📱 Page chargée');
+      setTimeout(runDemo, 1000);
+      setInterval(runDemo, 8000);
+      
+      const wasCallback = await handleOAuthCallback();
+      if (!wasCallback) {
+        await checkSession();
+      }
+    });
   </script>
 </body>
 </html>
