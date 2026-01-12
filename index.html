@@ -1338,7 +1338,7 @@
     // CONNEXION GOOGLE (avec scopes Sheets)
     // ============================================
     async function handleGoogleAuth() {
-      console.log('[OAUTH] 🚀 Lancement OAuth Google avec scopes Sheets...');
+      console.log('[OAUTH] 🚀 Lancement OAuth Google (connexion basique)...');
       
       closeModal();
       
@@ -1346,12 +1346,7 @@
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + '/',
-            scopes: 'openid email profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly',
-            queryParams: {
-              access_type: 'offline',
-              prompt: 'consent'
-            }
+            redirectTo: window.location.origin + '/'
           }
         });
         
