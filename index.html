@@ -733,6 +733,93 @@
       border: 2px solid rgba(255,107,53,0.3);
     }
     
+    /* WELCOME SCREEN */
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 3, 3, 0.98);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    
+    .welcome-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .welcome-logo {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      font-weight: 800;
+      margin-bottom: 32px;
+      animation: welcomePulse 2s ease-in-out infinite;
+      box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
+    }
+    
+    @keyframes welcomePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(255, 107, 53, 0.6); }
+    }
+    
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: welcomeFadeIn 0.6s ease forwards 0.3s;
+    }
+    
+    .welcome-subtitle {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: welcomeFadeIn 0.6s ease forwards 0.5s;
+    }
+    
+    @keyframes welcomeFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .welcome-dots {
+      display: flex;
+      gap: 12px;
+      opacity: 0;
+      animation: welcomeFadeIn 0.6s ease forwards 0.7s;
+    }
+    
+    .welcome-dot {
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-radius: 50%;
+      animation: welcomeBounce 1.4s ease-in-out infinite;
+    }
+    
+    .welcome-dot:nth-child(1) { animation-delay: 0s; }
+    .welcome-dot:nth-child(2) { animation-delay: 0.2s; }
+    .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes welcomeBounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
     @media (max-width: 768px) {
       .hero-demo { flex-direction: column !important; align-items: center; gap: 20px; }
       .iphone, .sheet { width: 200px; }
@@ -746,6 +833,18 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
+
+  <!-- WELCOME SCREEN -->
+  <div class="welcome-overlay" id="welcome-overlay">
+    <div class="welcome-logo">i</div>
+    <h1 class="welcome-title" id="welcome-title">Bienvenue !</h1>
+    <p class="welcome-subtitle" id="welcome-subtitle">Préparation de ton espace...</p>
+    <div class="welcome-dots">
+      <div class="welcome-dot"></div>
+      <div class="welcome-dot"></div>
+      <div class="welcome-dot"></div>
+    </div>
+  </div>
 
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -983,20 +1082,46 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    console.log('[INIT] 🚀 iArmy - OAuth Natif Supabase avec Modal');
+    console.log('[INIT] 🚀 iArmy - Flow unifié');
 
     // ============================================
-    // 🎯 FIX CALLBACK OAUTH - LISTENER CRITIQUE
+    // WELCOME SCREEN
+    // ============================================
+    function showWelcomeScreen(firstName) {
+      const overlay = document.getElementById('welcome-overlay');
+      const title = document.getElementById('welcome-title');
+      const subtitle = document.getElementById('welcome-subtitle');
+      
+      title.textContent = `Bienvenue ${firstName} ! 👋`;
+      subtitle.textContent = 'Préparation de ton espace...';
+      
+      overlay.classList.add('active');
+    }
+    
+    function hideWelcomeScreen() {
+      const overlay = document.getElementById('welcome-overlay');
+      overlay.classList.remove('active');
+    }
+
+    // ============================================
+    // CALLBACK OAUTH - GÈRE LE RETOUR GOOGLE
     // ============================================
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('[CALLBACK] 🔔 Auth event:', event);
-      console.log('[CALLBACK] 📦 Session:', session);
       
       if (event === 'SIGNED_IN' && session) {
         console.log('[CALLBACK] ✅ Connexion réussie !', session.user.email);
-        console.log('[CALLBACK] 👤 User metadata:', session.user.user_metadata);
         
-        // Vérifier si profil existe
+        // Récupérer le prénom
+        const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || 
+                         session.user.user_metadata?.name?.split(' ')[0] ||
+                         session.user.email?.split('@')[0] || 
+                         'toi';
+        
+        // Afficher l'écran de bienvenue
+        showWelcomeScreen(firstName);
+        
+        // Vérifier/créer le profil
         const { data: profile, error: profileError } = await supabaseClient
           .from('profiles')
           .select('id')
@@ -1004,10 +1129,9 @@
           .single();
         
         if (profileError && profileError.code === 'PGRST116') {
-          console.log('[CALLBACK] 🆕 Profil non trouvé, création...');
+          console.log('[CALLBACK] 🆕 Création du profil...');
           
-          // Créer le profil
-          const { error: insertError } = await supabaseClient
+          await supabaseClient
             .from('profiles')
             .insert({
               id: session.user.id,
@@ -1015,27 +1139,16 @@
               name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
               plan: 'free'
             });
-          
-          if (insertError) {
-            console.error('[CALLBACK] ❌ Erreur création profil:', insertError);
-          } else {
-            console.log('[CALLBACK] ✅ Profil créé avec succès !');
-          }
-        } else {
-          console.log('[CALLBACK] ✅ Profil existe déjà');
         }
         
-        // Rediriger vers compte.html
-        console.log('[CALLBACK] 🚀 Redirection vers compte.html...');
-        window.location.href = 'compte.html';
+        // Attendre 2 secondes pour l'animation puis rediriger
+        setTimeout(() => {
+          window.location.href = 'compta.html';
+        }, 2000);
+        
       } else if (event === 'SIGNED_OUT') {
-        console.log('[CALLBACK] 👋 Déconnexion détectée');
+        console.log('[CALLBACK] 👋 Déconnexion');
         updateNavBar();
-      } else if (event === 'INITIAL_SESSION') {
-        console.log('[CALLBACK] 🔄 Session initiale détectée');
-        if (session) {
-          console.log('[CALLBACK] ✅ Session existante trouvée');
-        }
       }
     });
 
@@ -1096,7 +1209,20 @@
     setTimeout(runDemo, 1000);
     setInterval(runDemo, 8000);
 
-    function launchRobot() { window.location.href = 'compta.html'; }
+    // ============================================
+    // LANCER LE ROBOT - VÉRIFIE SI CONNECTÉ
+    // ============================================
+    async function launchRobot() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (session) {
+        // Déjà connecté → direct vers compta
+        window.location.href = 'compta.html';
+      } else {
+        // Pas connecté → ouvre le modal
+        openModal('login');
+      }
+    }
 
     // ============================================
     // GESTION DU MODAL
@@ -1162,9 +1288,8 @@
     }
 
     // ============================================
-    // AUTHENTIFICATION
+    // NAVBAR
     // ============================================
-    
     async function updateNavBar() {
       console.log('[AUTH] 🔍 Vérification de la session...');
       
@@ -1182,23 +1307,14 @@
       
       console.log('[AUTH] ✅ Session active:', session.user.email);
       
-      const { data: profile, error } = await supabaseClient
+      const { data: profile } = await supabaseClient
         .from('profiles')
         .select('name, email')
         .eq('id', session.user.id)
         .single();
       
-      if (error) {
-        console.log('[PROFILE] ⚠️ Profil non trouvé, création...');
-        await createProfile(session.user);
-        window.location.reload();
-        return;
-      }
-      
-      console.log('[PROFILE] ✅ Profil trouvé:', profile.name);
-      
-      const userName = profile.name || 'User';
-      const userAvatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}`;
+      const userName = profile?.name || session.user.user_metadata?.full_name?.split(' ')[0] || 'User';
+      const userAvatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
       
       authButtons.innerHTML = `
         <div class="nav-user-section">
@@ -1218,40 +1334,24 @@
       `;
     }
     
-    async function createProfile(user) {
-      console.log('[PROFILE] 🆕 Création du profil pour:', user.email);
-      
-      const firstName = user.user_metadata?.full_name?.split(' ')[0] || user.email.split('@')[0];
-      
-      const { error } = await supabaseClient
-        .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email,
-          name: firstName,
-          plan: 'free'
-        });
-      
-      if (error) {
-        console.error('[PROFILE] ❌ Erreur création profil:', error);
-      } else {
-        console.log('[PROFILE] ✅ Profil créé avec succès !');
-      }
-    }
-    
-    /**
-     * 🎯 CONNEXION GOOGLE (OAuth natif Supabase)
-     * ⚠️ FIX: redirectTo changé de /compte.html vers /
-     */
+    // ============================================
+    // CONNEXION GOOGLE (avec scopes Sheets)
+    // ============================================
     async function handleGoogleAuth() {
-      console.log('[OAUTH] 🚀 Lancement OAuth Google...');
+      console.log('[OAUTH] 🚀 Lancement OAuth Google avec scopes Sheets...');
+      
+      closeModal();
       
       try {
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + '/',  // ← FIX: Redirect vers index.html
-            scopes: 'openid email profile'
+            redirectTo: window.location.origin + '/',
+            scopes: 'openid email profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly',
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent'
+            }
           }
         });
         
@@ -1265,9 +1365,9 @@
       }
     }
     
-    /**
-     * Connexion avec email/password
-     */
+    // ============================================
+    // CONNEXION EMAIL/PASSWORD
+    // ============================================
     async function handleLogin(e) {
       e.preventDefault();
       const btn = document.getElementById('login-btn');
@@ -1277,14 +1377,24 @@
       btn.disabled = true;
       
       try {
-        const { error } = await supabaseClient.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
           email: document.getElementById('login-email').value.trim(),
           password: document.getElementById('login-password').value
         });
         
         if (error) throw error;
         
-        window.location.href = 'compte.html';
+        // Récupérer le prénom
+        const firstName = data.user?.user_metadata?.name?.split(' ')[0] || 
+                         data.user?.email?.split('@')[0] || 
+                         'toi';
+        
+        closeModal();
+        showWelcomeScreen(firstName);
+        
+        setTimeout(() => {
+          window.location.href = 'compta.html';
+        }, 2000);
         
       } catch (error) {
         err.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect' : error.message;
@@ -1294,9 +1404,9 @@
       }
     }
 
-    /**
-     * Inscription avec email/password
-     */
+    // ============================================
+    // INSCRIPTION EMAIL/PASSWORD
+    // ============================================
     async function handleRegister(e) {
       e.preventDefault();
       const btn = document.getElementById('register-btn');
@@ -1306,19 +1416,29 @@
       btn.disabled = true;
       
       try {
+        const name = document.getElementById('register-name').value.trim();
+        
         const { data, error } = await supabaseClient.auth.signUp({
           email: document.getElementById('register-email').value.trim(),
           password: document.getElementById('register-password').value,
           options: { 
             data: { 
-              name: document.getElementById('register-name').value.trim() 
+              name: name,
+              full_name: name
             } 
           }
         });
         
         if (error) throw error;
         
-        window.location.href = 'compte.html';
+        const firstName = name.split(' ')[0];
+        
+        closeModal();
+        showWelcomeScreen(firstName);
+        
+        setTimeout(() => {
+          window.location.href = 'compta.html';
+        }, 2000);
         
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
@@ -1328,9 +1448,9 @@
       }
     }
     
-    /**
-     * Déconnexion
-     */
+    // ============================================
+    // DÉCONNEXION
+    // ============================================
     async function signOut() {
       console.log('[AUTH] 👋 Déconnexion...');
       await supabaseClient.auth.signOut();
@@ -1341,11 +1461,8 @@
     // INITIALISATION
     // ============================================
     window.addEventListener('DOMContentLoaded', async () => {
-      console.log('[INIT] 📱 Page chargée, initialisation...');
-      
+      console.log('[INIT] 📱 Page chargée');
       await updateNavBar();
-      
-      console.log('[INIT] ✅ Initialisation terminée');
     });
   </script>
 </body>
