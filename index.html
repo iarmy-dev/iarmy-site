@@ -986,6 +986,60 @@
     console.log('[INIT] 🚀 iArmy - OAuth Natif Supabase avec Modal');
 
     // ============================================
+    // 🎯 FIX CALLBACK OAUTH - LISTENER CRITIQUE
+    // ============================================
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('[CALLBACK] 🔔 Auth event:', event);
+      console.log('[CALLBACK] 📦 Session:', session);
+      
+      if (event === 'SIGNED_IN' && session) {
+        console.log('[CALLBACK] ✅ Connexion réussie !', session.user.email);
+        console.log('[CALLBACK] 👤 User metadata:', session.user.user_metadata);
+        
+        // Vérifier si profil existe
+        const { data: profile, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profileError && profileError.code === 'PGRST116') {
+          console.log('[CALLBACK] 🆕 Profil non trouvé, création...');
+          
+          // Créer le profil
+          const { error: insertError } = await supabaseClient
+            .from('profiles')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
+              plan: 'free'
+            });
+          
+          if (insertError) {
+            console.error('[CALLBACK] ❌ Erreur création profil:', insertError);
+          } else {
+            console.log('[CALLBACK] ✅ Profil créé avec succès !');
+          }
+        } else {
+          console.log('[CALLBACK] ✅ Profil existe déjà');
+        }
+        
+        // Rediriger vers compte.html
+        console.log('[CALLBACK] 🚀 Redirection vers compte.html...');
+        window.location.href = 'compte.html';
+      } else if (event === 'SIGNED_OUT') {
+        console.log('[CALLBACK] 👋 Déconnexion détectée');
+        updateNavBar();
+      } else if (event === 'INITIAL_SESSION') {
+        console.log('[CALLBACK] 🔄 Session initiale détectée');
+        if (session) {
+          console.log('[CALLBACK] ✅ Session existante trouvée');
+        }
+      }
+    });
+
+    // ============================================
     // ANIMATION DEMO (Telegram → Sheets)
     // ============================================
     function runDemo() {
@@ -1187,6 +1241,7 @@
     
     /**
      * 🎯 CONNEXION GOOGLE (OAuth natif Supabase)
+     * ⚠️ FIX: redirectTo changé de /compte.html vers /
      */
     async function handleGoogleAuth() {
       console.log('[OAUTH] 🚀 Lancement OAuth Google...');
@@ -1195,7 +1250,7 @@
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: window.location.origin + '/compte.html',
+            redirectTo: window.location.origin + '/',  // ← FIX: Redirect vers index.html
             scopes: 'openid email profile'
           }
         });
@@ -1289,17 +1344,6 @@
       console.log('[INIT] 📱 Page chargée, initialisation...');
       
       await updateNavBar();
-      
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        console.log('[AUTH] 🔄 État changé:', event);
-        if (event === 'SIGNED_IN') {
-          console.log('[AUTH] ✅ Connexion réussie !');
-          updateNavBar();
-        } else if (event === 'SIGNED_OUT') {
-          console.log('[AUTH] 👋 Déconnexion réussie');
-          updateNavBar();
-        }
-      });
       
       console.log('[INIT] ✅ Initialisation terminée');
     });
