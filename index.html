@@ -17,114 +17,29 @@
       background-size: 400% 400%; 
       animation: gradientShift 20s ease infinite; 
     }
-    @keyframes gradientShift { 
-      0% { background-position: 0% 50%; } 
-      50% { background-position: 100% 50%; } 
-      100% { background-position: 0% 50%; } 
-    }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     
-    .orb { 
-      position: fixed; 
-      border-radius: 50%; 
-      filter: blur(100px); 
-      animation: float 15s ease-in-out infinite; 
-      pointer-events: none; 
-      z-index: 0; 
-    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
     .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.18; }
     .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
     .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
     
-    .glass { 
-      background: rgba(255, 255, 255, 0.02); 
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.05); 
-    }
+    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
     
-    .logo-i { 
-      width: 40px; 
-      height: 40px; 
-      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
-      border-radius: 12px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-weight: 800; 
-      font-size: 20px; 
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      cursor: pointer;
-    }
-    .logo-i:hover { 
-      transform: scale(1.2) rotate(-15deg); 
-      box-shadow: 0 12px 40px rgba(255,107,53,0.6); 
-    }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
     
-    .btn-primary { 
-      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); 
-      padding: 14px 28px; 
-      border-radius: 14px; 
-      font-weight: 600; 
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      border: none; 
-      color: white; 
-      cursor: pointer; 
-      position: relative; 
-      overflow: hidden; 
-    }
-    .btn-primary::before { 
-      content: ''; 
-      position: absolute; 
-      top: 0; 
-      left: -100%; 
-      width: 100%; 
-      height: 100%; 
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); 
-      transition: left 0.6s ease; 
-    }
-    .btn-primary:hover { 
-      transform: translateY(-4px) scale(1.02); 
-      box-shadow: 0 15px 40px rgba(255,107,53,0.5); 
-    }
+    .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
+    .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.6s ease; }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
     .btn-primary:hover::before { left: 100%; }
     
-    .btn-secondary { 
-      background: rgba(255,255,255,0.04); 
-      border: 1px solid rgba(255,255,255,0.08); 
-      padding: 12px 24px; 
-      border-radius: 12px; 
-      font-weight: 500; 
-      transition: all 0.3s; 
-      color: white; 
-      cursor: pointer; 
-    }
-    .btn-secondary:hover { 
-      background: rgba(255,255,255,0.08); 
-      border-color: rgba(255,255,255,0.15); 
-    }
+    .btn-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: white; cursor: pointer; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
     
-    .btn-logout {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      color: #ef4444;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-    }
-    .btn-logout:hover {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.1));
-      border-color: rgba(239, 68, 68, 0.5);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-      color: #f87171;
-    }
+    .btn-logout { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 20px; border-radius: 12px; font-weight: 500; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+    .btn-logout:hover { background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.1)); border-color: rgba(239, 68, 68, 0.5); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); color: #f87171; }
     
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,687 +53,134 @@
     .delay-200 { animation-delay: 0.2s; opacity: 0; }
     .delay-300 { animation-delay: 0.3s; opacity: 0; }
     
-    .iphone { 
-      width: 220px; 
-      background: linear-gradient(145deg, #2a2a2a, #1a1a1a); 
-      border-radius: 36px; 
-      padding: 10px; 
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 30px 60px rgba(0,0,0,0.5); 
-    }
+    .iphone { width: 220px; background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border-radius: 36px; padding: 10px; box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 30px 60px rgba(0,0,0,0.5); }
     .iphone-screen { background: #000; border-radius: 28px; overflow: hidden; }
-    .iphone-notch { 
-      width: 90px; 
-      height: 24px; 
-      background: #000; 
-      border-radius: 0 0 16px 16px; 
-      margin: 0 auto; 
-      position: relative; 
-    }
+    .iphone-notch { width: 90px; height: 24px; background: #000; border-radius: 0 0 16px 16px; margin: 0 auto; position: relative; }
     
-    .telegram-header { 
-      background: #1c1c1e; 
-      padding: 8px 12px; 
-      display: flex; 
-      align-items: center; 
-      gap: 10px; 
-    }
+    .telegram-header { background: #1c1c1e; padding: 8px 12px; display: flex; align-items: center; gap: 10px; }
     .telegram-back { color: #0a84ff; font-size: 20px; }
-    .telegram-avatar { 
-      width: 30px; 
-      height: 30px; 
-      background: linear-gradient(135deg, #FF6B35, #FF8B5E); 
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-weight: 800; 
-      font-size: 12px; 
-    }
+    .telegram-avatar { width: 30px; height: 30px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
     .telegram-name { font-size: 14px; font-weight: 600; }
     .telegram-status { font-size: 11px; color: #0a84ff; }
-    .telegram-messages { 
-      background: #000; 
-      padding: 12px; 
-      height: 200px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 8px; 
-    }
-    .msg { 
-      max-width: 80%; 
-      padding: 8px 12px; 
-      border-radius: 18px; 
-      font-size: 13px; 
-      line-height: 1.3; 
-      opacity: 0; 
-      transform: translateY(10px); 
-      transition: all 0.3s; 
-    }
+    .telegram-messages { background: #000; padding: 12px; height: 200px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { max-width: 80%; padding: 8px 12px; border-radius: 18px; font-size: 13px; line-height: 1.3; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
     .msg.show { opacity: 1; transform: translateY(0); }
     .msg-user { background: #0a84ff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg-bot { background: #2c2c2e; align-self: flex-start; border-bottom-left-radius: 4px; }
     
-    .sheet { 
-      width: 200px; 
-      background: rgba(26, 26, 26, 0.9); 
-      border-radius: 16px; 
-      overflow: hidden; 
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
-      border: 1px solid rgba(255,255,255,0.05); 
-    }
-    .sheet-header { 
-      background: #0d7a3f; 
-      padding: 10px 14px; 
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
-    }
-    .sheet-icon { 
-      width: 20px; 
-      height: 20px; 
-      background: white; 
-      border-radius: 4px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-    }
+    .sheet { width: 200px; background: rgba(26, 26, 26, 0.9); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+    .sheet-header { background: #0d7a3f; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+    .sheet-icon { width: 20px; height: 20px; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
     .sheet-title { font-size: 13px; font-weight: 500; }
     .sheet-grid { font-size: 12px; }
-    .sheet-grid th, .sheet-grid td { 
-      padding: 8px 12px; 
-      border: 1px solid rgba(255,255,255,0.08); 
-      text-align: left; 
-    }
-    .sheet-grid th { 
-      background: rgba(255,255,255,0.03); 
-      font-weight: 500; 
-      color: rgba(255,255,255,0.5); 
-    }
+    .sheet-grid th, .sheet-grid td { padding: 8px 12px; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
+    .sheet-grid th { background: rgba(255,255,255,0.03); font-weight: 500; color: rgba(255,255,255,0.5); }
     .sheet-grid .amount { color: #4ade80; font-weight: 600; }
     .sheet-grid .empty-row { color: rgba(255,255,255,0.2); }
     
     .glide-container { position: relative; width: 120px; height: 40px; }
-    .glide-line { 
-      position: absolute; 
-      top: 50%; 
-      left: 0; 
-      right: 0; 
-      height: 2px; 
-      background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); 
-    }
-    .glide-logo { 
-      position: absolute; 
-      top: 50%; 
-      left: 0; 
-      transform: translateY(-50%); 
-      width: 36px; 
-      height: 36px; 
-      background: linear-gradient(135deg, #FF6B35, #FF8B5E); 
-      border-radius: 10px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-weight: 800; 
-      font-size: 16px; 
-      opacity: 0; 
-      box-shadow: 0 0 30px rgba(255,107,53,0.6); 
-    }
+    .glide-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); }
+    .glide-logo { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; opacity: 0; box-shadow: 0 0 30px rgba(255,107,53,0.6); }
     .glide-logo.animate { animation: glide 1.5s ease-in-out forwards; }
     
-    .animated-logo-ultra-simple {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      height: 70px;
-    }
+    .animated-logo-ultra-simple { display: flex; align-items: center; justify-content: center; gap: 20px; height: 70px; }
+    .logo-telegram-xl { animation: pulseTelegramXL 2s ease-in-out infinite; }
+    @keyframes pulseTelegramXL { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
     
-    .logo-telegram-xl {
-      animation: pulseTelegramXL 2s ease-in-out infinite;
-    }
+    .pulse-container { position: relative; width: 50px; height: 56px; display: flex; align-items: center; justify-content: center; }
+    .pulse-wave { position: absolute; width: 12px; height: 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; opacity: 0; }
+    .wave1 { animation: pulseWave 2s ease-out infinite; animation-delay: 0s; }
+    .wave2 { animation: pulseWave 2s ease-out infinite; animation-delay: 0.3s; }
+    .wave3 { animation: pulseWave 2s ease-out infinite; animation-delay: 0.6s; }
+    .wave4 { animation: pulseWave 2s ease-out infinite; animation-delay: 0.9s; }
+    @keyframes pulseWave { 0% { left: 0; opacity: 0; transform: scale(1); } 15% { opacity: 1; } 70% { opacity: 0.5; } 100% { left: 40px; opacity: 0; transform: scale(0.5); } }
     
-    @keyframes pulseTelegramXL {
-      0%, 100% { 
-        transform: scale(1); 
-      }
-      50% { 
-        transform: scale(1.12); 
-      }
-    }
+    .logo-spreadsheet-xl { animation: pulseSpreadsheet 2s ease-in-out infinite; }
+    @keyframes pulseSpreadsheet { 0%, 30%, 100% { transform: scale(1); } 75%, 85% { transform: scale(1.1); } }
     
-    .pulse-container {
-      position: relative;
-      width: 50px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .cell-fill { animation-duration: 2s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+    .cell-fill-1 { animation-name: fillCell1; }
+    .cell-fill-2 { animation-name: fillCell2; }
+    .cell-fill-3 { animation-name: fillCell3; }
+    .cell-fill-4 { animation-name: fillCell4; }
+    @keyframes fillCell1 { 0%, 40% { opacity: 0; } 50% { opacity: 0.9; } 100% { opacity: 0.9; } }
+    @keyframes fillCell2 { 0%, 45% { opacity: 0; } 55% { opacity: 0.9; } 100% { opacity: 0.9; } }
+    @keyframes fillCell3 { 0%, 50% { opacity: 0; } 60% { opacity: 0.9; } 100% { opacity: 0.9; } }
+    @keyframes fillCell4 { 0%, 55% { opacity: 0; } 65% { opacity: 0.9; } 100% { opacity: 0.9; } }
     
-    .pulse-wave {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
-      border-radius: 50%;
-      opacity: 0;
-    }
+    .module-card { background: linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%); border: 2px solid rgba(255,107,53,0.2); border-radius: 24px; padding: 24px; min-width: 280px; max-width: 320px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .module-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,107,53,0.4); box-shadow: 0 16px 48px rgba(255,107,53,0.3); }
     
-    .wave1 {
-      animation: pulseWave 2s ease-out infinite;
-      animation-delay: 0s;
-    }
+    .badge-new { background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,139,94,0.2)); color: #FF8B5E; border: 1px solid rgba(255,107,53,0.5); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; animation: badgeGlow 2s ease-in-out infinite; box-shadow: 0 0 20px rgba(255,107,53,0.4); }
+    @keyframes badgeGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.4); } 50% { box-shadow: 0 0 35px rgba(255,107,53,0.7), 0 0 50px rgba(255,107,53,0.5); } }
     
-    .wave2 {
-      animation: pulseWave 2s ease-out infinite;
-      animation-delay: 0.3s;
-    }
-    
-    .wave3 {
-      animation: pulseWave 2s ease-out infinite;
-      animation-delay: 0.6s;
-    }
-    
-    .wave4 {
-      animation: pulseWave 2s ease-out infinite;
-      animation-delay: 0.9s;
-    }
-    
-    @keyframes pulseWave {
-      0% {
-        left: 0;
-        opacity: 0;
-        transform: scale(1);
-      }
-      15% {
-        opacity: 1;
-      }
-      70% {
-        opacity: 0.5;
-      }
-      100% {
-        left: 40px;
-        opacity: 0;
-        transform: scale(0.5);
-      }
-    }
-    
-    .logo-spreadsheet-xl {
-      animation: pulseSpreadsheet 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulseSpreadsheet {
-      0%, 30%, 100% { 
-        transform: scale(1); 
-      }
-      75%, 85% { 
-        transform: scale(1.1); 
-      }
-    }
-    
-    .cell-fill {
-      animation-duration: 2s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease-in-out;
-    }
-    
-    .cell-fill-1 {
-      animation-name: fillCell1;
-    }
-    
-    .cell-fill-2 {
-      animation-name: fillCell2;
-    }
-    
-    .cell-fill-3 {
-      animation-name: fillCell3;
-    }
-    
-    .cell-fill-4 {
-      animation-name: fillCell4;
-    }
-    
-    @keyframes fillCell1 {
-      0%, 40% { opacity: 0; }
-      50% { opacity: 0.9; }
-      100% { opacity: 0.9; }
-    }
-    
-    @keyframes fillCell2 {
-      0%, 45% { opacity: 0; }
-      55% { opacity: 0.9; }
-      100% { opacity: 0.9; }
-    }
-    
-    @keyframes fillCell3 {
-      0%, 50% { opacity: 0; }
-      60% { opacity: 0.9; }
-      100% { opacity: 0.9; }
-    }
-    
-    @keyframes fillCell4 {
-      0%, 55% { opacity: 0; }
-      65% { opacity: 0.9; }
-      100% { opacity: 0.9; }
-    }
-    
-    .module-card {
-      background: linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%);
-      border: 2px solid rgba(255,107,53,0.2);
-      border-radius: 24px;
-      padding: 24px;
-      min-width: 280px;
-      max-width: 320px;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      cursor: pointer;
-    }
-    .module-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      border-color: rgba(255,107,53,0.4);
-      box-shadow: 0 16px 48px rgba(255,107,53,0.3);
-    }
-    
-    .badge-new { 
-      background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,139,94,0.2)); 
-      color: #FF8B5E; 
-      border: 1px solid rgba(255,107,53,0.5); 
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: inline-block;
-      animation: badgeGlow 2s ease-in-out infinite;
-      box-shadow: 0 0 20px rgba(255,107,53,0.4);
-    }
-    @keyframes badgeGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.4); }
-      50% { box-shadow: 0 0 35px rgba(255,107,53,0.7), 0 0 50px rgba(255,107,53,0.5); }
-    }
-    
-    .modal-backdrop { 
-      position: fixed; 
-      inset: 0; 
-      background: rgba(0,0,0,0.7); 
-      backdrop-filter: blur(16px); 
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 100; 
-      opacity: 0; 
-      pointer-events: none; 
-      transition: all 0.4s ease; 
-    }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 100; opacity: 0; pointer-events: none; transition: all 0.4s ease; }
     .modal-backdrop.active { opacity: 1; pointer-events: all; }
     
-    .modal-content { 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%, -50%) scale(0.9); 
-      background: rgba(15, 15, 15, 0.75); 
-      backdrop-filter: blur(50px); 
-      -webkit-backdrop-filter: blur(50px);
-      border: 1px solid rgba(255,255,255,0.15); 
-      border-radius: 32px; 
-      padding: 40px; 
-      width: 90%; 
-      max-width: 440px; 
-      z-index: 101; 
-      opacity: 0; 
-      pointer-events: none; 
-      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-      box-shadow: 0 30px 90px rgba(0,0,0,0.9), 
-                  0 0 0 1px rgba(255,107,53,0.15),
-                  inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .modal-content.active { 
-      opacity: 1; 
-      transform: translate(-50%, -50%) scale(1); 
-      pointer-events: all; 
-    }
+    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 40px; width: 90%; max-width: 440px; z-index: 101; opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 30px 90px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,107,53,0.15), inset 0 1px 0 rgba(255,255,255,0.1); }
+    .modal-content.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
     
-    .modal-close { 
-      position: absolute; 
-      top: 16px; 
-      right: 16px; 
-      width: 36px; 
-      height: 36px; 
-      background: rgba(255,255,255,0.05); 
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 50%; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      cursor: pointer; 
-      transition: all 0.3s; 
-    }
-    .modal-close:hover { 
-      background: rgba(255,255,255,0.12); 
-      transform: rotate(90deg); 
-    }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+    .modal-close:hover { background: rgba(255,255,255,0.12); transform: rotate(90deg); }
     
-    .input-field { 
-      background: rgba(255,255,255,0.04); 
-      border: 1px solid rgba(255,255,255,0.1); 
-      border-radius: 14px; 
-      padding: 16px 18px; 
-      color: white; 
-      width: 100%; 
-      font-size: 15px; 
-      transition: all 0.3s; 
-    }
-    .input-field:focus { 
-      outline: none; 
-      border-color: rgba(255,107,53,0.5); 
-      background: rgba(255,255,255,0.06);
-      box-shadow: 0 0 0 4px rgba(255,107,53,0.1); 
-    }
+    .input-field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; color: white; width: 100%; font-size: 15px; transition: all 0.3s; }
+    .input-field:focus { outline: none; border-color: rgba(255,107,53,0.5); background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(255,107,53,0.1); }
     .input-field::placeholder { color: rgba(255,255,255,0.3); }
     
-    .tab-container { 
-      display: flex; 
-      background: rgba(255,255,255,0.04); 
-      border-radius: 14px; 
-      padding: 5px; 
-      margin-bottom: 28px;
-      position: relative;
-    }
+    .tab-container { display: flex; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 5px; margin-bottom: 28px; position: relative; }
+    .tab-indicator { position: absolute; top: 5px; left: 5px; width: calc(50% - 5px); height: calc(100% - 10px); background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 11px; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 4px 12px rgba(255,107,53,0.3); z-index: 0; }
+    .tab-indicator.slide-right { transform: translateX(calc(100% + 5px)); }
+    .tab-btn { flex: 1; padding: 12px; border-radius: 11px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); background: transparent; border: none; cursor: pointer; transition: color 0.3s; z-index: 1; position: relative; }
+    .tab-btn.active { color: white; }
     
-    .tab-indicator {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      width: calc(50% - 5px);
-      height: calc(100% - 10px);
-      background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
-      border-radius: 11px;
-      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(255,107,53,0.3);
-      z-index: 0;
-    }
+    #login-form, #register-form { transition: opacity 0.3s ease, transform 0.3s ease; }
+    .slide-out-left { animation: slideOutLeft 0.3s ease forwards; }
+    .slide-in-right { animation: slideInRight 0.3s ease forwards; }
+    .slide-out-right { animation: slideOutRight 0.3s ease forwards; }
+    .slide-in-left { animation: slideInLeft 0.3s ease forwards; }
+    @keyframes slideOutLeft { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
     
-    .tab-indicator.slide-right {
-      transform: translateX(calc(100% + 5px));
-    }
-    
-    .tab-btn { 
-      flex: 1; 
-      padding: 12px; 
-      border-radius: 11px; 
-      font-size: 14px; 
-      font-weight: 600; 
-      color: rgba(255,255,255,0.5); 
-      background: transparent; 
-      border: none; 
-      cursor: pointer; 
-      transition: color 0.3s; 
-      z-index: 1;
-      position: relative;
-    }
-    .tab-btn.active { 
-      color: white;
-    }
-    
-    #login-form, #register-form {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    
-    .slide-out-left {
-      animation: slideOutLeft 0.3s ease forwards;
-    }
-    
-    .slide-in-right {
-      animation: slideInRight 0.3s ease forwards;
-    }
-    
-    .slide-out-right {
-      animation: slideOutRight 0.3s ease forwards;
-    }
-    
-    .slide-in-left {
-      animation: slideInLeft 0.3s ease forwards;
-    }
-    
-    @keyframes slideOutLeft {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(-30px);
-      }
-    }
-    
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    @keyframes slideOutRight {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-    }
-    
-    @keyframes slideInLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    
-    .error-msg { 
-      background: rgba(239,68,68,0.12); 
-      border: 1px solid rgba(239,68,68,0.3); 
-      border-radius: 12px; 
-      padding: 12px 16px; 
-      color: #ef4444; 
-      font-size: 13px; 
-      display: none; 
-    }
+    .error-msg { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 12px 16px; color: #ef4444; font-size: 13px; display: none; }
     .error-msg.show { display: block; }
     
-    .robot-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      width: 56px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      cursor: default;
-    }
-    .robot-card:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.1);
-      transform: translateY(-4px);
-    }
-    .robot-emoji {
-      animation: floatRobot 3s ease-in-out infinite;
-      filter: grayscale(0.3) opacity(0.7);
-    }
+    .robot-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: default; }
+    .robot-card:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.1); transform: translateY(-4px); }
+    .robot-emoji { animation: floatRobot 3s ease-in-out infinite; filter: grayscale(0.3) opacity(0.7); }
     .robot-card:nth-child(1) .robot-emoji { animation-delay: 0s; }
     .robot-card:nth-child(2) .robot-emoji { animation-delay: 0.2s; }
     .robot-card:nth-child(3) .robot-emoji { animation-delay: 0.4s; }
     .robot-card:nth-child(4) .robot-emoji { animation-delay: 0.6s; }
     .robot-card:nth-child(5) .robot-emoji { animation-delay: 0.8s; }
-    .robot-plus-card {
-      background: rgba(255, 107, 53, 0.05);
-      border-color: rgba(255, 107, 53, 0.2);
-    }
-    @keyframes floatRobot {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      25% { transform: translateY(-8px) rotate(2deg); }
-      75% { transform: translateY(-4px) rotate(-2deg); }
-    }
+    .robot-plus-card { background: rgba(255, 107, 53, 0.05); border-color: rgba(255, 107, 53, 0.2); }
+    @keyframes floatRobot { 0%, 100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-8px) rotate(2deg); } 75% { transform: translateY(-4px) rotate(-2deg); } }
     
-    @keyframes fillCell {
-      0% { 
-        background: rgba(255, 107, 53, 0.5); 
-        box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
-        transform: scale(1.08);
-      }
-      100% { 
-        background: transparent; 
-        box-shadow: none;
-        transform: scale(1);
-      }
-    }
-    .cell-filled {
-      animation: fillCell 0.8s ease-out;
-    }
+    @keyframes fillCell { 0% { background: rgba(255, 107, 53, 0.5); box-shadow: 0 0 20px rgba(255, 107, 53, 0.6); transform: scale(1.08); } 100% { background: transparent; box-shadow: none; transform: scale(1); } }
+    .cell-filled { animation: fillCell 0.8s ease-out; }
     
-    footer a {
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    footer a:hover {
-      color: #FF8B5E;
-      text-shadow: 0 0 20px rgba(255,139,94,0.5);
-      transform: translateY(-2px);
-    }
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: all 0.3s ease; position: relative; }
+    footer a:hover { color: #FF8B5E; text-shadow: 0 0 20px rgba(255,139,94,0.5); transform: translateY(-2px); }
     
-    .nav-user-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .nav-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      text-decoration: none;
-      color: white;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
-
-    .nav-profile:hover {
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.15);
-      transform: translateY(-2px);
-    }
-
-    .nav-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255,107,53,0.3);
-    }
+    .nav-user-section { display: flex; align-items: center; gap: 12px; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; transition: all 0.3s; font-weight: 500; }
+    .nav-profile:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
     
-    /* WELCOME SCREEN */
-    .welcome-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 3, 3, 0.98);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      z-index: 10000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
-    
-    .welcome-overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-    
-    .welcome-logo {
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
-      border-radius: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 52px;
-      font-weight: 800;
-      margin-bottom: 32px;
-      animation: welcomePulse 2s ease-in-out infinite;
-      box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
-    }
-    
-    @keyframes welcomePulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4); }
-      50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(255, 107, 53, 0.6); }
-    }
-    
-    .welcome-title {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      opacity: 0;
-      animation: welcomeFadeIn 0.6s ease forwards 0.3s;
-    }
-    
-    .welcome-subtitle {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-bottom: 40px;
-      opacity: 0;
-      animation: welcomeFadeIn 0.6s ease forwards 0.5s;
-    }
-    
-    @keyframes welcomeFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .welcome-dots {
-      display: flex;
-      gap: 12px;
-      opacity: 0;
-      animation: welcomeFadeIn 0.6s ease forwards 0.7s;
-    }
-    
-    .welcome-dot {
-      width: 12px;
-      height: 12px;
-      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
-      border-radius: 50%;
-      animation: welcomeBounce 1.4s ease-in-out infinite;
-    }
-    
+    .welcome-overlay { position: fixed; inset: 0; background: rgba(3, 3, 3, 0.98); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+    .welcome-overlay.active { opacity: 1; pointer-events: all; }
+    .welcome-logo { width: 100px; height: 100px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 800; margin-bottom: 32px; animation: welcomePulse 2s ease-in-out infinite; box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4); }
+    @keyframes welcomePulse { 0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 25px 80px rgba(255, 107, 53, 0.6); } }
+    .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; opacity: 0; animation: welcomeFadeIn 0.6s ease forwards 0.3s; }
+    .welcome-subtitle { font-size: 16px; color: rgba(255, 255, 255, 0.5); margin-bottom: 40px; opacity: 0; animation: welcomeFadeIn 0.6s ease forwards 0.5s; }
+    @keyframes welcomeFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .welcome-dots { display: flex; gap: 12px; opacity: 0; animation: welcomeFadeIn 0.6s ease forwards 0.7s; }
+    .welcome-dot { width: 12px; height: 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; animation: welcomeBounce 1.4s ease-in-out infinite; }
     .welcome-dot:nth-child(1) { animation-delay: 0s; }
     .welcome-dot:nth-child(2) { animation-delay: 0.2s; }
     .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
-    
-    @keyframes welcomeBounce {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-      40% { transform: scale(1); opacity: 1; }
-    }
+    @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
     
     @media (max-width: 768px) {
       .hero-demo { flex-direction: column !important; align-items: center; gap: 20px; }
@@ -833,8 +195,7 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-
-  <!-- WELCOME SCREEN -->
+  
   <div class="welcome-overlay" id="welcome-overlay">
     <div class="welcome-logo">i</div>
     <h1 class="welcome-title" id="welcome-title">Bienvenue !</h1>
@@ -845,7 +206,7 @@
       <div class="welcome-dot"></div>
     </div>
   </div>
-
+  
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
@@ -855,7 +216,7 @@
       <div id="auth-buttons"></div>
     </div>
   </nav>
-
+  
   <section class="min-h-screen flex items-center justify-center px-6 pt-20 relative z-10">
     <div class="max-w-6xl mx-auto text-center">
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 animate-fade-in-up">
@@ -913,7 +274,7 @@
       </div>
     </div>
   </section>
-
+  
   <section class="py-20 px-6 relative z-10">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-12">
@@ -958,16 +319,12 @@
                       <stop offset="100%" stop-color="#0a7e3e"/>
                     </linearGradient>
                   </defs>
-                  
                   <rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sheet-grad)"/>
-                  
                   <line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
                   <line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
                   <line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
-                  
                   <line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
                   <line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
-                  
                   <rect class="cell-fill cell-fill-1" x="12" y="28" width="10" height="8" fill="#4ade80" opacity="0"/>
                   <rect class="cell-fill cell-fill-2" x="22" y="28" width="12" height="8" fill="#4ade80" opacity="0"/>
                   <rect class="cell-fill cell-fill-3" x="34" y="28" width="10" height="8" fill="#4ade80" opacity="0"/>
@@ -998,7 +355,7 @@
       </div>
     </div>
   </section>
-
+  
   <section class="py-12 px-6 relative z-10">
     <div class="max-w-4xl mx-auto text-center">
       <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres modules arrivent très vite</p>
@@ -1012,21 +369,20 @@
       </div>
     </div>
   </section>
-
+  
   <footer style="padding:40px 24px; background:rgba(0,0,0,0.3); border-top:1px solid rgba(255,255,255,0.05);">
     <div class="max-w-4xl mx-auto">
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:24px;">
         <div style="display:flex; align-items:center; gap:24px; font-size:14px; color:rgba(255,255,255,0.4);">
-          <a href="index.html" style="color:inherit; text-decoration:none;">Accueil</a>
-          <a href="compte.html" style="color:inherit; text-decoration:none;">Mon compte</a>
-          <a href="mailto:contact@iarmy.fr" style="color:inherit; text-decoration:none;">Contact</a>
+          <a href="index.html">Accueil</a>
+          <a href="compte.html">Mon compte</a>
+          <a href="mailto:contact@iarmy.fr">Contact</a>
         </div>
         <p style="color:rgba(255,255,255,0.3); font-size:13px;">© 2026 iArmy</p>
       </div>
     </div>
   </footer>
-
-  <!-- MODAL CONNEXION/INSCRIPTION -->
+  
   <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
   <div class="modal-content" id="modal-content">
     <div class="modal-close" onclick="closeModal()">
@@ -1073,75 +429,57 @@
       </form>
     </div>
   </div>
-
+  
   <script>
-    // ============================================
-    // CONFIGURATION SUPABASE
-    // ============================================
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
     console.log('[INIT] 🚀 iArmy - Flow unifié');
-
-    // ============================================
-    // WELCOME SCREEN
-    // ============================================
+    
     function showWelcomeScreen(firstName) {
       const overlay = document.getElementById('welcome-overlay');
-      const title = document.getElementById('welcome-title');
-      const subtitle = document.getElementById('welcome-subtitle');
-      
-      title.textContent = `Bienvenue ${firstName} ! 👋`;
-      subtitle.textContent = 'Préparation de ton espace...';
-      
+      document.getElementById('welcome-title').textContent = `Bienvenue ${firstName} ! 👋`;
+      document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...';
       overlay.classList.add('active');
     }
     
     function hideWelcomeScreen() {
-      const overlay = document.getElementById('welcome-overlay');
-      overlay.classList.remove('active');
+      document.getElementById('welcome-overlay').classList.remove('active');
     }
-
-    // ============================================
-    // CALLBACK OAUTH - GÈRE LE RETOUR GOOGLE
-    // ============================================
+    
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('[CALLBACK] 🔔 Auth event:', event);
       
       if (event === 'SIGNED_IN' && session) {
         console.log('[CALLBACK] ✅ Connexion réussie !', session.user.email);
         
-        // Récupérer le prénom
         const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || 
                          session.user.user_metadata?.name?.split(' ')[0] ||
-                         session.user.email?.split('@')[0] || 
-                         'toi';
+                         session.user.email?.split('@')[0] || 'toi';
         
-        // Afficher l'écran de bienvenue
         showWelcomeScreen(firstName);
         
-        // Vérifier/créer le profil
-        const { data: profile, error: profileError } = await supabaseClient
-          .from('profiles')
-          .select('id')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (profileError && profileError.code === 'PGRST116') {
-          console.log('[CALLBACK] 🆕 Création du profil...');
-          
-          await supabaseClient
+        try {
+          const { data: profile, error: profileError } = await supabaseClient
             .from('profiles')
-            .insert({
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (profileError && profileError.code === 'PGRST116') {
+            console.log('[CALLBACK] 🆕 Création du profil...');
+            await supabaseClient.from('profiles').insert({
               id: session.user.id,
               email: session.user.email,
               name: session.user.user_metadata.full_name || session.user.email.split('@')[0],
               plan: 'free'
             });
+          }
+        } catch (e) {
+          console.log('[CALLBACK] ⚠️ Erreur profil:', e.message);
         }
         
-        // Attendre 2 secondes pour l'animation puis rediriger
         setTimeout(() => {
           window.location.href = 'compta.html';
         }, 2000);
@@ -1151,10 +489,7 @@
         updateNavBar();
       }
     });
-
-    // ============================================
-    // ANIMATION DEMO (Telegram → Sheets)
-    // ============================================
+    
     function runDemo() {
       const container = document.getElementById('telegram-messages');
       const glideLogo = document.getElementById('glide-logo');
@@ -1208,40 +543,38 @@
     
     setTimeout(runDemo, 1000);
     setInterval(runDemo, 8000);
-
-    // ============================================
-    // LANCER LE ROBOT - VÉRIFIE SI CONNECTÉ
-    // ============================================
+    
     async function launchRobot() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      let session = null;
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        session = data?.session;
+      } catch (e) {
+        console.log('[LAUNCH] ⚠️ Erreur getSession:', e.message);
+      }
       
       if (session) {
-        // Déjà connecté → direct vers compta
         window.location.href = 'compta.html';
       } else {
-        // Pas connecté → ouvre le modal
         openModal('login');
       }
     }
-
-    // ============================================
-    // GESTION DU MODAL
-    // ============================================
+    
     function openModal(tab = 'login') {
       document.getElementById('modal-backdrop').classList.add('active');
       document.getElementById('modal-content').classList.add('active');
       document.body.style.overflow = 'hidden';
       switchTab(tab);
     }
-
+    
     function closeModal() {
       document.getElementById('modal-backdrop').classList.remove('active');
       document.getElementById('modal-content').classList.remove('active');
       document.body.style.overflow = '';
     }
-
+    
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
+    
     function switchTab(tab) {
       const loginForm = document.getElementById('login-form');
       const registerForm = document.getElementById('register-form');
@@ -1286,15 +619,18 @@
         }
       }
     }
-
-    // ============================================
-    // NAVBAR
-    // ============================================
+    
     async function updateNavBar() {
       console.log('[AUTH] 🔍 Vérification de la session...');
-      
-      const { data: { session } } = await supabaseClient.auth.getSession();
       const authButtons = document.getElementById('auth-buttons');
+      
+      let session = null;
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        session = data?.session;
+      } catch (e) {
+        console.log('[AUTH] ⚠️ Erreur getSession:', e.message);
+      }
       
       if (!session) {
         console.log('[AUTH] ❌ Pas de session active');
@@ -1307,14 +643,20 @@
       
       console.log('[AUTH] ✅ Session active:', session.user.email);
       
-      const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('name, email')
-        .eq('id', session.user.id)
-        .single();
+      let userName = session.user.user_metadata?.full_name?.split(' ')[0] || 'User';
+      let userAvatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
       
-      const userName = profile?.name || session.user.user_metadata?.full_name?.split(' ')[0] || 'User';
-      const userAvatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
+      try {
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('name, email')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.name) userName = profile.name;
+      } catch (e) {
+        console.log('[AUTH] ⚠️ Erreur profil:', e.message);
+      }
       
       authButtons.innerHTML = `
         <div class="nav-user-section">
@@ -1334,12 +676,8 @@
       `;
     }
     
-    // ============================================
-    // CONNEXION GOOGLE (avec scopes Sheets)
-    // ============================================
     async function handleGoogleAuth() {
-      console.log('[OAUTH] 🚀 Lancement OAuth Google (connexion basique)...');
-      
+      console.log('[OAUTH] 🚀 Lancement OAuth Google...');
       closeModal();
       
       try {
@@ -1351,18 +689,13 @@
         });
         
         if (error) throw error;
-        
         console.log('[OAUTH] ✅ Redirection vers Google...');
-        
       } catch (error) {
         console.error('[OAUTH] ❌ Erreur:', error);
         alert('Erreur lors de la connexion: ' + error.message);
       }
     }
     
-    // ============================================
-    // CONNEXION EMAIL/PASSWORD
-    // ============================================
     async function handleLogin(e) {
       e.preventDefault();
       const btn = document.getElementById('login-btn');
@@ -1379,10 +712,8 @@
         
         if (error) throw error;
         
-        // Récupérer le prénom
         const firstName = data.user?.user_metadata?.name?.split(' ')[0] || 
-                         data.user?.email?.split('@')[0] || 
-                         'toi';
+                         data.user?.email?.split('@')[0] || 'toi';
         
         closeModal();
         showWelcomeScreen(firstName);
@@ -1398,10 +729,7 @@
         btn.disabled = false;
       }
     }
-
-    // ============================================
-    // INSCRIPTION EMAIL/PASSWORD
-    // ============================================
+    
     async function handleRegister(e) {
       e.preventDefault();
       const btn = document.getElementById('register-btn');
@@ -1443,18 +771,16 @@
       }
     }
     
-    // ============================================
-    // DÉCONNEXION
-    // ============================================
     async function signOut() {
       console.log('[AUTH] 👋 Déconnexion...');
-      await supabaseClient.auth.signOut();
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.log('[AUTH] ⚠️ Erreur signOut:', e.message);
+      }
       window.location.reload();
     }
     
-    // ============================================
-    // INITIALISATION
-    // ============================================
     window.addEventListener('DOMContentLoaded', async () => {
       console.log('[INIT] 📱 Page chargée');
       await updateNavBar();
