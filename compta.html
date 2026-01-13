@@ -400,12 +400,25 @@
       showLoader('Chargement de tes fichiers...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
+        console.log('[SHEETS] Fetching from API...');
         var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY } });
         var result = await response.json();
+        console.log('[SHEETS] API Response:', result);
+        console.log('[SHEETS] Total files received:', result.sheets?.length || 0);
+
+        // Debug: chercher "recette 25"
+        if (result.sheets) {
+          var recette = result.sheets.find(function(s) { return s.name.toLowerCase().includes('recette'); });
+          console.log('[SHEETS] Files containing "recette":', result.sheets.filter(function(s) { return s.name.toLowerCase().includes('recette'); }));
+
+          // Log first 20 files
+          console.log('[SHEETS] First 20 files:', result.sheets.slice(0, 20).map(function(s) { return s.name; }));
+        }
+
         hideLoader();
         if (!result.success) throw new Error(result.error);
         if (result.sheets?.length > 0) showSheetsOverlay(result.sheets); else showNoSheetsMessage();
-      } catch (error) { hideLoader(); alert('Erreur: ' + error.message); }
+      } catch (error) { console.error('[SHEETS] Error:', error); hideLoader(); alert('Erreur: ' + error.message); }
     }
 
     var allSheets = []; // Store all sheets for filtering
@@ -414,20 +427,25 @@
     var MAX_FILES = 10;
 
     function showSheetsOverlay(sheets) {
+      console.log('[SHEETS] showSheetsOverlay called with', sheets.length, 'sheets');
       // Sort by most recent first
       allSheets = sheets.slice().sort(function(a, b) {
         return new Date(b.modifiedTime) - new Date(a.modifiedTime);
       });
+      console.log('[SHEETS] allSheets stored:', allSheets.length);
       currentFilter = 'all';
       showAllFiles = false;
       document.getElementById('sheets-search-input').value = '';
       // Reset folder tabs
       document.querySelectorAll('.sheets-folder').forEach(function(f, i) { f.classList.toggle('active', i === 0); });
-      renderSheetsList(getFilteredSheets());
+      var filtered = getFilteredSheets();
+      console.log('[SHEETS] getFilteredSheets returned:', filtered.length);
+      renderSheetsList(filtered);
       document.getElementById('sheets-overlay').classList.add('active');
     }
 
     function getFilteredSheets() {
+      console.log('[SHEETS] getFilteredSheets - currentFilter:', currentFilter, 'allSheets:', allSheets.length);
       var filtered = allSheets;
       if (currentFilter === 'recent') {
         // Already sorted by date, just return all (limit handled by renderSheetsList)
@@ -435,10 +453,12 @@
       } else if (currentFilter === 'shared') {
         filtered = allSheets.filter(function(sheet) { return sheet.shared === true; });
       }
+      console.log('[SHEETS] getFilteredSheets returning:', filtered.length);
       return filtered;
     }
 
     function renderSheetsList(sheets) {
+      console.log('[SHEETS] renderSheetsList called with', sheets.length, 'sheets, showAllFiles:', showAllFiles);
       var grid = document.getElementById('sheets-grid');
       if (sheets.length === 0) {
         grid.innerHTML = '<div class="sheets-empty"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><h4>Aucun fichier trouve</h4><p>Essayez une autre recherche</p></div>';
@@ -447,6 +467,7 @@
       // Limit to MAX_FILES unless showAllFiles is true
       var displaySheets = showAllFiles ? sheets : sheets.slice(0, MAX_FILES);
       var hasMore = sheets.length > MAX_FILES && !showAllFiles;
+      console.log('[SHEETS] Displaying', displaySheets.length, 'sheets, hasMore:', hasMore);
 
       var html = displaySheets.map(function(sheet) {
         return '<div class="sheet-card" onclick="selectSheet({id:\'' + sheet.id + '\',name:\'' + sheet.name.replace(/'/g, "\\'") + '\'})">' +
@@ -480,13 +501,16 @@
     }
 
     function filterByFolder(folder, element) {
+      console.log('[SHEETS] filterByFolder called:', folder);
       // Update active state
       document.querySelectorAll('.sheets-folder').forEach(function(f) { f.classList.remove('active'); });
       element.classList.add('active');
       currentFilter = folder;
       showAllFiles = false;
       document.getElementById('sheets-search-input').value = '';
-      renderSheetsList(getFilteredSheets());
+      var filtered = getFilteredSheets();
+      console.log('[SHEETS] After filter, rendering', filtered.length, 'sheets');
+      renderSheetsList(filtered);
     }
 
     function showNoSheetsMessage() {
@@ -497,9 +521,11 @@
     function closeSheetsOverlay() { document.getElementById('sheets-overlay').classList.remove('active'); }
     async function refreshSheets() {
       // Force refresh from Google API
+      console.log('[SHEETS] refreshSheets called');
       showLoader('Actualisation des fichiers...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
+        console.log('[SHEETS] Fetching fresh data from API...');
         var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', {
           method: 'POST',
           headers: {
@@ -511,15 +537,24 @@
           body: JSON.stringify({ forceRefresh: true })
         });
         var result = await response.json();
+        console.log('[SHEETS] Refresh response:', result);
+        console.log('[SHEETS] Refresh got', result.sheets?.length || 0, 'sheets');
+
+        // Debug: chercher "recette"
+        if (result.sheets) {
+          console.log('[SHEETS] Files containing "recette":', result.sheets.filter(function(s) { return s.name.toLowerCase().includes('recette'); }));
+        }
+
         hideLoader();
         if (!result.success) throw new Error(result.error);
         if (result.sheets?.length > 0) {
           showSheetsOverlay(result.sheets);
-          showToast('Liste actualisee !');
+          showToast('Liste actualisee ! (' + result.sheets.length + ' fichiers)');
         } else {
           showNoSheetsMessage();
         }
       } catch (error) {
+        console.error('[SHEETS] Refresh error:', error);
         hideLoader();
         alert('Erreur: ' + error.message);
       }
