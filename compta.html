@@ -149,6 +149,38 @@
     .btn-google-sheets:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2); }
     .btn-google-sheets.connected { background: linear-gradient(135deg, #0f9d58, #0a7e3e); color: white; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
+
+    /* Config Preview Modal */
+    .config-preview-overlay { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(30px); z-index: 10003; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .config-preview-overlay.active { opacity: 1; pointer-events: all; }
+    .config-preview-content { max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; background: rgba(20, 20, 20, 0.98); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 40px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); animation: previewSlideIn 0.4s ease; }
+    @keyframes previewSlideIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .config-preview-header { text-align: center; margin-bottom: 32px; }
+    .config-preview-header h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .config-preview-header p { color: rgba(255, 255, 255, 0.5); font-size: 15px; }
+    .config-preview-sheet { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+    .config-preview-sheet-name { display: flex; align-items: center; gap: 12px; font-size: 15px; color: rgba(255, 255, 255, 0.7); margin-bottom: 4px; }
+    .config-preview-sheet-name svg { width: 20px; height: 20px; color: #0f9d58; }
+    .config-preview-sheet-name strong { color: white; }
+    .config-preview-table { width: 100%; border-collapse: collapse; margin-top: 24px; border-radius: 12px; overflow: hidden; }
+    .config-preview-table th { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; padding: 14px 16px; text-align: center; font-weight: 600; font-size: 13px; border: none; }
+    .config-preview-table td { padding: 14px 16px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); font-size: 14px; }
+    .config-preview-table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.04); }
+    .config-preview-table .highlight { background: rgba(34, 197, 94, 0.15) !important; border-color: rgba(34, 197, 94, 0.2); }
+    .config-preview-legend { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+    .config-preview-legend-color { width: 14px; height: 14px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 4px; }
+    .config-preview-columns { margin: 24px 0; }
+    .config-preview-columns h4 { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.6); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .config-preview-column-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; margin-bottom: 8px; }
+    .config-preview-column-item code { background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+    .config-preview-column-item span { color: rgba(255, 255, 255, 0.4); }
+    .config-preview-column-item strong { color: white; }
+    .config-preview-buttons { display: flex; gap: 16px; margin-top: 32px; }
+    .config-preview-buttons button { flex: 1; padding: 18px 24px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-preview-confirm { background: linear-gradient(135deg, #22c55e, #16a34a); border: none; color: white; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); }
+    .btn-preview-confirm:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(34, 197, 94, 0.5); }
+    .btn-preview-cancel { background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.7); }
+    .btn-preview-cancel:hover { background: rgba(255, 255, 255, 0.05); color: white; }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -210,6 +242,36 @@
         Rafraichir la liste
       </button>
       <button class="btn-back" onclick="closeSheetsOverlay()">← Retour</button>
+    </div>
+  </div>
+  <!-- Config Preview Modal -->
+  <div class="config-preview-overlay" id="config-preview-overlay">
+    <div class="config-preview-content">
+      <div class="config-preview-header">
+        <h2>🔍 Aperçu de ta configuration</h2>
+        <p>Vérifie que tout est correct avant de valider</p>
+      </div>
+
+      <div class="config-preview-sheet" id="preview-sheet-info">
+        <div class="config-preview-sheet-name">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
+          <span>Fichier : <strong id="preview-file-name">-</strong></span>
+        </div>
+      </div>
+
+      <div id="preview-table-container">
+        <!-- Le tableau sera généré ici -->
+      </div>
+
+      <div class="config-preview-columns" id="preview-columns-list">
+        <h4>Colonnes détectées</h4>
+        <!-- Les colonnes seront listées ici -->
+      </div>
+
+      <div class="config-preview-buttons">
+        <button class="btn-preview-cancel" onclick="closeConfigPreview()">← Modifier</button>
+        <button class="btn-preview-confirm" onclick="confirmConfig()">Valider ✓</button>
+      </div>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -809,25 +871,145 @@
         if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          finalConfig = JSON.parse(jsonMatch[0]);
-          // Sauvegarder la config complète avec excel_config ET sheet_id
-          var configToSave = {
-            user_id: currentUser.id,
-            excel_config: finalConfig,
-            sheet_id: excelData?.sheetId || null,
-            is_active: true
-          };
-          console.log('[COMPTA] 💾 Sauvegarde user_configs:', configToSave);
-          var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
-          if (saveError) console.error('[COMPTA] ❌ Erreur sauvegarde:', saveError);
-          else console.log('[COMPTA] ✅ Config sauvegardée!');
-          var colonnes = finalConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
-          addBotMessage('✅ Parfait ! J\'ai tout compris !\n\n📊 Colonnes détectées : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
-          setTimeout(function() { goToStep(3); }, 1500);
+          var parsedConfig = JSON.parse(jsonMatch[0]);
+          console.log('[COMPTA] 🔍 Config détectée, affichage preview:', parsedConfig);
+          // Show preview instead of saving directly
+          showConfigPreview(parsedConfig);
         } else { addBotMessage(response); }
       } catch (err) { console.error(err); addBotMessage("Désolé, j'ai eu un problème. Tu peux répéter ?"); }
       isWaitingForAI = false;
     }
+
+    // ========== CONFIG PREVIEW FUNCTIONS ==========
+    var pendingConfig = null;
+
+    function showConfigPreview(config) {
+      pendingConfig = config;
+      console.log('[PREVIEW] Showing config preview:', config);
+
+      // Set file name
+      document.getElementById('preview-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
+
+      // Build table preview
+      var tableHtml = '';
+      if (excelData?.sheets?.[0]?.allRows) {
+        var rows = excelData.sheets[0].allRows;
+        var headerRowNum = config.ligne_entetes || 1;
+        var dataStartRow = config.premiere_ligne_donnees || 2;
+
+        // Find all columns mentioned in config
+        var highlightCols = {};
+        if (config.colonnes_a_remplir) {
+          config.colonnes_a_remplir.forEach(function(col) {
+            highlightCols[col.colonne] = col.nom;
+          });
+        }
+        if (config.colonne_date) highlightCols[config.colonne_date] = 'Date';
+
+        // Get all column letters from data
+        var allCols = [];
+        rows.forEach(function(row) {
+          if (row.row === '...') return;
+          row.cells.forEach(function(cell) {
+            if (!allCols.includes(cell.col)) allCols.push(cell.col);
+          });
+        });
+        allCols.sort();
+
+        // Build table header
+        tableHtml += '<table class="config-preview-table"><thead><tr>';
+        tableHtml += '<th style="width:50px">#</th>';
+        allCols.forEach(function(col) {
+          var isHighlight = highlightCols[col] ? ' class="highlight"' : '';
+          tableHtml += '<th' + isHighlight + '>' + col + (highlightCols[col] ? '<br><small>(' + highlightCols[col] + ')</small>' : '') + '</th>';
+        });
+        tableHtml += '</tr></thead><tbody>';
+
+        // Build rows (max 8 rows for preview)
+        var displayRows = rows.slice(0, 8);
+        displayRows.forEach(function(row) {
+          if (row.row === '...') {
+            tableHtml += '<tr><td colspan="' + (allCols.length + 1) + '" style="text-align:center;color:rgba(255,255,255,0.3)">...</td></tr>';
+            return;
+          }
+          var isHeaderRow = row.row === headerRowNum;
+          tableHtml += '<tr' + (isHeaderRow ? ' style="background:rgba(255,107,53,0.1)"' : '') + '>';
+          tableHtml += '<td style="font-weight:600;color:rgba(255,255,255,0.4)">' + row.row + '</td>';
+
+          allCols.forEach(function(col) {
+            var cellVal = '';
+            row.cells.forEach(function(cell) {
+              if (cell.col === col) cellVal = cell.val;
+            });
+            var isHighlight = highlightCols[col] && row.row >= dataStartRow ? ' class="highlight"' : '';
+            tableHtml += '<td' + isHighlight + '>' + (cellVal || '-') + '</td>';
+          });
+          tableHtml += '</tr>';
+        });
+
+        tableHtml += '</tbody></table>';
+        tableHtml += '<div class="config-preview-legend"><div class="config-preview-legend-color"></div><span>Colonnes qui seront remplies par le bot</span></div>';
+      }
+      document.getElementById('preview-table-container').innerHTML = tableHtml;
+
+      // Build columns list
+      var colsHtml = '';
+      if (config.colonnes_a_remplir) {
+        config.colonnes_a_remplir.forEach(function(col) {
+          var aliases = col.aliases?.slice(0, 4).join(', ') || '-';
+          colsHtml += '<div class="config-preview-column-item">';
+          colsHtml += '<code>' + col.colonne + '</code>';
+          colsHtml += '<strong>' + col.nom + '</strong>';
+          colsHtml += '<span>→ ' + aliases + '</span>';
+          colsHtml += '</div>';
+        });
+      }
+      if (config.colonne_date) {
+        colsHtml += '<div class="config-preview-column-item">';
+        colsHtml += '<code>' + config.colonne_date + '</code>';
+        colsHtml += '<strong>Date</strong>';
+        colsHtml += '<span>→ auto</span>';
+        colsHtml += '</div>';
+      }
+      document.getElementById('preview-columns-list').innerHTML = '<h4>Colonnes détectées</h4>' + colsHtml;
+
+      // Show modal
+      document.getElementById('config-preview-overlay').classList.add('active');
+    }
+
+    function closeConfigPreview() {
+      document.getElementById('config-preview-overlay').classList.remove('active');
+      addBotMessage("D'accord ! Qu'est-ce que tu voudrais modifier ?");
+    }
+
+    async function confirmConfig() {
+      if (!pendingConfig) return;
+
+      // Close modal
+      document.getElementById('config-preview-overlay').classList.remove('active');
+
+      // Save config
+      var configToSave = {
+        user_id: currentUser.id,
+        excel_config: pendingConfig,
+        sheet_id: excelData?.sheetId || null,
+        is_active: true
+      };
+      console.log('[COMPTA] 💾 Sauvegarde user_configs:', configToSave);
+      var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
+      if (saveError) {
+        console.error('[COMPTA] ❌ Erreur sauvegarde:', saveError);
+        addBotMessage("Oups, erreur lors de la sauvegarde. Réessaie ?");
+        return;
+      }
+      console.log('[COMPTA] ✅ Config sauvegardée!');
+      finalConfig = pendingConfig;
+
+      var colonnes = pendingConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
+      addBotMessage('✅ Parfait ! Configuration validée !\n\n📊 Colonnes : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
+      setTimeout(function() { goToStep(3); }, 1500);
+    }
+    // ========== END CONFIG PREVIEW ==========
 
     function goToStep(step) { document.querySelectorAll('.step-item').forEach(function(item, i) { item.classList.remove('active', 'completed', 'upcoming'); if (i < step - 1) item.classList.add('completed'); else if (i === step - 1) item.classList.add('active'); else item.classList.add('upcoming'); }); document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); }); document.getElementById('step-' + step).classList.add('active'); if (step === 3) checkExistingTelegramConnection(); }
 
