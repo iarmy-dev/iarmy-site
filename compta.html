@@ -3,300 +3,656 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compta Express - Configuration | iArmy</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23FF6B35'/%3E%3Cstop offset='1' stop-color='%23FF8B5E'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50' y='70' font-family='Arial' font-size='60' font-weight='800' fill='white' text-anchor='middle'%3Ei%3C/text%3E%3C/svg%3E">
+  <title>Mes fichiers - iArmy Compta</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230F9D58'/%3E%3Cstop offset='1' stop-color='%2334A853'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='50' y='70' font-family='Arial' font-size='60' font-weight='800' fill='white' text-anchor='middle'%3Ei%3C/text%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
-    h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
-    body { background: #0a0a0a; color: white; min-height: 100vh; overflow-x: hidden; }
-    .bg-gradient-animate { background: linear-gradient(135deg, #0a0a0a 0%, #0f0a0d 25%, #0a0f0f 50%, #0d0f0a 75%, #0a0a0a 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: 0.25; animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
-    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; }
-    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; animation-delay: -7s; }
-    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 40%; left: 40%; opacity: 0.15; animation-delay: -3s; }
-    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px); border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-    .glass-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: all 0.4s ease; }
-    .glass-card:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.4s; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25); }
-    .logo-i:hover { transform: scale(1.15) rotate(-8deg); box-shadow: 0 0 40px rgba(255,107,53,0.6); }
-    .sidebar { background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(20px); width: 280px; min-height: calc(100vh - 70px); padding: 24px; position: fixed; left: 0; top: 70px; z-index: 40; }
-    .step-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; margin-bottom: 8px; transition: all 0.3s ease; cursor: pointer; }
-    .step-item:hover:not(.upcoming):not(.active) { background: rgba(255, 255, 255, 0.03); }
-    .step-item.active { background: rgba(255, 107, 53, 0.08); cursor: default; }
-    .step-item.completed { opacity: 0.6; cursor: pointer; }
-    .step-item.completed:hover { opacity: 0.8; background: rgba(255, 255, 255, 0.03); }
-    .step-item.upcoming { cursor: not-allowed; opacity: 0.3; pointer-events: none; }
-    .step-number { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.08); }
-    .step-item.active .step-number { background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-color: transparent; box-shadow: 0 0 20px rgba(255, 107, 53, 0.3); }
-    .step-item.completed .step-number { background: linear-gradient(135deg, #22c55e, #4ade80); border-color: transparent; }
-    .step-label { font-size: 14px; font-weight: 500; color: rgba(255, 255, 255, 0.5); }
-    .step-item.active .step-label { color: white; }
-    .main-content { margin-left: 280px; padding: 40px; max-width: 900px; position: relative; z-index: 10; }
-    .step-content { display: none; animation: fadeIn 0.4s ease; }
-    .step-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .upload-zone { border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 60px 40px; text-align: center; transition: all 0.4s ease; cursor: pointer; background: rgba(255, 255, 255, 0.01); }
-    .upload-zone:hover, .upload-zone.dragover { border-color: rgba(255, 107, 53, 0.4); background: rgba(255, 107, 53, 0.03); }
-    .chat-container { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 24px; overflow: hidden; max-width: 700px; }
-    .chat-header { padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); display: flex; align-items: center; gap: 12px; }
-    .chat-header-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-    .chat-messages { padding: 24px; min-height: 300px; max-height: 500px; overflow-y: auto; }
-    .chat-msg { margin-bottom: 20px; animation: slideIn 0.3s ease-out; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .chat-msg-bot { display: flex; gap: 12px; align-items: flex-start; }
-    .chat-msg-user { display: flex; gap: 12px; flex-direction: row-reverse; align-items: flex-start; }
-    .chat-avatar { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
-    .chat-avatar-bot { background: linear-gradient(135deg, #FF6B35, #FF8B5E); }
-    .chat-avatar-user { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 107, 53, 0.25); color: rgba(255, 139, 94, 0.8); }
-    .chat-bubble { padding: 16px 20px; border-radius: 20px; max-width: 85%; line-height: 1.7; font-size: 15px; }
-    .chat-bubble-bot { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-bottom-left-radius: 4px; }
-    .chat-bubble-bot strong { color: #FF8B5E; }
-    .chat-bubble-user { background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.08)); border: 1px solid rgba(255, 107, 53, 0.2); border-bottom-right-radius: 4px; }
-    .chat-input-container { padding: 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.04); display: flex; gap: 12px; }
-    .chat-input { flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 16px 20px; color: white; font-size: 15px; }
-    .chat-input:focus { outline: none; border-color: rgba(255, 107, 53, 0.4); }
-    .chat-input::placeholder { color: rgba(255, 255, 255, 0.25); }
-    .chat-send { background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; padding: 16px 28px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-    .chat-send:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4); }
-    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-    .loading-indicator { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: rgba(255, 255, 255, 0.04); border-radius: 20px; width: fit-content; border-bottom-left-radius: 4px; }
-    .loading-bar-wrapper { width: 100px; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
-    .loading-bar-fill { height: 100%; background: linear-gradient(90deg, transparent 0%, #FF6B35 20%, #FF8B5E 50%, #FF6B35 80%, transparent 100%); background-size: 200% 100%; animation: slideBar 1.2s linear infinite; width: 100%; }
-    @keyframes slideBar { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
-    .close-btn { position: fixed; top: 24px; right: 24px; width: 44px; height: 44px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; z-index: 100; transition: all 0.3s ease; }
-    .close-btn:hover { background: rgba(255, 255, 255, 0.08); transform: rotate(90deg); }
-    .btn-glow { background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; padding: 16px 32px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25); width: 100%; font-size: 15px; text-decoration: none; display: inline-block; text-align: center; }
-    .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4); }
-    .btn-glow:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-telegram { background: linear-gradient(135deg, #0088cc, #00aaff); border: none; border-radius: 14px; padding: 16px 32px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.3s ease; width: 100%; font-size: 15px; text-decoration: none; }
-    .btn-telegram:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 136, 204, 0.5); }
-    .check-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #22c55e, #4ade80); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; animation: popIn 0.5s ease; }
-    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-    .btn-logout { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.3); padding: 10px 20px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: none; }
-    .btn-logout:hover { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1)); transform: translateY(-2px); }
-    .welcome-overlay { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(30px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-    .welcome-overlay.active { opacity: 1; pointer-events: all; }
-    .welcome-logo { width: 100px; height: 100px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 800; margin-bottom: 32px; animation: welcomePulse 2s ease-in-out infinite; box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4); }
-    @keyframes welcomePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    .welcome-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; text-align: center; }
-    .welcome-subtitle { font-size: 16px; color: rgba(255, 255, 255, 0.5); margin-bottom: 40px; text-align: center; }
-    .welcome-dots { display: flex; gap: 12px; }
-    .welcome-dot { width: 12px; height: 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; animation: welcomeBounce 1.4s ease-in-out infinite; }
-    .welcome-dot:nth-child(2) { animation-delay: 0.2s; }
-    .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
-    .global-loader { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    .global-loader.active { opacity: 1; pointer-events: all; }
-    .loader-spinner { width: 60px; height: 60px; border: 4px solid rgba(255, 107, 53, 0.2); border-top-color: #FF6B35; border-radius: 50%; animation: spinLoader 0.8s linear infinite; margin-bottom: 24px; }
-    @keyframes spinLoader { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 16px; color: rgba(255, 255, 255, 0.6); }
-    .sheets-overlay { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(30px); z-index: 9999; overflow-y: auto; padding: 40px 20px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-    .sheets-overlay.active { opacity: 1; pointer-events: all; }
-    .sheets-content { max-width: 700px; margin: 0 auto; }
-    .sheets-header { text-align: center; margin-bottom: 40px; }
-    .sheets-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-    .sheets-header p { color: rgba(255, 255, 255, 0.5); font-size: 16px; }
-    .sheets-grid { display: grid; gap: 16px; margin-bottom: 24px; }
-    .sheet-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 24px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: all 0.3s; }
-    .sheet-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 107, 53, 0.4); transform: translateX(8px); }
-    .sheet-card-icon { width: 56px; height: 56px; background: rgba(15, 157, 88, 0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
-    .sheet-card-info { flex: 1; }
-    .sheet-card-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-    .sheet-card-info p { font-size: 14px; color: rgba(255, 255, 255, 0.4); }
-    .sheet-card-arrow { font-size: 24px; color: rgba(255, 255, 255, 0.3); transition: all 0.3s; }
-    .sheet-card:hover .sheet-card-arrow { color: #FF6B35; transform: translateX(4px); }
-    .btn-refresh { width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); padding: 16px; border-radius: 14px; color: white; font-weight: 500; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .btn-refresh:hover { background: rgba(255, 255, 255, 0.08); }
-    .btn-back { width: 100%; background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); padding: 14px; border-radius: 14px; color: rgba(255, 255, 255, 0.6); cursor: pointer; margin-top: 12px; transition: all 0.3s; }
-    .btn-back:hover { background: rgba(255, 255, 255, 0.04); color: white; }
-    .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 16px 32px; border-radius: 16px; font-weight: 600; box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4); z-index: 10002; opacity: 0; transition: all 0.4s; }
+    * { font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: #f8f9fa; color: #202124; min-height: 100vh; }
+
+    /* Navbar */
+    .navbar { background: white; border-bottom: 1px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
+    .logo-sheets { width: 40px; height: 40px; background: linear-gradient(135deg, #0F9D58 0%, #34A853 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; }
+
+    /* Search bar */
+    .search-container { max-width: 720px; width: 100%; }
+    .search-bar { background: #f1f3f4; border: none; border-radius: 8px; padding: 12px 16px 12px 48px; width: 100%; font-size: 14px; transition: all 0.2s; }
+    .search-bar:focus { background: white; box-shadow: 0 1px 6px rgba(32,33,36,0.28); outline: none; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #5f6368; }
+
+    /* Sidebar */
+    .sidebar { width: 256px; background: white; border-right: 1px solid #e0e0e0; min-height: calc(100vh - 65px); padding: 8px 0; }
+    .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 8px 24px; margin: 2px 8px; border-radius: 0 24px 24px 0; cursor: pointer; font-size: 14px; color: #202124; transition: background 0.15s; }
+    .sidebar-item:hover { background: #f1f3f4; }
+    .sidebar-item.active { background: #e8f0fe; color: #1967d2; font-weight: 500; }
+    .sidebar-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+    .sidebar-divider { height: 1px; background: #e0e0e0; margin: 8px 0; }
+    .sidebar-section { padding: 12px 24px 8px; font-size: 11px; font-weight: 500; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* New button */
+    .btn-new { display: flex; align-items: center; gap: 12px; background: white; border: 1px solid #dadce0; border-radius: 24px; padding: 8px 24px 8px 12px; margin: 16px; font-size: 14px; font-weight: 500; color: #3c4043; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; }
+    .btn-new:hover { background: #f8f9fa; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .btn-new-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #0F9D58, #34A853); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+
+    /* Main content */
+    .main-content { flex: 1; padding: 24px 32px; max-width: 1200px; }
+    .section-title { font-size: 14px; font-weight: 500; color: #5f6368; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* File cards */
+    .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .file-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s; }
+    .file-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-color: #d0d0d0; }
+    .file-card-preview { height: 140px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e0e0e0; position: relative; }
+    .file-card-preview svg { width: 64px; height: 64px; color: #0F9D58; opacity: 0.8; }
+    .file-card-info { padding: 12px 16px; }
+    .file-card-name { font-size: 14px; font-weight: 500; color: #202124; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-card-meta { font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 4px; }
+    .file-card-actions { position: absolute; top: 8px; right: 8px; opacity: 0; transition: opacity 0.2s; }
+    .file-card:hover .file-card-actions { opacity: 1; }
+    .file-card-btn { width: 32px; height: 32px; background: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .file-card-btn:hover { background: #f1f3f4; }
+
+    /* File list view */
+    .files-list { background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+    .file-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e0e0e0; cursor: pointer; transition: background 0.15s; }
+    .file-row:last-child { border-bottom: none; }
+    .file-row:hover { background: #f8f9fa; }
+    .file-row-icon { width: 40px; height: 40px; background: #e8f5e9; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; }
+    .file-row-icon svg { width: 24px; height: 24px; color: #0F9D58; }
+    .file-row-info { flex: 1; min-width: 0; }
+    .file-row-name { font-size: 14px; color: #202124; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-row-meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
+    .file-row-date { font-size: 13px; color: #5f6368; width: 140px; text-align: right; }
+    .file-row-status { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 12px; border-radius: 12px; margin-left: 16px; }
+    .status-synced { background: #e6f4ea; color: #137333; }
+    .status-pending { background: #fef7e0; color: #b06000; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 80px 40px; }
+    .empty-state-icon { width: 120px; height: 120px; margin: 0 auto 24px; background: #f1f3f4; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .empty-state-icon svg { width: 56px; height: 56px; color: #9aa0a6; }
+    .empty-state h3 { font-size: 22px; font-weight: 400; color: #202124; margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; color: #5f6368; margin-bottom: 24px; }
+    .btn-primary { background: #1a73e8; color: white; border: none; border-radius: 4px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary:hover { background: #1557b0; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .btn-secondary { background: white; color: #1a73e8; border: 1px solid #dadce0; border-radius: 4px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-secondary:hover { background: #f8f9fa; border-color: #1a73e8; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal { background: white; border-radius: 8px; width: 100%; max-width: 560px; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+    .modal-header { padding: 24px 24px 16px; border-bottom: 1px solid #e0e0e0; }
+    .modal-header h2 { font-size: 22px; font-weight: 400; color: #202124; margin: 0; }
+    .modal-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    /* Upload zone */
+    .upload-zone { border: 2px dashed #dadce0; border-radius: 8px; padding: 48px 32px; text-align: center; transition: all 0.2s; cursor: pointer; }
+    .upload-zone:hover, .upload-zone.dragover { border-color: #1a73e8; background: #e8f0fe; }
+    .upload-zone-icon { width: 48px; height: 48px; margin: 0 auto 16px; color: #5f6368; }
+
+    /* Chat container */
+    .chat-container { background: white; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+    .chat-header { padding: 16px 20px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 12px; background: #f8f9fa; }
+    .chat-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #0F9D58, #34A853); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; }
+    .chat-messages { padding: 20px; min-height: 300px; max-height: 400px; overflow-y: auto; background: #fafafa; }
+    .chat-msg { margin-bottom: 16px; display: flex; gap: 12px; }
+    .chat-msg-bot { flex-direction: row; }
+    .chat-msg-user { flex-direction: row-reverse; }
+    .chat-bubble { padding: 12px 16px; border-radius: 18px; max-width: 80%; font-size: 14px; line-height: 1.5; }
+    .chat-bubble-bot { background: white; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px; color: #202124; }
+    .chat-bubble-user { background: #1a73e8; color: white; border-bottom-right-radius: 4px; }
+    .chat-input-container { padding: 16px 20px; border-top: 1px solid #e0e0e0; display: flex; gap: 12px; background: white; }
+    .chat-input { flex: 1; border: 1px solid #dadce0; border-radius: 24px; padding: 10px 16px; font-size: 14px; }
+    .chat-input:focus { outline: none; border-color: #1a73e8; }
+    .chat-send { background: #1a73e8; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .chat-send:hover { background: #1557b0; }
+    .chat-send:disabled { background: #dadce0; cursor: not-allowed; }
+
+    /* Loading */
+    .typing-dots { display: flex; gap: 4px; padding: 8px 0; }
+    .typing-dot { width: 8px; height: 8px; background: #9aa0a6; border-radius: 50%; animation: typingBounce 1.4s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+
+    /* Loader */
+    .loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .loader.active { opacity: 1; pointer-events: all; }
+    .loader-spinner { width: 48px; height: 48px; border: 4px solid #e0e0e0; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { margin-top: 16px; font-size: 14px; color: #5f6368; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #323232; color: white; padding: 12px 24px; border-radius: 4px; font-size: 14px; z-index: 3000; opacity: 0; transition: all 0.3s; }
     .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .btn-google-sheets { width: 100%; background: white; color: #3c4043; border: none; border-radius: 14px; padding: 16px 24px; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .btn-google-sheets:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2); }
-    .btn-google-sheets.connected { background: linear-gradient(135deg, #0f9d58, #0a7e3e); color: white; }
-    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
+    .toast.success { background: #0F9D58; }
+    .toast.error { background: #d93025; }
+
+    /* View toggle */
+    .view-toggle { display: flex; background: #f1f3f4; border-radius: 4px; padding: 2px; }
+    .view-toggle button { background: none; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; color: #5f6368; }
+    .view-toggle button.active { background: white; color: #202124; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+
+    /* Folders */
+    .folder-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+    .folder-card:hover { background: #f8f9fa; border-color: #d0d0d0; }
+    .folder-icon { width: 40px; height: 40px; background: #e8f0fe; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .folder-icon svg { width: 24px; height: 24px; color: #1a73e8; }
+
+    /* Telegram step */
+    .telegram-card { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 32px; text-align: center; max-width: 400px; margin: 0 auto; }
+    .telegram-icon { width: 64px; height: 64px; background: #e3f2fd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .telegram-icon svg { width: 32px; height: 32px; color: #1a73e8; }
+    .btn-telegram { background: #0088cc; color: white; border: none; border-radius: 8px; padding: 14px 28px; font-size: 15px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .btn-telegram:hover { background: #006699; }
+
+    /* Steps indicator */
+    .steps-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 32px; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #dadce0; }
+    .step-dot.active { background: #1a73e8; width: 24px; border-radius: 4px; }
+    .step-dot.completed { background: #0F9D58; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .files-grid { grid-template-columns: 1fr; }
+      .search-container { max-width: 100%; }
+    }
   </style>
 </head>
-<body class="bg-gradient-animate">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="welcome-overlay" id="welcome-overlay">
-    <div class="welcome-logo">i</div>
-    <h1 class="welcome-title" id="welcome-title">Bienvenue ! 👋</h1>
-    <p class="welcome-subtitle" id="welcome-subtitle">Préparation de ton espace...</p>
-    <div class="welcome-dots"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
-  </div>
-  <div class="global-loader" id="global-loader">
+<body>
+  <!-- Loader -->
+  <div class="loader" id="loader">
     <div class="loader-spinner"></div>
     <p class="loader-text" id="loader-text">Chargement...</p>
   </div>
-  <div class="sheets-overlay" id="sheets-overlay">
-    <div class="sheets-content">
-      <div class="sheets-header"><h2>📊 Choisis ton fichier</h2><p>Sélectionne le Google Sheet où le bot écrira</p></div>
-      <div class="sheets-grid" id="sheets-grid"></div>
-      <button class="btn-refresh" onclick="refreshSheets()">🔄 Rafraîchir la liste</button>
-      <button class="btn-back" onclick="closeSheetsOverlay()">← Retour</button>
-    </div>
-  </div>
+
+  <!-- Toast -->
   <div class="toast" id="toast"></div>
-  <nav class="glass fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3"><div class="logo-i">i</div><span class="font-semibold text-lg">iArmy</span></a>
-      <div id="auth-buttons"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px;">
+      <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #5f6368;">
+        <div class="logo-sheets">i</div>
+        <span style="font-size: 18px; color: #5f6368;">Compta</span>
+      </a>
+
+      <div class="search-container" style="position: relative; margin-left: 24px;">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" class="search-bar" id="search-input" placeholder="Rechercher dans mes fichiers...">
+      </div>
+
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;" id="auth-buttons"></div>
     </div>
   </nav>
-  <div class="flex min-h-screen" style="padding-top: 70px;">
+
+  <div style="display: flex;">
+    <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="mb-6"><span class="text-xs text-white/30 uppercase tracking-wider">Configuration</span></div>
-      <div id="steps-nav">
-        <div class="step-item active"><div class="step-number">1</div><span class="step-label">Ton fichier</span></div>
-        <div class="step-item upcoming"><div class="step-number">2</div><span class="step-label">On discute</span></div>
-        <div class="step-item upcoming"><div class="step-number">3</div><span class="step-label">Telegram</span></div>
+      <button class="btn-new" onclick="openNewFileModal()">
+        <div class="btn-new-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </div>
+        Nouveau
+      </button>
+
+      <div class="sidebar-item active" onclick="showSection('recent')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        <span>Récents</span>
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('all')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+        <span>Tous les fichiers</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section">Dossiers</div>
+
+      <div class="sidebar-item" onclick="showSection('folder-compta')">
+        <svg viewBox="0 0 24 24" fill="#fbbc04"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+        <span>Comptabilite</span>
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('folder-archives')">
+        <svg viewBox="0 0 24 24" fill="#9aa0a6"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+        <span>Archives 2024</span>
+      </div>
+
+      <div class="sidebar-item" style="color: #1a73e8;" onclick="createFolder()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <span>Creer un dossier</span>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-item" onclick="showSection('trash')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        <span>Corbeille</span>
       </div>
     </aside>
+
+    <!-- Main content -->
     <main class="main-content">
-      <a href="index.html" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
-      <div class="step-content active" id="step-1">
-        <div class="mb-2"><span class="text-white/30 text-sm">Étape 1/3</span></div>
-        <h1 class="text-3xl font-bold mb-3">Connecte ton fichier</h1>
-        <p class="text-white/40 mb-10">Choisis ton mode de travail</p>
-        <div class="glass-card p-8 mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-content text-2xl">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="2" fill="#0F9D58"/><path d="M9 11h3v10H9V11zm4 0h3v10h-3V11zm4 0h3v10h-3V11z" fill="white"/></svg>
-            </div>
-            <div><h3 class="text-xl font-semibold">Google Sheets</h3><span class="text-xs text-green-400 font-medium">⭐ Recommandé</span></div>
+      <!-- Section: Recent files -->
+      <div id="section-recent">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+          <h1 style="font-size: 24px; font-weight: 400; color: #202124;">Fichiers recents</h1>
+          <div class="view-toggle">
+            <button class="active" onclick="setView('grid')" id="view-grid">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+            </button>
+            <button onclick="setView('list')" id="view-list">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"/></svg>
+            </button>
           </div>
-          <p class="text-white/60 mb-6 leading-relaxed">Connexion directe + écriture automatique en temps réel</p>
-          <button id="btn-google-sheets" class="btn-google-sheets" onclick="handleGoogleSheetsClick()">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg>
-            <span id="btn-google-sheets-text">Se connecter avec Google</span>
-          </button>
         </div>
-        <div class="text-center text-white/30 text-sm font-medium mb-6">OU</div>
-        <div class="glass-card p-8">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-content text-2xl">📁</div>
-            <h3 class="text-xl font-semibold">Upload Excel</h3>
+
+        <!-- Files grid -->
+        <div class="files-grid" id="files-grid"></div>
+
+        <!-- Files list -->
+        <div class="files-list" id="files-list" style="display: none;"></div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
           </div>
-          <p class="text-white/60 mb-6 leading-relaxed">J'analyse ton fichier existant</p>
-          <div class="upload-zone" id="upload-zone">
-            <div class="text-5xl mb-4">📊</div>
-            <p class="text-lg font-medium mb-2">Glisse ton fichier ici</p>
-            <p class="text-white/40 text-sm mb-4">ou clique pour parcourir</p>
-            <div class="flex justify-center gap-2">
-              <span class="px-3 py-1 rounded-lg bg-white/5 text-white/50 text-xs font-medium">.xlsx</span>
-              <span class="px-3 py-1 rounded-lg bg-white/5 text-white/50 text-xs font-medium">.xls</span>
-            </div>
-          </div>
-          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden">
-        </div>
-        <div class="mt-8 flex items-center justify-center gap-2 text-white/30 text-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
-          <span>Tes données restent confidentielles</span>
-        </div>
-      </div>
-      <div class="step-content" id="step-2">
-        <div class="mb-2"><span class="text-white/30 text-sm">Étape 2/3</span></div>
-        <h1 class="text-3xl font-bold mb-3">Parlons de ton fichier</h1>
-        <p class="text-white/40 mb-8">Je vais te poser quelques questions pour bien comprendre.</p>
-        <div class="chat-container">
-          <div class="chat-header"><div class="chat-header-avatar">i</div><div><h3 class="font-semibold">iArmy</h3><p class="text-sm text-white/30">Analyse ton fichier...</p></div></div>
-          <div class="chat-messages" id="chat-messages"></div>
-          <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Ta réponse...">
-            <button class="chat-send" id="chat-send-btn">Envoyer</button>
+          <h3>Aucun fichier connecte</h3>
+          <p>Connecte ton Google Sheets ou upload un fichier Excel pour commencer</p>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button class="btn-primary" onclick="connectGoogleSheets()">
+              <span style="display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/></svg>
+                Connecter Google Sheets
+              </span>
+            </button>
+            <button class="btn-secondary" onclick="openUploadModal()">Importer un fichier</button>
           </div>
         </div>
       </div>
-      <div class="step-content" id="step-3">
-        <div class="text-center mb-8">
-          <div class="check-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <h1 class="text-3xl font-bold mb-2">Presque fini ! 🎉</h1>
-          <p class="text-white/40">Connecte ton robot Telegram</p>
+
+      <!-- Section: Configuration wizard -->
+      <div id="section-wizard" style="display: none;">
+        <div class="steps-bar">
+          <div class="step-dot" id="step-dot-1"></div>
+          <div class="step-dot" id="step-dot-2"></div>
+          <div class="step-dot" id="step-dot-3"></div>
         </div>
-        <div id="telegram-initial" class="glass-card p-8 max-w-lg mx-auto text-center">
-          <div class="mb-6">
-            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-content text-4xl mb-4">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="#0088cc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Connecte-toi en 1 clic</h3>
-            <p class="text-white/50 mb-6">Le bot s'ouvrira automatiquement</p>
+
+        <!-- Step 1: File selection done -->
+        <div id="wizard-step-1" style="display: none;">
+          <!-- Handled by modal -->
+        </div>
+
+        <!-- Step 2: Chat analysis -->
+        <div id="wizard-step-2" style="display: none;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="font-size: 22px; font-weight: 400; color: #202124; margin-bottom: 8px;">Analysons ton fichier</h2>
+            <p style="color: #5f6368; font-size: 14px;">Je vais te poser quelques questions pour comprendre ta structure</p>
           </div>
-          <button id="connect-telegram-btn" onclick="connectTelegram()" class="btn-telegram w-full">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
-            Connecter Telegram
-          </button>
-          <p class="text-xs text-white/30 mt-4">🔒 Connexion sécurisée par token unique</p>
+          <div class="chat-container" style="max-width: 640px; margin: 0 auto;">
+            <div class="chat-header">
+              <div class="chat-avatar">i</div>
+              <div>
+                <div style="font-weight: 500; color: #202124;">Assistant iArmy</div>
+                <div style="font-size: 12px; color: #5f6368;">Analyse en cours...</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-container">
+              <input type="text" class="chat-input" id="chat-input" placeholder="Ta reponse...">
+              <button class="chat-send" id="chat-send-btn" onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
-        <div id="telegram-connecting" class="glass-card p-8 max-w-lg mx-auto text-center" style="display: none;">
-          <div class="welcome-dots mb-6" style="justify-content: center;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
-          <h3 class="text-xl font-semibold mb-2">En attente de connexion...</h3>
-          <p class="text-white/50 mb-4">Clique sur "Démarrer" dans Telegram</p>
-          <a id="telegram-link-fallback" href="#" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm">👉 Ouvrir manuellement</a>
-        </div>
-        <div id="telegram-connected" class="glass-card p-8 max-w-lg mx-auto text-center" style="display: none;">
-          <div class="check-icon mx-auto"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
-          <h3 class="text-2xl font-bold mb-2">Telegram connecté ! 🎉</h3>
-          <p class="text-white/50 mb-6">Tu peux maintenant utiliser ton robot</p>
-          <a href="compte.html" class="btn-glow">Aller à mon espace</a>
+
+        <!-- Step 3: Telegram connection -->
+        <div id="wizard-step-3" style="display: none;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h2 style="font-size: 22px; font-weight: 400; color: #202124; margin-bottom: 8px;">Connecte Telegram</h2>
+            <p style="color: #5f6368; font-size: 14px;">Derniere etape pour activer ton bot</p>
+          </div>
+
+          <div class="telegram-card" id="telegram-initial">
+            <div class="telegram-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 8px;">Pret a connecter</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 20px;">Clique pour ouvrir Telegram et activer le bot</p>
+            <button class="btn-telegram" onclick="connectTelegram()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
+              Connecter Telegram
+            </button>
+          </div>
+
+          <div class="telegram-card" id="telegram-connecting" style="display: none;">
+            <div class="typing-dots" style="justify-content: center; margin-bottom: 16px;">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 8px;">En attente...</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 16px;">Clique sur "Demarrer" dans Telegram</p>
+            <a id="telegram-link-fallback" href="#" target="_blank" style="color: #1a73e8; font-size: 14px;">Ouvrir manuellement</a>
+          </div>
+
+          <div class="telegram-card" id="telegram-connected" style="display: none;">
+            <div style="width: 64px; height: 64px; background: #e6f4ea; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#0F9D58"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 500; margin-bottom: 8px; color: #0F9D58;">Telegram connecte !</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 20px;">Ton bot est pret a recevoir des donnees</p>
+            <button class="btn-primary" onclick="finishSetup()">Terminer la configuration</button>
+          </div>
         </div>
       </div>
     </main>
   </div>
+
+  <!-- Modal: New file -->
+  <div class="modal-overlay" id="modal-new-file">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Connecter un fichier</h2>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; gap: 16px;">
+          <div class="folder-card" onclick="connectGoogleSheets()" style="border: 2px solid #e0e0e0;">
+            <div class="folder-icon" style="background: #e8f5e9;">
+              <svg viewBox="0 0 24 24" fill="#0F9D58"><path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/></svg>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight: 500; color: #202124;">Google Sheets</div>
+              <div style="font-size: 12px; color: #5f6368;">Connexion directe, synchro automatique</div>
+            </div>
+            <span style="color: #0F9D58; font-size: 12px; font-weight: 500;">Recommande</span>
+          </div>
+
+          <div class="upload-zone" id="upload-zone">
+            <svg class="upload-zone-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+            <div style="font-size: 14px; color: #202124; margin-bottom: 4px;">Glisse un fichier Excel ici</div>
+            <div style="font-size: 12px; color: #5f6368;">ou clique pour parcourir (.xlsx, .xls)</div>
+          </div>
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-new-file')">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Google Sheets picker -->
+  <div class="modal-overlay" id="modal-sheets-picker">
+    <div class="modal" style="max-width: 640px;">
+      <div class="modal-header">
+        <h2>Mes Google Sheets</h2>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div id="sheets-list" style="max-height: 400px; overflow-y: auto;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="refreshSheets()" style="margin-right: auto;">
+          <span style="display: flex; align-items: center; gap: 6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            Rafraichir
+          </span>
+        </button>
+        <button class="btn-secondary" onclick="closeModal('modal-sheets-picker')">Fermer</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
-    
-    let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null;
-    const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'dépense', 'depense', 'espèce', 'espece', 'carte', 'ticket', 'chèque', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
 
-    function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
-    function hideWelcome() { document.getElementById('welcome-overlay').classList.remove('active'); }
-    function showLoader(text) { document.getElementById('loader-text').textContent = text; document.getElementById('global-loader').classList.add('active'); }
-    function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
-    function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, 3000); }
-    function formatDate(dateString) { const date = new Date(dateString); const diff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24)); if (diff === 0) return "aujourd'hui"; if (diff === 1) return "hier"; if (diff < 7) return 'il y a ' + diff + ' jours'; return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); }
+    let currentUser = null;
+    let userProvider = null;
+    let hasGoogleSheetsAccess = false;
+    let excelData = null;
+    let chatHistory = [];
+    let finalConfig = null;
+    let isWaitingForAI = false;
+    let connectionCheckInterval = null;
+    let currentView = 'grid';
+    let userFiles = [];
 
-    async function initComptaPage() {
-      console.log('[COMPTA] 🚀 Init');
+    const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'depense', 'depenses', 'espece', 'especes', 'carte', 'ticket', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('[COMPTA] Init');
+
+      // Check for OAuth callback
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('code') && urlParams.get('state') === 'sheets_auth') {
+        await handleSheetsCallback();
+      }
+
+      await initPage();
+    });
+
+    async function initPage() {
+      showLoader('Chargement...');
+
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
       currentUser = session.user;
       userProvider = session.user.app_metadata?.provider || 'email';
-      console.log('[COMPTA] ✅ Connecté:', currentUser.email);
-      const firstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.user_metadata?.name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'toi';
-      showWelcome(firstName);
+
       await updateNavBar();
       await checkGoogleSheetsAccess();
-      updateGoogleSheetsButton();
-      setTimeout(function() { hideWelcome(); }, 1500);
-      setupUploadZone();
+      await loadUserFiles();
+
+      setupEventListeners();
+      hideLoader();
+    }
+
+    async function updateNavBar() {
+      var authButtons = document.getElementById('auth-buttons');
+      if (!currentUser) return;
+
+      var userName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'User';
+      var userAvatar = currentUser.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userName) + '&background=1a73e8&color=fff';
+
+      authButtons.innerHTML = '<div style="display: flex; align-items: center; gap: 12px;">' +
+        '<a href="compte.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #5f6368; padding: 4px 12px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background=\'#f1f3f4\'" onmouseout="this.style.background=\'transparent\'">' +
+        '<img src="' + userAvatar + '" style="width: 32px; height: 32px; border-radius: 50%;">' +
+        '<span style="font-size: 14px;">' + userName + '</span></a>' +
+        '<button onclick="signOut()" style="background: none; border: 1px solid #dadce0; padding: 8px 16px; border-radius: 4px; font-size: 13px; color: #5f6368; cursor: pointer;">Deconnexion</button></div>';
+    }
+
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
     }
 
     async function checkGoogleSheetsAccess() {
       const { data: credentials } = await supabaseClient.from('google_credentials').select('refresh_token').eq('user_id', currentUser.id).single();
       hasGoogleSheetsAccess = !!(credentials && credentials.refresh_token);
-      console.log('[COMPTA]', hasGoogleSheetsAccess ? '✅ Google Sheets autorisé' : '❌ Pas encore autorisé');
     }
 
-    function updateGoogleSheetsButton() {
-      const btn = document.getElementById('btn-google-sheets');
-      if (hasGoogleSheetsAccess) { btn.classList.add('connected'); btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg><span>Choisir mon fichier</span>'; }
-      else if (userProvider === 'google') { btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f9d58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg><span>Autoriser l\'accès à Google Sheets</span>'; }
-      else { btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg><span>Se connecter avec Google</span>'; }
+    async function loadUserFiles() {
+      try {
+        // Load from google_credentials (connected sheets)
+        const { data: creds } = await supabaseClient
+          .from('google_credentials')
+          .select('sheet_id, sheet_name, updated_at')
+          .eq('user_id', currentUser.id);
+
+        // Load from user_configs
+        const { data: configs } = await supabaseClient
+          .from('user_configs')
+          .select('id, excel_config, created_at, updated_at')
+          .eq('user_id', currentUser.id);
+
+        userFiles = [];
+
+        if (creds && creds.length > 0) {
+          creds.forEach(function(c) {
+            if (c.sheet_name) {
+              userFiles.push({
+                id: c.sheet_id,
+                name: c.sheet_name,
+                type: 'google_sheets',
+                lastSync: c.updated_at,
+                status: 'synced'
+              });
+            }
+          });
+        }
+
+        if (configs && configs.length > 0) {
+          configs.forEach(function(c) {
+            if (c.excel_config && c.excel_config.fileName) {
+              // Check if not already in list
+              var exists = userFiles.some(function(f) { return f.name === c.excel_config.fileName; });
+              if (!exists) {
+                userFiles.push({
+                  id: c.id,
+                  name: c.excel_config.fileName || 'Fichier sans nom',
+                  type: c.excel_config.isGoogleSheet ? 'google_sheets' : 'excel',
+                  lastSync: c.updated_at,
+                  status: 'synced'
+                });
+              }
+            }
+          });
+        }
+
+        renderFiles();
+      } catch (error) {
+        console.error('[COMPTA] Error loading files:', error);
+        renderFiles();
+      }
     }
 
-    async function handleGoogleSheetsClick() { if (hasGoogleSheetsAccess) await openSheetsPicker(); else authorizeGoogleSheets(); }
+    function renderFiles() {
+      var grid = document.getElementById('files-grid');
+      var list = document.getElementById('files-list');
+      var empty = document.getElementById('empty-state');
+
+      if (userFiles.length === 0) {
+        grid.style.display = 'none';
+        list.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+
+      // Render grid view
+      grid.innerHTML = userFiles.map(function(file) {
+        return '<div class="file-card" onclick="openFile(\'' + file.id + '\')">' +
+          '<div class="file-card-preview">' +
+          '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/><path d="M8 15h8v2H8zm0-4h8v2H8z"/></svg>' +
+          '<div class="file-card-actions"><button class="file-card-btn" onclick="event.stopPropagation(); showFileMenu(\'' + file.id + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></button></div>' +
+          '</div>' +
+          '<div class="file-card-info">' +
+          '<div class="file-card-name">' + file.name + '</div>' +
+          '<div class="file-card-meta">' +
+          (file.type === 'google_sheets' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="#0F9D58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="#0F9D58"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>') +
+          '<span>' + formatDate(file.lastSync) + '</span>' +
+          '</div></div></div>';
+      }).join('');
+
+      // Render list view
+      list.innerHTML = userFiles.map(function(file) {
+        return '<div class="file-row" onclick="openFile(\'' + file.id + '\')">' +
+          '<div class="file-row-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg></div>' +
+          '<div class="file-row-info"><div class="file-row-name">' + file.name + '</div><div class="file-row-meta">' + (file.type === 'google_sheets' ? 'Google Sheets' : 'Excel') + '</div></div>' +
+          '<div class="file-row-date">' + formatDate(file.lastSync) + '</div>' +
+          '<div class="file-row-status ' + (file.status === 'synced' ? 'status-synced' : 'status-pending') + '">' +
+          (file.status === 'synced' ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Synchronise' : 'En attente') +
+          '</div></div>';
+      }).join('');
+
+      // Show correct view
+      if (currentView === 'grid') {
+        grid.style.display = 'grid';
+        list.style.display = 'none';
+      } else {
+        grid.style.display = 'none';
+        list.style.display = 'block';
+      }
+    }
+
+    function setView(view) {
+      currentView = view;
+      document.getElementById('view-grid').classList.toggle('active', view === 'grid');
+      document.getElementById('view-list').classList.toggle('active', view === 'list');
+      renderFiles();
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Jamais';
+      var date = new Date(dateStr);
+      var now = new Date();
+      var diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+      if (diff === 0) return "Aujourd'hui";
+      if (diff === 1) return 'Hier';
+      if (diff < 7) return 'Il y a ' + diff + ' jours';
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function openFile(fileId) {
+      console.log('[COMPTA] Open file:', fileId);
+      showToast('Ouverture du fichier...', 'success');
+      // TODO: Navigate to file detail or open analysis
+    }
+
+    function showFileMenu(fileId) {
+      console.log('[COMPTA] Show menu for:', fileId);
+      // TODO: Show context menu
+    }
+
+    // Modal functions
+    function openNewFileModal() {
+      document.getElementById('modal-new-file').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function openUploadModal() {
+      closeModal('modal-new-file');
+      document.getElementById('file-input').click();
+    }
+
+    // Google Sheets
+    async function connectGoogleSheets() {
+      closeModal('modal-new-file');
+
+      if (hasGoogleSheetsAccess) {
+        await openSheetsPicker();
+      } else {
+        authorizeGoogleSheets();
+      }
+    }
 
     function authorizeGoogleSheets() {
       var REDIRECT_URI = window.location.origin + window.location.pathname;
@@ -310,190 +666,461 @@
       var urlParams = new URLSearchParams(window.location.search);
       var code = urlParams.get('code'), state = urlParams.get('state');
       if (!code || state !== 'sheets_auth') return false;
-      console.log('[COMPTA] 🔄 Processing Sheets callback...');
-      showLoader('Connexion à Google Sheets...');
+
+      showLoader('Connexion a Google Sheets...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) throw new Error('Session expirée');
-        var response = await fetch(SUPABASE_URL + '/functions/v1/google-sheets-auth', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ code: code, redirect_uri: window.location.origin + window.location.pathname }) });
+        if (!session) throw new Error('Session expiree');
+
+        var response = await fetch(SUPABASE_URL + '/functions/v1/google-sheets-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+          body: JSON.stringify({ code: code, redirect_uri: window.location.origin + window.location.pathname })
+        });
+
         var result = await response.json();
-        if (!result.success) throw new Error(result.error || 'Échec');
-        console.log('[COMPTA] ✅ Sheets connecté !');
+        if (!result.success) throw new Error(result.error || 'Echec');
+
         window.history.replaceState({}, document.title, window.location.pathname);
         hasGoogleSheetsAccess = true;
         hideLoader();
-        showToast('✅ Google Sheets connecté !');
-        if (result.sheets?.length > 0) showSheetsOverlay(result.sheets); else showNoSheetsMessage();
-        updateGoogleSheetsButton();
+        showToast('Google Sheets connecte !', 'success');
+
+        if (result.sheets?.length > 0) {
+          showSheetsPicker(result.sheets);
+        }
         return true;
-      } catch (error) { console.error('[COMPTA] ❌', error); hideLoader(); alert('Erreur: ' + error.message); window.history.replaceState({}, document.title, window.location.pathname); return false; }
+      } catch (error) {
+        console.error('[COMPTA] Error:', error);
+        hideLoader();
+        showToast('Erreur: ' + error.message, 'error');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return false;
+      }
     }
 
     async function openSheetsPicker() {
-      showLoader('Chargement de tes fichiers...');
+      showLoader('Chargement des fichiers...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
-        var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY } });
+        var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY }
+        });
         var result = await response.json();
         hideLoader();
+
         if (!result.success) throw new Error(result.error);
-        if (result.sheets?.length > 0) showSheetsOverlay(result.sheets); else showNoSheetsMessage();
-      } catch (error) { hideLoader(); alert('Erreur: ' + error.message); }
+        if (result.sheets?.length > 0) {
+          showSheetsPicker(result.sheets);
+        } else {
+          showToast('Aucun fichier trouve', 'error');
+        }
+      } catch (error) {
+        hideLoader();
+        showToast('Erreur: ' + error.message, 'error');
+      }
     }
 
-    function showSheetsOverlay(sheets) {
-      var grid = document.getElementById('sheets-grid');
-      grid.innerHTML = '';
-      sheets.forEach(function(sheet) {
-        var card = document.createElement('div');
-        card.className = 'sheet-card';
-        card.onclick = function() { selectSheet(sheet); };
-        card.innerHTML = '<div class="sheet-card-icon">📊</div><div class="sheet-card-info"><h3>' + sheet.name + '</h3><p>Modifié ' + formatDate(sheet.modifiedTime) + '</p></div><div class="sheet-card-arrow">→</div>';
-        grid.appendChild(card);
-      });
-      document.getElementById('sheets-overlay').classList.add('active');
+    function showSheetsPicker(sheets) {
+      var list = document.getElementById('sheets-list');
+      list.innerHTML = sheets.map(function(sheet) {
+        return '<div class="file-row" onclick="selectSheet(\'' + sheet.id + '\', \'' + sheet.name.replace(/'/g, "\\'") + '\')">' +
+          '<div class="file-row-icon" style="background: #e8f5e9;"><svg viewBox="0 0 24 24" fill="#0F9D58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg></div>' +
+          '<div class="file-row-info"><div class="file-row-name">' + sheet.name + '</div><div class="file-row-meta">Modifie ' + formatDate(sheet.modifiedTime) + '</div></div>' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="#9aa0a6"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>';
+      }).join('');
+      document.getElementById('modal-sheets-picker').classList.add('active');
     }
-    
-    function showNoSheetsMessage() {
-      document.getElementById('sheets-grid').innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 60px; margin-bottom: 24px; opacity: 0.3;">📄</div><h3 style="margin-bottom: 12px;">Aucun fichier trouvé</h3><p style="color: rgba(255,255,255,0.5); margin-bottom: 24px;">Crée un Google Sheet et reviens ici</p><a href="https://sheets.google.com/create" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0f9d58, #0a7e3e); padding: 14px 24px; border-radius: 12px; color: white; text-decoration: none; font-weight: 600;">➕ Créer un Google Sheet</a></div>';
-      document.getElementById('sheets-overlay').classList.add('active');
-    }
-    function closeSheetsOverlay() { document.getElementById('sheets-overlay').classList.remove('active'); }
-    async function refreshSheets() { closeSheetsOverlay(); await openSheetsPicker(); }
 
-    async function selectSheet(sheet) {
-      console.log('[COMPTA] 📄 Sheet sélectionné:', sheet.name);
-      closeSheetsOverlay();
-      showLoader('Analyse de "' + sheet.name + '"...');
+    async function selectSheet(sheetId, sheetName) {
+      closeModal('modal-sheets-picker');
+      showLoader('Analyse de "' + sheetName + '"...');
+
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
-        await supabaseClient.from('google_credentials').update({ sheet_id: sheet.id, sheet_name: sheet.name }).eq('user_id', session.user.id);
-        var response = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ sheetId: sheet.id }) });
+        await supabaseClient.from('google_credentials').update({ sheet_id: sheetId, sheet_name: sheetName }).eq('user_id', session.user.id);
+
+        var response = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+          body: JSON.stringify({ sheetId: sheetId })
+        });
+
         var result = await response.json();
         if (!result.success) throw new Error(result.error);
+
         excelData = result.excelData;
-        console.log('[COMPTA] 📊 Données Sheet:', excelData);
+        excelData.sheetId = sheetId;
+        excelData.fileName = sheetName;
+
         hideLoader();
-        showToast('✅ "' + sheet.name + '" chargé !');
-        goToStep(2);
+        showToast('"' + sheetName + '" charge !', 'success');
+        startWizard(2);
         await startAnalysis();
-      } catch (error) { console.error('[COMPTA] ❌', error); hideLoader(); alert('Erreur: ' + error.message); }
+      } catch (error) {
+        console.error('[COMPTA] Error:', error);
+        hideLoader();
+        showToast('Erreur: ' + error.message, 'error');
+      }
     }
 
-    async function updateNavBar() {
-      var authButtons = document.getElementById('auth-buttons');
-      if (!currentUser) { authButtons.innerHTML = '<a href="index.html">Retour</a>'; return; }
-      var userName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.user_metadata?.name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'User';
-      var userAvatar = currentUser.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=' + userName + '&background=FF6B35&color=fff';
-      authButtons.innerHTML = '<div style="display: flex; align-items: center; gap: 12px;"><a href="compte.html" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white;"><img src="' + userAvatar + '" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid rgba(255,107,53,0.3);"><span style="font-weight: 500;">' + userName + '</span></a><button onclick="signOut()" class="btn-logout"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Déconnexion</button></div>';
+    async function refreshSheets() {
+      closeModal('modal-sheets-picker');
+      await openSheetsPicker();
     }
-    async function signOut() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
 
-    function setupUploadZone() {
-      var uploadZone = document.getElementById('upload-zone'), fileInput = document.getElementById('file-input');
+    // File upload
+    function setupEventListeners() {
+      var uploadZone = document.getElementById('upload-zone');
+      var fileInput = document.getElementById('file-input');
+
       if (uploadZone && fileInput) {
         uploadZone.addEventListener('click', function() { fileInput.click(); });
         uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); uploadZone.classList.add('dragover'); });
         uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('dragover'); });
-        uploadZone.addEventListener('drop', function(e) { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-        fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
+        uploadZone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          uploadZone.classList.remove('dragover');
+          if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', function(e) {
+          if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
       }
-      document.getElementById('chat-input')?.addEventListener('keypress', function(e) { if (e.key === 'Enter') sendMessage(); });
-      document.getElementById('chat-send-btn')?.addEventListener('click', sendMessage);
+
+      document.getElementById('chat-input')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+      });
+
+      // Search
+      document.getElementById('search-input')?.addEventListener('input', function(e) {
+        filterFiles(e.target.value);
+      });
+
+      // Close modals on overlay click
+      document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) overlay.classList.remove('active');
+        });
+      });
     }
-    
-    function detectHeaderRow(rows) { var bestRow = null, bestScore = 0; rows.forEach(function(row) { if (row.row === '...') return; var score = 0; row.cells.forEach(function(cell) { var val = String(cell.val).toLowerCase(); HEADER_KEYWORDS.forEach(function(kw) { if (val.includes(kw)) score++; }); }); if (score > bestScore) { bestScore = score; bestRow = row; } }); return bestRow; }
-    
+
+    function filterFiles(query) {
+      var q = query.toLowerCase();
+      var filtered = userFiles.filter(function(f) {
+        return f.name.toLowerCase().includes(q);
+      });
+      // Re-render with filtered
+      // For now just log
+      console.log('[COMPTA] Filter:', q, filtered.length, 'results');
+    }
+
+    function detectHeaderRow(rows) {
+      var bestRow = null, bestScore = 0;
+      rows.forEach(function(row) {
+        if (row.row === '...') return;
+        var score = 0;
+        row.cells.forEach(function(cell) {
+          var val = String(cell.val).toLowerCase();
+          HEADER_KEYWORDS.forEach(function(kw) { if (val.includes(kw)) score++; });
+        });
+        if (score > bestScore) { bestScore = score; bestRow = row; }
+      });
+      return bestRow;
+    }
+
     async function handleFile(file) {
       var ext = '.' + file.name.split('.').pop().toLowerCase();
-      if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
-      goToStep(2);
+      if (!['.xlsx', '.xls', '.csv'].includes(ext)) {
+        showToast('Format non supporte', 'error');
+        return;
+      }
+
+      closeModal('modal-new-file');
+      showLoader('Analyse de "' + file.name + '"...');
+
       var reader = new FileReader();
       reader.onload = async function(e) {
         try {
           var data = new Uint8Array(e.target.result);
           var workbook = XLSX.read(data, { type: 'array', cellFormula: true });
           excelData = { fileName: file.name, sheets: [], isGoogleSheet: false };
+
           workbook.SheetNames.forEach(function(sheetName, sheetIndex) {
             var sheet = workbook.Sheets[sheetName];
             if (!sheet['!ref']) return;
             var range = XLSX.utils.decode_range(sheet['!ref']);
-            if (sheetIndex > 0) { excelData.sheets.push({ name: sheetName, allRows: [], rowCount: range.e.r, colCount: range.e.c + 1, formulas: {}, detectedHeaders: null }); return; }
+            if (sheetIndex > 0) {
+              excelData.sheets.push({ name: sheetName, allRows: [], rowCount: range.e.r, colCount: range.e.c + 1, formulas: {}, detectedHeaders: null });
+              return;
+            }
+
             var allRows = [], maxCol = Math.min(range.e.c, 20);
-            var readRow = function(row) { var rowData = []; for (var col = 0; col <= maxCol; col++) { var cellAddress = XLSX.utils.encode_cell({ r: row, c: col }); var cell = sheet[cellAddress]; var colLetter = col < 26 ? String.fromCharCode(65 + col) : 'A' + String.fromCharCode(65 + col - 26); if (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') { rowData.push({ col: colLetter, val: typeof cell.v === 'number' ? (cell.v % 1 === 0 ? cell.v : cell.v.toFixed(2)) : String(cell.v).substring(0, 30) }); } } return rowData; };
-            for (var row = 0; row <= Math.min(15, range.e.r); row++) { var rowData = readRow(row); if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData }); }
-            if (range.e.r > 20) { allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes masquées)' }] }); for (var row2 = Math.max(16, range.e.r - 10); row2 <= range.e.r; row2++) { var rowData2 = readRow(row2); if (rowData2.length > 0) allRows.push({ row: row2 + 1, cells: rowData2 }); } }
+            var readRow = function(row) {
+              var rowData = [];
+              for (var col = 0; col <= maxCol; col++) {
+                var cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                var cell = sheet[cellAddress];
+                var colLetter = col < 26 ? String.fromCharCode(65 + col) : 'A' + String.fromCharCode(65 + col - 26);
+                if (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') {
+                  rowData.push({ col: colLetter, val: typeof cell.v === 'number' ? (cell.v % 1 === 0 ? cell.v : cell.v.toFixed(2)) : String(cell.v).substring(0, 30) });
+                }
+              }
+              return rowData;
+            };
+
+            for (var row = 0; row <= Math.min(15, range.e.r); row++) {
+              var rowData = readRow(row);
+              if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData });
+            }
+
+            if (range.e.r > 20) {
+              allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes masquees)' }] });
+              for (var row2 = Math.max(16, range.e.r - 10); row2 <= range.e.r; row2++) {
+                var rowData2 = readRow(row2);
+                if (rowData2.length > 0) allRows.push({ row: row2 + 1, cells: rowData2 });
+              }
+            }
+
             var headerRow = detectHeaderRow(allRows);
             var detectedHeaders = headerRow ? { rowNumber: headerRow.row, columns: headerRow.cells.map(function(c) { return { letter: c.col, name: c.val }; }) } : null;
-            var formulas = {}; var formulaCount = 0;
-            for (var cellRef in sheet) { if (cellRef[0] !== '!' && sheet[cellRef].f && formulaCount < 20) { formulas[cellRef] = sheet[cellRef].f; formulaCount++; } }
+
+            var formulas = {}, formulaCount = 0;
+            for (var cellRef in sheet) {
+              if (cellRef[0] !== '!' && sheet[cellRef].f && formulaCount < 20) {
+                formulas[cellRef] = sheet[cellRef].f;
+                formulaCount++;
+              }
+            }
+
             excelData.sheets.push({ name: sheetName, allRows: allRows, rowCount: range.e.r, colCount: range.e.c + 1, formulas: formulas, detectedHeaders: detectedHeaders });
           });
+
+          hideLoader();
+          startWizard(2);
           await startAnalysis();
-        } catch (err) { console.error(err); addBotMessage("Hmm, j'ai eu un problème. Tu peux réessayer ?"); }
+        } catch (err) {
+          console.error(err);
+          hideLoader();
+          showToast('Erreur lors de la lecture', 'error');
+        }
       };
       reader.readAsArrayBuffer(file);
     }
 
-    function addBotMessage(text) { var container = document.getElementById('chat-messages'); document.getElementById('typing-indicator')?.remove(); var msgDiv = document.createElement('div'); msgDiv.className = 'chat-msg chat-msg-bot'; msgDiv.innerHTML = '<div class="chat-avatar chat-avatar-bot">i</div><div class="chat-bubble chat-bubble-bot">' + text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') + '</div>'; container.appendChild(msgDiv); container.scrollTop = container.scrollHeight; chatHistory.push({ role: 'assistant', content: text }); }
-    function addUserMessage(text) { var container = document.getElementById('chat-messages'); var msgDiv = document.createElement('div'); msgDiv.className = 'chat-msg chat-msg-user'; msgDiv.innerHTML = '<div class="chat-avatar chat-avatar-user"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="chat-bubble chat-bubble-user">' + text + '</div>'; container.appendChild(msgDiv); container.scrollTop = container.scrollHeight; chatHistory.push({ role: 'user', content: text }); }
-    function showTyping() { var container = document.getElementById('chat-messages'); var typingDiv = document.createElement('div'); typingDiv.className = 'chat-msg chat-msg-bot'; typingDiv.id = 'typing-indicator'; typingDiv.innerHTML = '<div class="chat-avatar chat-avatar-bot">i</div><div class="loading-indicator"><div class="loading-bar-wrapper"><div class="loading-bar-fill"></div></div><div style="margin-left: 8px;"><span style="font-size:13px;color:rgba(255,255,255,0.4)">Analyse...</span></div></div>'; container.appendChild(typingDiv); container.scrollTop = container.scrollHeight; }
-    
-    async function callAPI(mode) { var response = await fetch(SUPABASE_URL + '/functions/v1/hyper-responder', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ excelData: excelData, chatHistory: chatHistory, mode: mode }) }); var result = await response.json(); if (result.error) throw new Error(result.error); return result.response; }
-    
-    async function startAnalysis() { showTyping(); isWaitingForAI = true; try { var response = await callAPI('analyze'); addBotMessage(response); } catch (err) { console.error(err); addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?"); } isWaitingForAI = false; }
-    
+    // Wizard
+    function startWizard(step) {
+      document.getElementById('section-recent').style.display = 'none';
+      document.getElementById('section-wizard').style.display = 'block';
+      goToStep(step);
+    }
+
+    function goToStep(step) {
+      for (var i = 1; i <= 3; i++) {
+        var dot = document.getElementById('step-dot-' + i);
+        var content = document.getElementById('wizard-step-' + i);
+
+        dot.classList.remove('active', 'completed');
+        if (i < step) dot.classList.add('completed');
+        else if (i === step) dot.classList.add('active');
+
+        content.style.display = (i === step) ? 'block' : 'none';
+      }
+
+      if (step === 3) checkExistingTelegramConnection();
+    }
+
+    // Chat
+    function addBotMessage(text) {
+      var container = document.getElementById('chat-messages');
+      document.getElementById('typing-indicator')?.remove();
+
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-bot';
+      msgDiv.innerHTML = '<div class="chat-avatar">i</div><div class="chat-bubble chat-bubble-bot">' + text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') + '</div>';
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      chatHistory.push({ role: 'assistant', content: text });
+    }
+
+    function addUserMessage(text) {
+      var container = document.getElementById('chat-messages');
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg chat-msg-user';
+      msgDiv.innerHTML = '<div class="chat-avatar" style="background: #1a73e8;">U</div><div class="chat-bubble chat-bubble-user">' + text + '</div>';
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      chatHistory.push({ role: 'user', content: text });
+    }
+
+    function showTyping() {
+      var container = document.getElementById('chat-messages');
+      var typingDiv = document.createElement('div');
+      typingDiv.className = 'chat-msg chat-msg-bot';
+      typingDiv.id = 'typing-indicator';
+      typingDiv.innerHTML = '<div class="chat-avatar">i</div><div class="chat-bubble chat-bubble-bot"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+      container.appendChild(typingDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function callAPI(mode) {
+      var response = await fetch(SUPABASE_URL + '/functions/v1/hyper-responder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+        body: JSON.stringify({ excelData: excelData, chatHistory: chatHistory, mode: mode })
+      });
+      var result = await response.json();
+      if (result.error) throw new Error(result.error);
+      return result.response;
+    }
+
+    async function startAnalysis() {
+      showTyping();
+      isWaitingForAI = true;
+      try {
+        var response = await callAPI('analyze');
+        addBotMessage(response);
+      } catch (err) {
+        console.error(err);
+        addBotMessage("J'ai eu un souci. Peux-tu me decrire comment tu fais ta compta ?");
+      }
+      isWaitingForAI = false;
+    }
+
     async function sendMessage() {
-      var input = document.getElementById('chat-input'), text = input.value.trim();
+      var input = document.getElementById('chat-input');
+      var text = input.value.trim();
       if (!text || isWaitingForAI) return;
+
       input.value = '';
       addUserMessage(text);
       showTyping();
       isWaitingForAI = true;
+
       try {
         var response = await callAPI('chat');
         var cleanResponse = response.trim();
         if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
         var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           finalConfig = JSON.parse(jsonMatch[0]);
-          await supabaseClient.from('user_configs').upsert({ user_id: currentUser.id, excel_config: finalConfig, sheet_id: excelData?.sheetId || null }, { onConflict: 'user_id' });
-          var colonnes = finalConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
-          addBotMessage('✅ Parfait ! J\'ai tout compris !\n\n📊 Colonnes détectées : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
+          await supabaseClient.from('user_configs').upsert({
+            user_id: currentUser.id,
+            excel_config: finalConfig,
+            sheet_id: excelData?.sheetId || null
+          }, { onConflict: 'user_id' });
+
+          var colonnes = finalConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Depenses';
+          addBotMessage('Parfait ! J\'ai tout compris !\n\n**Colonnes detectees:** ' + colonnes + '\n\nDerniere etape : connecte Telegram !');
           setTimeout(function() { goToStep(3); }, 1500);
-        } else { addBotMessage(response); }
-      } catch (err) { console.error(err); addBotMessage("Désolé, j'ai eu un problème. Tu peux répéter ?"); }
+        } else {
+          addBotMessage(response);
+        }
+      } catch (err) {
+        console.error(err);
+        addBotMessage("Desole, j'ai eu un probleme. Tu peux repeter ?");
+      }
       isWaitingForAI = false;
     }
 
-    function goToStep(step) { document.querySelectorAll('.step-item').forEach(function(item, i) { item.classList.remove('active', 'completed', 'upcoming'); if (i < step - 1) item.classList.add('completed'); else if (i === step - 1) item.classList.add('active'); else item.classList.add('upcoming'); }); document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); }); document.getElementById('step-' + step).classList.add('active'); if (step === 3) checkExistingTelegramConnection(); }
-
+    // Telegram
     async function connectTelegram() {
-      var btn = document.getElementById('connect-telegram-btn');
-      btn.disabled = true; btn.textContent = 'Génération du lien...';
+      var btn = document.querySelector('#telegram-initial button');
+      btn.disabled = true;
+      btn.textContent = 'Generation du lien...';
+
       try {
-        var token = crypto.randomUUID(), expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        var { error } = await supabaseClient.from('connection_tokens').insert({ user_id: currentUser.id, token: token, expires_at: expiresAt.toISOString(), used: false });
+        var token = crypto.randomUUID();
+        var expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        var { error } = await supabaseClient.from('connection_tokens').insert({
+          user_id: currentUser.id,
+          token: token,
+          expires_at: expiresAt.toISOString(),
+          used: false
+        });
+
         if (error) throw error;
+
         var telegramLink = 'https://t.me/IArmyBOT?start=' + token;
         document.getElementById('telegram-initial').style.display = 'none';
         document.getElementById('telegram-connecting').style.display = 'block';
         document.getElementById('telegram-link-fallback').href = telegramLink;
+
         window.open(telegramLink, '_blank');
         startConnectionCheck();
-      } catch (err) { alert('Erreur : ' + err.message); btn.disabled = false; btn.textContent = 'Connecter Telegram'; }
+      } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Connecter Telegram';
+      }
     }
-    
-    function startConnectionCheck() { connectionCheckInterval = setInterval(async function() { try { var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle(); if (data?.telegram_user_id) { clearInterval(connectionCheckInterval); showTelegramConnected(); } } catch (err) {} }, 3000); }
-    function showTelegramConnected() { document.getElementById('telegram-connecting').style.display = 'none'; document.getElementById('telegram-connected').style.display = 'block'; }
-    async function checkExistingTelegramConnection() { if (!currentUser) return; try { var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle(); if (data?.telegram_user_id) { document.getElementById('telegram-initial').style.display = 'none'; showTelegramConnected(); } } catch (err) {} }
 
-    document.addEventListener('DOMContentLoaded', async function() {
-      console.log('[COMPTA] 📱 Page chargée');
-      var urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('code') && urlParams.get('state') === 'sheets_auth') { console.log('[COMPTA] 🔄 Callback OAuth Sheets'); await handleSheetsCallback(); }
-      await initComptaPage();
-    });
+    function startConnectionCheck() {
+      connectionCheckInterval = setInterval(async function() {
+        try {
+          var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle();
+          if (data?.telegram_user_id) {
+            clearInterval(connectionCheckInterval);
+            document.getElementById('telegram-connecting').style.display = 'none';
+            document.getElementById('telegram-connected').style.display = 'block';
+          }
+        } catch (err) {}
+      }, 3000);
+    }
+
+    async function checkExistingTelegramConnection() {
+      if (!currentUser) return;
+      try {
+        var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle();
+        if (data?.telegram_user_id) {
+          document.getElementById('telegram-initial').style.display = 'none';
+          document.getElementById('telegram-connected').style.display = 'block';
+        }
+      } catch (err) {}
+    }
+
+    function finishSetup() {
+      document.getElementById('section-wizard').style.display = 'none';
+      document.getElementById('section-recent').style.display = 'block';
+      loadUserFiles();
+      showToast('Configuration terminee !', 'success');
+    }
+
+    // Sections
+    function showSection(section) {
+      document.querySelectorAll('.sidebar-item').forEach(function(item) {
+        item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+      console.log('[COMPTA] Show section:', section);
+    }
+
+    function createFolder() {
+      var name = prompt('Nom du nouveau dossier:');
+      if (name) {
+        showToast('Dossier "' + name + '" cree', 'success');
+      }
+    }
+
+    // Utilities
+    function showLoader(text) {
+      document.getElementById('loader-text').textContent = text;
+      document.getElementById('loader').classList.add('active');
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').classList.remove('active');
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast active ' + (type || '');
+      setTimeout(function() { toast.classList.remove('active'); }, 3000);
+    }
   </script>
 </body>
 </html>
