@@ -430,7 +430,8 @@
     function getFilteredSheets() {
       var filtered = allSheets;
       if (currentFilter === 'recent') {
-        filtered = allSheets.slice(0, 5); // 5 most recent
+        // Already sorted by date, just return all (limit handled by renderSheetsList)
+        filtered = allSheets;
       } else if (currentFilter === 'shared') {
         filtered = allSheets.filter(function(sheet) { return sheet.shared === true; });
       }
