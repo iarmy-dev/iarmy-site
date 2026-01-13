@@ -890,12 +890,15 @@
       // Set file name
       document.getElementById('preview-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
 
+      // Support both flat and nested config formats
+      var headerRowNum = config.ligne_entetes || config.structure?.ligne_entetes || 1;
+      var dataStartRow = config.premiere_ligne_donnees || config.structure?.premiere_ligne_donnees || 2;
+      var dateColumn = config.colonne_date || config.structure?.colonne_date;
+
       // Build table preview
       var tableHtml = '';
       if (excelData?.sheets?.[0]?.allRows) {
         var rows = excelData.sheets[0].allRows;
-        var headerRowNum = config.ligne_entetes || 1;
-        var dataStartRow = config.premiere_ligne_donnees || 2;
 
         // Find all columns mentioned in config
         var highlightCols = {};
@@ -904,7 +907,7 @@
             highlightCols[col.colonne] = col.nom;
           });
         }
-        if (config.colonne_date) highlightCols[config.colonne_date] = 'Date';
+        if (dateColumn) highlightCols[dateColumn] = 'Date';
 
         // Get all column letters from data
         var allCols = [];
@@ -964,9 +967,9 @@
           colsHtml += '</div>';
         });
       }
-      if (config.colonne_date) {
+      if (dateColumn) {
         colsHtml += '<div class="config-preview-column-item">';
-        colsHtml += '<code>' + config.colonne_date + '</code>';
+        colsHtml += '<code>' + dateColumn + '</code>';
         colsHtml += '<strong>Date</strong>';
         colsHtml += '<span>→ auto</span>';
         colsHtml += '</div>';
