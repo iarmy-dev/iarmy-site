@@ -400,11 +400,16 @@
       showLoader('Chargement de tes fichiers...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
-        console.log('[SHEETS] Fetching from API...');
-        var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY } });
+        var apiUrl = SUPABASE_URL + '/functions/v1/list-google-sheets';
+        console.log('[SHEETS] ====== FETCH START ======');
+        console.log('[SHEETS] URL:', apiUrl);
+        console.log('[SHEETS] Token:', session.access_token ? 'OK (length: ' + session.access_token.length + ')' : 'MISSING');
+        var response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY } });
+        console.log('[SHEETS] Response status:', response.status);
         var result = await response.json();
         console.log('[SHEETS] API Response:', result);
         console.log('[SHEETS] Total files received:', result.sheets?.length || 0);
+        console.log('[SHEETS] ====== FETCH END ======');
 
         // Debug: chercher "recette 25"
         if (result.sheets) {
@@ -521,12 +526,13 @@
     function closeSheetsOverlay() { document.getElementById('sheets-overlay').classList.remove('active'); }
     async function refreshSheets() {
       // Force refresh from Google API
-      console.log('[SHEETS] refreshSheets called');
+      console.log('[SHEETS] ====== REFRESH START ======');
       showLoader('Actualisation des fichiers...');
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
-        console.log('[SHEETS] Fetching fresh data from API...');
-        var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', {
+        var apiUrl = SUPABASE_URL + '/functions/v1/list-google-sheets';
+        console.log('[SHEETS] URL:', apiUrl);
+        var response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -536,9 +542,11 @@
           },
           body: JSON.stringify({ forceRefresh: true })
         });
+        console.log('[SHEETS] Response status:', response.status);
         var result = await response.json();
         console.log('[SHEETS] Refresh response:', result);
         console.log('[SHEETS] Refresh got', result.sheets?.length || 0, 'sheets');
+        console.log('[SHEETS] ====== REFRESH END ======');
 
         // Debug: chercher "recette"
         if (result.sheets) {
