@@ -707,11 +707,24 @@
     async function loadAndAnalyzeSheet(sheetToUse, session) {
       showLoader('Analyse de "' + sheetToUse.name + '"...');
       try {
+        // 1. Mettre à jour google_credentials avec le sheet sélectionné
         await supabaseClient.from('google_credentials').update({ sheet_id: sheetToUse.id, sheet_name: sheetToUse.name }).eq('user_id', session.user.id);
+
+        // 2. Créer/mettre à jour user_configs avec le sheet_id (config vide pour l'instant, sera complétée par l'AI)
+        await supabaseClient.from('user_configs').upsert({
+          user_id: session.user.id,
+          sheet_id: sheetToUse.id,
+          is_active: true
+        }, { onConflict: 'user_id' });
+        console.log('[COMPTA] ✅ user_configs initialisé avec sheet_id:', sheetToUse.id);
+
+        // 3. Lire les données du sheet
         var response = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ sheetId: sheetToUse.id }) });
         var result = await response.json();
         if (!result.success) throw new Error(result.error);
         excelData = result.excelData;
+        excelData.sheetId = sheetToUse.id; // Ajouter le sheetId pour la sauvegarde finale
+        excelData.sheetName = sheetToUse.name;
         console.log('[COMPTA] 📊 Données Sheet:', excelData);
         hideLoader();
         showToast('✅ "' + sheetToUse.name + '" chargé !');
@@ -797,7 +810,17 @@
         var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           finalConfig = JSON.parse(jsonMatch[0]);
-          await supabaseClient.from('user_configs').upsert({ user_id: currentUser.id, excel_config: finalConfig, sheet_id: excelData?.sheetId || null }, { onConflict: 'user_id' });
+          // Sauvegarder la config complète avec excel_config ET sheet_id
+          var configToSave = {
+            user_id: currentUser.id,
+            excel_config: finalConfig,
+            sheet_id: excelData?.sheetId || null,
+            is_active: true
+          };
+          console.log('[COMPTA] 💾 Sauvegarde user_configs:', configToSave);
+          var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
+          if (saveError) console.error('[COMPTA] ❌ Erreur sauvegarde:', saveError);
+          else console.log('[COMPTA] ✅ Config sauvegardée!');
           var colonnes = finalConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
           addBotMessage('✅ Parfait ! J\'ai tout compris !\n\n📊 Colonnes détectées : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
           setTimeout(function() { goToStep(3); }, 1500);
