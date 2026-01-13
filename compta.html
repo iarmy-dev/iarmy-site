@@ -618,7 +618,7 @@
 
         try {
           console.log('[COMPTA] 🔄 Converting Excel to Google Sheet...');
-          var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/convert-excel-to-sheet', {
+          var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
