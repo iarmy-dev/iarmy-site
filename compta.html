@@ -836,12 +836,15 @@
             if (sheetIndex > 0) { excelData.sheets.push({ name: sheetName, allRows: [], rowCount: range.e.r, colCount: range.e.c + 1, formulas: {}, detectedHeaders: null }); return; }
             var allRows = [], maxCol = Math.min(range.e.c, 20);
             var readRow = function(row) { var rowData = []; for (var col = 0; col <= maxCol; col++) { var cellAddress = XLSX.utils.encode_cell({ r: row, c: col }); var cell = sheet[cellAddress]; var colLetter = col < 26 ? String.fromCharCode(65 + col) : 'A' + String.fromCharCode(65 + col - 26); if (cell && cell.v !== undefined && cell.v !== null && cell.v !== '') { rowData.push({ col: colLetter, val: typeof cell.v === 'number' ? (cell.v % 1 === 0 ? cell.v : cell.v.toFixed(2)) : String(cell.v).substring(0, 30) }); } } return rowData; };
-            for (var row = 0; row <= Math.min(15, range.e.r); row++) { var rowData = readRow(row); if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData }); }
-            if (range.e.r > 20) { allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes masquées)' }] }); for (var row2 = Math.max(16, range.e.r - 10); row2 <= range.e.r; row2++) { var rowData2 = readRow(row2); if (rowData2.length > 0) allRows.push({ row: row2 + 1, cells: rowData2 }); } }
+            // Lire TOUTES les lignes (jusqu'à 100 max pour éviter les fichiers trop gros)
+            var maxRows = Math.min(range.e.r, 100);
+            for (var row = 0; row <= maxRows; row++) { var rowData = readRow(row); if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData }); }
+            if (range.e.r > 100) { allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes ' + 101 + ' à ' + (range.e.r + 1) + ' masquées)' }] }); }
             var headerRow = detectHeaderRow(allRows);
             var detectedHeaders = headerRow ? { rowNumber: headerRow.row, columns: headerRow.cells.map(function(c) { return { letter: c.col, name: c.val }; }) } : null;
+            // Capturer TOUTES les formules (jusqu'à 100 max)
             var formulas = {}; var formulaCount = 0;
-            for (var cellRef in sheet) { if (cellRef[0] !== '!' && sheet[cellRef].f && formulaCount < 20) { formulas[cellRef] = sheet[cellRef].f; formulaCount++; } }
+            for (var cellRef in sheet) { if (cellRef[0] !== '!' && sheet[cellRef].f && formulaCount < 100) { formulas[cellRef] = sheet[cellRef].f; formulaCount++; } }
             excelData.sheets.push({ name: sheetName, allRows: allRows, rowCount: range.e.r, colCount: range.e.c + 1, formulas: formulas, detectedHeaders: detectedHeaders });
           });
           await startAnalysis();
