@@ -822,6 +822,14 @@
     async function handleFile(file) {
       var ext = '.' + file.name.split('.').pop().toLowerCase();
       if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
+
+      // Si l'utilisateur a accès à Google Sheets, uploader et convertir
+      if (hasGoogleSheetsAccess && ext !== '.csv') {
+        await handleFileWithUpload(file);
+        return;
+      }
+
+      // Sinon, analyse locale (comportement existant)
       goToStep(2);
       var reader = new FileReader();
       reader.onload = async function(e) {
@@ -851,6 +859,106 @@
         } catch (err) { console.error(err); addBotMessage("Hmm, j'ai eu un problème. Tu peux réessayer ?"); }
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    async function handleFileWithUpload(file) {
+      showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive en cours...');
+
+      try {
+        var { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+
+        // Lire le fichier en base64
+        var base64Content = await new Promise(function(resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var binary = new Uint8Array(e.target.result);
+            var base64 = btoa(String.fromCharCode.apply(null, binary));
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(file);
+        });
+
+        console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
+
+        // Upload vers Google Drive
+        showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+        var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileContent: base64Content,
+            mimeType: file.type || (file.name.endsWith('.xlsx')
+              ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              : 'application/vnd.ms-excel')
+          })
+        });
+
+        var uploadResult = await uploadResponse.json();
+        console.log('[UPLOAD] Upload result:', uploadResult);
+
+        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload échoué');
+
+        console.log('[UPLOAD] ✅ File uploaded to Drive:', uploadResult.file.id);
+
+        // Maintenant convertir en Google Sheet
+        showLoader('📊 Fichier uploadé !\n\nConversion en Google Sheet...\n(ton fichier original reste intact)');
+
+        var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileId: uploadResult.file.id,
+            fileName: uploadResult.file.name
+          })
+        });
+
+        var convertResult = await convertResponse.json();
+        console.log('[UPLOAD] Conversion result:', convertResult);
+
+        if (!convertResult.success) throw new Error(convertResult.error || 'Conversion échouée');
+
+        var sheetToUse = {
+          id: convertResult.sheet.id,
+          name: convertResult.sheet.name
+        };
+        console.log('[UPLOAD] ✅ Conversion réussie:', sheetToUse.name);
+
+        hideLoader();
+
+        // Vérifier les différences de conversion
+        if (convertResult.verification && !convertResult.verification.success) {
+          console.log('[UPLOAD] ⚠️ Différences détectées:', convertResult.verification.differences);
+          pendingConvertedSheet = sheetToUse;
+          pendingCompareUrls = {
+            original: convertResult.sheet.originalWebViewLink,
+            converted: convertResult.sheet.webViewLink
+          };
+          showVerifyWarning(convertResult.verification.differences);
+          return;
+        }
+
+        showToast('✅ Fichier prêt ! L\'original reste intact sur ton Drive.');
+        await new Promise(function(r) { setTimeout(r, 1000); });
+
+        // Charger et analyser le Google Sheet
+        await loadAndAnalyzeSheet(sheetToUse, session);
+
+      } catch (error) {
+        console.error('[UPLOAD] ❌ Error:', error);
+        hideLoader();
+        alert('Erreur: ' + error.message);
+      }
     }
 
     function addBotMessage(text) { var container = document.getElementById('chat-messages'); document.getElementById('typing-indicator')?.remove(); var msgDiv = document.createElement('div'); msgDiv.className = 'chat-msg chat-msg-bot'; msgDiv.innerHTML = '<div class="chat-avatar chat-avatar-bot">i</div><div class="chat-bubble chat-bubble-bot">' + text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') + '</div>'; container.appendChild(msgDiv); container.scrollTop = container.scrollHeight; chatHistory.push({ role: 'assistant', content: text }); }
