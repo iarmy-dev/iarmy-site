@@ -675,8 +675,8 @@
       var isExcel = sheet.fileType === 'excel-xlsx' || sheet.fileType === 'excel-xls';
 
       if (isExcel) {
-        // Show conversion loader
-        showLoader('Conversion en cours...');
+        // Show conversion loader with explanation
+        showLoader('📊 Fichier Excel détecté !\n\nConversion en Google Sheet...\n(ton fichier original reste intact)');
 
         try {
           console.log('[COMPTA] 🔄 Converting Excel to Google Sheet...');
