@@ -859,7 +859,32 @@
     
     async function callAPI(mode) { var response = await fetch(SUPABASE_URL + '/functions/v1/clever-processor', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ excelData: excelData, chatHistory: chatHistory, mode: mode }) }); var result = await response.json(); if (result.error) throw new Error(result.error); return result.response; }
     
-    async function startAnalysis() { showTyping(); isWaitingForAI = true; try { var response = await callAPI('analyze'); addBotMessage(response); } catch (err) { console.error(err); addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?"); } isWaitingForAI = false; }
+    async function startAnalysis() {
+      showTyping();
+      isWaitingForAI = true;
+      try {
+        var response = await callAPI('analyze');
+        var cleanResponse = response.trim();
+        if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            var parsedConfig = JSON.parse(jsonMatch[0]);
+            console.log('[COMPTA] 🔍 Config détectée dans startAnalysis:', parsedConfig);
+            showConfigPreview(parsedConfig);
+          } catch (parseErr) {
+            console.error('[COMPTA] JSON parse error:', parseErr);
+            addBotMessage(response);
+          }
+        } else {
+          addBotMessage(response);
+        }
+      } catch (err) {
+        console.error(err);
+        addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?");
+      }
+      isWaitingForAI = false;
+    }
     
     async function sendMessage() {
       var input = document.getElementById('chat-input'), text = input.value.trim();
