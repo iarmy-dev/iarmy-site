@@ -453,6 +453,54 @@
     function showLoader(text) { document.getElementById('loader-text').textContent = text; document.getElementById('global-loader').classList.add('active'); }
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
     function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
+
+    // IndexedDB helpers for storing large files (no size limit like localStorage)
+    const DB_NAME = 'iArmyCompta';
+    const DB_STORE = 'pendingFiles';
+    function openDB() {
+      return new Promise(function(resolve, reject) {
+        var request = indexedDB.open(DB_NAME, 1);
+        request.onerror = function() { reject(request.error); };
+        request.onsuccess = function() { resolve(request.result); };
+        request.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE, { keyPath: 'id' });
+          }
+        };
+      });
+    }
+    async function storeInDB(data) {
+      var db = await openDB();
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction(DB_STORE, 'readwrite');
+        var store = tx.objectStore(DB_STORE);
+        var request = store.put({ id: 'pendingConfig', ...data });
+        request.onsuccess = function() { resolve(); };
+        request.onerror = function() { reject(request.error); };
+      });
+    }
+    async function getFromDB() {
+      var db = await openDB();
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction(DB_STORE, 'readonly');
+        var store = tx.objectStore(DB_STORE);
+        var request = store.get('pendingConfig');
+        request.onsuccess = function() { resolve(request.result); };
+        request.onerror = function() { reject(request.error); };
+      });
+    }
+    async function clearFromDB() {
+      var db = await openDB();
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction(DB_STORE, 'readwrite');
+        var store = tx.objectStore(DB_STORE);
+        var request = store.delete('pendingConfig');
+        request.onsuccess = function() { resolve(); };
+        request.onerror = function() { reject(request.error); };
+      });
+    }
+
     function formatDate(dateString) { const date = new Date(dateString); const diff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24)); if (diff === 0) return "aujourd'hui"; if (diff === 1) return "hier"; if (diff < 7) return 'il y a ' + diff + ' jours'; return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); }
 
     async function initComptaPage() {
@@ -514,20 +562,19 @@
         updateGoogleSheetsButton();
 
         // Check if we have a pending config to process (user was validating when they connected)
-        var pendingData = localStorage.getItem('pendingConfigAfterAuth');
+        var pendingData = await getFromDB();
         if (pendingData) {
           console.log('[COMPTA] 📋 Pending config found after auth, processing...');
-          localStorage.removeItem('pendingConfigAfterAuth');
-          var parsed = JSON.parse(pendingData);
+          await clearFromDB();
 
           // Restore state
-          pendingConfig = parsed.config;
-          excelData = parsed.excelData;
+          pendingConfig = pendingData.config;
+          excelData = pendingData.excelData;
 
           // If we have stored file content, upload it automatically
-          if (parsed.fileContent) {
+          if (pendingData.fileContent) {
             console.log('[COMPTA] 📤 Uploading stored file...');
-            await uploadStoredFile(parsed.fileContent, parsed.fileName, parsed.fileMimeType);
+            await uploadStoredFile(pendingData.fileContent, pendingData.fileName, pendingData.fileMimeType);
           } else {
             // No file to upload, just save the config
             await saveConfigAndContinue();
@@ -1245,7 +1292,7 @@
     }
 
     async function connectGoogleAndContinue() {
-      // Store config and file content before OAuth redirect
+      // Store config and file content before OAuth redirect (using IndexedDB for large files)
       showLoader('Préparation...');
 
       try {
@@ -1270,17 +1317,17 @@
           dataToStore.fileContent = base64Content;
           dataToStore.fileName = pendingLocalFile.name;
           dataToStore.fileMimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-          console.log('[COMPTA] 📦 File stored in localStorage, size:', base64Content.length);
+          console.log('[COMPTA] 📦 File stored in IndexedDB, size:', base64Content.length);
         }
 
-        localStorage.setItem('pendingConfigAfterAuth', JSON.stringify(dataToStore));
+        await storeInDB(dataToStore);
         hideLoader();
         closeConnectGoogleOverlay();
         authorizeGoogleSheets();
       } catch (error) {
         console.error('[COMPTA] Error storing file:', error);
         hideLoader();
-        alert('Erreur: fichier trop volumineux. Essaie de le compresser.');
+        alert('Erreur: ' + error.message);
       }
     }
 
