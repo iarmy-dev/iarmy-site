@@ -1077,16 +1077,19 @@
         var mimeType = file.type || (file.name.endsWith('.xlsx')
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           : 'application/vnd.ms-excel');
-        // Build JSON manually to avoid JSON.stringify stack overflow on large strings
-        var jsonBody = '{"fileName":' + JSON.stringify(file.name) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(mimeType) + '}';
+        // Use Blob to avoid stack overflow on large strings
+        var jsonBlob = new Blob([
+          '{"fileName":', JSON.stringify(file.name),
+          ',"fileContent":"', base64Content,
+          '","mimeType":', JSON.stringify(mimeType), '}'
+        ], { type: 'application/json' });
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: jsonBody
+          body: jsonBlob
         });
 
         var uploadResult = await uploadResponse.json();
@@ -1426,15 +1429,18 @@
 
         // Upload to Google Drive
         var mimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        var jsonBody = '{"fileName":' + JSON.stringify(pendingLocalFile.name) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(mimeType) + '}';
+        var jsonBlob = new Blob([
+          '{"fileName":', JSON.stringify(pendingLocalFile.name),
+          ',"fileContent":"', base64Content,
+          '","mimeType":', JSON.stringify(mimeType), '}'
+        ], { type: 'application/json' });
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: jsonBody
+          body: jsonBlob
         });
 
         var uploadResult = await uploadResponse.json();
@@ -1501,15 +1507,18 @@
 
         // Upload to Google Drive
         var finalMimeType = mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-        var jsonBody = '{"fileName":' + JSON.stringify(fileName) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(finalMimeType) + '}';
+        var jsonBlob = new Blob([
+          '{"fileName":', JSON.stringify(fileName),
+          ',"fileContent":"', base64Content,
+          '","mimeType":', JSON.stringify(finalMimeType), '}'
+        ], { type: 'application/json' });
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: jsonBody
+          body: jsonBlob
         });
 
         var uploadResult = await uploadResponse.json();
@@ -1586,14 +1595,8 @@
 
     function importPreviousData() {
       console.log('[COMPTA] User wants to import previous data');
-      // Trigger file upload flow - user will upload their existing Excel
-      // After upload, we'll extract data and merge into new template
+      // Trigger file input directly - stays on same screen until file selected
       document.getElementById('file-input').click();
-      // Go back to step 1 to show upload zone
-      document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
-      document.getElementById('step-1').classList.add('active');
-      // Show a hint to the user
-      showToast('Glisse ton fichier Excel pour importer tes données', 4000);
     }
 
     async function skipImport() {
