@@ -454,6 +454,18 @@
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
     function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
 
+    // Efficient ArrayBuffer to Base64 (chunked to handle large files without stack overflow)
+    function arrayBufferToBase64(buffer) {
+      var bytes = new Uint8Array(buffer);
+      var binary = '';
+      var chunkSize = 8192; // Process in 8KB chunks
+      for (var i = 0; i < bytes.length; i += chunkSize) {
+        var chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        binary += String.fromCharCode.apply(null, chunk);
+      }
+      return btoa(binary);
+    }
+
     // IndexedDB helpers for storing large files (no size limit like localStorage)
     const DB_NAME = 'iArmyCompta';
     const DB_STORE = 'pendingFiles';
@@ -571,10 +583,12 @@
           pendingConfig = pendingData.config;
           excelData = pendingData.excelData;
 
-          // If we have stored file content, upload it automatically
-          if (pendingData.fileContent) {
+          // If we have stored file buffer, upload it automatically
+          if (pendingData.fileBuffer) {
             console.log('[COMPTA] 📤 Uploading stored file...');
-            await uploadStoredFile(pendingData.fileContent, pendingData.fileName, pendingData.fileMimeType);
+            // Convert ArrayBuffer to base64 efficiently (chunked to avoid stack overflow)
+            var base64 = arrayBufferToBase64(pendingData.fileBuffer);
+            await uploadStoredFile(base64, pendingData.fileName, pendingData.fileMimeType);
           } else {
             // No file to upload, just save the config
             await saveConfigAndContinue();
@@ -983,17 +997,14 @@
         var { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Session expirée');
 
-        // Lire le fichier en base64
-        var base64Content = await new Promise(function(resolve, reject) {
+        // Lire le fichier et convertir en base64 (chunked pour gros fichiers)
+        var arrayBuffer = await new Promise(function(resolve, reject) {
           var reader = new FileReader();
-          reader.onload = function(e) {
-            var binary = new Uint8Array(e.target.result);
-            var base64 = btoa(String.fromCharCode.apply(null, binary));
-            resolve(base64);
-          };
+          reader.onload = function(e) { resolve(e.target.result); };
           reader.onerror = reject;
           reader.readAsArrayBuffer(file);
         });
+        var base64Content = arrayBufferToBase64(arrayBuffer);
 
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
@@ -1302,22 +1313,18 @@
           excelData: excelData
         };
 
-        // Store file content as base64 if we have a local file
+        // Store file as ArrayBuffer (no encoding = fast, IndexedDB handles binary natively)
         if (pendingLocalFile) {
-          var base64Content = await new Promise(function(resolve, reject) {
+          var arrayBuffer = await new Promise(function(resolve, reject) {
             var reader = new FileReader();
-            reader.onload = function(e) {
-              var binary = new Uint8Array(e.target.result);
-              var base64 = btoa(String.fromCharCode.apply(null, binary));
-              resolve(base64);
-            };
+            reader.onload = function(e) { resolve(e.target.result); };
             reader.onerror = reject;
             reader.readAsArrayBuffer(pendingLocalFile);
           });
-          dataToStore.fileContent = base64Content;
+          dataToStore.fileBuffer = arrayBuffer;
           dataToStore.fileName = pendingLocalFile.name;
           dataToStore.fileMimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-          console.log('[COMPTA] 📦 File stored in IndexedDB, size:', base64Content.length);
+          console.log('[COMPTA] 📦 File stored in IndexedDB, size:', arrayBuffer.byteLength, 'bytes');
         }
 
         await storeInDB(dataToStore);
@@ -1344,17 +1351,14 @@
         var { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Session expirée');
 
-        // Read file as base64
-        var base64Content = await new Promise(function(resolve, reject) {
+        // Read file and convert to base64 (chunked for large files)
+        var arrayBuffer = await new Promise(function(resolve, reject) {
           var reader = new FileReader();
-          reader.onload = function(e) {
-            var binary = new Uint8Array(e.target.result);
-            var base64 = btoa(String.fromCharCode.apply(null, binary));
-            resolve(base64);
-          };
+          reader.onload = function(e) { resolve(e.target.result); };
           reader.onerror = reject;
           reader.readAsArrayBuffer(pendingLocalFile);
         });
+        var base64Content = arrayBufferToBase64(arrayBuffer);
 
         // Upload to Google Drive
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
