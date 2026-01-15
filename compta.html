@@ -121,6 +121,8 @@
 
     /* Section title */
     .sheets-section-title { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; padding-left: 4px; }
+    .sheets-file-count { display: inline; }
+    @media (max-width: 768px) { .sheets-file-count { display: none; } }
 
     .sheets-grid { display: grid; gap: 12px; margin-bottom: 24px; }
     .sheet-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px 24px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: all 0.3s; }
@@ -232,7 +234,7 @@
       </div>
 
       <!-- Section title -->
-      <div class="sheets-section-title">Fichiers disponibles</div>
+      <div class="sheets-section-title" id="sheets-section-title">Fichiers disponibles <span class="sheets-file-count" id="sheets-file-count"></span></div>
 
       <!-- Sheets list -->
       <div class="sheets-grid" id="sheets-grid"></div>
@@ -684,21 +686,20 @@
         console.log('[SHEETS] ====== FETCH START ======');
         console.log('[SHEETS] URL:', apiUrl);
         console.log('[SHEETS] Token:', session.access_token ? 'OK (length: ' + session.access_token.length + ')' : 'MISSING');
-        var response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY } });
+        var response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ limit: 50 })
+        });
         console.log('[SHEETS] Response status:', response.status);
         var result = await response.json();
         console.log('[SHEETS] API Response:', result);
         console.log('[SHEETS] Total files received:', result.sheets?.length || 0);
         console.log('[SHEETS] ====== FETCH END ======');
-
-        // Debug: chercher "recette 25"
-        if (result.sheets) {
-          var recette = result.sheets.find(function(s) { return s.name.toLowerCase().includes('recette'); });
-          console.log('[SHEETS] Files containing "recette":', result.sheets.filter(function(s) { return s.name.toLowerCase().includes('recette'); }));
-
-          // Log first 20 files
-          console.log('[SHEETS] First 20 files:', result.sheets.slice(0, 20).map(function(s) { return s.name; }));
-        }
 
         hideLoader();
         if (!result.success) throw new Error(result.error);
@@ -710,19 +711,39 @@
     var currentFilter = 'all';
     var showAllFiles = false;
     var MAX_FILES = 10;
+    var isSearchMode = false;
+    var searchTimeout = null;
+
+    // Priority keywords for sorting
+    var PRIORITY_KEYWORDS = ['compta', 'recette', 'caisse', 'comptabilité', 'comptabilite', 'vente', 'recettes'];
+
+    function sortWithPriority(sheets) {
+      return sheets.slice().sort(function(a, b) {
+        var aName = a.name.toLowerCase();
+        var bName = b.name.toLowerCase();
+        var aPriority = PRIORITY_KEYWORDS.some(function(kw) { return aName.includes(kw); });
+        var bPriority = PRIORITY_KEYWORDS.some(function(kw) { return bName.includes(kw); });
+        // Priority files first
+        if (aPriority && !bPriority) return -1;
+        if (!aPriority && bPriority) return 1;
+        // Then by date (most recent first)
+        return new Date(b.modifiedTime) - new Date(a.modifiedTime);
+      });
+    }
 
     function showSheetsOverlay(sheets) {
       console.log('[SHEETS] showSheetsOverlay called with', sheets.length, 'sheets');
-      // Sort by most recent first
-      allSheets = sheets.slice().sort(function(a, b) {
-        return new Date(b.modifiedTime) - new Date(a.modifiedTime);
-      });
+      // Sort with priority keywords first, then by date
+      allSheets = sortWithPriority(sheets);
       console.log('[SHEETS] allSheets stored:', allSheets.length);
       currentFilter = 'all';
       showAllFiles = false;
+      isSearchMode = false;
       document.getElementById('sheets-search-input').value = '';
       // Reset folder tabs
       document.querySelectorAll('.sheets-folder').forEach(function(f, i) { f.classList.toggle('active', i === 0); });
+      // Update file count (hidden on mobile via CSS)
+      document.getElementById('sheets-file-count').textContent = '(' + sheets.length + ')';
       var filtered = getFilteredSheets();
       console.log('[SHEETS] getFilteredSheets returned:', filtered.length);
       renderSheetsList(filtered);
@@ -782,16 +803,60 @@
     }
 
     function filterSheetsList(query) {
-      var q = query.toLowerCase();
+      var q = query.trim();
       showAllFiles = false;
+
+      // Clear any pending search timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+        searchTimeout = null;
+      }
+
+      // If empty query, show original list
       if (!q) {
+        isSearchMode = false;
+        document.getElementById('sheets-file-count').textContent = '(' + allSheets.length + ')';
         renderSheetsList(getFilteredSheets());
         return;
       }
-      var filtered = allSheets.filter(function(sheet) {
-        return sheet.name.toLowerCase().includes(q);
+
+      // First: instant local filter for immediate feedback
+      var localFiltered = allSheets.filter(function(sheet) {
+        return sheet.name.toLowerCase().includes(q.toLowerCase());
       });
-      renderSheetsList(filtered);
+      isSearchMode = true;
+      document.getElementById('sheets-file-count').textContent = '(' + localFiltered.length + ')';
+      renderSheetsList(localFiltered);
+
+      // Then: debounced API search for more results (after 500ms)
+      searchTimeout = setTimeout(async function() {
+        try {
+          console.log('[SHEETS] API search for:', q);
+          var { data: { session } } = await supabaseClient.auth.getSession();
+          var response = await fetch(SUPABASE_URL + '/functions/v1/list-google-sheets', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token,
+              'apikey': SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({ limit: 50, search: q })
+          });
+          var result = await response.json();
+          if (result.success && result.sheets) {
+            console.log('[SHEETS] API search returned:', result.sheets.length, 'files');
+            // Only update if still in search mode with same query
+            var currentQuery = document.getElementById('sheets-search-input').value.trim();
+            if (currentQuery === q) {
+              var sorted = sortWithPriority(result.sheets);
+              document.getElementById('sheets-file-count').textContent = '(' + sorted.length + ')';
+              renderSheetsList(sorted);
+            }
+          }
+        } catch (e) {
+          console.error('[SHEETS] API search error:', e);
+        }
+      }, 500);
     }
 
     function filterByFolder(folder, element) {
@@ -801,7 +866,9 @@
       element.classList.add('active');
       currentFilter = folder;
       showAllFiles = false;
+      isSearchMode = false;
       document.getElementById('sheets-search-input').value = '';
+      document.getElementById('sheets-file-count').textContent = '(' + allSheets.length + ')';
       var filtered = getFilteredSheets();
       console.log('[SHEETS] After filter, rendering', filtered.length, 'sheets');
       renderSheetsList(filtered);
@@ -829,7 +896,7 @@
             'apikey': SUPABASE_ANON_KEY,
             'Cache-Control': 'no-cache'
           },
-          body: JSON.stringify({ forceRefresh: true })
+          body: JSON.stringify({ limit: 50 })
         });
         console.log('[SHEETS] Response status:', response.status);
         var result = await response.json();
@@ -837,16 +904,11 @@
         console.log('[SHEETS] Refresh got', result.sheets?.length || 0, 'sheets');
         console.log('[SHEETS] ====== REFRESH END ======');
 
-        // Debug: chercher "recette"
-        if (result.sheets) {
-          console.log('[SHEETS] Files containing "recette":', result.sheets.filter(function(s) { return s.name.toLowerCase().includes('recette'); }));
-        }
-
         hideLoader();
         if (!result.success) throw new Error(result.error);
         if (result.sheets?.length > 0) {
           showSheetsOverlay(result.sheets);
-          showToast('Liste actualisee ! (' + result.sheets.length + ' fichiers)');
+          showToast('Liste actualisee !');
         } else {
           showNoSheetsMessage();
         }
