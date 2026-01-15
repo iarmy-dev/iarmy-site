@@ -1074,6 +1074,11 @@
 
         // Upload vers Google Drive
         showLoader('OK Fichier lu\n2. Upload vers ton Drive...');
+        var mimeType = file.type || (file.name.endsWith('.xlsx')
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/vnd.ms-excel');
+        // Build JSON manually to avoid JSON.stringify stack overflow on large strings
+        var jsonBody = '{"fileName":' + JSON.stringify(file.name) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(mimeType) + '}';
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
@@ -1081,13 +1086,7 @@
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: JSON.stringify({
-            fileName: file.name,
-            fileContent: base64Content,
-            mimeType: file.type || (file.name.endsWith('.xlsx')
-              ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-              : 'application/vnd.ms-excel')
-          })
+          body: jsonBody
         });
 
         var uploadResult = await uploadResponse.json();
@@ -1426,6 +1425,8 @@
         var base64Content = await arrayBufferToBase64(arrayBuffer);
 
         // Upload to Google Drive
+        var mimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        var jsonBody = '{"fileName":' + JSON.stringify(pendingLocalFile.name) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(mimeType) + '}';
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
@@ -1433,17 +1434,13 @@
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: JSON.stringify({
-            fileName: pendingLocalFile.name,
-            fileContent: base64Content,
-            mimeType: pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          })
+          body: jsonBody
         });
 
         var uploadResult = await uploadResponse.json();
-        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload échoué');
+        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload echoue');
 
-        console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
+        console.log('[COMPTA] File uploaded:', uploadResult.file.id);
 
         // Convert to Google Sheet
         showLoader('OK Fichier lu\nOK Upload termine\n3. Conversion en Google Sheet...');
@@ -1503,6 +1500,8 @@
         if (!session) throw new Error('Session expirée');
 
         // Upload to Google Drive
+        var finalMimeType = mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        var jsonBody = '{"fileName":' + JSON.stringify(fileName) + ',"fileContent":"' + base64Content + '","mimeType":' + JSON.stringify(finalMimeType) + '}';
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
@@ -1510,17 +1509,13 @@
             'Authorization': 'Bearer ' + session.access_token,
             'apikey': SUPABASE_ANON_KEY
           },
-          body: JSON.stringify({
-            fileName: fileName,
-            fileContent: base64Content,
-            mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          })
+          body: jsonBody
         });
 
         var uploadResult = await uploadResponse.json();
-        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload échoué');
+        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload echoue');
 
-        console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
+        console.log('[COMPTA] File uploaded:', uploadResult.file.id);
 
         // Convert to Google Sheet
         showLoader('OK Upload termine\n2. Conversion en Google Sheet...');
