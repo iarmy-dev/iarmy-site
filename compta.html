@@ -296,6 +296,44 @@
       <button onclick="closeVerifyOverlay()" style="width: 100%; background: transparent; border: none; padding: 14px; color: rgba(255,255,255,0.4); cursor: pointer; margin-top: 12px; font-size: 14px;">Annuler</button>
     </div>
   </div>
+  <!-- Connect Google Modal - shown when user validates without Google access -->
+  <div class="sheets-overlay" id="connect-google-overlay" style="z-index: 60;">
+    <div class="sheets-content" style="max-width: 480px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="width: 72px; height: 72px; background: linear-gradient(135deg, rgba(15, 157, 88, 0.2), rgba(66, 133, 244, 0.2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px;">📊</div>
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">Ton fichier est prêt !</h2>
+        <p style="color: rgba(255,255,255,0.6); font-size: 15px; line-height: 1.6;">Pour que le bot Telegram puisse écrire dedans, ton fichier doit être sur Google Sheets.</p>
+      </div>
+      <div style="background: rgba(15, 157, 88, 0.08); border: 1px solid rgba(15, 157, 88, 0.2); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+          <div style="width: 28px; height: 28px; background: rgba(15, 157, 88, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;">✓</div>
+          <div>
+            <div style="font-weight: 600; margin-bottom: 4px;">On s'occupe de tout</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 13px;">Ton Excel sera converti automatiquement en Google Sheet</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+          <div style="width: 28px; height: 28px; background: rgba(15, 157, 88, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;">✓</div>
+          <div>
+            <div style="font-weight: 600; margin-bottom: 4px;">Ton fichier original reste intact</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 13px;">On crée une copie Google Sheet, tu gardes ton Excel</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <div style="width: 28px; height: 28px; background: rgba(15, 157, 88, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px;">✓</div>
+          <div>
+            <div style="font-weight: 600; margin-bottom: 4px;">Tout se fait en ligne</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 13px;">Accède à ta compta depuis n'importe où</div>
+          </div>
+        </div>
+      </div>
+      <button onclick="connectGoogleAndContinue()" class="btn-glow" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg>
+        Connecter Google Sheets
+      </button>
+      <button onclick="closeConnectGoogleOverlay()" style="width: 100%; background: transparent; border: none; padding: 14px; color: rgba(255,255,255,0.4); cursor: pointer; margin-top: 12px; font-size: 14px;">Annuler</button>
+    </div>
+  </div>
   <nav class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3"><div class="logo-i">i</div><span class="font-semibold text-lg">iArmy</span></a>
@@ -407,14 +445,14 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
     
-    let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null;
+    let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null, pendingLocalFile = null;
     const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'dépense', 'depense', 'espèce', 'espece', 'carte', 'ticket', 'chèque', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
 
     function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
     function hideWelcome() { document.getElementById('welcome-overlay').classList.remove('active'); }
     function showLoader(text) { document.getElementById('loader-text').textContent = text; document.getElementById('global-loader').classList.add('active'); }
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
-    function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, 3000); }
+    function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
     function formatDate(dateString) { const date = new Date(dateString); const diff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24)); if (diff === 0) return "aujourd'hui"; if (diff === 1) return "hier"; if (diff < 7) return 'il y a ' + diff + ' jours'; return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); }
 
     async function initComptaPage() {
@@ -473,8 +511,25 @@
         hasGoogleSheetsAccess = true;
         hideLoader();
         showToast('✅ Google Sheets connecté !');
-        if (result.sheets?.length > 0) showSheetsOverlay(result.sheets); else showNoSheetsMessage();
         updateGoogleSheetsButton();
+
+        // Check if we have a pending config to process (user was validating when they connected)
+        var pendingData = localStorage.getItem('pendingConfigAfterAuth');
+        if (pendingData) {
+          console.log('[COMPTA] 📋 Pending config found after auth');
+          localStorage.removeItem('pendingConfigAfterAuth');
+          var parsed = JSON.parse(pendingData);
+
+          // Show message to re-upload the file (file data was lost during OAuth redirect)
+          goToStep(1);
+          setTimeout(function() {
+            showToast('✅ Google connecté ! Re-glisse ton fichier pour finaliser.', 5000);
+          }, 500);
+          return true;
+        }
+
+        // Normal flow - show sheets picker
+        if (result.sheets?.length > 0) showSheetsOverlay(result.sheets); else showNoSheetsMessage();
         return true;
       } catch (error) { console.error('[COMPTA] ❌', error); hideLoader(); alert('Erreur: ' + error.message); window.history.replaceState({}, document.title, window.location.pathname); return false; }
     }
@@ -823,13 +878,19 @@
       var ext = '.' + file.name.split('.').pop().toLowerCase();
       if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
 
-      // Si l'utilisateur a accès à Google Sheets, uploader et convertir
+      // Store file for potential later upload (after Google auth)
+      if (ext !== '.csv') {
+        pendingLocalFile = file;
+        console.log('[COMPTA] 📁 Fichier local stocké pour upload ultérieur:', file.name);
+      }
+
+      // Si l'utilisateur a accès à Google Sheets, uploader et convertir directement
       if (hasGoogleSheetsAccess && ext !== '.csv') {
         await handleFileWithUpload(file);
         return;
       }
 
-      // Sinon, analyse locale (comportement existant)
+      // Sinon, analyse locale d'abord (on demandera Google à la validation)
       goToStep(2);
       var reader = new FileReader();
       reader.onload = async function(e) {
@@ -1124,9 +1185,32 @@
     async function confirmConfig() {
       if (!pendingConfig) return;
 
-      // Close modal
+      // Close preview modal
       document.getElementById('config-preview-overlay').classList.remove('active');
 
+      // Check if we need Google access (local file without Google connected)
+      var isLocalFile = !excelData?.isGoogleSheet && !excelData?.sheetId;
+      console.log('[COMPTA] isLocalFile:', isLocalFile, 'hasGoogleSheetsAccess:', hasGoogleSheetsAccess);
+
+      if (isLocalFile && !hasGoogleSheetsAccess) {
+        // Show the "connect Google" modal
+        console.log('[COMPTA] 📋 Fichier local sans accès Google - affichage modal');
+        document.getElementById('connect-google-overlay').classList.add('active');
+        return;
+      }
+
+      // If local file with Google access, upload and convert first
+      if (isLocalFile && hasGoogleSheetsAccess && pendingLocalFile) {
+        console.log('[COMPTA] 📤 Upload et conversion du fichier local...');
+        await uploadAndConvertLocalFile();
+        return;
+      }
+
+      // Otherwise, save directly (Google Sheet already selected)
+      await saveConfigAndContinue();
+    }
+
+    async function saveConfigAndContinue() {
       // Save config
       var configToSave = {
         user_id: currentUser.id,
@@ -1147,6 +1231,114 @@
       var colonnes = pendingConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
       addBotMessage('✅ Parfait ! Configuration validée !\n\n📊 Colonnes : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
       setTimeout(function() { goToStep(3); }, 1500);
+    }
+
+    function closeConnectGoogleOverlay() {
+      document.getElementById('connect-google-overlay').classList.remove('active');
+    }
+
+    function connectGoogleAndContinue() {
+      // Store that we have a pending config to process after auth
+      localStorage.setItem('pendingConfigAfterAuth', JSON.stringify({
+        config: pendingConfig,
+        fileName: excelData?.fileName,
+        hasLocalFile: !!pendingLocalFile
+      }));
+      closeConnectGoogleOverlay();
+      authorizeGoogleSheets();
+    }
+
+    async function uploadAndConvertLocalFile() {
+      if (!pendingLocalFile) {
+        console.error('[COMPTA] No pending local file');
+        await saveConfigAndContinue();
+        return;
+      }
+
+      showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+
+      try {
+        var { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+
+        // Read file as base64
+        var base64Content = await new Promise(function(resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var binary = new Uint8Array(e.target.result);
+            var base64 = btoa(String.fromCharCode.apply(null, binary));
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(pendingLocalFile);
+        });
+
+        // Upload to Google Drive
+        var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileName: pendingLocalFile.name,
+            fileContent: base64Content,
+            mimeType: pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          })
+        });
+
+        var uploadResult = await uploadResponse.json();
+        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload échoué');
+
+        console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
+
+        // Convert to Google Sheet
+        showLoader('📊 Conversion en Google Sheet...');
+
+        var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileId: uploadResult.file.id,
+            fileName: uploadResult.file.name
+          })
+        });
+
+        var convertResult = await convertResponse.json();
+        if (!convertResult.success) throw new Error(convertResult.error || 'Conversion échouée');
+
+        console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
+
+        // Update excelData with the Google Sheet info
+        excelData.sheetId = convertResult.sheet.id;
+        excelData.sheetName = convertResult.sheet.name;
+        excelData.isGoogleSheet = true;
+
+        // Update google_credentials with the sheet
+        await supabaseClient.from('google_credentials').update({
+          sheet_id: convertResult.sheet.id,
+          sheet_name: convertResult.sheet.name
+        }).eq('user_id', currentUser.id);
+
+        hideLoader();
+        showToast('✅ Fichier converti et prêt !');
+
+        // Clear pending file
+        pendingLocalFile = null;
+
+        // Now save the config
+        await saveConfigAndContinue();
+
+      } catch (error) {
+        console.error('[COMPTA] ❌ Error:', error);
+        hideLoader();
+        alert('Erreur: ' + error.message);
+      }
     }
     // ========== END CONFIG PREVIEW ==========
 
