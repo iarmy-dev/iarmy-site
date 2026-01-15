@@ -571,6 +571,16 @@
       currentUser = session.user;
       userProvider = session.user.app_metadata?.provider || 'email';
       console.log('[COMPTA] ✅ Connecté:', currentUser.email);
+
+      // Welcome uniquement à la première connexion
+      var welcomeKey = 'iarmy_welcomed_' + currentUser.id;
+      if (!localStorage.getItem(welcomeKey)) {
+        var firstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.user_metadata?.name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'toi';
+        showWelcome(firstName);
+        localStorage.setItem(welcomeKey, '1');
+        setTimeout(hideWelcome, 1500);
+      }
+
       await updateNavBar();
       await checkGoogleSheetsAccess();
       updateGoogleSheetsButton();
