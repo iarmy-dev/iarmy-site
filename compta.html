@@ -353,42 +353,87 @@
       <a href="index.html" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
       <div class="step-content active" id="step-1">
         <div class="mb-2"><span class="text-white/30 text-sm">Étape 1/3</span></div>
-        <h1 class="text-3xl font-bold mb-3">Connecte ton fichier</h1>
-        <p class="text-white/40 mb-10">Choisis ton mode de travail</p>
-        <div class="glass-card p-8 mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-content text-2xl">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="2" fill="#0F9D58"/><path d="M9 11h3v10H9V11zm4 0h3v10h-3V11zm4 0h3v10h-3V11z" fill="white"/></svg>
+        <h1 class="text-3xl font-bold mb-3">Comment veux-tu commencer ?</h1>
+        <p class="text-white/40 mb-8">Choisis l'option qui te convient le mieux</p>
+
+        <!-- Option 1: Modèle vide (RECOMMANDÉ) -->
+        <div class="glass-card p-8 mb-5" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-2xl">✨</div>
+            <div>
+              <h3 class="text-xl font-semibold">Partir de zéro</h3>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">⭐ RECOMMANDÉ</span>
             </div>
-            <div><h3 class="text-xl font-semibold">Google Sheets</h3><span class="text-xs text-green-400 font-medium">⭐ Recommandé</span></div>
           </div>
-          <p class="text-white/60 mb-6 leading-relaxed">Connexion directe + écriture automatique en temps réel</p>
-          <button id="btn-google-sheets" class="btn-google-sheets" onclick="handleGoogleSheetsClick()">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg>
-            <span id="btn-google-sheets-text">Se connecter avec Google</span>
+          <p class="text-white/60 mb-5 leading-relaxed">Un modèle propre et optimisé, prêt à l'emploi. Idéal pour bien démarrer.</p>
+          <button onclick="chooseEmptyTemplate()" class="btn-glow w-full" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Commencer avec un modèle vierge
           </button>
         </div>
-        <div class="text-center text-white/30 text-sm font-medium mb-6">OU</div>
-        <div class="glass-card p-8">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-content text-2xl">📁</div>
-            <h3 class="text-xl font-semibold">Upload Excel</h3>
+
+        <div class="text-center text-white/30 text-sm font-medium mb-5">ou importe ton fichier existant</div>
+
+        <!-- Option 2: Google Sheets -->
+        <div class="glass-card p-6 mb-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="20" height="20" rx="2" fill="#0F9D58"/><path d="M9 11h3v10H9V11zm4 0h3v10h-3V11zm4 0h3v10h-3V11z" fill="white"/></svg>
+            </div>
+            <div><h3 class="text-lg font-semibold">Google Sheets</h3><p class="text-xs text-white/40">Connexion directe + écriture temps réel</p></div>
           </div>
-          <p class="text-white/60 mb-6 leading-relaxed">J'analyse ton fichier existant</p>
-          <div class="upload-zone" id="upload-zone">
-            <div class="text-5xl mb-4">📊</div>
-            <p class="text-lg font-medium mb-2">Glisse ton fichier ici</p>
-            <p class="text-white/40 text-sm mb-4">ou clique pour parcourir</p>
+          <button id="btn-google-sheets" class="btn-google-sheets w-full" onclick="handleGoogleSheetsClick()">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg>
+            <span id="btn-google-sheets-text">Choisir un fichier Google</span>
+          </button>
+        </div>
+
+        <!-- Option 3: Upload Excel -->
+        <div class="glass-card p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-xl">📁</div>
+            <div><h3 class="text-lg font-semibold">Upload Excel</h3><p class="text-xs text-white/40">J'analyse ton fichier existant</p></div>
+          </div>
+          <div class="upload-zone" id="upload-zone" style="padding: 30px 20px;">
+            <div class="text-4xl mb-3">📊</div>
+            <p class="text-base font-medium mb-1">Glisse ton fichier ici</p>
+            <p class="text-white/40 text-xs mb-3">ou clique pour parcourir</p>
             <div class="flex justify-center gap-2">
-              <span class="px-3 py-1 rounded-lg bg-white/5 text-white/50 text-xs font-medium">.xlsx</span>
-              <span class="px-3 py-1 rounded-lg bg-white/5 text-white/50 text-xs font-medium">.xls</span>
+              <span class="px-2 py-0.5 rounded-lg bg-white/5 text-white/50 text-xs">.xlsx</span>
+              <span class="px-2 py-0.5 rounded-lg bg-white/5 text-white/50 text-xs">.xls</span>
             </div>
           </div>
           <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden">
         </div>
-        <div class="mt-8 flex items-center justify-center gap-2 text-white/30 text-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+
+        <div class="mt-6 flex items-center justify-center gap-2 text-white/30 text-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
           <span>Tes données restent confidentielles</span>
+        </div>
+      </div>
+
+      <!-- ÉCRAN 1.5: Import données antérieures -->
+      <div class="step-content" id="step-import">
+        <div class="mb-2"><span class="text-white/30 text-sm">Étape 1/3</span></div>
+        <h1 class="text-3xl font-bold mb-3">Une dernière chose...</h1>
+        <p class="text-white/40 mb-10">Avant de créer ton fichier</p>
+
+        <div class="glass-card p-8 text-center max-w-lg mx-auto">
+          <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center text-4xl mb-6">📅</div>
+          <h2 class="text-2xl font-bold mb-3">Tu as des données de <span id="import-year"></span> ?</h2>
+          <p class="text-white/50 mb-8 leading-relaxed">Si tu as déjà un fichier Excel avec ta compta de cette année, je peux récupérer tes données et les intégrer dans ton nouveau fichier propre.</p>
+
+          <div class="flex flex-col gap-3">
+            <button onclick="importPreviousData()" class="btn-glow w-full" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Oui, importer mes données
+            </button>
+            <button onclick="skipImport()" style="width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 24px; color: white; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+              Non, partir de zéro
+            </button>
+          </div>
+
+          <p class="text-white/30 text-xs mt-6">Tu pourras toujours ajouter des données plus tard</p>
         </div>
       </div>
       <div class="step-content" id="step-2">
@@ -454,16 +499,20 @@
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
     function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
 
-    // Efficient ArrayBuffer to Base64 (chunked to handle large files without stack overflow)
+    // Convert ArrayBuffer to Base64 using native Blob/FileReader (fast, no stack overflow)
     function arrayBufferToBase64(buffer) {
-      var bytes = new Uint8Array(buffer);
-      var binary = '';
-      var chunkSize = 8192; // Process in 8KB chunks
-      for (var i = 0; i < bytes.length; i += chunkSize) {
-        var chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-        binary += String.fromCharCode.apply(null, chunk);
-      }
-      return btoa(binary);
+      return new Promise(function(resolve, reject) {
+        var blob = new Blob([buffer]);
+        var reader = new FileReader();
+        reader.onload = function() {
+          // Result is "data:application/octet-stream;base64,XXXXX"
+          var dataUrl = reader.result;
+          var base64 = dataUrl.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
     }
 
     // IndexedDB helpers for storing large files (no size limit like localStorage)
@@ -522,12 +571,9 @@
       currentUser = session.user;
       userProvider = session.user.app_metadata?.provider || 'email';
       console.log('[COMPTA] ✅ Connecté:', currentUser.email);
-      const firstName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.user_metadata?.name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'toi';
-      showWelcome(firstName);
       await updateNavBar();
       await checkGoogleSheetsAccess();
       updateGoogleSheetsButton();
-      setTimeout(function() { hideWelcome(); }, 1500);
       setupUploadZone();
     }
 
@@ -579,6 +625,14 @@
           console.log('[COMPTA] 📋 Pending config found after auth, processing...');
           await clearFromDB();
 
+          // Check if this is the empty template flow
+          if (pendingData.isEmptyTemplateFlow) {
+            console.log('[COMPTA] 🆕 Empty template flow detected, creating template...');
+            isEmptyTemplateFlow = true;
+            await createEmptyTemplate();
+            return true;
+          }
+
           // Restore state
           pendingConfig = pendingData.config;
           excelData = pendingData.excelData;
@@ -586,8 +640,8 @@
           // If we have stored file buffer, upload it automatically
           if (pendingData.fileBuffer) {
             console.log('[COMPTA] 📤 Uploading stored file...');
-            // Convert ArrayBuffer to base64 efficiently (chunked to avoid stack overflow)
-            var base64 = arrayBufferToBase64(pendingData.fileBuffer);
+            // Convert ArrayBuffer to base64 using native method (no stack overflow)
+            var base64 = await arrayBufferToBase64(pendingData.fileBuffer);
             await uploadStoredFile(base64, pendingData.fileName, pendingData.fileMimeType);
           } else {
             // No file to upload, just save the config
@@ -1004,7 +1058,7 @@
           reader.onerror = reject;
           reader.readAsArrayBuffer(file);
         });
-        var base64Content = arrayBufferToBase64(arrayBuffer);
+        var base64Content = await arrayBufferToBase64(arrayBuffer);
 
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
@@ -1310,7 +1364,8 @@
         var dataToStore = {
           config: pendingConfig,
           fileName: excelData?.fileName,
-          excelData: excelData
+          excelData: excelData,
+          isEmptyTemplateFlow: isEmptyTemplateFlow // Store flow state
         };
 
         // Store file as ArrayBuffer (no encoding = fast, IndexedDB handles binary natively)
@@ -1358,7 +1413,7 @@
           reader.onerror = reject;
           reader.readAsArrayBuffer(pendingLocalFile);
         });
-        var base64Content = arrayBufferToBase64(arrayBuffer);
+        var base64Content = await arrayBufferToBase64(arrayBuffer);
 
         // Upload to Google Drive
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
@@ -1506,6 +1561,115 @@
     // ========== END CONFIG PREVIEW ==========
 
     function goToStep(step) { document.querySelectorAll('.step-item').forEach(function(item, i) { item.classList.remove('active', 'completed', 'upcoming'); if (i < step - 1) item.classList.add('completed'); else if (i === step - 1) item.classList.add('active'); else item.classList.add('upcoming'); }); document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); }); document.getElementById('step-' + step).classList.add('active'); if (step === 3) checkExistingTelegramConnection(); }
+
+    // ========== EMPTY TEMPLATE FLOW ==========
+    var isEmptyTemplateFlow = false;
+
+    function showStepImport() {
+      // Set current year
+      document.getElementById('import-year').textContent = new Date().getFullYear();
+      // Hide all step-content, show step-import
+      document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
+      document.getElementById('step-import').classList.add('active');
+    }
+
+    function chooseEmptyTemplate() {
+      console.log('[COMPTA] User chose empty template');
+      isEmptyTemplateFlow = true;
+      showStepImport();
+    }
+
+    function importPreviousData() {
+      console.log('[COMPTA] User wants to import previous data');
+      // Trigger file upload flow - user will upload their existing Excel
+      // After upload, we'll extract data and merge into new template
+      document.getElementById('file-input').click();
+      // Go back to step 1 to show upload zone
+      document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
+      document.getElementById('step-1').classList.add('active');
+      // Show a hint to the user
+      showToast('Glisse ton fichier Excel pour importer tes données', 4000);
+    }
+
+    async function skipImport() {
+      console.log('[COMPTA] User skipped import - creating empty template');
+      showLoader('Creation du modele...');
+
+      // Check if user has Google access
+      if (!hasGoogleSheetsAccess) {
+        hideLoader();
+        // Show connect google modal
+        document.getElementById('connect-google-overlay').classList.add('active');
+        return;
+      }
+
+      try {
+        // Create empty template directly
+        await createEmptyTemplate();
+      } catch (error) {
+        console.error('[COMPTA] Error creating template:', error);
+        hideLoader();
+        alert('Erreur: ' + error.message);
+      }
+    }
+
+    async function createEmptyTemplate() {
+      var { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) throw new Error('Session expirée');
+
+      showLoader('Creation du modele vierge...');
+
+      // Create a new Google Sheet with default structure
+      var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+          'apikey': SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+          templateType: 'compta',
+          year: new Date().getFullYear()
+        })
+      });
+
+      var result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Echec de la creation');
+
+      console.log('[COMPTA] Template created:', result.sheet);
+
+      // Save the config
+      var defaultConfig = {
+        onglet: 'Compta ' + new Date().getFullYear(),
+        ligne_entetes: 1,
+        premiere_ligne_donnees: 2,
+        colonne_date: 'A',
+        format_date: 'DD/MM/YYYY',
+        colonnes_a_remplir: [
+          { nom: 'CB', colonne: 'B', aliases: ['cb', 'carte', 'carte bancaire', 'visa', 'tpe'] },
+          { nom: 'ESP', colonne: 'C', aliases: ['esp', 'especes', 'espèces', 'cash', 'liquide'] },
+          { nom: 'TR', colonne: 'D', aliases: ['tr', 'ticket resto', 'ticket restaurant', 'tickets'] },
+          { nom: 'Depenses', colonne: 'E', aliases: ['dep', 'depenses', 'dépenses', 'achats', 'frais'] }
+        ]
+      };
+
+      // Save to database
+      var { error: saveError } = await supabaseClient.from('compta_configs').upsert({
+        user_id: currentUser.id,
+        sheet_id: result.sheet.id,
+        sheet_name: result.sheet.name,
+        config: defaultConfig,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+
+      if (saveError) throw saveError;
+
+      hideLoader();
+      showToast('Modele cree avec succes !');
+      goToStep(3);
+    }
+    // ========== END EMPTY TEMPLATE FLOW ==========
 
     async function connectTelegram() {
       var btn = document.getElementById('connect-telegram-btn');

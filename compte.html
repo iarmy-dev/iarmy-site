@@ -25,18 +25,10 @@
     .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
     .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 32px; margin-bottom: 24px; }
     .profile-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,107,53,0.3); margin-bottom: 24px; }
-    .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 20px; }
-    .spinner { width: 50px; height: 50px; border: 3px solid rgba(255,107,53,0.1); border-top-color: #FF6B35; border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-gradient-animate">
-  <div id="loading-screen" class="loading">
-    <div class="spinner"></div>
-    <p class="text-white/70">Chargement...</p>
-  </div>
-
-  <div id="main-content" style="display: none;">
+  <div id="main-content">
     <nav class="glass fixed top-0 left-0 right-0 z-50">
       <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <a href="index.html" class="flex items-center gap-3">
@@ -103,11 +95,7 @@
       }
       
       console.log('[COMPTE] ✅ Connecté:', session.user.email);
-      
-      // Masquer loading, afficher contenu
-      document.getElementById('loading-screen').style.display = 'none';
-      document.getElementById('main-content').style.display = 'block';
-      
+
       const user = session.user;
       const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
       const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
