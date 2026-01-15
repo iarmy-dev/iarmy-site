@@ -124,6 +124,12 @@
     .sheets-file-count { display: inline; }
     @media (max-width: 768px) { .sheets-file-count { display: none; } }
 
+    /* Suggested files section */
+    .sheets-suggested { margin-bottom: 24px; padding: 16px; background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02)); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 16px; }
+    .sheets-suggested-title { font-size: 13px; font-weight: 600; color: #FF8B5E; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .sheets-suggested .sheet-card { background: rgba(255, 107, 53, 0.06); border-color: rgba(255, 107, 53, 0.15); }
+    .sheets-suggested .sheet-card:hover { background: rgba(255, 107, 53, 0.12); border-color: rgba(255, 107, 53, 0.4); }
+
     .sheets-grid { display: grid; gap: 12px; margin-bottom: 24px; }
     .sheet-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px 24px; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: all 0.3s; }
     .sheet-card:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 107, 53, 0.4); transform: translateX(8px); }
@@ -233,8 +239,17 @@
         </div>
       </div>
 
+      <!-- Suggested files (dynamic) -->
+      <div class="sheets-suggested" id="sheets-suggested" style="display: none;">
+        <div class="sheets-suggested-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Ca ressemble a ta compta
+        </div>
+        <div class="sheets-grid" id="sheets-suggested-grid"></div>
+      </div>
+
       <!-- Section title -->
-      <div class="sheets-section-title" id="sheets-section-title">Fichiers disponibles <span class="sheets-file-count" id="sheets-file-count"></span></div>
+      <div class="sheets-section-title" id="sheets-section-title">Autres fichiers <span class="sheets-file-count" id="sheets-file-count"></span></div>
 
       <!-- Sheets list -->
       <div class="sheets-grid" id="sheets-grid"></div>
@@ -400,16 +415,24 @@
 
         <!-- Option 1: Fichier vierge (RECOMMANDÉ) -->
         <div class="glass-card p-8 mb-5 max-w-lg mx-auto" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));">
-          <div class="flex items-center gap-3 mb-3">
+          <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-2xl">+</div>
             <div>
-              <h3 class="text-xl font-semibold">Creer un fichier vierge</h3>
+              <h3 class="text-xl font-semibold">Partir de zero</h3>
               <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">RECOMMANDE</span>
             </div>
           </div>
-          <p class="text-white/60 mb-5 leading-relaxed">Template optimise, pret a l'emploi. Ideal pour bien demarrer.</p>
+          <p class="text-white/50 mb-4 text-sm leading-relaxed">On te cree un Google Sheet propre et pret a l'emploi avec :</p>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">Date</span>
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">CB</span>
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">Especes</span>
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">Ticket Resto</span>
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">Depenses</span>
+            <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">Notes</span>
+          </div>
           <button onclick="createEmptyTemplate()" class="btn-glow w-full">
-            Commencer avec un fichier vierge
+            Creer mon fichier
           </button>
         </div>
 
@@ -714,27 +737,32 @@
     var isSearchMode = false;
     var searchTimeout = null;
 
-    // Priority keywords for sorting
-    var PRIORITY_KEYWORDS = ['compta', 'recette', 'caisse', 'comptabilité', 'comptabilite', 'vente', 'recettes'];
+    // Priority keywords for identifying likely compta files
+    var PRIORITY_KEYWORDS = ['compta', 'recette', 'caisse', 'comptabilité', 'comptabilite', 'vente', 'recettes', 'depense', 'tresorerie'];
 
-    function sortWithPriority(sheets) {
+    function isLikelyComptaFile(sheet) {
+      var name = sheet.name.toLowerCase();
+      // Check if name contains priority keywords
+      var hasKeyword = PRIORITY_KEYWORDS.some(function(kw) { return name.includes(kw); });
+      // Check if recently modified (within last 30 days)
+      var modDate = new Date(sheet.modifiedTime);
+      var thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      var isRecent = modDate > thirtyDaysAgo;
+      // A file is likely compta if it has keyword AND is recent
+      return hasKeyword && isRecent;
+    }
+
+    function sortByDate(sheets) {
       return sheets.slice().sort(function(a, b) {
-        var aName = a.name.toLowerCase();
-        var bName = b.name.toLowerCase();
-        var aPriority = PRIORITY_KEYWORDS.some(function(kw) { return aName.includes(kw); });
-        var bPriority = PRIORITY_KEYWORDS.some(function(kw) { return bName.includes(kw); });
-        // Priority files first
-        if (aPriority && !bPriority) return -1;
-        if (!aPriority && bPriority) return 1;
-        // Then by date (most recent first)
         return new Date(b.modifiedTime) - new Date(a.modifiedTime);
       });
     }
 
     function showSheetsOverlay(sheets) {
       console.log('[SHEETS] showSheetsOverlay called with', sheets.length, 'sheets');
-      // Sort with priority keywords first, then by date
-      allSheets = sortWithPriority(sheets);
+      // Sort all by date
+      allSheets = sortByDate(sheets);
       console.log('[SHEETS] allSheets stored:', allSheets.length);
       currentFilter = 'all';
       showAllFiles = false;
@@ -742,12 +770,49 @@
       document.getElementById('sheets-search-input').value = '';
       // Reset folder tabs
       document.querySelectorAll('.sheets-folder').forEach(function(f, i) { f.classList.toggle('active', i === 0); });
-      // Update file count (hidden on mobile via CSS)
-      document.getElementById('sheets-file-count').textContent = '(' + sheets.length + ')';
-      var filtered = getFilteredSheets();
-      console.log('[SHEETS] getFilteredSheets returned:', filtered.length);
-      renderSheetsList(filtered);
+      // Render with suggested section
+      renderSheetsWithSuggested(allSheets);
       document.getElementById('sheets-overlay').classList.add('active');
+    }
+
+    function renderSheetsWithSuggested(sheets) {
+      // Identify suggested files (likely compta)
+      var suggested = sheets.filter(isLikelyComptaFile).slice(0, 3); // Max 3 suggested
+      var suggestedIds = suggested.map(function(s) { return s.id; });
+      var others = sheets.filter(function(s) { return suggestedIds.indexOf(s.id) === -1; });
+
+      console.log('[SHEETS] Suggested:', suggested.length, 'Others:', others.length);
+
+      // Render suggested section
+      var suggestedSection = document.getElementById('sheets-suggested');
+      var suggestedGrid = document.getElementById('sheets-suggested-grid');
+      if (suggested.length > 0 && !isSearchMode) {
+        suggestedGrid.innerHTML = suggested.map(renderSheetCard).join('');
+        suggestedSection.style.display = 'block';
+      } else {
+        suggestedSection.style.display = 'none';
+      }
+
+      // Update file count (hidden on mobile)
+      document.getElementById('sheets-file-count').textContent = '(' + others.length + ')';
+
+      // Render other files
+      renderSheetsList(others);
+    }
+
+    function renderSheetCard(sheet) {
+      var isExcel = sheet.fileType === 'excel-xlsx' || sheet.fileType === 'excel-xls';
+      var iconBg = isExcel ? 'rgba(33, 115, 70, 0.15)' : 'rgba(15, 157, 88, 0.15)';
+      var iconColor = isExcel ? '#217346' : '#0f9d58';
+      var iconSvg = isExcel
+        ? '<svg viewBox="0 0 24 24" fill="' + iconColor + '"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7v-2h2V7h2v2h2v2zm0 4h-2v2H9v-2H7v-2h2v-2h2v2h2v2zm1-6V3.5L18.5 8H14z"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="' + iconColor + '"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>';
+      var typeLabel = isExcel ? ' <span style="font-size:10px;background:rgba(33,115,70,0.2);color:#217346;padding:2px 6px;border-radius:4px;margin-left:6px;">Excel</span>' : '';
+
+      return '<div class="sheet-card" onclick="selectSheet({id:\'' + sheet.id + '\',name:\'' + sheet.name.replace(/'/g, "\\'") + '\',fileType:\'' + (sheet.fileType || 'google-sheet') + '\'})">' +
+        '<div class="sheet-card-icon" style="background:' + iconBg + '">' + iconSvg + '</div>' +
+        '<div class="sheet-card-info"><h3>' + sheet.name + typeLabel + '</h3><p><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>' + formatDate(sheet.modifiedTime) + '</p></div>' +
+        '<svg class="sheet-card-arrow" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>';
     }
 
     function getFilteredSheets() {
@@ -768,6 +833,7 @@
       var grid = document.getElementById('sheets-grid');
       if (sheets.length === 0) {
         grid.innerHTML = '<div class="sheets-empty"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><h4>Aucun fichier trouve</h4><p>Essayez une autre recherche</p></div>';
+        document.getElementById('sheets-suggested').style.display = 'none';
         return;
       }
       // Limit to MAX_FILES unless showAllFiles is true
@@ -775,21 +841,7 @@
       var hasMore = sheets.length > MAX_FILES && !showAllFiles;
       console.log('[SHEETS] Displaying', displaySheets.length, 'sheets, hasMore:', hasMore);
 
-      var html = displaySheets.map(function(sheet) {
-        // Different icon and color for Excel vs Google Sheets
-        var isExcel = sheet.fileType === 'excel-xlsx' || sheet.fileType === 'excel-xls';
-        var iconBg = isExcel ? 'rgba(33, 115, 70, 0.15)' : 'rgba(15, 157, 88, 0.15)';
-        var iconColor = isExcel ? '#217346' : '#0f9d58';
-        var iconSvg = isExcel
-          ? '<svg viewBox="0 0 24 24" fill="' + iconColor + '"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7v-2h2V7h2v2h2v2zm0 4h-2v2H9v-2H7v-2h2v-2h2v2h2v2zm1-6V3.5L18.5 8H14z"/></svg>'
-          : '<svg viewBox="0 0 24 24" fill="' + iconColor + '"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>';
-        var typeLabel = isExcel ? ' <span style="font-size:10px;background:rgba(33,115,70,0.2);color:#217346;padding:2px 6px;border-radius:4px;margin-left:6px;">Excel</span>' : '';
-
-        return '<div class="sheet-card" onclick="selectSheet({id:\'' + sheet.id + '\',name:\'' + sheet.name.replace(/'/g, "\\'") + '\',fileType:\'' + (sheet.fileType || 'google-sheet') + '\'})">' +
-          '<div class="sheet-card-icon" style="background:' + iconBg + '">' + iconSvg + '</div>' +
-          '<div class="sheet-card-info"><h3>' + sheet.name + typeLabel + '</h3><p><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>' + formatDate(sheet.modifiedTime) + '</p></div>' +
-          '<svg class="sheet-card-arrow" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>';
-      }).join('');
+      var html = displaySheets.map(renderSheetCard).join('');
 
       if (hasMore) {
         html += '<div onclick="showMoreFiles()" style="text-align: center; padding: 16px; color: rgba(255,255,255,0.5); cursor: pointer; border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px; margin-top: 8px; transition: all 0.2s;" onmouseover="this.style.borderColor=\'rgba(255,107,53,0.4)\';this.style.color=\'#FF8B5E\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.15)\';this.style.color=\'rgba(255,255,255,0.5)\'">Voir ' + (sheets.length - MAX_FILES) + ' fichiers de plus...</div>';
@@ -812,19 +864,21 @@
         searchTimeout = null;
       }
 
-      // If empty query, show original list
+      // If empty query, show original list with suggested
       if (!q) {
         isSearchMode = false;
-        document.getElementById('sheets-file-count').textContent = '(' + allSheets.length + ')';
-        renderSheetsList(getFilteredSheets());
+        renderSheetsWithSuggested(allSheets);
         return;
       }
+
+      // Search mode: hide suggested section
+      isSearchMode = true;
+      document.getElementById('sheets-suggested').style.display = 'none';
 
       // First: instant local filter for immediate feedback
       var localFiltered = allSheets.filter(function(sheet) {
         return sheet.name.toLowerCase().includes(q.toLowerCase());
       });
-      isSearchMode = true;
       document.getElementById('sheets-file-count').textContent = '(' + localFiltered.length + ')';
       renderSheetsList(localFiltered);
 
@@ -848,7 +902,7 @@
             // Only update if still in search mode with same query
             var currentQuery = document.getElementById('sheets-search-input').value.trim();
             if (currentQuery === q) {
-              var sorted = sortWithPriority(result.sheets);
+              var sorted = sortByDate(result.sheets);
               document.getElementById('sheets-file-count').textContent = '(' + sorted.length + ')';
               renderSheetsList(sorted);
             }
@@ -868,10 +922,16 @@
       showAllFiles = false;
       isSearchMode = false;
       document.getElementById('sheets-search-input').value = '';
-      document.getElementById('sheets-file-count').textContent = '(' + allSheets.length + ')';
       var filtered = getFilteredSheets();
       console.log('[SHEETS] After filter, rendering', filtered.length, 'sheets');
-      renderSheetsList(filtered);
+      // Show suggested only for 'all' filter
+      if (folder === 'all') {
+        renderSheetsWithSuggested(filtered);
+      } else {
+        document.getElementById('sheets-suggested').style.display = 'none';
+        document.getElementById('sheets-file-count').textContent = '(' + filtered.length + ')';
+        renderSheetsList(filtered);
+      }
     }
 
     function showNoSheetsMessage() {
