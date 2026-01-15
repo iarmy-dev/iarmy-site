@@ -991,7 +991,7 @@
     }
 
     async function handleFileWithUpload(file) {
-      showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive en cours...');
+      showLoader('① Lecture du fichier...');
 
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
@@ -1009,7 +1009,7 @@
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
         // Upload vers Google Drive
-        showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+        showLoader('✓ Fichier lu\n② Upload vers ton Drive...');
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
@@ -1034,7 +1034,7 @@
         console.log('[UPLOAD] ✅ File uploaded to Drive:', uploadResult.file.id);
 
         // Maintenant convertir en Google Sheet
-        showLoader('📊 Fichier uploadé !\n\nConversion en Google Sheet...\n(ton fichier original reste intact)');
+        showLoader('✓ Fichier lu\n✓ Upload terminé\n③ Conversion en Google Sheet...');
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1381,7 +1381,7 @@
         console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
 
         // Convert to Google Sheet
-        showLoader('📊 Conversion en Google Sheet...');
+        showLoader('✓ Fichier lu\n✓ Upload terminé\n③ Conversion en Google Sheet...');
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1401,6 +1401,8 @@
 
         console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
 
+        showLoader('✓ Fichier lu\n✓ Upload terminé\n✓ Conversion terminée\n④ Sauvegarde...');
+
         // Update excelData with the Google Sheet info
         excelData.sheetId = convertResult.sheet.id;
         excelData.sheetName = convertResult.sheet.name;
@@ -1413,7 +1415,7 @@
         }).eq('user_id', currentUser.id);
 
         hideLoader();
-        showToast('✅ Fichier converti et prêt !');
+        showToast('✓ Tout est prêt !');
 
         // Clear pending file
         pendingLocalFile = null;
@@ -1429,7 +1431,7 @@
     }
 
     async function uploadStoredFile(base64Content, fileName, mimeType) {
-      showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+      showLoader('① Upload vers ton Drive...');
 
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
@@ -1456,7 +1458,7 @@
         console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
 
         // Convert to Google Sheet
-        showLoader('📊 Conversion en Google Sheet...');
+        showLoader('✓ Upload terminé\n② Conversion en Google Sheet...');
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1476,6 +1478,8 @@
 
         console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
 
+        showLoader('✓ Upload terminé\n✓ Conversion terminée\n③ Sauvegarde...');
+
         // Update excelData with the Google Sheet info
         excelData.sheetId = convertResult.sheet.id;
         excelData.sheetName = convertResult.sheet.name;
@@ -1488,7 +1492,7 @@
         }).eq('user_id', currentUser.id);
 
         hideLoader();
-        showToast('✅ Fichier converti et prêt !');
+        showToast('✓ Tout est prêt !');
 
         // Now save the config
         await saveConfigAndContinue();
