@@ -516,15 +516,22 @@
         // Check if we have a pending config to process (user was validating when they connected)
         var pendingData = localStorage.getItem('pendingConfigAfterAuth');
         if (pendingData) {
-          console.log('[COMPTA] 📋 Pending config found after auth');
+          console.log('[COMPTA] 📋 Pending config found after auth, processing...');
           localStorage.removeItem('pendingConfigAfterAuth');
           var parsed = JSON.parse(pendingData);
 
-          // Show message to re-upload the file (file data was lost during OAuth redirect)
-          goToStep(1);
-          setTimeout(function() {
-            showToast('✅ Google connecté ! Re-glisse ton fichier pour finaliser.', 5000);
-          }, 500);
+          // Restore state
+          pendingConfig = parsed.config;
+          excelData = parsed.excelData;
+
+          // If we have stored file content, upload it automatically
+          if (parsed.fileContent) {
+            console.log('[COMPTA] 📤 Uploading stored file...');
+            await uploadStoredFile(parsed.fileContent, parsed.fileName, parsed.fileMimeType);
+          } else {
+            // No file to upload, just save the config
+            await saveConfigAndContinue();
+          }
           return true;
         }
 
@@ -1237,15 +1244,44 @@
       document.getElementById('connect-google-overlay').classList.remove('active');
     }
 
-    function connectGoogleAndContinue() {
-      // Store that we have a pending config to process after auth
-      localStorage.setItem('pendingConfigAfterAuth', JSON.stringify({
-        config: pendingConfig,
-        fileName: excelData?.fileName,
-        hasLocalFile: !!pendingLocalFile
-      }));
-      closeConnectGoogleOverlay();
-      authorizeGoogleSheets();
+    async function connectGoogleAndContinue() {
+      // Store config and file content before OAuth redirect
+      showLoader('Préparation...');
+
+      try {
+        var dataToStore = {
+          config: pendingConfig,
+          fileName: excelData?.fileName,
+          excelData: excelData
+        };
+
+        // Store file content as base64 if we have a local file
+        if (pendingLocalFile) {
+          var base64Content = await new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              var binary = new Uint8Array(e.target.result);
+              var base64 = btoa(String.fromCharCode.apply(null, binary));
+              resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(pendingLocalFile);
+          });
+          dataToStore.fileContent = base64Content;
+          dataToStore.fileName = pendingLocalFile.name;
+          dataToStore.fileMimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          console.log('[COMPTA] 📦 File stored in localStorage, size:', base64Content.length);
+        }
+
+        localStorage.setItem('pendingConfigAfterAuth', JSON.stringify(dataToStore));
+        hideLoader();
+        closeConnectGoogleOverlay();
+        authorizeGoogleSheets();
+      } catch (error) {
+        console.error('[COMPTA] Error storing file:', error);
+        hideLoader();
+        alert('Erreur: fichier trop volumineux. Essaie de le compresser.');
+      }
     }
 
     async function uploadAndConvertLocalFile() {
@@ -1330,6 +1366,78 @@
 
         // Clear pending file
         pendingLocalFile = null;
+
+        // Now save the config
+        await saveConfigAndContinue();
+
+      } catch (error) {
+        console.error('[COMPTA] ❌ Error:', error);
+        hideLoader();
+        alert('Erreur: ' + error.message);
+      }
+    }
+
+    async function uploadStoredFile(base64Content, fileName, mimeType) {
+      showLoader('📤 Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+
+      try {
+        var { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Session expirée');
+
+        // Upload to Google Drive
+        var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileName: fileName,
+            fileContent: base64Content,
+            mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          })
+        });
+
+        var uploadResult = await uploadResponse.json();
+        if (!uploadResult.success) throw new Error(uploadResult.error || 'Upload échoué');
+
+        console.log('[COMPTA] ✅ File uploaded:', uploadResult.file.id);
+
+        // Convert to Google Sheet
+        showLoader('📊 Conversion en Google Sheet...');
+
+        var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            fileId: uploadResult.file.id,
+            fileName: uploadResult.file.name
+          })
+        });
+
+        var convertResult = await convertResponse.json();
+        if (!convertResult.success) throw new Error(convertResult.error || 'Conversion échouée');
+
+        console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
+
+        // Update excelData with the Google Sheet info
+        excelData.sheetId = convertResult.sheet.id;
+        excelData.sheetName = convertResult.sheet.name;
+        excelData.isGoogleSheet = true;
+
+        // Update google_credentials with the sheet
+        await supabaseClient.from('google_credentials').update({
+          sheet_id: convertResult.sheet.id,
+          sheet_name: convertResult.sheet.name
+        }).eq('user_id', currentUser.id);
+
+        hideLoader();
+        showToast('✅ Fichier converti et prêt !');
 
         // Now save the config
         await saveConfigAndContinue();
