@@ -1375,6 +1375,20 @@
 
         console.log('[ANALYSE] Sheet data received:', readResult.excelData?.fileName);
 
+        // DEBUG: Afficher les headers détectés pour vérifier les lettres de colonnes
+        if (readResult.excelData?.sheets?.[0]?.detectedHeaders?.columns) {
+          var headers = readResult.excelData.sheets[0].detectedHeaders.columns;
+          var importantHeaders = headers.filter(function(h) {
+            return /^(CB|ESP|TR|Dépenses|Recettes|Date)$/i.test(h.name);
+          });
+          console.log('========================================');
+          console.log('[DEBUG] HEADERS DÉTECTÉS PAR read-google-sheet:');
+          importantHeaders.forEach(function(h) {
+            console.log('  ' + h.name + ' = colonne ' + h.letter);
+          });
+          console.log('========================================');
+        }
+
         // Mettre a jour excelData avec les vraies donnees du sheet
         excelData = readResult.excelData;
         excelData.sheetId = sheetId;
@@ -1405,6 +1419,17 @@
           try {
             var parsedConfig = JSON.parse(jsonMatch[0]);
             console.log('[ANALYSE] Config detectee:', parsedConfig);
+
+            // DEBUG: Comparer ce que Claude a détecté vs ce que read-google-sheet a envoyé
+            if (parsedConfig.colonnes_a_remplir) {
+              console.log('========================================');
+              console.log('[DEBUG] COLONNES DÉTECTÉES PAR CLAUDE:');
+              parsedConfig.colonnes_a_remplir.forEach(function(c) {
+                console.log('  ' + c.nom + ' = colonne ' + c.colonne);
+              });
+              console.log('========================================');
+            }
+
             showAnalyseResult(parsedConfig);
           } catch (parseErr) {
             console.error('[ANALYSE] JSON parse error:', parseErr);
