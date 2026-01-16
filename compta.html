@@ -1433,6 +1433,22 @@
               console.log('========================================');
             }
 
+            // FIX: Déduire la colonne date à partir de CB (date = CB - 1 colonne)
+            // Ceci gère les sheets avec 2 zones où la date manuelle est juste à gauche de CB
+            if (parsedConfig.colonnes_a_remplir) {
+              var cbCol = parsedConfig.colonnes_a_remplir.find(function(c) {
+                return c.nom && c.nom.toUpperCase() === 'CB';
+              });
+              if (cbCol && cbCol.colonne && cbCol.colonne.length === 1) {
+                var cbLetter = cbCol.colonne.toUpperCase();
+                var expectedDateCol = String.fromCharCode(cbLetter.charCodeAt(0) - 1);
+                if (parsedConfig.colonne_date !== expectedDateCol) {
+                  console.log('[FIX] Colonne date corrigée: ' + parsedConfig.colonne_date + ' -> ' + expectedDateCol + ' (CB=' + cbLetter + ', donc date=' + expectedDateCol + ')');
+                  parsedConfig.colonne_date = expectedDateCol;
+                }
+              }
+            }
+
             showAnalyseResult(parsedConfig);
           } catch (parseErr) {
             console.error('[ANALYSE] JSON parse error:', parseErr);
