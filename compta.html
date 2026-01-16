@@ -1686,8 +1686,21 @@
           addAnalyseBotMessage("Reponds a une question ci-dessus, ou dis-moi ce qui ne va pas.");
         }
       } else {
-        // Score >= 90% → bouton continuer
-        document.getElementById('analyse-continue-btn').style.display = 'block';
+        // Score >= 90%
+        if (confidence >= 98) {
+          // Score parfait → message + auto-continue après 2s
+          document.getElementById('analyse-title').textContent = 'Parfait ! ✨';
+          document.getElementById('analyse-subtitle').textContent = 'Configuration detectee automatiquement';
+          document.getElementById('analyse-continue-btn').style.display = 'block';
+          document.getElementById('analyse-continue-btn').textContent = 'Passage a Telegram dans 2s...';
+          document.getElementById('analyse-continue-btn').disabled = true;
+          setTimeout(function() {
+            goToTelegram();
+          }, 2000);
+        } else {
+          // Score bon mais pas parfait → bouton continuer
+          document.getElementById('analyse-continue-btn').style.display = 'block';
+        }
       }
     }
 
