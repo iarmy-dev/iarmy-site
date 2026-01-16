@@ -1620,8 +1620,6 @@
           iconEl.textContent = (i + 1);
         }
       }
-      var progress = stepIndex >= 2 ? 100 : (stepIndex + 1) * 33;
-      document.getElementById('analyse-progress').style.width = progress + '%';
     }
 
     async function startAnalysis() {
@@ -1684,9 +1682,9 @@
     }
 
     function showAnalyseError(message) {
-      document.getElementById('analyse-loading').style.display = 'none';
       document.getElementById('analyse-title').textContent = 'Oups...';
       document.getElementById('analyse-subtitle').textContent = message;
+      document.getElementById('analyse-live-feed').innerHTML = '<div style="text-align: center; padding: 30px; color: rgba(255,255,255,0.5);">' + message + '</div>';
     }
     
     async function sendMessage() {
