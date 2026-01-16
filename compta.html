@@ -545,7 +545,6 @@
         <div style="text-align: center; margin-bottom: 32px;">
           <div class="mb-2"><span class="text-white/30 text-sm">Étape 3/4</span></div>
           <h1 class="text-3xl font-bold mb-2">Configure ton assistant</h1>
-          <p class="text-white/40">Quand tu envoies un message, voici ce qui s'écrit dans ton tableau</p>
         </div>
 
         <!-- Loading state avec étapes détaillées -->
@@ -667,21 +666,21 @@ DEP 100</div>
                 <!-- Excel Footer avec onglets -->
                 <div style="background: #2d2d2d; padding: 6px 12px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #404040;">
                   <div id="excel-sheet-tab" style="background: #217346; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; color: white; margin-bottom: -6px; font-weight: 500;">janv</div>
-                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">fév</div>
-                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">mars</div>
-                  <div style="font-size: 14px; color: #666; margin-left: 4px;">+</div>
+                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">+ autres</div>
+                  <a id="open-sheet-link" href="#" target="_blank" style="margin-left: auto; font-size: 10px; color: #6ab3f3; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                    Ouvrir dans Google Sheets ↗
+                  </a>
                 </div>
               </div>
 
-              <!-- Indicateur de zone si 2 tableaux -->
-              <div id="excel-zone-indicator" style="display: none; margin-top: 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3); border-radius: 10px; padding: 10px 14px;">
+              <!-- Indicateur de zone si colonnes formules détectées -->
+              <div id="excel-zone-indicator" style="display: none; margin-top: 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 10px; padding: 10px 14px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="font-size: 14px;">📍</span>
+                  <span style="font-size: 14px;">📊</span>
                   <div style="flex: 1;">
-                    <div style="font-size: 12px; font-weight: 600; color: #FF6B35;">Zone de saisie manuelle</div>
-                    <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Colonnes M → Q (à droite du tableau)</div>
+                    <div style="font-size: 12px; font-weight: 600; color: #22C55E;">2 zones détectées</div>
+                    <div class="zone-desc" style="font-size: 11px; color: rgba(255,255,255,0.5);">Zone calculs (protégée) + Zone saisie manuelle</div>
                   </div>
-                  <button onclick="scrollExcelToZone()" style="padding: 4px 10px; background: rgba(255,107,53,0.2); border: none; border-radius: 6px; color: #FF6B35; font-size: 11px; cursor: pointer;">Voir →</button>
                 </div>
               </div>
             </div>
@@ -726,6 +725,11 @@ DEP 100</div>
                 💡 Des règles spéciales apparaîtront ici si tu as DEP et ESP configurés
               </div>
             </div>
+          </div>
+
+          <!-- Explication finale -->
+          <div style="text-align: center; padding: 16px 0; color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 8px;">
+            👆 Quand tu envoies un message Telegram, les valeurs s'écrivent automatiquement dans ton tableau
           </div>
 
           <!-- Boutons footer -->
@@ -2042,6 +2046,15 @@ DEP 100</div>
         sheetTabEl.textContent = pendingConfig.onglet;
       }
 
+      // Mettre à jour le lien vers Google Sheet
+      var sheetLink = document.getElementById('open-sheet-link');
+      if (sheetLink && excelData && excelData.webViewLink) {
+        sheetLink.href = excelData.webViewLink;
+        sheetLink.style.display = 'flex';
+      } else if (sheetLink) {
+        sheetLink.style.display = 'none';
+      }
+
       // Mettre à jour le jour actuel
       var dayCell = document.getElementById('excel-day-cell');
       if (dayCell) {
@@ -2050,6 +2063,21 @@ DEP 100</div>
 
       // Vérifier si DEP et ESP existent pour afficher la règle spéciale
       checkSpecialRules();
+
+      // Afficher l'indicateur de zone si des colonnes formules détectées
+      var zoneIndicator = document.getElementById('excel-zone-indicator');
+      if (zoneIndicator && pendingConfig && pendingConfig.colonnes_protegees && pendingConfig.colonnes_protegees.length > 0) {
+        zoneIndicator.style.display = 'block';
+        // Calculer la plage de colonnes manuelles
+        var manualCols = configEditorData.map(function(c) { return c.column; }).sort();
+        var formulaCols = pendingConfig.colonnes_protegees.sort();
+        var zoneDesc = document.querySelector('#excel-zone-indicator .zone-desc');
+        if (zoneDesc && manualCols.length > 0) {
+          zoneDesc.textContent = 'Colonnes ' + manualCols[0] + ' → ' + manualCols[manualCols.length - 1] + ' (zone de saisie)';
+        }
+      } else if (zoneIndicator) {
+        zoneIndicator.style.display = 'none';
+      }
 
       // Construire le tableau Excel
       buildExcelPreview();
@@ -2085,30 +2113,22 @@ DEP 100</div>
       // Générer le HTML du tableau simplifié
       var html = '';
 
-      // THEAD: Double header - Lettre de colonne + Nom du mot-clé
+      // THEAD: Noms des colonnes EN GROS + lettres en petit
       html += '<thead>';
 
-      // Ligne 1: Lettres des colonnes (style Excel)
-      html += '<tr style="background: #2d2d2d;">';
-      html += '<th style="padding: 6px 10px; border: 1px solid #404040; background: #2d2d2d; color: #666; width: 45px;"></th>';
+      // Ligne unique avec NOM en gros + lettre en petit
+      html += '<tr style="background: linear-gradient(to bottom, #2d2d2d, #252526);">';
+      html += '<th style="padding: 8px 10px; border: 1px solid #404040; background: #2d2d2d; color: #555; width: 40px; font-size: 10px;">Ligne</th>';
       sortedCols.forEach(function(col) {
+        var keyword = usedColumns[col]; // CB, ESP, TR, DEP, JOUR
         var isDateCol = col === dateCol;
-        html += '<th style="padding: 6px 12px; border: 1px solid #404040; background: ' + (isDateCol ? '#2d2d2d' : 'rgba(34, 197, 94, 0.15)') + '; color: ' + (isDateCol ? '#888' : '#22C55E') + '; font-weight: 700; text-align: center; font-size: 13px; min-width: 70px;">' + col + '</th>';
-      });
-      html += '</tr>';
-
-      // Ligne 2: Noms des colonnes (en-têtes Excel ligne 4 environ)
-      html += '<tr style="background: #252526;">';
-      html += '<td style="padding: 4px 10px; border: 1px solid #404040; background: #2a2a2a; color: #666; text-align: center; font-size: 10px;">' + headerRow + '</td>';
-      sortedCols.forEach(function(col) {
-        var keyword = usedColumns[col];
-        var realName = keyword;
-        // Chercher le vrai nom dans availableColumns
-        availableColumns.forEach(function(c) {
-          if (c.letter === col && c.name) realName = c.name;
-        });
-        var displayName = realName.length > 8 ? realName.substring(0, 8) + '..' : realName;
-        html += '<td style="padding: 5px 8px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 11px; font-weight: 500;">' + displayName + '</td>';
+        var bgColor = isDateCol ? '#2d2d2d' : 'rgba(34, 197, 94, 0.12)';
+        var nameColor = isDateCol ? '#888' : '#22C55E';
+        var displayName = keyword.length > 6 ? keyword.substring(0, 6) + '..' : keyword;
+        html += '<th style="padding: 8px 6px; border: 1px solid #404040; background: ' + bgColor + '; text-align: center; min-width: 65px;">';
+        html += '<div style="font-size: 14px; font-weight: 700; color: ' + nameColor + '; margin-bottom: 2px;">' + displayName + '</div>';
+        html += '<div style="font-size: 9px; color: #666; font-weight: 400;">col ' + col + '</div>';
+        html += '</th>';
       });
       html += '</tr>';
 
