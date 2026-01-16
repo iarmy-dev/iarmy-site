@@ -427,39 +427,45 @@
           </div>
           <p class="text-white/50 mb-3 text-sm leading-relaxed">On te cree un Google Sheet avec tes colonnes :</p>
 
-          <!-- Colonnes interactives avec × pour supprimer, double-clic pour modifier -->
+          <!-- Colonnes interactives : drag pour réordonner, double-clic pour modifier, × pour supprimer -->
           <div class="flex flex-wrap gap-2 mb-3" id="template-columns">
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Date</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">CB</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Especes</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Ticket Resto</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Depenses</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text">
+            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
+              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Notes</span>
               <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -478,7 +484,7 @@
 
           <p class="text-white/30 text-xs mb-5 flex items-center gap-1">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            Double-clic pour modifier, survole pour supprimer
+            Glisse pour reordonner, double-clic pour modifier
           </p>
           <button onclick="createEmptyTemplate()" class="btn-glow w-full">
             Creer mon fichier
@@ -1888,6 +1894,41 @@
     }
 
     // Fonctions pour les colonnes interactives du template
+    var draggedCol = null;
+
+    function dragColStart(e) {
+      draggedCol = e.target.closest('.template-col');
+      if (draggedCol) {
+        draggedCol.style.opacity = '0.5';
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+      }
+    }
+
+    function dragColOver(e) {
+      e.preventDefault();
+      var target = e.target.closest('.template-col');
+      if (target && target !== draggedCol && draggedCol) {
+        var container = document.getElementById('template-columns');
+        var cols = Array.from(container.querySelectorAll('.template-col'));
+        var draggedIndex = cols.indexOf(draggedCol);
+        var targetIndex = cols.indexOf(target);
+
+        if (draggedIndex < targetIndex) {
+          target.after(draggedCol);
+        } else {
+          target.before(draggedCol);
+        }
+      }
+    }
+
+    function dragColEnd(e) {
+      if (draggedCol) {
+        draggedCol.style.opacity = '1';
+        draggedCol = null;
+      }
+    }
+
     function removeTemplateCol(btn) {
       var col = btn.closest('.template-col');
       if (col) {
@@ -1930,8 +1971,12 @@
       var inputDiv = document.getElementById('add-col-input');
 
       var newCol = document.createElement('span');
-      newCol.className = 'template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-text';
-      newCol.innerHTML = '<span class="col-name" ondblclick="editColName(this)">' + name + '</span><button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+      newCol.className = 'template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing';
+      newCol.draggable = true;
+      newCol.ondragstart = dragColStart;
+      newCol.ondragover = dragColOver;
+      newCol.ondragend = dragColEnd;
+      newCol.innerHTML = '<svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg><span class="col-name" ondblclick="editColName(this)">' + name + '</span><button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 
       newCol.style.opacity = '0';
       newCol.style.transform = 'scale(0.8)';
