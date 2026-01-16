@@ -2450,26 +2450,36 @@ DEP 100</div>
         btn.style.color = 'rgba(255,255,255,0.8)';
       }
 
-      // Récupérer les colonnes disponibles du sheet (filtrer les valeurs numériques)
+      // Récupérer les colonnes disponibles du sheet
+      // IMPORTANT: Inclure TOUTES les colonnes détectées + colonnes A-Z pour permettre sélection manuelle
       availableColumns = [];
+      var detectedColsByLetter = {};
+
       if (excelData && excelData.sheets && excelData.sheets[0] && excelData.sheets[0].detectedHeaders) {
-        availableColumns = excelData.sheets[0].detectedHeaders.columns
-          .filter(function(c) {
-            // Filtrer les noms qui sont juste des nombres (ex: "1", "2306.7", "10")
-            if (!c.name) return false;
-            var name = String(c.name).trim();
-            if (name === '') return false;
-            // Si c'est un nombre pur, on l'exclut
-            if (!isNaN(parseFloat(name)) && isFinite(name)) return false;
-            // Si c'est une lettre seule (A, B, C...), on l'exclut aussi
-            if (/^[A-Z]$/i.test(name)) return false;
-            return true;
-          })
-          .map(function(c) {
-            return { letter: c.letter, name: c.name };
-          });
+        excelData.sheets[0].detectedHeaders.columns.forEach(function(c) {
+          if (!c.name) return;
+          var name = String(c.name).trim();
+          if (name === '') return;
+          // Si c'est un nombre pur, on garde quand même la colonne mais avec un nom générique
+          if (!isNaN(parseFloat(name)) && isFinite(name)) return;
+          // Si c'est une lettre seule (A, B, C...), on l'exclut
+          if (/^[A-Z]$/i.test(name)) return;
+          detectedColsByLetter[c.letter] = c.name;
+        });
       }
-      console.log('[CONFIG EDITOR] Available columns (filtered):', availableColumns);
+
+      // Ajouter toutes les colonnes A à Z (pour permettre sélection manuelle)
+      for (var i = 0; i < 26; i++) {
+        var letter = String.fromCharCode(65 + i); // A, B, C, ... Z
+        if (detectedColsByLetter[letter]) {
+          // Colonne avec header détecté
+          availableColumns.push({ letter: letter, name: detectedColsByLetter[letter] });
+        } else {
+          // Colonne sans header - afficher juste la lettre
+          availableColumns.push({ letter: letter, name: null });
+        }
+      }
+      console.log('[CONFIG EDITOR] Available columns (A-Z with headers):', availableColumns);
 
       // Convertir la config actuelle en données éditables
       configEditorData = [];
@@ -2727,20 +2737,16 @@ DEP 100</div>
 
         // Select colonne
         rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.8); font-size: 12px; cursor: pointer;">';
-        if (availableColumns.length > 0) {
-          availableColumns.forEach(function(col) {
-            var selected = col.letter === row.column ? 'selected' : '';
-            var displayName = col.name + ' (' + col.letter + ')';
-            if (col.name.length > 15) displayName = col.name.substring(0, 15) + '... (' + col.letter + ')';
-            rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
-          });
-        } else {
-          for (var i = 0; i < 26; i++) {
-            var letter = String.fromCharCode(65 + i);
-            var selected = letter === row.column ? 'selected' : '';
-            rowHtml += '<option value="' + letter + '" ' + selected + '>Colonne ' + letter + '</option>';
+        availableColumns.forEach(function(col) {
+          var selected = col.letter === row.column ? 'selected' : '';
+          var displayName;
+          if (col.name) {
+            displayName = col.name.length > 15 ? col.name.substring(0, 15) + '... (' + col.letter + ')' : col.name + ' (' + col.letter + ')';
+          } else {
+            displayName = 'Colonne ' + col.letter;
           }
-        }
+          rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
+        });
         rowHtml += '</select>';
 
         // Bouton + note (si pas encore de note)
@@ -2758,14 +2764,16 @@ DEP 100</div>
           rowHtml += '<div style="display: flex; align-items: center; gap: 8px; margin-left: 20px; padding: 8px 12px; background: rgba(139,92,246,0.08); border-radius: 10px; border: 1px solid rgba(139,92,246,0.2);">';
           rowHtml += '<span style="color: rgba(139,92,246,0.6); font-size: 11px;">└ texte →</span>';
           rowHtml += '<select onchange="updateNoteColumn(' + index + ', this.value)" style="flex: 1; background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25); border-radius: 6px; padding: 6px 10px; color: #a78bfa; font-size: 11px; cursor: pointer;">';
-          if (availableColumns.length > 0) {
-            availableColumns.forEach(function(col) {
-              var selected = col.letter === row.noteColumn ? 'selected' : '';
-              var displayName = col.name + ' (' + col.letter + ')';
-              if (col.name.length > 12) displayName = col.name.substring(0, 12) + '... (' + col.letter + ')';
-              rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
-            });
-          }
+          availableColumns.forEach(function(col) {
+            var selected = col.letter === row.noteColumn ? 'selected' : '';
+            var displayName;
+            if (col.name) {
+              displayName = col.name.length > 12 ? col.name.substring(0, 12) + '... (' + col.letter + ')' : col.name + ' (' + col.letter + ')';
+            } else {
+              displayName = 'Colonne ' + col.letter;
+            }
+            rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
+          });
           rowHtml += '</select>';
           rowHtml += '<button onclick="removeNoteColumn(' + index + ')" style="width: 20px; height: 20px; background: transparent; border: none; color: rgba(139,92,246,0.4); cursor: pointer; font-size: 12px;" onmouseover="this.style.color=\'#f87171\'" onmouseout="this.style.color=\'rgba(139,92,246,0.4)\'" title="Supprimer la note">×</button>';
           rowHtml += '</div>';
