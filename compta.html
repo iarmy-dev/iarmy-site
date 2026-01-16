@@ -555,7 +555,10 @@
             </div>
             <!-- File info -->
             <div style="flex: 1;">
-              <div style="font-weight: 600; font-size: 15px; color: rgba(255,255,255,0.9); margin-bottom: 4px;" id="analyse-file-name">...</div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                <span style="font-weight: 600; font-size: 15px; color: rgba(255,255,255,0.9);" id="analyse-file-name">...</span>
+                <a id="analyse-file-link" href="#" target="_blank" style="display: none; font-size: 12px; color: #0f9d58; text-decoration: none; padding: 4px 8px; background: rgba(15, 157, 88, 0.1); border-radius: 6px;">Ouvrir ↗</a>
+              </div>
               <div style="font-size: 13px; color: rgba(255,255,255,0.4);" id="analyse-status">Lecture du fichier...</div>
             </div>
           </div>
@@ -1281,7 +1284,7 @@
         console.log('[COMPTA] ✅ user_configs initialisé avec sheet_id:', sheetToUse.id);
 
         // 3. Stocker les infos du sheet
-        excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name };
+        excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name, webViewLink: sheetToUse.webViewLink };
 
         // 4. Lancer l'analyse (qui va à l'étape 3 et lit les données)
         await startAnalysisWithSheetRead(sheetToUse.id, session.access_token);
@@ -1570,9 +1573,10 @@
 
         var sheetToUse = {
           id: convertResult.sheet.id,
-          name: convertResult.sheet.name
+          name: convertResult.sheet.name,
+          webViewLink: convertResult.sheet.webViewLink
         };
-        console.log('[UPLOAD] ✅ Conversion réussie:', sheetToUse.name);
+        console.log('[UPLOAD] ✅ Conversion réussie:', sheetToUse.name, sheetToUse.webViewLink);
 
         // Vérifier les différences de conversion
         if (convertResult.verification && !convertResult.verification.success) {
@@ -1790,6 +1794,14 @@
       setTimeout(function() {
         // Mettre à jour titre et statut
         document.getElementById('analyse-status').textContent = confidence + '% de confiance';
+
+        // Afficher le lien vers le Google Sheet si disponible
+        var sheetLink = excelData?.webViewLink || (excelData?.sheetId ? 'https://docs.google.com/spreadsheets/d/' + excelData.sheetId + '/edit' : null);
+        if (sheetLink) {
+          var linkEl = document.getElementById('analyse-file-link');
+          linkEl.href = sheetLink;
+          linkEl.style.display = 'inline-block';
+        }
 
         if (confidence >= 90) {
           document.getElementById('analyse-title').textContent = 'Analyse terminee ✓';
