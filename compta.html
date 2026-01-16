@@ -190,52 +190,6 @@
     .btn-google-sheets:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2); }
     .btn-google-sheets.connected { background: linear-gradient(135deg, #0f9d58, #0a7e3e); color: white; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
-
-    /* Config Preview Modal */
-    .config-preview-overlay { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(30px); z-index: 10003; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-    .config-preview-overlay.active { opacity: 1; pointer-events: all; }
-    .config-preview-content { max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; background: rgba(20, 20, 20, 0.98); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px; padding: 40px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); animation: previewSlideIn 0.4s ease; }
-    @keyframes previewSlideIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .config-preview-header { text-align: center; margin-bottom: 32px; }
-    .config-preview-header h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; }
-    .config-preview-header p { color: rgba(255, 255, 255, 0.5); font-size: 15px; }
-    .config-preview-sheet { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-    .config-preview-sheet-name { display: flex; align-items: center; gap: 12px; font-size: 15px; color: rgba(255, 255, 255, 0.7); margin-bottom: 4px; }
-    .config-preview-sheet-name svg { width: 20px; height: 20px; color: #0f9d58; }
-    .config-preview-sheet-name strong { color: white; }
-    /* Confidence indicator */
-    .confidence-indicator { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; }
-    .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .confidence-label { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
-    .confidence-value { font-size: 18px; font-weight: 700; }
-    .confidence-value.high { color: #22C55E; }
-    .confidence-value.medium { color: #F59E0B; }
-    .confidence-value.low { color: #EF4444; }
-    .confidence-bar { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
-    .confidence-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease, background 0.3s; }
-    .confidence-fill.high { background: linear-gradient(90deg, #22C55E, #16A34A); }
-    .confidence-fill.medium { background: linear-gradient(90deg, #F59E0B, #D97706); }
-    .confidence-fill.low { background: linear-gradient(90deg, #EF4444, #DC2626); }
-    .confidence-reason { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 10px; margin-bottom: 0; line-height: 1.4; }
-    .config-preview-table { width: 100%; border-collapse: collapse; margin-top: 24px; border-radius: 12px; overflow: hidden; }
-    .config-preview-table th { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; padding: 14px 16px; text-align: center; font-weight: 600; font-size: 13px; border: none; }
-    .config-preview-table td { padding: 14px 16px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); font-size: 14px; }
-    .config-preview-table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.04); }
-    .config-preview-table .highlight { background: rgba(34, 197, 94, 0.15) !important; border-color: rgba(34, 197, 94, 0.2); }
-    .config-preview-legend { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 12px; color: rgba(255, 255, 255, 0.5); }
-    .config-preview-legend-color { width: 14px; height: 14px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 4px; }
-    .config-preview-columns { margin: 24px 0; }
-    .config-preview-columns h4 { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.6); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .config-preview-column-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; margin-bottom: 8px; }
-    .config-preview-column-item code { background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; }
-    .config-preview-column-item span { color: rgba(255, 255, 255, 0.4); }
-    .config-preview-column-item strong { color: white; }
-    .config-preview-buttons { display: flex; gap: 16px; margin-top: 32px; }
-    .config-preview-buttons button { flex: 1; padding: 18px 24px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-    .btn-preview-confirm { background: linear-gradient(135deg, #22c55e, #16a34a); border: none; color: white; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); }
-    .btn-preview-confirm:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(34, 197, 94, 0.5); }
-    .btn-preview-cancel { background: transparent; border: 1px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.7); }
-    .btn-preview-cancel:hover { background: rgba(255, 255, 255, 0.05); color: white; }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -313,117 +267,6 @@
         Rafraichir la liste
       </button>
       <button class="btn-back" onclick="closeSheetsOverlay()">← Retour</button>
-    </div>
-  </div>
-  <!-- Config Preview Modal - Nouveau design avec Score et Résumé clair -->
-  <div class="config-preview-overlay" id="config-preview-overlay">
-    <div class="config-preview-content" style="max-width: 520px;">
-      <!-- Score principal -->
-      <div id="score-section" style="text-align: center; margin-bottom: 32px;">
-        <div id="score-circle" style="width: 120px; height: 120px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; background: conic-gradient(#22C55E var(--score-pct, 92%), rgba(255,255,255,0.1) 0); position: relative;">
-          <div style="width: 100px; height: 100px; border-radius: 50%; background: #141414; display: flex; align-items: center; justify-content: center;">
-            <span id="score-text">92%</span>
-          </div>
-        </div>
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;" id="score-title">Analyse terminee</h2>
-        <p style="color: rgba(255,255,255,0.5); font-size: 14px;" id="score-subtitle">J'ai bien compris la structure de ton fichier</p>
-      </div>
-
-      <!-- Fichier -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#0f9d58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
-        <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Fichier : <strong style="color: white;" id="preview-file-name">-</strong></span>
-      </div>
-
-      <!-- Résumé en cards -->
-      <div id="summary-cards" style="display: grid; gap: 12px; margin-bottom: 24px;">
-        <!-- Cards générées dynamiquement -->
-      </div>
-
-      <!-- Message si pas 100% - Points qui pèchent -->
-      <div id="refinement-notice" style="display: none; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 14px; padding: 16px; margin-bottom: 20px;">
-        <div style="font-weight: 600; font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 16px;">⚠️</span>
-          Points a verifier
-        </div>
-        <div id="refinement-issues" style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <!-- Issues générées dynamiquement -->
-        </div>
-      </div>
-
-      <!-- Suggestion si score bas ou trop d'échanges -->
-      <div id="start-fresh-notice" style="display: none; background: rgba(255, 107, 53, 0.06); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 14px; padding: 18px; margin-bottom: 20px;">
-        <div style="font-weight: 600; font-size: 15px; margin-bottom: 12px;">Config incertaine - que faire ?</div>
-
-        <!-- Option 1: Partir de zéro -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 14px; margin-bottom: 10px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 16px;">✨</span>
-            <span style="font-weight: 600; font-size: 14px;">Partir de zero</span>
-            <span style="background: rgba(34, 197, 94, 0.15); color: #22C55E; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">RECOMMANDE</span>
-          </div>
-          <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 10px 0;">On te cree un fichier Google Sheet tout neuf avec tes colonnes. Config 100% sure.</p>
-          <button onclick="switchToFreshStart()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; padding: 10px 16px; color: white; font-weight: 600; font-size: 13px; cursor: pointer;">
-            Creer un fichier vierge
-          </button>
-        </div>
-
-        <!-- Option 2: Valider quand même -->
-        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 14px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-            <span style="font-size: 16px;">⚡</span>
-            <span style="font-weight: 600; font-size: 14px;">Valider quand meme</span>
-          </div>
-          <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin: 0 0 10px 0;">La config peut etre imparfaite. Tu pourras re-configurer depuis ton compte si ca marche pas.</p>
-          <button onclick="confirmConfig()" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 14px; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 12px; cursor: pointer;">
-            Continuer avec cette config
-          </button>
-        </div>
-      </div>
-
-      <!-- Boutons -->
-      <div style="display: flex; gap: 12px;" id="preview-buttons">
-        <button id="btn-refine" onclick="openRefinementChat()" style="flex: 1; display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 16px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-          Affiner avec iArmy
-        </button>
-        <button class="btn-preview-confirm" onclick="confirmConfig()" style="flex: 2;">
-          Valider ✓
-        </button>
-      </div>
-
-      <!-- Lien pour voir les détails techniques -->
-      <button onclick="toggleTechnicalDetails()" style="width: 100%; background: none; border: none; color: rgba(255,255,255,0.3); font-size: 12px; margin-top: 16px; cursor: pointer; padding: 8px;">
-        <span id="technical-toggle-text">Voir les détails techniques ▼</span>
-      </button>
-      <div id="technical-details" style="display: none; margin-top: 12px;">
-        <div id="preview-columns-list" style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px;">
-          <h4 style="font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase;">Mapping des colonnes</h4>
-          <!-- Colonnes générées ici -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Chat pour affinement -->
-  <div class="config-preview-overlay" id="refinement-chat-overlay" style="z-index: 10004;">
-    <div class="config-preview-content" style="max-width: 600px; padding: 0; overflow: hidden;">
-      <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700;">i</div>
-          <div>
-            <h3 style="font-weight: 600; font-size: 16px;">Affinons ta configuration</h3>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.4);">Dis-moi ce qui ne va pas</p>
-          </div>
-        </div>
-        <button onclick="closeRefinementChat()" style="background: rgba(255,255,255,0.05); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255,255,255,0.5);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div id="refinement-chat-messages" style="padding: 20px 24px; min-height: 200px; max-height: 350px; overflow-y: auto;"></div>
-      <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 12px;">
-        <input type="text" id="refinement-chat-input" placeholder="Explique ce que tu voudrais changer..." style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px;">
-        <button onclick="sendRefinementMessage()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 12px; padding: 14px 24px; color: white; font-weight: 600; cursor: pointer;">Envoyer</button>
-      </div>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -509,7 +352,7 @@
       <a href="index.html" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
       <!-- ÉTAPE 1a: Autoriser Google Sheets (si pas encore fait) -->
       <div class="step-content active" id="step-auth">
-        <div class="mb-2"><span class="text-white/30 text-sm">Etape 1/3</span></div>
+        <div class="mb-2"><span class="text-white/30 text-sm">Etape 1/4</span></div>
         <h1 class="text-3xl font-bold mb-3">Connecte Google Sheets</h1>
         <p class="text-white/40 mb-8">Pour que le bot puisse ecrire dans ton fichier</p>
 
@@ -546,9 +389,9 @@
         </div>
       </div>
 
-      <!-- ÉTAPE 1b: Choix du fichier (après auth Google) -->
+      <!-- ÉTAPE 2: Choix du fichier (après auth Google) -->
       <div class="step-content" id="step-choice">
-        <div class="mb-2"><span class="text-white/30 text-sm">Etape 1/3</span></div>
+        <div class="mb-2"><span class="text-white/30 text-sm">Etape 2/4</span></div>
         <h1 class="text-3xl font-bold mb-3">Comment veux-tu commencer ?</h1>
         <p class="text-white/40 mb-8">Choisis l'option qui te convient</p>
 
@@ -684,20 +527,81 @@
           <span>Tes donnees restent confidentielles</span>
         </div>
       </div>
-      <div class="step-content" id="step-2">
-        <div class="mb-2"><span class="text-white/30 text-sm">Étape 2/3</span></div>
-        <h1 class="text-3xl font-bold mb-3">Parlons de ton fichier</h1>
-        <p class="text-white/40 mb-8">Je vais te poser quelques questions pour bien comprendre.</p>
-        <div class="chat-container">
-          <div class="chat-header"><div class="chat-header-avatar">i</div><div><h3 class="font-semibold">iArmy</h3><p class="text-sm text-white/30">Analyse ton fichier...</p></div></div>
-          <div class="chat-messages" id="chat-messages"></div>
-          <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Ta réponse...">
-            <button class="chat-send" id="chat-send-btn">Envoyer</button>
+      <!-- STEP 3: Analyse (Score + Chat intégré) -->
+      <div class="step-content" id="step-analyse">
+        <div class="mb-2"><span class="text-white/30 text-sm">Etape 3/4</span></div>
+        <h1 class="text-3xl font-bold mb-3" id="analyse-title">Analyse en cours...</h1>
+        <p class="text-white/40 mb-6" id="analyse-subtitle">Je lis ton fichier</p>
+
+        <!-- Zone principale analyse -->
+        <div class="glass-card p-6 max-w-2xl mx-auto">
+          <!-- Score + Résumé -->
+          <div id="analyse-result" style="display: none;">
+            <!-- Score en haut à gauche -->
+            <div style="display: flex; align-items: flex-start; gap: 24px; margin-bottom: 24px;">
+              <div id="analyse-score-circle" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; background: conic-gradient(#22C55E 92%, rgba(255,255,255,0.1) 0); flex-shrink: 0;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(20,20,20,0.95); display: flex; align-items: center; justify-content: center;">
+                  <span id="analyse-score-text">92%</span>
+                </div>
+              </div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;" id="analyse-file-name">Fichier</div>
+                <div id="analyse-columns-summary" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <!-- Colonnes détectées en tags -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Questions/Problèmes si score < 90% -->
+            <div id="analyse-questions" style="display: none; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+              <div style="font-weight: 600; font-size: 13px; margin-bottom: 10px; color: #FBBF24;">Quelques questions :</div>
+              <div id="analyse-questions-list" style="font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6;">
+                <!-- Questions générées -->
+              </div>
+            </div>
+
+            <!-- Options si config incertaine -->
+            <div id="analyse-uncertain" style="display: none; background: rgba(255, 107, 53, 0.06); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+              <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">Config incertaine</div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="switchToFreshStart()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; padding: 10px 16px; color: white; font-weight: 600; font-size: 13px; cursor: pointer;">
+                  Partir de zero (recommande)
+                </button>
+                <button onclick="forceValidateConfig()" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 16px; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 13px; cursor: pointer;">
+                  Valider quand meme
+                </button>
+              </div>
+            </div>
           </div>
+
+          <!-- Chat intégré pour régler les détails -->
+          <div id="analyse-chat" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-top: 16px;">
+            <div id="analyse-chat-messages" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px; padding-right: 8px;">
+              <!-- Messages du chat -->
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="analyse-chat-input" placeholder="Ex: CB est en colonne N..." style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; color: white; font-size: 14px;">
+              <button onclick="sendAnalyseMessage()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; padding: 12px 20px; color: white; font-weight: 600; cursor: pointer;">
+                Envoyer
+              </button>
+            </div>
+          </div>
+
+          <!-- Loader pendant l'analyse -->
+          <div id="analyse-loading" style="text-align: center; padding: 40px 0;">
+            <div class="welcome-dots" style="justify-content: center; margin-bottom: 16px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
+            <p style="color: rgba(255,255,255,0.5);">Analyse en cours...</p>
+          </div>
+
+          <!-- Bouton Continuer (quand score OK) -->
+          <button id="analyse-continue-btn" onclick="goToTelegram()" style="display: none; width: 100%; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 12px; padding: 16px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 16px;">
+            Continuer →
+          </button>
         </div>
       </div>
-      <div class="step-content" id="step-3">
+
+      <!-- STEP 4: Telegram -->
+      <div class="step-content" id="step-telegram">
         <div class="text-center mb-8">
           <div class="check-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
           <h1 class="text-3xl font-bold mb-2">Presque fini ! 🎉</h1>
@@ -705,7 +609,7 @@
         </div>
         <div id="telegram-initial" class="glass-card p-8 max-w-lg mx-auto text-center">
           <div class="mb-6">
-            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-content text-4xl mb-4">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-4xl mb-4">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="#0088cc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
             </div>
             <h3 class="text-xl font-semibold mb-2">Connecte-toi en 1 clic</h3>
@@ -1624,9 +1528,18 @@
     
     async function startAnalysis() {
       // Reset du compteur d'échanges pour ce nouveau fichier
-      refinementExchangeCount = 0;
+      analyseExchangeCount = 0;
+      analyseChatHistory = [];
 
-      showTyping();
+      // Naviguer vers step-analyse et afficher le loader
+      goToStep(3);
+      document.getElementById('analyse-loading').style.display = 'block';
+      document.getElementById('analyse-result').style.display = 'none';
+      document.getElementById('analyse-chat').style.display = 'none';
+      document.getElementById('analyse-continue-btn').style.display = 'none';
+      document.getElementById('analyse-title').textContent = 'Analyse en cours...';
+      document.getElementById('analyse-subtitle').textContent = 'Je lis ton fichier';
+
       isWaitingForAI = true;
       try {
         var response = await callAPI('analyze');
@@ -1637,19 +1550,25 @@
           try {
             var parsedConfig = JSON.parse(jsonMatch[0]);
             console.log('[COMPTA] 🔍 Config détectée dans startAnalysis:', parsedConfig);
-            showConfigPreview(parsedConfig);
+            showAnalyseResult(parsedConfig);
           } catch (parseErr) {
             console.error('[COMPTA] JSON parse error:', parseErr);
-            addBotMessage(response);
+            showAnalyseError("Erreur d'analyse. Reessaie ?");
           }
         } else {
-          addBotMessage(response);
+          showAnalyseError("Je n'ai pas pu analyser le fichier.");
         }
       } catch (err) {
         console.error(err);
-        addBotMessage("J'ai eu un souci. Tu peux me décrire comment tu fais ta compta ?");
+        showAnalyseError("Erreur: " + err.message);
       }
       isWaitingForAI = false;
+    }
+
+    function showAnalyseError(message) {
+      document.getElementById('analyse-loading').style.display = 'none';
+      document.getElementById('analyse-title').textContent = 'Oups...';
+      document.getElementById('analyse-subtitle').textContent = message;
     }
     
     async function sendMessage() {
@@ -1674,344 +1593,208 @@
       isWaitingForAI = false;
     }
 
-    // ========== CONFIG PREVIEW FUNCTIONS ==========
+    // ========== ANALYSE FUNCTIONS (Step 3 intégré) ==========
     var pendingConfig = null;
-    var refinementChatHistory = [];
-    var refinementExchangeCount = 0; // Compteur d'échanges pour le chat d'affinement
+    var analyseChatHistory = [];
+    var analyseExchangeCount = 0;
+    var SCORE_HIGH = 90;
+    var SCORE_LOW = 70;
+    var MAX_EXCHANGES = 3;
 
-    function showConfigPreview(config) {
+    function showAnalyseResult(config) {
       pendingConfig = config;
-      console.log('[PREVIEW] Showing config preview:', config);
+      console.log('[ANALYSE] Showing result:', config);
 
-      // Set file name
-      document.getElementById('preview-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
+      // Cacher le loader, montrer le résultat
+      document.getElementById('analyse-loading').style.display = 'none';
+      document.getElementById('analyse-result').style.display = 'block';
 
-      // Get confidence
+      // Mettre à jour le titre
       var confidence = config.confiance !== undefined ? Math.min(100, Math.max(0, config.confiance)) : 85;
       var scoreColor = confidence >= 80 ? '#22C55E' : confidence >= 60 ? '#F59E0B' : '#EF4444';
 
-      // Update score circle
-      var scoreCircle = document.getElementById('score-circle');
-      scoreCircle.style.background = 'conic-gradient(' + scoreColor + ' ' + confidence + '%, rgba(255,255,255,0.1) 0)';
-      document.getElementById('score-text').textContent = confidence + '%';
-      document.getElementById('score-text').style.color = scoreColor;
-
-      // Update title/subtitle based on score
       if (confidence >= 90) {
-        document.getElementById('score-title').textContent = 'Parfait !';
-        document.getElementById('score-subtitle').textContent = "J'ai parfaitement compris ton fichier";
+        document.getElementById('analyse-title').textContent = 'Parfait !';
+        document.getElementById('analyse-subtitle').textContent = "J'ai bien compris ton fichier";
       } else if (confidence >= 70) {
-        document.getElementById('score-title').textContent = 'Analyse terminee';
-        document.getElementById('score-subtitle').textContent = "J'ai bien compris la structure de ton fichier";
+        document.getElementById('analyse-title').textContent = 'Analyse terminee';
+        document.getElementById('analyse-subtitle').textContent = 'Quelques points a verifier';
       } else {
-        document.getElementById('score-title').textContent = 'Quelques doutes';
-        document.getElementById('score-subtitle').textContent = "Je pense avoir compris, mais verifie";
+        document.getElementById('analyse-title').textContent = 'Quelques doutes';
+        document.getElementById('analyse-subtitle').textContent = 'On va regler ca ensemble';
       }
 
-      // Get config values
-      var dateColumn = config.colonne_date || config.structure?.colonne_date;
-      var dateFormat = config.format_date || 'DD/MM/YYYY';
-      var onglet = config.onglet || excelData?.sheets?.[0]?.name || '-';
+      // Score circle
+      var scoreCircle = document.getElementById('analyse-score-circle');
+      scoreCircle.style.background = 'conic-gradient(' + scoreColor + ' ' + confidence + '%, rgba(255,255,255,0.1) 0)';
+      document.getElementById('analyse-score-text').textContent = confidence + '%';
+      document.getElementById('analyse-score-text').style.color = scoreColor;
 
-      // Build summary cards
-      var cardsHtml = '';
+      // Nom du fichier
+      document.getElementById('analyse-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
 
-      // Date card
-      if (dateColumn) {
-        cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
-        cardsHtml += '<span style="font-size: 20px;">📅</span>';
-        cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">Colonne Date</div><div style="font-weight: 600;">Colonne ' + dateColumn + ' <span style="color: rgba(255,255,255,0.4); font-weight: 400;">(' + dateFormat + ')</span></div></div>';
-        cardsHtml += '</div>';
+      // Tags des colonnes détectées
+      var tagsHtml = '';
+      var icons = { 'cb': '💳', 'carte': '💳', 'esp': '💵', 'espece': '💵', 'especes': '💵', 'tr': '🎟️', 'ticket': '🎟️', 'depense': '📉', 'depenses': '📉', 'date': '📅' };
+
+      if (config.colonne_date) {
+        tagsHtml += '<span style="background: rgba(34, 197, 94, 0.15); color: #22C55E; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;">📅 Date: ' + config.colonne_date + '</span>';
       }
-
-      // Columns cards
-      if (config.colonnes_a_remplir && config.colonnes_a_remplir.length > 0) {
-        var icons = { 'cb': '💳', 'carte': '💳', 'esp': '💵', 'espece': '💵', 'especes': '💵', 'tr': '🎟️', 'ticket': '🎟️', 'depense': '📉', 'depenses': '📉' };
-        config.colonnes_a_remplir.forEach(function(col) {
-          var colNameLower = col.nom.toLowerCase();
-          var icon = icons[colNameLower] || '📊';
-          cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
-          cardsHtml += '<span style="font-size: 20px;">' + icon + '</span>';
-          cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">' + col.nom + '</div><div style="font-weight: 600;">Colonne ' + col.colonne + '</div></div>';
-          cardsHtml += '</div>';
-        });
-      }
-
-      // Onglet card
-      cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
-      cardsHtml += '<span style="font-size: 20px;">📋</span>';
-      cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">Onglet</div><div style="font-weight: 600;">' + onglet + '</div></div>';
-      cardsHtml += '</div>';
-
-      document.getElementById('summary-cards').innerHTML = cardsHtml;
-
-      // Seuils de confiance
-      var SCORE_HIGH = 90;    // >= 90% : tout est bon, on valide direct
-      var SCORE_LOW = 70;     // < 70% : on propose "partir de zéro"
-      var MAX_EXCHANGES = 3;  // Après 3 échanges sans succès, on propose "partir de zéro"
-
-      // Gérer l'affichage selon le score et les échanges
-      var showStartFresh = (confidence < SCORE_LOW) || (refinementExchangeCount >= MAX_EXCHANGES);
-      var showRefine = (confidence < SCORE_HIGH) && !showStartFresh;
-
-      // Reset les notices et boutons
-      document.getElementById('refinement-notice').style.display = 'none';
-      document.getElementById('start-fresh-notice').style.display = 'none';
-      document.getElementById('btn-refine').style.display = 'none';
-      document.getElementById('preview-buttons').style.display = 'flex';
-
-      if (showStartFresh) {
-        // Score trop bas ou trop d'échanges → proposer les 2 options
-        document.getElementById('start-fresh-notice').style.display = 'block';
-        document.getElementById('preview-buttons').style.display = 'none'; // Cacher les boutons normaux
-      } else if (showRefine) {
-        // Score moyen → proposer d'affiner avec liste des problèmes
-        document.getElementById('refinement-notice').style.display = 'block';
-        document.getElementById('btn-refine').style.display = 'block';
-
-        // Extraire les problèmes du scoring_detail
-        var issues = [];
-        if (config.scoring_detail) {
-          var sd = config.scoring_detail;
-          if (sd.onglet && sd.onglet.penalty < 0) issues.push('Onglet incertain');
-          if (sd.zone && sd.zone.penalty < 0) issues.push('Zone de saisie');
-          if (sd.colonne_date && sd.colonne_date.penalty < -5) issues.push('Colonne Date');
-          if (sd.colonne_cb && sd.colonne_cb.penalty < 0) issues.push('Colonne CB');
-          if (sd.colonne_especes && sd.colonne_especes.penalty < 0) issues.push('Colonne Especes');
-          if (sd.format_date && sd.format_date.penalty < 0) issues.push('Format de date');
-          if (sd.lignes && sd.lignes.penalty < 0) issues.push('Lignes de donnees');
-        }
-        // Fallback si pas de scoring_detail
-        if (issues.length === 0 && config.raison_confiance) {
-          issues.push(config.raison_confiance);
-        }
-        if (issues.length === 0) {
-          issues.push('Quelques details a verifier');
-        }
-
-        // Générer les tags
-        var issuesHtml = issues.map(function(issue) {
-          return '<span style="background: rgba(251, 191, 36, 0.15); color: #FBBF24; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">' + issue + '</span>';
-        }).join('');
-        document.getElementById('refinement-issues').innerHTML = issuesHtml;
-      }
-      // Sinon score >= 90% → on montre juste le bouton Valider
-
-      // Build technical details (columns list)
-      var colsHtml = '';
       if (config.colonnes_a_remplir) {
         config.colonnes_a_remplir.forEach(function(col) {
-          var aliases = col.aliases?.slice(0, 3).join(', ') || '-';
-          colsHtml += '<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">';
-          colsHtml += '<code style="background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 2px 8px; border-radius: 4px; font-size: 12px;">' + col.colonne + '</code>';
-          colsHtml += '<span style="font-weight: 500;">' + col.nom + '</span>';
-          colsHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 12px; margin-left: auto;">→ ' + aliases + '</span>';
-          colsHtml += '</div>';
+          var icon = icons[col.nom.toLowerCase()] || '📊';
+          tagsHtml += '<span style="background: rgba(34, 197, 94, 0.15); color: #22C55E; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;">' + icon + ' ' + col.nom + ': ' + col.colonne + '</span>';
         });
       }
-      if (dateColumn) {
-        colsHtml += '<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">';
-        colsHtml += '<code style="background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 2px 8px; border-radius: 4px; font-size: 12px;">' + dateColumn + '</code>';
-        colsHtml += '<span style="font-weight: 500;">Date</span>';
-        colsHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 12px; margin-left: auto;">→ auto</span>';
-        colsHtml += '</div>';
-      }
-      document.getElementById('preview-columns-list').innerHTML = '<h4 style="font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase;">Mapping des colonnes</h4>' + colsHtml;
+      document.getElementById('analyse-columns-summary').innerHTML = tagsHtml;
 
-      // Reset technical details state
-      document.getElementById('technical-details').style.display = 'none';
-      document.getElementById('technical-toggle-text').textContent = 'Voir les details techniques ▼';
+      // Gérer l'affichage selon le score
+      var showUncertain = (confidence < SCORE_LOW) || (analyseExchangeCount >= MAX_EXCHANGES);
+      var showQuestions = (confidence < SCORE_HIGH) && !showUncertain;
 
-      // Update sidebar to show step 3 as active
-      updateSidebarStep(3);
+      // Reset
+      document.getElementById('analyse-questions').style.display = 'none';
+      document.getElementById('analyse-uncertain').style.display = 'none';
+      document.getElementById('analyse-chat').style.display = 'none';
+      document.getElementById('analyse-continue-btn').style.display = 'none';
 
-      // Show modal
-      document.getElementById('config-preview-overlay').classList.add('active');
-    }
+      if (showUncertain) {
+        // Score trop bas ou trop d'échanges
+        document.getElementById('analyse-uncertain').style.display = 'block';
+      } else if (showQuestions) {
+        // Score moyen → montrer les questions + chat
+        document.getElementById('analyse-questions').style.display = 'block';
+        document.getElementById('analyse-chat').style.display = 'block';
 
-    function toggleTechnicalDetails() {
-      var details = document.getElementById('technical-details');
-      var toggleText = document.getElementById('technical-toggle-text');
-      if (details.style.display === 'none') {
-        details.style.display = 'block';
-        toggleText.textContent = 'Masquer les details ▲';
+        // Générer les questions basées sur les problèmes
+        var questions = [];
+        if (config.scoring_detail) {
+          var sd = config.scoring_detail;
+          if (sd.colonne_cb && sd.colonne_cb.penalty < 0) questions.push('Dans quelle colonne se trouve <strong>CB/Carte</strong> ?');
+          if (sd.colonne_especes && sd.colonne_especes.penalty < 0) questions.push('Dans quelle colonne se trouve <strong>Especes</strong> ?');
+          if (sd.colonne_date && sd.colonne_date.penalty < -5) questions.push('Dans quelle colonne se trouve la <strong>Date</strong> ?');
+          if (sd.format_date && sd.format_date.penalty < 0) questions.push('Quel est le format de date ? (ex: DD/MM/YYYY)');
+          if (sd.onglet && sd.onglet.penalty < 0) questions.push('Quel onglet utiliser pour la saisie ?');
+        }
+        if (questions.length === 0) {
+          questions.push('Est-ce que cette configuration te semble correcte ?');
+        }
+        document.getElementById('analyse-questions-list').innerHTML = questions.map(function(q) { return '• ' + q; }).join('<br>');
+
+        // Message initial dans le chat
+        if (analyseChatHistory.length === 0) {
+          addAnalyseBotMessage("Reponds a une question ci-dessus, ou dis-moi ce qui ne va pas.");
+        }
       } else {
-        details.style.display = 'none';
-        toggleText.textContent = 'Voir les details techniques ▼';
+        // Score >= 90% → bouton continuer
+        document.getElementById('analyse-continue-btn').style.display = 'block';
       }
     }
 
-    function closeConfigPreview() {
-      document.getElementById('config-preview-overlay').classList.remove('active');
-    }
-
-    function switchToFreshStart() {
-      // Ferme le modal de preview et retourne à l'écran "Partir de zéro"
-      document.getElementById('config-preview-overlay').classList.remove('active');
-      document.getElementById('refinement-chat-overlay').classList.remove('active');
-
-      // Reset le compteur d'échanges
-      refinementExchangeCount = 0;
-
-      // Retour à l'étape choix du fichier
-      goToStep(2);
-
-      // Toast pour confirmer
-      showToast('Tu peux creer un fichier vierge ci-dessus');
-    }
-
-    // ========== REFINEMENT CHAT FUNCTIONS ==========
-    function openRefinementChat() {
-      refinementChatHistory = [];
-      document.getElementById('refinement-chat-messages').innerHTML = '';
-
-      // Construire un message intelligent basé sur les problèmes détectés
-      var msg = "";
-      var suggestions = [];
-
-      if (pendingConfig && pendingConfig.scoring_detail) {
-        var sd = pendingConfig.scoring_detail;
-        var problems = [];
-
-        if (sd.colonne_cb && sd.colonne_cb.penalty < 0) {
-          problems.push("la colonne CB");
-          suggestions.push("\"CB est en colonne X\"");
-        }
-        if (sd.colonne_especes && sd.colonne_especes.penalty < 0) {
-          problems.push("la colonne Especes");
-          suggestions.push("\"Especes est en colonne Y\"");
-        }
-        if (sd.format_date && sd.format_date.penalty < 0) {
-          problems.push("le format de date");
-          suggestions.push("\"La date est en DD/MM/YYYY\"");
-        }
-        if (sd.onglet && sd.onglet.penalty < 0) {
-          problems.push("l'onglet a utiliser");
-          suggestions.push("\"Utilise l'onglet Recettes\"");
-        }
-        if (sd.lignes && sd.lignes.penalty < 0) {
-          problems.push("les lignes de donnees");
-          suggestions.push("\"Les donnees commencent ligne 5\"");
-        }
-
-        if (problems.length > 0) {
-          msg = "J'ai un doute sur <strong>" + problems.join("</strong>, <strong>") + "</strong>.<br><br>Dis-moi simplement, par exemple :<br>";
-          msg += suggestions.slice(0, 2).map(function(s) { return "• " + s; }).join("<br>");
-        }
-      }
-
-      // Fallback si pas de problèmes détectés
-      if (!msg) {
-        msg = "Qu'est-ce qui ne te semble pas correct ?<br><br>Tu peux me dire par exemple :<br>• \"CB est en colonne N\"<br>• \"Je n'ai pas de colonne Depenses\"";
-      }
-
-      addRefinementBotMessage(msg);
-
-      document.getElementById('refinement-chat-overlay').classList.add('active');
-      document.getElementById('refinement-chat-input').focus();
-    }
-
-    function closeRefinementChat() {
-      document.getElementById('refinement-chat-overlay').classList.remove('active');
-    }
-
-    function addRefinementBotMessage(text) {
-      var html = '<div style="display: flex; gap: 10px; margin-bottom: 16px;">';
-      html += '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">i</div>';
-      html += '<div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; max-width: 85%; font-size: 14px; line-height: 1.5;">' + text + '</div>';
+    function addAnalyseBotMessage(text) {
+      var html = '<div style="display: flex; gap: 8px; margin-bottom: 10px;">';
+      html += '<div style="width: 24px; height: 24px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; flex-shrink: 0;">i</div>';
+      html += '<div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5; max-width: 90%;">' + text + '</div>';
       html += '</div>';
-      document.getElementById('refinement-chat-messages').innerHTML += html;
-      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
-      refinementChatHistory.push({ role: 'assistant', content: text });
+      var container = document.getElementById('analyse-chat-messages');
+      container.innerHTML += html;
+      container.scrollTop = container.scrollHeight;
+      analyseChatHistory.push({ role: 'assistant', content: text });
     }
 
-    function addRefinementUserMessage(text) {
-      var html = '<div style="display: flex; gap: 10px; margin-bottom: 16px; flex-direction: row-reverse;">';
-      html += '<div style="width: 32px; height: 32px; background: rgba(255,255,255,0.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">👤</div>';
-      html += '<div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.08)); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 12px 16px; max-width: 85%; font-size: 14px; line-height: 1.5;">' + text + '</div>';
+    function addAnalyseUserMessage(text) {
+      var html = '<div style="display: flex; gap: 8px; margin-bottom: 10px; flex-direction: row-reverse;">';
+      html += '<div style="width: 24px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;">👤</div>';
+      html += '<div style="background: rgba(255, 107, 53, 0.15); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5; max-width: 90%;">' + text + '</div>';
       html += '</div>';
-      document.getElementById('refinement-chat-messages').innerHTML += html;
-      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
-      refinementChatHistory.push({ role: 'user', content: text });
+      var container = document.getElementById('analyse-chat-messages');
+      container.innerHTML += html;
+      container.scrollTop = container.scrollHeight;
+      analyseChatHistory.push({ role: 'user', content: text });
     }
 
-    function showRefinementTyping() {
-      var html = '<div id="refinement-typing" style="display: flex; gap: 10px; margin-bottom: 16px;">';
-      html += '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">i</div>';
-      html += '<div style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 12px 16px;"><div class="loading-bar-wrapper" style="width: 60px;"><div class="loading-bar-fill"></div></div></div>';
-      html += '</div>';
-      document.getElementById('refinement-chat-messages').innerHTML += html;
-      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
-    }
-
-    function hideRefinementTyping() {
-      var typing = document.getElementById('refinement-typing');
-      if (typing) typing.remove();
-    }
-
-    async function sendRefinementMessage() {
-      var input = document.getElementById('refinement-chat-input');
+    async function sendAnalyseMessage() {
+      var input = document.getElementById('analyse-chat-input');
       var text = input.value.trim();
       if (!text) return;
-
       input.value = '';
-      addRefinementUserMessage(text);
-      showRefinementTyping();
 
-      // Add to main chatHistory so Claude has context
+      addAnalyseUserMessage(text);
+      analyseExchangeCount++;
+
+      // Ajouter au chatHistory global pour le contexte
       chatHistory.push({ role: 'user', content: text });
 
-      // Incrémenter le compteur d'échanges
-      refinementExchangeCount++;
-      console.log('[REFINEMENT] Exchange count:', refinementExchangeCount);
+      // Afficher typing
+      var typingHtml = '<div id="analyse-typing" style="display: flex; gap: 8px; margin-bottom: 10px;">';
+      typingHtml += '<div style="width: 24px; height: 24px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; flex-shrink: 0;">i</div>';
+      typingHtml += '<div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px;"><div class="welcome-dots" style="transform: scale(0.6); margin: -8px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div></div>';
+      typingHtml += '</div>';
+      document.getElementById('analyse-chat-messages').innerHTML += typingHtml;
 
       try {
-        // Call the API with the refinement context
         var response = await callAPI('chat');
-        hideRefinementTyping();
+        // Retirer typing
+        var typing = document.getElementById('analyse-typing');
+        if (typing) typing.remove();
 
         var cleanResponse = response.trim();
         if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
-        // Add assistant response to chatHistory
         chatHistory.push({ role: 'assistant', content: response });
 
         var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           var newConfig = JSON.parse(jsonMatch[0]);
-          console.log('[REFINEMENT] New config detected:', newConfig);
-
-          // Update the preview with new config
-          closeRefinementChat();
-          showConfigPreview(newConfig);
+          console.log('[ANALYSE] New config:', newConfig);
+          showAnalyseResult(newConfig);
           showToast('Configuration mise a jour !');
         } else {
-          addRefinementBotMessage(response);
-
-          // Après 3 échanges sans succès, on ferme le chat et on montre "Partir de zéro"
-          if (refinementExchangeCount >= 3) {
-            setTimeout(function() {
-              closeRefinementChat();
-              showConfigPreview(pendingConfig); // Re-afficher le preview avec les nouvelles options
-            }, 2000);
+          addAnalyseBotMessage(response);
+          if (analyseExchangeCount >= MAX_EXCHANGES) {
+            showAnalyseResult(pendingConfig); // Re-afficher avec options "incertain"
           }
         }
       } catch (err) {
-        hideRefinementTyping();
-        console.error('[REFINEMENT] Error:', err);
-        addRefinementBotMessage("Desole, j'ai eu un probleme. Tu peux reformuler ?");
+        var typing = document.getElementById('analyse-typing');
+        if (typing) typing.remove();
+        console.error('[ANALYSE] Error:', err);
+        addAnalyseBotMessage("Desole, j'ai eu un probleme. Tu peux reformuler ?");
       }
     }
 
-    // Handle Enter key in refinement chat
+    function switchToFreshStart() {
+      analyseExchangeCount = 0;
+      analyseChatHistory = [];
+      goToStep(2);
+      showToast('Tu peux creer un fichier vierge ci-dessus');
+    }
+
+    function forceValidateConfig() {
+      // Valider même si score bas
+      confirmConfig();
+    }
+
+    function goToTelegram() {
+      // Sauvegarder la config et aller à Telegram
+      confirmConfig();
+    }
+
+    // Gérer Enter dans le chat analyse
     document.addEventListener('DOMContentLoaded', function() {
-      var refinementInput = document.getElementById('refinement-chat-input');
-      if (refinementInput) {
-        refinementInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') sendRefinementMessage();
+      var analyseInput = document.getElementById('analyse-chat-input');
+      if (analyseInput) {
+        analyseInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') sendAnalyseMessage();
         });
       }
     });
+
+    // ========== LEGACY FUNCTIONS (pour compatibilité) ==========
+    function showConfigPreview(config) {
+      // Rediriger vers le nouveau flow
+      showAnalyseResult(config);
+    }
 
     // ========== SIDEBAR NAVIGATION ==========
     function updateSidebarStep(stepNum) {
@@ -2044,11 +1827,8 @@
     function goToStep(stepNum) {
       console.log('[NAV] goToStep', stepNum);
 
-      // Fermer tous les modals avant de naviguer
-      var configOverlay = document.getElementById('config-preview-overlay');
-      var refinementOverlay = document.getElementById('refinement-chat-overlay');
-      if (configOverlay) configOverlay.classList.remove('active');
-      if (refinementOverlay) refinementOverlay.classList.remove('active');
+      // Fermer tous les overlays
+      document.querySelectorAll('.sheets-overlay').forEach(function(el) { el.classList.remove('active'); });
 
       document.querySelectorAll('.step-content').forEach(function(el) { el.classList.remove('active'); });
 
@@ -2065,12 +1845,12 @@
         document.getElementById('step-choice').classList.add('active');
         updateSidebarStep(2);
       } else if (stepNum === 3) {
-        // Étape 3 = Analyse (modal de preview, pas de contenu step-content)
-        // Cette étape est gérée par showConfigPreview()
+        // Étape 3 = Analyse (page intégrée)
+        document.getElementById('step-analyse').classList.add('active');
         updateSidebarStep(3);
       } else if (stepNum === 4) {
         // Étape 4 = Telegram
-        document.getElementById('step-3').classList.add('active');
+        document.getElementById('step-telegram').classList.add('active');
         updateSidebarStep(4);
         checkExistingTelegramConnection();
       }
@@ -2078,9 +1858,6 @@
 
     async function confirmConfig() {
       if (!pendingConfig) return;
-
-      // Close preview modal
-      document.getElementById('config-preview-overlay').classList.remove('active');
 
       // Check if we need Google access (local file without Google connected)
       var isLocalFile = !excelData?.isGoogleSheet && !excelData?.sheetId;
