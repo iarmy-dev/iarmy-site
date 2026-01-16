@@ -1355,7 +1355,8 @@
         });
 
         var readResult = await readResponse.json();
-        if (!readResult.success) throw new Error(readResult.error || 'Lecture echouee');
+        console.log('[ANALYSE] Read result:', readResult);
+        if (!readResult.success) throw new Error(readResult.error || 'Lecture echouee (pas de detail)');
 
         console.log('[ANALYSE] Sheet data received:', readResult.excelData?.fileName);
 
