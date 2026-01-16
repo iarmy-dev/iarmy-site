@@ -315,45 +315,84 @@
       <button class="btn-back" onclick="closeSheetsOverlay()">← Retour</button>
     </div>
   </div>
-  <!-- Config Preview Modal -->
+  <!-- Config Preview Modal - Nouveau design avec Score et Résumé clair -->
   <div class="config-preview-overlay" id="config-preview-overlay">
-    <div class="config-preview-content">
-      <div class="config-preview-header">
-        <h2>🔍 Aperçu de ta configuration</h2>
-        <p>Vérifie que tout est correct avant de valider</p>
+    <div class="config-preview-content" style="max-width: 520px;">
+      <!-- Score principal -->
+      <div id="score-section" style="text-align: center; margin-bottom: 32px;">
+        <div id="score-circle" style="width: 120px; height: 120px; margin: 0 auto 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; background: conic-gradient(#22C55E var(--score-pct, 92%), rgba(255,255,255,0.1) 0); position: relative;">
+          <div style="width: 100px; height: 100px; border-radius: 50%; background: #141414; display: flex; align-items: center; justify-content: center;">
+            <span id="score-text">92%</span>
+          </div>
+        </div>
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;" id="score-title">Analyse terminee</h2>
+        <p style="color: rgba(255,255,255,0.5); font-size: 14px;" id="score-subtitle">J'ai bien compris la structure de ton fichier</p>
       </div>
 
-      <div class="config-preview-sheet" id="preview-sheet-info">
-        <div class="config-preview-sheet-name">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
-          <span>Fichier : <strong id="preview-file-name">-</strong></span>
+      <!-- Fichier -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#0f9d58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
+        <span style="color: rgba(255,255,255,0.6); font-size: 14px;">Fichier : <strong style="color: white;" id="preview-file-name">-</strong></span>
+      </div>
+
+      <!-- Résumé en cards -->
+      <div id="summary-cards" style="display: grid; gap: 12px; margin-bottom: 24px;">
+        <!-- Cards générées dynamiquement -->
+      </div>
+
+      <!-- Message si pas 100% -->
+      <div id="refinement-notice" style="display: none; background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <span style="font-size: 18px;">💬</span>
+          <div>
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;" id="refinement-title">Quelques points a clarifier</div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin: 0;" id="refinement-reason">On peut discuter pour affiner si besoin</p>
+          </div>
         </div>
       </div>
 
-      <!-- Indicateur de confiance -->
-      <div class="confidence-indicator" id="confidence-indicator" style="display: none;">
-        <div class="confidence-header">
-          <span class="confidence-label">Confiance de l'analyse</span>
-          <span class="confidence-value" id="confidence-value">85%</span>
+      <!-- Boutons -->
+      <div style="display: flex; gap: 12px;">
+        <button id="btn-refine" onclick="openRefinementChat()" style="flex: 1; display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 16px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+          💬 Affiner
+        </button>
+        <button class="btn-preview-confirm" onclick="confirmConfig()" style="flex: 2;">
+          Valider ✓
+        </button>
+      </div>
+
+      <!-- Lien pour voir les détails techniques -->
+      <button onclick="toggleTechnicalDetails()" style="width: 100%; background: none; border: none; color: rgba(255,255,255,0.3); font-size: 12px; margin-top: 16px; cursor: pointer; padding: 8px;">
+        <span id="technical-toggle-text">Voir les détails techniques ▼</span>
+      </button>
+      <div id="technical-details" style="display: none; margin-top: 12px;">
+        <div id="preview-columns-list" style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px;">
+          <h4 style="font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase;">Mapping des colonnes</h4>
+          <!-- Colonnes générées ici -->
         </div>
-        <div class="confidence-bar">
-          <div class="confidence-fill" id="confidence-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Chat pour affinement -->
+  <div class="config-preview-overlay" id="refinement-chat-overlay" style="z-index: 10004;">
+    <div class="config-preview-content" style="max-width: 600px; padding: 0; overflow: hidden;">
+      <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700;">i</div>
+          <div>
+            <h3 style="font-weight: 600; font-size: 16px;">Affinons ta configuration</h3>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.4);">Dis-moi ce qui ne va pas</p>
+          </div>
         </div>
-        <p class="confidence-reason" id="confidence-reason"></p>
+        <button onclick="closeRefinementChat()" style="background: rgba(255,255,255,0.05); border: none; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgba(255,255,255,0.5);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-
-      <div id="preview-table-container">
-        <!-- Le tableau sera généré ici -->
-      </div>
-
-      <div class="config-preview-columns" id="preview-columns-list">
-        <h4>Colonnes détectées</h4>
-        <!-- Les colonnes seront listées ici -->
-      </div>
-
-      <div class="config-preview-buttons">
-        <button class="btn-preview-cancel" onclick="closeConfigPreview()">← Modifier</button>
-        <button class="btn-preview-confirm" onclick="confirmConfig()">Valider ✓</button>
+      <div id="refinement-chat-messages" style="padding: 20px 24px; min-height: 200px; max-height: 350px; overflow-y: auto;"></div>
+      <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 12px;">
+        <input type="text" id="refinement-chat-input" placeholder="Explique ce que tu voudrais changer..." style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px;">
+        <button onclick="sendRefinementMessage()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 12px; padding: 14px 24px; color: white; font-weight: 600; cursor: pointer;">Envoyer</button>
       </div>
     </div>
   </div>
@@ -425,11 +464,15 @@
   </nav>
   <div class="flex min-h-screen" style="padding-top: 70px;">
     <aside class="sidebar">
-      <div class="mb-6"><span class="text-xs text-white/30 uppercase tracking-wider">Configuration</span></div>
+      <div class="mb-6">
+        <span class="text-xs text-white/30 uppercase tracking-wider">Configuration</span>
+        <div class="text-lg font-semibold mt-1" style="color: #FF6B35;">Module Compta</div>
+      </div>
       <div id="steps-nav">
-        <div class="step-item active"><div class="step-number">1</div><span class="step-label">Ton fichier</span></div>
-        <div class="step-item upcoming"><div class="step-number">2</div><span class="step-label">On discute</span></div>
-        <div class="step-item upcoming"><div class="step-number">3</div><span class="step-label">Telegram</span></div>
+        <div class="step-item active" id="step-nav-1"><div class="step-number">1</div><span class="step-label">Connexion Google</span></div>
+        <div class="step-item upcoming" id="step-nav-2"><div class="step-number">2</div><span class="step-label">Ton fichier</span></div>
+        <div class="step-item upcoming" id="step-nav-3"><div class="step-number">3</div><span class="step-label">Analyse</span></div>
+        <div class="step-item upcoming" id="step-nav-4"><div class="step-number">4</div><span class="step-label">Telegram</span></div>
       </div>
     </aside>
     <main class="main-content">
@@ -815,8 +858,10 @@
       // Afficher le bon ecran selon l'etat Google Sheets
       if (hasGoogleSheetsAccess) {
         showStepChoice();
+      } else {
+        // Step 1 = Connexion Google (pas encore fait)
+        updateSidebarStep(1);
       }
-      // sinon step-auth est deja visible par defaut
 
       setupUploadZone();
     }
@@ -824,6 +869,7 @@
     function showStepChoice() {
       document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
       document.getElementById('step-choice').classList.add('active');
+      updateSidebarStep(2); // Étape 2 = Ton fichier (après Google connecté)
     }
 
     async function checkGoogleSheetsAccess() {
@@ -1597,6 +1643,7 @@
 
     // ========== CONFIG PREVIEW FUNCTIONS ==========
     var pendingConfig = null;
+    var refinementChatHistory = [];
 
     function showConfigPreview(config) {
       pendingConfig = config;
@@ -1605,123 +1652,275 @@
       // Set file name
       document.getElementById('preview-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
 
-      // Show confidence indicator if available
-      var confidenceEl = document.getElementById('confidence-indicator');
-      if (config.confiance !== undefined) {
-        var confidence = Math.min(100, Math.max(0, config.confiance));
-        var level = confidence >= 70 ? 'high' : confidence >= 50 ? 'medium' : 'low';
+      // Get confidence
+      var confidence = config.confiance !== undefined ? Math.min(100, Math.max(0, config.confiance)) : 85;
+      var scoreColor = confidence >= 80 ? '#22C55E' : confidence >= 60 ? '#F59E0B' : '#EF4444';
 
-        document.getElementById('confidence-value').textContent = confidence + '%';
-        document.getElementById('confidence-value').className = 'confidence-value ' + level;
-        document.getElementById('confidence-fill').style.width = confidence + '%';
-        document.getElementById('confidence-fill').className = 'confidence-fill ' + level;
+      // Update score circle
+      var scoreCircle = document.getElementById('score-circle');
+      scoreCircle.style.background = 'conic-gradient(' + scoreColor + ' ' + confidence + '%, rgba(255,255,255,0.1) 0)';
+      document.getElementById('score-text').textContent = confidence + '%';
+      document.getElementById('score-text').style.color = scoreColor;
 
-        var reasonEl = document.getElementById('confidence-reason');
-        if (config.raison_confiance) {
-          reasonEl.textContent = config.raison_confiance;
-          reasonEl.style.display = 'block';
-        } else {
-          reasonEl.style.display = 'none';
-        }
-
-        confidenceEl.style.display = 'block';
+      // Update title/subtitle based on score
+      if (confidence >= 90) {
+        document.getElementById('score-title').textContent = 'Parfait !';
+        document.getElementById('score-subtitle').textContent = "J'ai parfaitement compris ton fichier";
+      } else if (confidence >= 70) {
+        document.getElementById('score-title').textContent = 'Analyse terminee';
+        document.getElementById('score-subtitle').textContent = "J'ai bien compris la structure de ton fichier";
       } else {
-        confidenceEl.style.display = 'none';
+        document.getElementById('score-title').textContent = 'Quelques doutes';
+        document.getElementById('score-subtitle').textContent = "Je pense avoir compris, mais verifie";
       }
 
-      // Support both flat and nested config formats
-      var headerRowNum = config.ligne_entetes || config.structure?.ligne_entetes || 1;
-      var dataStartRow = config.premiere_ligne_donnees || config.structure?.premiere_ligne_donnees || 2;
+      // Get config values
       var dateColumn = config.colonne_date || config.structure?.colonne_date;
+      var dateFormat = config.format_date || 'DD/MM/YYYY';
+      var onglet = config.onglet || excelData?.sheets?.[0]?.name || '-';
 
-      // Build table preview
-      var tableHtml = '';
-      if (excelData?.sheets?.[0]?.allRows) {
-        var rows = excelData.sheets[0].allRows;
+      // Build summary cards
+      var cardsHtml = '';
 
-        // Find all columns mentioned in config
-        var highlightCols = {};
-        if (config.colonnes_a_remplir) {
-          config.colonnes_a_remplir.forEach(function(col) {
-            highlightCols[col.colonne] = col.nom;
-          });
-        }
-        if (dateColumn) highlightCols[dateColumn] = 'Date';
-
-        // Get all column letters from data
-        var allCols = [];
-        rows.forEach(function(row) {
-          if (row.row === '...') return;
-          row.cells.forEach(function(cell) {
-            if (!allCols.includes(cell.col)) allCols.push(cell.col);
-          });
-        });
-        allCols.sort();
-
-        // Build table header
-        tableHtml += '<table class="config-preview-table"><thead><tr>';
-        tableHtml += '<th style="width:50px">#</th>';
-        allCols.forEach(function(col) {
-          var isHighlight = highlightCols[col] ? ' class="highlight"' : '';
-          tableHtml += '<th' + isHighlight + '>' + col + (highlightCols[col] ? '<br><small>(' + highlightCols[col] + ')</small>' : '') + '</th>';
-        });
-        tableHtml += '</tr></thead><tbody>';
-
-        // Build rows (max 8 rows for preview)
-        var displayRows = rows.slice(0, 8);
-        displayRows.forEach(function(row) {
-          if (row.row === '...') {
-            tableHtml += '<tr><td colspan="' + (allCols.length + 1) + '" style="text-align:center;color:rgba(255,255,255,0.3)">...</td></tr>';
-            return;
-          }
-          var isHeaderRow = row.row === headerRowNum;
-          tableHtml += '<tr' + (isHeaderRow ? ' style="background:rgba(255,107,53,0.1)"' : '') + '>';
-          tableHtml += '<td style="font-weight:600;color:rgba(255,255,255,0.4)">' + row.row + '</td>';
-
-          allCols.forEach(function(col) {
-            var cellVal = '';
-            row.cells.forEach(function(cell) {
-              if (cell.col === col) cellVal = cell.val;
-            });
-            var isHighlight = highlightCols[col] && row.row >= dataStartRow ? ' class="highlight"' : '';
-            tableHtml += '<td' + isHighlight + '>' + (cellVal || '-') + '</td>';
-          });
-          tableHtml += '</tr>';
-        });
-
-        tableHtml += '</tbody></table>';
-        tableHtml += '<div class="config-preview-legend"><div class="config-preview-legend-color"></div><span>Colonnes qui seront remplies par le bot</span></div>';
+      // Date card
+      if (dateColumn) {
+        cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
+        cardsHtml += '<span style="font-size: 20px;">📅</span>';
+        cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">Colonne Date</div><div style="font-weight: 600;">Colonne ' + dateColumn + ' <span style="color: rgba(255,255,255,0.4); font-weight: 400;">(' + dateFormat + ')</span></div></div>';
+        cardsHtml += '</div>';
       }
-      document.getElementById('preview-table-container').innerHTML = tableHtml;
 
-      // Build columns list
+      // Columns cards
+      if (config.colonnes_a_remplir && config.colonnes_a_remplir.length > 0) {
+        var icons = { 'cb': '💳', 'carte': '💳', 'esp': '💵', 'espece': '💵', 'especes': '💵', 'tr': '🎟️', 'ticket': '🎟️', 'depense': '📉', 'depenses': '📉' };
+        config.colonnes_a_remplir.forEach(function(col) {
+          var colNameLower = col.nom.toLowerCase();
+          var icon = icons[colNameLower] || '📊';
+          cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
+          cardsHtml += '<span style="font-size: 20px;">' + icon + '</span>';
+          cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">' + col.nom + '</div><div style="font-weight: 600;">Colonne ' + col.colonne + '</div></div>';
+          cardsHtml += '</div>';
+        });
+      }
+
+      // Onglet card
+      cardsHtml += '<div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px;">';
+      cardsHtml += '<span style="font-size: 20px;">📋</span>';
+      cardsHtml += '<div style="flex: 1;"><div style="font-size: 13px; color: rgba(255,255,255,0.5);">Onglet</div><div style="font-weight: 600;">' + onglet + '</div></div>';
+      cardsHtml += '</div>';
+
+      document.getElementById('summary-cards').innerHTML = cardsHtml;
+
+      // Show refinement notice and button if confidence < 100
+      if (confidence < 100) {
+        document.getElementById('refinement-notice').style.display = 'block';
+        document.getElementById('btn-refine').style.display = 'block';
+        if (config.raison_confiance) {
+          document.getElementById('refinement-reason').textContent = config.raison_confiance;
+        }
+      } else {
+        document.getElementById('refinement-notice').style.display = 'none';
+        document.getElementById('btn-refine').style.display = 'none';
+      }
+
+      // Build technical details (columns list)
       var colsHtml = '';
       if (config.colonnes_a_remplir) {
         config.colonnes_a_remplir.forEach(function(col) {
-          var aliases = col.aliases?.slice(0, 4).join(', ') || '-';
-          colsHtml += '<div class="config-preview-column-item">';
-          colsHtml += '<code>' + col.colonne + '</code>';
-          colsHtml += '<strong>' + col.nom + '</strong>';
-          colsHtml += '<span>→ ' + aliases + '</span>';
+          var aliases = col.aliases?.slice(0, 3).join(', ') || '-';
+          colsHtml += '<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">';
+          colsHtml += '<code style="background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 2px 8px; border-radius: 4px; font-size: 12px;">' + col.colonne + '</code>';
+          colsHtml += '<span style="font-weight: 500;">' + col.nom + '</span>';
+          colsHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 12px; margin-left: auto;">→ ' + aliases + '</span>';
           colsHtml += '</div>';
         });
       }
       if (dateColumn) {
-        colsHtml += '<div class="config-preview-column-item">';
-        colsHtml += '<code>' + dateColumn + '</code>';
-        colsHtml += '<strong>Date</strong>';
-        colsHtml += '<span>→ auto</span>';
+        colsHtml += '<div style="display: flex; align-items: center; gap: 10px; padding: 8px 0;">';
+        colsHtml += '<code style="background: rgba(255, 107, 53, 0.15); color: #FF8B5E; padding: 2px 8px; border-radius: 4px; font-size: 12px;">' + dateColumn + '</code>';
+        colsHtml += '<span style="font-weight: 500;">Date</span>';
+        colsHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 12px; margin-left: auto;">→ auto</span>';
         colsHtml += '</div>';
       }
-      document.getElementById('preview-columns-list').innerHTML = '<h4>Colonnes détectées</h4>' + colsHtml;
+      document.getElementById('preview-columns-list').innerHTML = '<h4 style="font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-transform: uppercase;">Mapping des colonnes</h4>' + colsHtml;
+
+      // Reset technical details state
+      document.getElementById('technical-details').style.display = 'none';
+      document.getElementById('technical-toggle-text').textContent = 'Voir les details techniques ▼';
+
+      // Update sidebar to show step 3 as active
+      updateSidebarStep(3);
 
       // Show modal
       document.getElementById('config-preview-overlay').classList.add('active');
     }
 
+    function toggleTechnicalDetails() {
+      var details = document.getElementById('technical-details');
+      var toggleText = document.getElementById('technical-toggle-text');
+      if (details.style.display === 'none') {
+        details.style.display = 'block';
+        toggleText.textContent = 'Masquer les details ▲';
+      } else {
+        details.style.display = 'none';
+        toggleText.textContent = 'Voir les details techniques ▼';
+      }
+    }
+
     function closeConfigPreview() {
       document.getElementById('config-preview-overlay').classList.remove('active');
-      addBotMessage("D'accord ! Qu'est-ce que tu voudrais modifier ?");
+    }
+
+    // ========== REFINEMENT CHAT FUNCTIONS ==========
+    function openRefinementChat() {
+      refinementChatHistory = [];
+      document.getElementById('refinement-chat-messages').innerHTML = '';
+
+      // Add initial message from bot
+      addRefinementBotMessage("Qu'est-ce qui ne te semble pas correct dans ma detection ? Tu peux me dire par exemple : \"La colonne CB est en fait en colonne P\" ou \"Je n'ai pas de colonne Depenses\".");
+
+      document.getElementById('refinement-chat-overlay').classList.add('active');
+      document.getElementById('refinement-chat-input').focus();
+    }
+
+    function closeRefinementChat() {
+      document.getElementById('refinement-chat-overlay').classList.remove('active');
+    }
+
+    function addRefinementBotMessage(text) {
+      var html = '<div style="display: flex; gap: 10px; margin-bottom: 16px;">';
+      html += '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">i</div>';
+      html += '<div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; max-width: 85%; font-size: 14px; line-height: 1.5;">' + text + '</div>';
+      html += '</div>';
+      document.getElementById('refinement-chat-messages').innerHTML += html;
+      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
+      refinementChatHistory.push({ role: 'assistant', content: text });
+    }
+
+    function addRefinementUserMessage(text) {
+      var html = '<div style="display: flex; gap: 10px; margin-bottom: 16px; flex-direction: row-reverse;">';
+      html += '<div style="width: 32px; height: 32px; background: rgba(255,255,255,0.08); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">👤</div>';
+      html += '<div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.08)); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 12px 16px; max-width: 85%; font-size: 14px; line-height: 1.5;">' + text + '</div>';
+      html += '</div>';
+      document.getElementById('refinement-chat-messages').innerHTML += html;
+      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
+      refinementChatHistory.push({ role: 'user', content: text });
+    }
+
+    function showRefinementTyping() {
+      var html = '<div id="refinement-typing" style="display: flex; gap: 10px; margin-bottom: 16px;">';
+      html += '<div style="width: 32px; height: 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0;">i</div>';
+      html += '<div style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 12px 16px;"><div class="loading-bar-wrapper" style="width: 60px;"><div class="loading-bar-fill"></div></div></div>';
+      html += '</div>';
+      document.getElementById('refinement-chat-messages').innerHTML += html;
+      document.getElementById('refinement-chat-messages').scrollTop = document.getElementById('refinement-chat-messages').scrollHeight;
+    }
+
+    function hideRefinementTyping() {
+      var typing = document.getElementById('refinement-typing');
+      if (typing) typing.remove();
+    }
+
+    async function sendRefinementMessage() {
+      var input = document.getElementById('refinement-chat-input');
+      var text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      addRefinementUserMessage(text);
+      showRefinementTyping();
+
+      // Add to main chatHistory so Claude has context
+      chatHistory.push({ role: 'user', content: text });
+
+      try {
+        // Call the API with the refinement context
+        var response = await callAPI('chat');
+        hideRefinementTyping();
+
+        var cleanResponse = response.trim();
+        if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+        // Add assistant response to chatHistory
+        chatHistory.push({ role: 'assistant', content: response });
+
+        var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          var newConfig = JSON.parse(jsonMatch[0]);
+          console.log('[REFINEMENT] New config detected:', newConfig);
+
+          // Update the preview with new config
+          closeRefinementChat();
+          showConfigPreview(newConfig);
+          showToast('Configuration mise a jour !');
+        } else {
+          addRefinementBotMessage(response);
+        }
+      } catch (err) {
+        hideRefinementTyping();
+        console.error('[REFINEMENT] Error:', err);
+        addRefinementBotMessage("Desole, j'ai eu un probleme. Tu peux reformuler ?");
+      }
+    }
+
+    // Handle Enter key in refinement chat
+    document.addEventListener('DOMContentLoaded', function() {
+      var refinementInput = document.getElementById('refinement-chat-input');
+      if (refinementInput) {
+        refinementInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') sendRefinementMessage();
+        });
+      }
+    });
+
+    // ========== SIDEBAR NAVIGATION ==========
+    function updateSidebarStep(stepNum) {
+      for (var i = 1; i <= 4; i++) {
+        var stepEl = document.getElementById('step-nav-' + i);
+        if (!stepEl) continue;
+        stepEl.classList.remove('completed', 'active', 'upcoming');
+        stepEl.removeAttribute('onclick');
+
+        if (i < stepNum) {
+          stepEl.classList.add('completed');
+          stepEl.querySelector('.step-number').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+          stepEl.onclick = function(s) { return function() { goToStep(s); }; }(i);
+        } else if (i === stepNum) {
+          stepEl.classList.add('active');
+          stepEl.querySelector('.step-number').textContent = i;
+        } else {
+          stepEl.classList.add('upcoming');
+          stepEl.querySelector('.step-number').textContent = i;
+        }
+      }
+    }
+
+    function goToStep(stepNum) {
+      console.log('[NAV] goToStep', stepNum);
+      document.querySelectorAll('.step-content').forEach(function(el) { el.classList.remove('active'); });
+
+      if (stepNum === 1) {
+        // Étape 1 = Connexion Google
+        if (hasGoogleSheetsAccess) {
+          document.getElementById('step-choice').classList.add('active');
+        } else {
+          document.getElementById('step-auth').classList.add('active');
+        }
+        updateSidebarStep(1);
+      } else if (stepNum === 2) {
+        // Étape 2 = Choix du fichier
+        document.getElementById('step-choice').classList.add('active');
+        updateSidebarStep(2);
+      } else if (stepNum === 3) {
+        // Étape 3 = Analyse (modal de preview, pas de contenu step-content)
+        // Cette étape est gérée par showConfigPreview()
+        updateSidebarStep(3);
+      } else if (stepNum === 4) {
+        // Étape 4 = Telegram
+        document.getElementById('step-3').classList.add('active');
+        updateSidebarStep(4);
+        checkExistingTelegramConnection();
+      }
     }
 
     async function confirmConfig() {
@@ -1772,7 +1971,7 @@
 
       var colonnes = pendingConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
       addBotMessage('✅ Parfait ! Configuration validée !\n\n📊 Colonnes : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
-      setTimeout(function() { goToStep(3); }, 1500);
+      setTimeout(function() { goToStep(4); }, 1500);
     }
 
     function closeConnectGoogleOverlay() {
@@ -2393,7 +2592,7 @@
 
       hideLoader();
       showToast('Modele cree avec succes !');
-      goToStep(3);
+      goToStep(4);
     }
     // ========== END EMPTY TEMPLATE FLOW ==========
 
