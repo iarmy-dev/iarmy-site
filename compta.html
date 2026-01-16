@@ -618,55 +618,47 @@ DEP 100</div>
               </div>
             </div>
 
-            <!-- DROITE: Mini Excel -->
-            <div>
+            <!-- DROITE: Mini Excel complet -->
+            <div style="flex: 1;">
               <!-- Excel Frame -->
               <div style="background: #1e1e1e; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
                 <!-- Excel Header Bar -->
                 <div style="background: #217346; padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12.06L9.93 8.89H8.22L7.13 10.9L7.09 10.96L7.06 11.03Q6.8 10.5 6.5 9.96 6.25 9.43 5.97 8.89H4.16L6.05 12.08L4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H12V15.75M13.88 11.38V8.25H12V11.38M13.88 7V4.5H8.25V7M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38M20.75 7V4.5H15.13V7Z"/></svg>
                   <span id="excel-filename" style="font-size: 12px; font-weight: 500; color: white;">recette 25.xlsx</span>
+                  <div style="margin-left: auto; display: flex; gap: 4px;">
+                    <div style="width: 10px; height: 10px; background: #ff5f57; border-radius: 50%;"></div>
+                    <div style="width: 10px; height: 10px; background: #ffbd2e; border-radius: 50%;"></div>
+                    <div style="width: 10px; height: 10px; background: #28ca42; border-radius: 50%;"></div>
+                  </div>
                 </div>
 
-                <!-- Excel Grid -->
-                <div style="overflow-x: auto;">
-                  <table id="excel-preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead>
-                      <tr style="background: #2d2d2d;">
-                        <th style="padding: 6px 10px; border: 1px solid #404040; color: #888; font-weight: 500; min-width: 40px;"></th>
-                        <!-- Colonnes générées dynamiquement -->
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Ligne headers (noms des colonnes) -->
-                      <tr id="excel-header-row" style="background: #252526;">
-                        <td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">4</td>
-                        <!-- Cellules générées dynamiquement -->
-                      </tr>
-                      <!-- Ligne des valeurs (jour actuel) -->
-                      <tr id="excel-value-row" style="background: #1e1e1e;">
-                        <td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;" id="excel-day-cell">16</td>
-                        <!-- Cellules générées dynamiquement -->
-                      </tr>
-                    </tbody>
+                <!-- Excel Grid Container -->
+                <div id="excel-grid-container" style="overflow-x: auto; max-height: 320px; overflow-y: auto;">
+                  <!-- Le tableau sera généré dynamiquement par buildExcelPreview() -->
+                  <table id="excel-preview-table" style="width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px;">
                   </table>
                 </div>
 
-                <!-- Excel Footer -->
-                <div style="background: #2d2d2d; padding: 6px 12px; display: flex; align-items: center; gap: 12px; border-top: 1px solid #404040;">
-                  <div id="excel-sheet-tab" style="background: #1e1e1e; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; color: white; border: 1px solid #404040; border-bottom: none; margin-bottom: -1px;">janv</div>
-                  <div style="font-size: 10px; color: #666;">+ Autre feuille</div>
+                <!-- Excel Footer avec onglets -->
+                <div style="background: #2d2d2d; padding: 6px 12px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #404040;">
+                  <div id="excel-sheet-tab" style="background: #217346; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; color: white; margin-bottom: -6px; font-weight: 500;">janv</div>
+                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">fév</div>
+                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">mars</div>
+                  <div style="font-size: 14px; color: #666; margin-left: 4px;">+</div>
                 </div>
               </div>
 
-              <!-- Label sous l'Excel -->
-              <div style="text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4);">
-                📊 Ton Google Sheet
-              </div>
-
-              <!-- Flèche de connexion visuelle -->
-              <div style="position: absolute; left: 280px; top: 180px; width: 32px; display: flex; align-items: center; justify-content: center;">
-                <div style="font-size: 24px; color: #22C55E; animation: pulseArrow 1.5s ease-in-out infinite;">→</div>
+              <!-- Indicateur de zone si 2 tableaux -->
+              <div id="excel-zone-indicator" style="display: none; margin-top: 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3); border-radius: 10px; padding: 10px 14px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 14px;">📍</span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 12px; font-weight: 600; color: #FF6B35;">Zone de saisie manuelle</div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.5);">Colonnes M → Q (à droite du tableau)</div>
+                  </div>
+                  <button onclick="scrollExcelToZone()" style="padding: 4px 10px; background: rgba(255,107,53,0.2); border: none; border-radius: 6px; color: #FF6B35; font-size: 11px; cursor: pointer;">Voir →</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1947,6 +1939,10 @@ DEP 100</div>
     }
 
     function buildExcelPreview() {
+      var table = document.getElementById('excel-preview-table');
+      var today = new Date().getDate();
+      var dateCol = pendingConfig ? pendingConfig.colonne_date : null;
+
       // Récupérer les colonnes utilisées par les mots-clés
       var usedColumns = {};
       configEditorData.forEach(function(row) {
@@ -1955,8 +1951,7 @@ DEP 100</div>
         }
       });
 
-      // Ajouter la colonne date si disponible
-      var dateCol = pendingConfig ? pendingConfig.colonne_date : null;
+      // Ajouter la colonne date
       if (dateCol) {
         usedColumns[dateCol] = 'Jour';
       }
@@ -1964,37 +1959,93 @@ DEP 100</div>
       // Trier les colonnes par ordre alphabétique
       var sortedCols = Object.keys(usedColumns).sort();
 
-      // Construire le header du tableau
-      var headerRow = document.querySelector('#excel-preview-table thead tr');
-      var headerHtml = '<th style="padding: 6px 10px; border: 1px solid #404040; color: #888; font-weight: 500; min-width: 40px;"></th>';
-      sortedCols.forEach(function(col) {
-        headerHtml += '<th style="padding: 6px 12px; border: 1px solid #404040; color: #888; font-weight: 500; text-align: center;">' + col + '</th>';
-      });
-      headerRow.innerHTML = headerHtml;
+      // Générer le HTML du tableau complet
+      var html = '';
 
-      // Construire la ligne des noms de colonnes
-      var namesRow = document.getElementById('excel-header-row');
-      var namesHtml = '<td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">4</td>';
+      // THEAD: Lettres des colonnes
+      html += '<thead><tr style="background: #2d2d2d; position: sticky; top: 0; z-index: 2;">';
+      html += '<th style="padding: 4px 8px; border: 1px solid #404040; color: #666; font-weight: 500; min-width: 30px; background: #2d2d2d;"></th>';
+      sortedCols.forEach(function(col) {
+        var isDateCol = col === dateCol;
+        var isUsedCol = usedColumns[col] && !isDateCol;
+        var bgColor = isUsedCol ? 'rgba(34, 197, 94, 0.15)' : '#2d2d2d';
+        html += '<th style="padding: 4px 8px; border: 1px solid #404040; color: ' + (isUsedCol ? '#22C55E' : '#888') + '; font-weight: 600; text-align: center; min-width: 60px; background: ' + bgColor + ';">' + col + '</th>';
+      });
+      html += '</tr></thead>';
+
+      // TBODY
+      html += '<tbody>';
+
+      // Ligne des en-têtes (noms des colonnes) - ligne 4
+      html += '<tr style="background: #252526;">';
+      html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #666; text-align: center; font-size: 10px; background: #2a2a2a;">4</td>';
       sortedCols.forEach(function(col) {
         var colName = usedColumns[col];
-        // Trouver le vrai nom dans availableColumns
         availableColumns.forEach(function(c) {
           if (c.letter === col && c.name) colName = c.name;
         });
-        var isHighlight = col !== dateCol;
-        var bgColor = isHighlight ? 'rgba(34, 197, 94, 0.1)' : 'transparent';
-        namesHtml += '<td style="padding: 6px 12px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 11px; background: ' + bgColor + ';">' + colName + '</td>';
+        var isDateCol = col === dateCol;
+        var displayName = colName.length > 10 ? colName.substring(0, 10) + '..' : colName;
+        html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 10px; font-weight: 500;">' + displayName + '</td>';
       });
-      namesRow.innerHTML = namesHtml;
+      html += '</tr>';
 
-      // Construire la ligne des valeurs (vide pour l'instant, sera remplie par updatePreview)
-      var valuesRow = document.getElementById('excel-value-row');
-      var day = new Date().getDate();
-      var valuesHtml = '<td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">' + (day + 3) + '</td>';
-      sortedCols.forEach(function(col) {
-        valuesHtml += '<td id="excel-cell-' + col + '" style="padding: 6px 12px; border: 1px solid #404040; color: white; text-align: center; font-weight: 500;"></td>';
-      });
-      valuesRow.innerHTML = valuesHtml;
+      // Lignes de données (jours)
+      // Afficher 7 jours autour d'aujourd'hui
+      var startDay = Math.max(1, today - 3);
+      var endDay = Math.min(31, today + 3);
+
+      for (var day = startDay; day <= endDay; day++) {
+        var isToday = day === today;
+        var rowNum = day + 7; // Ligne Excel approximative
+        var rowBg = isToday ? 'rgba(34, 197, 94, 0.08)' : (day % 2 === 0 ? '#1e1e1e' : '#232323');
+        var rowBorder = isToday ? '2px solid #22C55E' : '1px solid #404040';
+
+        html += '<tr style="background: ' + rowBg + ';">';
+        html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #666; text-align: center; font-size: 10px; background: #2a2a2a;">' + rowNum + '</td>';
+
+        sortedCols.forEach(function(col) {
+          var isDateCol = col === dateCol;
+          var cellId = isToday ? 'excel-cell-' + col : '';
+          var cellStyle = 'padding: 6px 8px; border: ' + rowBorder + '; text-align: center; font-size: 11px;';
+
+          if (isDateCol) {
+            // Colonne date : afficher le jour
+            cellStyle += ' color: #888;';
+            html += '<td style="' + cellStyle + '">' + day + '</td>';
+          } else if (isToday) {
+            // Cellule d'aujourd'hui : sera remplie par updatePreview
+            cellStyle += ' color: #22C55E; font-weight: 600; background: rgba(34, 197, 94, 0.05);';
+            html += '<td id="' + cellId + '" style="' + cellStyle + '"></td>';
+          } else {
+            // Autres jours : montrer des valeurs fictives grisées
+            var fakeVal = day < today ? (Math.floor(Math.random() * 900) + 100) : '';
+            cellStyle += ' color: #555;';
+            html += '<td style="' + cellStyle + '">' + fakeVal + '</td>';
+          }
+        });
+
+        html += '</tr>';
+      }
+
+      // Ligne "..." pour montrer qu'il y a plus
+      html += '<tr style="background: #1a1a1a;">';
+      html += '<td colspan="' + (sortedCols.length + 1) + '" style="padding: 4px; border: 1px solid #404040; color: #555; text-align: center; font-size: 10px;">⋮ lignes ' + (endDay + 8) + ' à 38 ⋮</td>';
+      html += '</tr>';
+
+      html += '</tbody>';
+
+      table.innerHTML = html;
+
+      // Mettre à jour les valeurs d'aujourd'hui
+      updatePreview();
+    }
+
+    function scrollExcelToZone() {
+      var container = document.getElementById('excel-grid-container');
+      if (container) {
+        container.scrollLeft = container.scrollWidth;
+      }
     }
 
     function closeConfigEditor() {
