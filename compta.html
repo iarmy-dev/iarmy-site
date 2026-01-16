@@ -2075,11 +2075,16 @@ DEP 100</div>
       configEditorData = [];
       if (pendingConfig && pendingConfig.colonnes_a_remplir) {
         pendingConfig.colonnes_a_remplir.forEach(function(col) {
-          configEditorData.push({
+          var rowData = {
             keyword: col.nom,
             column: col.colonne,
             aliases: col.aliases || []
-          });
+          };
+          // Charger noteColumn si défini
+          if (col.noteColumn) {
+            rowData.noteColumn = col.noteColumn;
+          }
+          configEditorData.push(rowData);
         });
       }
 
@@ -2308,19 +2313,20 @@ DEP 100</div>
       container.innerHTML = '';
 
       configEditorData.forEach(function(row, index) {
-        // Ligne GLASS: [KEYWORD] → [Column]
-        var rowHtml = '<div class="glass-row" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\';this.style.borderColor=\'rgba(255,255,255,0.12)\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\';this.style.borderColor=\'rgba(255,255,255,0.08)\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)\'">';
+        // Container pour la ligne + note optionnelle
+        var rowHtml = '<div class="keyword-row-container" style="display: flex; flex-direction: column; gap: 6px;">';
+
+        // Ligne principale GLASS: [KEYWORD] → [Column]
+        rowHtml += '<div class="glass-row" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\'">';
 
         // Input mot-clé (glass orange)
-        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 72px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 10px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; box-shadow: 0 2px 6px rgba(255,107,53,0.15), inset 0 1px 0 rgba(255,255,255,0.1); transition: all 0.2s;" placeholder="..." onfocus="this.style.boxShadow=\'0 0 0 2px rgba(255,107,53,0.3), 0 4px 12px rgba(255,107,53,0.2)\'" onblur="this.style.boxShadow=\'0 2px 6px rgba(255,107,53,0.15), inset 0 1px 0 rgba(255,255,255,0.1)\'">';
+        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 72px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 10px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; box-shadow: 0 2px 6px rgba(255,107,53,0.15); transition: all 0.2s;" placeholder="...">';
 
-        // Flèche avec glow subtil
-        rowHtml += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; text-shadow: 0 0 10px rgba(255,255,255,0.1);">→</span>';
+        // Flèche
+        rowHtml += '<span style="color: rgba(255,255,255,0.35); font-size: 16px;">→</span>';
 
-        // Select colonne (glass style)
-        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.8); font-size: 12px; cursor: pointer; appearance: none; background-image: url(\'data:image/svg+xml;utf8,<svg fill=\"white\" opacity=\"0.5\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>\'); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; padding-right: 30px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
-
-        // Options: nom de colonne en premier
+        // Select colonne
+        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.8); font-size: 12px; cursor: pointer;">';
         if (availableColumns.length > 0) {
           availableColumns.forEach(function(col) {
             var selected = col.letter === row.column ? 'selected' : '';
@@ -2337,14 +2343,54 @@ DEP 100</div>
         }
         rowHtml += '</select>';
 
-        // Bouton supprimer (glass hover)
-        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; transition: all 0.25s ease; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\';this.style.borderColor=\'rgba(239,68,68,0.3)\';this.style.boxShadow=\'0 2px 8px rgba(239,68,68,0.2)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\';this.style.borderColor=\'transparent\';this.style.boxShadow=\'none\'">×</button>';
+        // Bouton + note (si pas encore de note)
+        if (!row.noteColumn) {
+          rowHtml += '<button onclick="addNoteColumn(' + index + ')" style="padding: 4px 8px; background: transparent; border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 10px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.borderColor=\'rgba(139,92,246,0.5)\';this.style.color=\'#a78bfa\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.15)\';this.style.color=\'rgba(255,255,255,0.3)\'" title="Ajouter une colonne pour le texte (ex: justificatif)">+ note</button>';
+        }
+
+        // Bouton supprimer
+        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; transition: all 0.25s ease; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\'">×</button>';
+
+        rowHtml += '</div>';
+
+        // Ligne note (si activée)
+        if (row.noteColumn) {
+          rowHtml += '<div style="display: flex; align-items: center; gap: 8px; margin-left: 20px; padding: 8px 12px; background: rgba(139,92,246,0.08); border-radius: 10px; border: 1px solid rgba(139,92,246,0.2);">';
+          rowHtml += '<span style="color: rgba(139,92,246,0.6); font-size: 11px;">└ texte →</span>';
+          rowHtml += '<select onchange="updateNoteColumn(' + index + ', this.value)" style="flex: 1; background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25); border-radius: 6px; padding: 6px 10px; color: #a78bfa; font-size: 11px; cursor: pointer;">';
+          if (availableColumns.length > 0) {
+            availableColumns.forEach(function(col) {
+              var selected = col.letter === row.noteColumn ? 'selected' : '';
+              var displayName = col.name + ' (' + col.letter + ')';
+              if (col.name.length > 12) displayName = col.name.substring(0, 12) + '... (' + col.letter + ')';
+              rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
+            });
+          }
+          rowHtml += '</select>';
+          rowHtml += '<button onclick="removeNoteColumn(' + index + ')" style="width: 20px; height: 20px; background: transparent; border: none; color: rgba(139,92,246,0.4); cursor: pointer; font-size: 12px;" onmouseover="this.style.color=\'#f87171\'" onmouseout="this.style.color=\'rgba(139,92,246,0.4)\'" title="Supprimer la note">×</button>';
+          rowHtml += '</div>';
+        }
 
         rowHtml += '</div>';
         container.innerHTML += rowHtml;
       });
 
       updatePreview();
+    }
+
+    function addNoteColumn(index) {
+      var defaultCol = availableColumns.length > 0 ? availableColumns[0].letter : 'A';
+      configEditorData[index].noteColumn = defaultCol;
+      renderConfigEditorRows();
+    }
+
+    function updateNoteColumn(index, value) {
+      configEditorData[index].noteColumn = value;
+    }
+
+    function removeNoteColumn(index) {
+      delete configEditorData[index].noteColumn;
+      renderConfigEditorRows();
     }
 
     function updatePreview() {
@@ -2557,11 +2603,16 @@ DEP 100</div>
           else if (kwLower === 'raz' || kwLower === 'recette' || kwLower === 'recettes') aliases = ['raz', 'recette', 'recettes', 'ca', 'ttc', 'ticket z', 'ticketz'];
           else if (kwLower === 'dep' || kwLower === 'dépenses' || kwLower === 'depenses') aliases = ['dep', 'dépense', 'dépenses', 'depense', 'depenses', 'frais'];
 
-          newColonnes.push({
+          var colConfig = {
             nom: kw.toUpperCase(),
             colonne: row.column,
             aliases: aliases
-          });
+          };
+          // Ajouter noteColumn si défini
+          if (row.noteColumn) {
+            colConfig.noteColumn = row.noteColumn;
+          }
+          newColonnes.push(colConfig);
         }
       });
 
