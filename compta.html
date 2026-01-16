@@ -1128,14 +1128,22 @@
     async function signOut() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
 
     function setupUploadZone() {
-      var uploadZone = document.getElementById('upload-zone'), fileInput = document.getElementById('file-input');
-      if (uploadZone && fileInput) {
+      var uploadZone = document.getElementById('upload-zone');
+      var fileInput = document.getElementById('file-input');
+
+      // Setup upload zone if it exists
+      if (uploadZone) {
         uploadZone.addEventListener('click', function() { fileInput.click(); });
         uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); uploadZone.classList.add('dragover'); });
         uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('dragover'); });
         uploadZone.addEventListener('drop', function(e) { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+      }
+
+      // Always setup file input listener
+      if (fileInput) {
         fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
       }
+
       document.getElementById('chat-input')?.addEventListener('keypress', function(e) { if (e.key === 'Enter') sendMessage(); });
       document.getElementById('chat-send-btn')?.addEventListener('click', sendMessage);
     }
