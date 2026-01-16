@@ -351,10 +351,25 @@
         </div>
       </div>
 
+      <!-- Suggestion "Partir de zéro" si score bas ou trop d'échanges -->
+      <div id="start-fresh-notice" style="display: none; background: rgba(255, 107, 53, 0.08); border: 1px solid rgba(255, 107, 53, 0.25); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: flex-start; gap: 10px;">
+          <span style="font-size: 18px;">✨</span>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">Partir de zero ?</div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 12px 0;">Pour une config propre et sure, on te cree un fichier tout neuf avec tes colonnes.</p>
+            <button onclick="switchToFreshStart()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; padding: 10px 16px; color: white; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Creer un fichier vierge
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Boutons -->
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 12px;" id="preview-buttons">
         <button id="btn-refine" onclick="openRefinementChat()" style="flex: 1; display: none; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 16px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-          💬 Affiner
+          Affiner avec iArmy
         </button>
         <button class="btn-preview-confirm" onclick="confirmConfig()" style="flex: 2;">
           Valider ✓
@@ -465,8 +480,8 @@
   <div class="flex min-h-screen" style="padding-top: 70px;">
     <aside class="sidebar">
       <div class="mb-6">
-        <span class="text-xs text-white/30 uppercase tracking-wider">Configuration</span>
-        <div class="text-lg font-semibold mt-1" style="color: #FF6B35;">Module Compta</div>
+        <span class="text-xs text-white/30 uppercase tracking-wider">Activation</span>
+        <div class="text-lg font-semibold mt-1" style="color: #FF6B35;">Compta Express</div>
       </div>
       <div id="steps-nav">
         <div class="step-item active" id="step-nav-1"><div class="step-number">1</div><span class="step-label">Connexion Google</span></div>
@@ -1593,6 +1608,9 @@
     async function callAPI(mode) { var response = await fetch(SUPABASE_URL + '/functions/v1/clever-processor', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ excelData: excelData, chatHistory: chatHistory, mode: mode }) }); var result = await response.json(); if (result.error) throw new Error(result.error); return result.response; }
     
     async function startAnalysis() {
+      // Reset du compteur d'échanges pour ce nouveau fichier
+      refinementExchangeCount = 0;
+
       showTyping();
       isWaitingForAI = true;
       try {
@@ -1644,6 +1662,7 @@
     // ========== CONFIG PREVIEW FUNCTIONS ==========
     var pendingConfig = null;
     var refinementChatHistory = [];
+    var refinementExchangeCount = 0; // Compteur d'échanges pour le chat d'affinement
 
     function showConfigPreview(config) {
       pendingConfig = config;
@@ -1711,17 +1730,32 @@
 
       document.getElementById('summary-cards').innerHTML = cardsHtml;
 
-      // Show refinement notice and button if confidence < 100
-      if (confidence < 100) {
+      // Seuils de confiance
+      var SCORE_HIGH = 85;    // >= 85% : tout est bon, on valide
+      var SCORE_LOW = 70;     // < 70% : on propose "partir de zéro"
+      var MAX_EXCHANGES = 3;  // Après 3 échanges sans succès, on propose "partir de zéro"
+
+      // Gérer l'affichage selon le score et les échanges
+      var showStartFresh = (confidence < SCORE_LOW) || (refinementExchangeCount >= MAX_EXCHANGES);
+      var showRefine = (confidence < SCORE_HIGH) && !showStartFresh;
+
+      // Reset les notices
+      document.getElementById('refinement-notice').style.display = 'none';
+      document.getElementById('start-fresh-notice').style.display = 'none';
+      document.getElementById('btn-refine').style.display = 'none';
+
+      if (showStartFresh) {
+        // Score trop bas ou trop d'échanges → proposer "Partir de zéro"
+        document.getElementById('start-fresh-notice').style.display = 'block';
+      } else if (showRefine) {
+        // Score moyen → proposer d'affiner
         document.getElementById('refinement-notice').style.display = 'block';
         document.getElementById('btn-refine').style.display = 'block';
         if (config.raison_confiance) {
           document.getElementById('refinement-reason').textContent = config.raison_confiance;
         }
-      } else {
-        document.getElementById('refinement-notice').style.display = 'none';
-        document.getElementById('btn-refine').style.display = 'none';
       }
+      // Sinon score >= 85% → on montre juste le bouton Valider
 
       // Build technical details (columns list)
       var colsHtml = '';
@@ -1769,6 +1803,21 @@
 
     function closeConfigPreview() {
       document.getElementById('config-preview-overlay').classList.remove('active');
+    }
+
+    function switchToFreshStart() {
+      // Ferme le modal de preview et retourne à l'écran "Partir de zéro"
+      document.getElementById('config-preview-overlay').classList.remove('active');
+      document.getElementById('refinement-chat-overlay').classList.remove('active');
+
+      // Reset le compteur d'échanges
+      refinementExchangeCount = 0;
+
+      // Retour à l'étape choix du fichier
+      goToStep(2);
+
+      // Toast pour confirmer
+      showToast('Tu peux creer un fichier vierge ci-dessus');
     }
 
     // ========== REFINEMENT CHAT FUNCTIONS ==========
@@ -1833,6 +1882,10 @@
       // Add to main chatHistory so Claude has context
       chatHistory.push({ role: 'user', content: text });
 
+      // Incrémenter le compteur d'échanges
+      refinementExchangeCount++;
+      console.log('[REFINEMENT] Exchange count:', refinementExchangeCount);
+
       try {
         // Call the API with the refinement context
         var response = await callAPI('chat');
@@ -1855,6 +1908,14 @@
           showToast('Configuration mise a jour !');
         } else {
           addRefinementBotMessage(response);
+
+          // Après 3 échanges sans succès, on ferme le chat et on montre "Partir de zéro"
+          if (refinementExchangeCount >= 3) {
+            setTimeout(function() {
+              closeRefinementChat();
+              showConfigPreview(pendingConfig); // Re-afficher le preview avec les nouvelles options
+            }, 2000);
+          }
         }
       } catch (err) {
         hideRefinementTyping();
