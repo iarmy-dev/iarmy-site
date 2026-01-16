@@ -2021,7 +2021,19 @@
         updateSidebarStep(3);
       } else if (stepNum === 4) {
         // Étape 4 = Telegram
-        document.getElementById('step-telegram').classList.add('active');
+        console.log('[NAV] 🔵 Activation step-telegram...');
+        var telegramStep = document.getElementById('step-telegram');
+        if (telegramStep) {
+          telegramStep.classList.add('active');
+          console.log('[NAV] ✅ step-telegram.classList:', telegramStep.classList.toString());
+        } else {
+          console.error('[NAV] ❌ step-telegram element NOT FOUND!');
+        }
+        // S'assurer que telegram-initial est visible par défaut
+        var telegramInitial = document.getElementById('telegram-initial');
+        if (telegramInitial && telegramInitial.style.display === 'none') {
+          console.log('[NAV] 🔄 Resetting telegram-initial visibility');
+        }
         updateSidebarStep(4);
         checkExistingTelegramConnection();
       }
@@ -2029,14 +2041,19 @@
 
     async function confirmConfig() {
       console.log('[COMPTA] 📋 confirmConfig called');
+      console.log('[COMPTA] 📋 pendingConfig:', pendingConfig);
+      console.log('[COMPTA] 📋 excelData:', excelData);
+      console.log('[COMPTA] 📋 excelData?.sheetId:', excelData?.sheetId);
+
       if (!pendingConfig) {
         console.log('[COMPTA] ❌ pendingConfig is null, returning');
+        alert('Erreur: Configuration non trouvée. Veuillez réanalyser le fichier.');
         return;
       }
 
       // Si on a déjà un sheetId (Google Sheet sélectionné ou fichier converti), sauvegarder directement
       if (excelData?.sheetId) {
-        console.log('[COMPTA] ✅ sheetId existe, sauvegarde directe');
+        console.log('[COMPTA] ✅ sheetId existe:', excelData.sheetId, '- sauvegarde directe');
         await saveConfigAndContinue();
         return;
       }
@@ -2083,7 +2100,9 @@
       finalConfig = pendingConfig;
 
       // Aller directement à l'étape Telegram
+      console.log('[COMPTA] 🚀 Navigation vers step 4 (Telegram)...');
       goToStep(4);
+      console.log('[COMPTA] ✅ goToStep(4) completed');
     }
 
     function closeConnectGoogleOverlay() {
@@ -2682,7 +2701,26 @@
     
     function startConnectionCheck() { connectionCheckInterval = setInterval(async function() { try { var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle(); if (data?.telegram_user_id) { clearInterval(connectionCheckInterval); showTelegramConnected(); } } catch (err) {} }, 3000); }
     function showTelegramConnected() { document.getElementById('telegram-connecting').style.display = 'none'; document.getElementById('telegram-connected').style.display = 'block'; }
-    async function checkExistingTelegramConnection() { if (!currentUser) return; try { var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle(); if (data?.telegram_user_id) { document.getElementById('telegram-initial').style.display = 'none'; showTelegramConnected(); } } catch (err) {} }
+    async function checkExistingTelegramConnection() {
+      console.log('[TELEGRAM] checkExistingTelegramConnection called, currentUser:', currentUser?.id);
+      if (!currentUser) {
+        console.log('[TELEGRAM] No currentUser, returning');
+        return;
+      }
+      try {
+        var { data, error } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle();
+        console.log('[TELEGRAM] Query result - data:', data, 'error:', error);
+        if (data?.telegram_user_id) {
+          console.log('[TELEGRAM] User already connected, showing connected state');
+          document.getElementById('telegram-initial').style.display = 'none';
+          showTelegramConnected();
+        } else {
+          console.log('[TELEGRAM] No existing connection, telegram-initial should be visible');
+        }
+      } catch (err) {
+        console.error('[TELEGRAM] Error checking connection:', err);
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', async function() {
       console.log('[COMPTA] 📱 Page chargée');
