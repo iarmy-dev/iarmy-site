@@ -2022,18 +2022,28 @@
       } else if (stepNum === 4) {
         // Étape 4 = Telegram
         console.log('[NAV] 🔵 Activation step-telegram...');
+
+        // FORCE: Fermer TOUS les loaders et overlays
+        document.getElementById('global-loader')?.classList.remove('active');
+        document.getElementById('welcome-overlay')?.classList.remove('active');
+        document.querySelectorAll('.sheets-overlay').forEach(function(el) { el.classList.remove('active'); });
+        console.log('[NAV] 🧹 All overlays/loaders cleared');
+
         var telegramStep = document.getElementById('step-telegram');
         if (telegramStep) {
           telegramStep.classList.add('active');
-          console.log('[NAV] ✅ step-telegram.classList:', telegramStep.classList.toString());
+          telegramStep.style.display = 'block'; // Force display
+          console.log('[NAV] ✅ step-telegram activated, display:', telegramStep.style.display);
         } else {
           console.error('[NAV] ❌ step-telegram element NOT FOUND!');
         }
+
         // S'assurer que telegram-initial est visible par défaut
         var telegramInitial = document.getElementById('telegram-initial');
-        if (telegramInitial && telegramInitial.style.display === 'none') {
-          console.log('[NAV] 🔄 Resetting telegram-initial visibility');
+        if (telegramInitial) {
+          console.log('[NAV] telegram-initial current display:', telegramInitial.style.display);
         }
+
         updateSidebarStep(4);
         checkExistingTelegramConnection();
       }
