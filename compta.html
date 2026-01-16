@@ -4013,14 +4013,21 @@ DEP 100</div>
     document.addEventListener('DOMContentLoaded', async function() {
       console.log('[COMPTA] 📱 Page chargée');
       var urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('code') && urlParams.get('state') === 'sheets_auth') { console.log('[COMPTA] 🔄 Callback OAuth Sheets'); await handleSheetsCallback(); }
-      await initComptaPage();
 
-      // Si ?edit=true, charger la config existante et ouvrir l'éditeur
+      // Si ?edit=true, charger directement l'éditeur (skip le flow normal)
       if (urlParams.get('edit') === 'true') {
         console.log('[COMPTA] 📝 Mode édition directe demandé');
+        // Init minimal (juste session)
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+        currentUser = session.user;
+        await updateNavBar();
         await loadExistingConfigForEdit();
+        return; // Stop ici, pas besoin du flow normal
       }
+
+      if (urlParams.get('code') && urlParams.get('state') === 'sheets_auth') { console.log('[COMPTA] 🔄 Callback OAuth Sheets'); await handleSheetsCallback(); }
+      await initComptaPage();
     });
 
     async function loadExistingConfigForEdit() {
