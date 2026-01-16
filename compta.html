@@ -2083,14 +2083,8 @@ TR 50</div>
         // Suggérer d'ajouter RAZ
       }
 
-      // Vérifier si DEP existe
-      var hasDep = configEditorData.some(function(c) { return c.keyword.toUpperCase() === 'DEP' || c.keyword.toUpperCase() === 'DÉPENSES'; });
-      var hasEsp = configEditorData.some(function(c) { return c.keyword.toUpperCase() === 'ESP'; });
-      if (hasDep && hasEsp) {
-        document.getElementById('dep-combine-option').style.display = 'block';
-      } else {
-        document.getElementById('dep-combine-option').style.display = 'none';
-      }
+      // Vérifier si DEP et ESP existent pour afficher la règle spéciale
+      checkSpecialRules();
 
       renderConfigEditorRows();
       document.getElementById('config-editor-overlay').style.display = 'block';
@@ -2210,7 +2204,7 @@ TR 50</div>
 
     function updateConfigKeyword(index, value) {
       configEditorData[index].keyword = value;
-      checkDepEspOption();
+      checkSpecialRules();
     }
 
     function updateConfigColumn(index, value) {
@@ -2220,7 +2214,7 @@ TR 50</div>
     function removeConfigRow(index) {
       configEditorData.splice(index, 1);
       renderConfigEditorRows();
-      checkDepEspOption();
+      checkSpecialRules();
     }
 
     function addConfigRow() {
@@ -2233,17 +2227,6 @@ TR 50</div>
       renderConfigEditorRows();
     }
 
-    function checkDepEspOption() {
-      var hasDep = configEditorData.some(function(c) {
-        var kw = c.keyword.toUpperCase();
-        return kw === 'DEP' || kw === 'DÉPENSES' || kw === 'DEPENSES';
-      });
-      var hasEsp = configEditorData.some(function(c) {
-        var kw = c.keyword.toUpperCase();
-        return kw === 'ESP' || kw === 'ESPECES' || kw === 'ESPÈCES';
-      });
-      document.getElementById('dep-combine-option').style.display = (hasDep && hasEsp) ? 'block' : 'none';
-    }
 
     function toggleDepCombine() {
       depCombineWithEsp = document.getElementById('dep-combine-checkbox').checked;
