@@ -1379,13 +1379,16 @@
         if (readResult.excelData?.sheets?.[0]?.detectedHeaders?.columns) {
           var headers = readResult.excelData.sheets[0].detectedHeaders.columns;
           var importantHeaders = headers.filter(function(h) {
-            return /^(CB|ESP|TR|Dépenses|Recettes|Date)$/i.test(h.name);
+            return /^(CB|ESP|TR|Dépenses|Recettes|Date|Jour)$/i.test(h.name);
           });
           console.log('========================================');
           console.log('[DEBUG] HEADERS DÉTECTÉS PAR read-google-sheet:');
           importantHeaders.forEach(function(h) {
             console.log('  ' + h.name + ' = colonne ' + h.letter);
           });
+          // Log the explicitly detected date column
+          var detectedDateCol = readResult.excelData.sheets[0].detectedDateColumn;
+          console.log('[DEBUG] COLONNE DATE PRÉ-DÉTECTÉE: ' + (detectedDateCol || 'NON DÉTECTÉE'));
           console.log('========================================');
         }
 
