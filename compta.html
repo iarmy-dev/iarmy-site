@@ -200,7 +200,397 @@
     .btn-google-sheets { width: 100%; background: white; color: #3c4043; border: none; border-radius: 14px; padding: 16px 24px; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .btn-google-sheets:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2); }
     .btn-google-sheets.connected { background: linear-gradient(135deg, #0f9d58, #0a7e3e); color: white; }
-    @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
+    /* ============================================= */
+    /* MOBILE PROGRESS INDICATOR                    */
+    /* ============================================= */
+    .mobile-progress {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 12px 20px;
+      z-index: 45;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .mobile-progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 8px;
+    }
+    .mobile-step {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    .mobile-step.active {
+      background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+    }
+    .mobile-step.completed {
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      border-color: transparent;
+      color: white;
+    }
+    .mobile-step-line {
+      width: 24px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: background 0.3s ease;
+    }
+    .mobile-step-line.completed {
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+    }
+    .mobile-step-label {
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 500;
+    }
+
+    /* ============================================= */
+    /* MOBILE STYLES - Version propre et responsive */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      /* Show mobile progress */
+      .mobile-progress { display: block; }
+
+      /* Adjust main content for mobile progress bar */
+      .flex.min-h-screen { padding-top: 130px !important; }
+
+      /* Layout de base */
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; padding: 16px; max-width: 100%; }
+
+      /* Header */
+      .glass { padding: 12px 16px !important; }
+      .logo-i { width: 36px; height: 36px; font-size: 18px; border-radius: 10px; }
+
+      /* Hide "iArmy" text on mobile, keep logo */
+      nav a span.font-semibold { display: none; }
+
+      /* Auth buttons - compact on mobile */
+      #auth-buttons > div { gap: 6px !important; }
+      #auth-buttons a[id="user-profile-btn"] {
+        padding: 6px 10px !important;
+        border-radius: 10px !important;
+      }
+      /* Hide username, keep avatar only */
+      #auth-buttons a[id="user-profile-btn"] span { display: none; }
+      #auth-buttons a[id="user-profile-btn"] img {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      #auth-buttons button[id="logout-btn"] {
+        padding: 8px !important;
+        border-radius: 8px !important;
+      }
+
+      /* Orbes de fond - plus petits sur mobile */
+      .orb-1 { width: 300px; height: 300px; top: -150px; right: -100px; }
+      .orb-2 { width: 250px; height: 250px; bottom: -125px; left: -100px; }
+      .orb-3 { display: none; }
+
+      /* Titres */
+      h1 { font-size: 24px !important; line-height: 1.3; }
+      h2 { font-size: 20px !important; }
+      h3 { font-size: 18px !important; }
+
+      /* Upload zone */
+      .upload-zone { padding: 40px 20px; border-radius: 20px; }
+      .upload-zone svg { width: 48px !important; height: 48px !important; }
+      .upload-zone p { font-size: 14px !important; }
+
+      /* Boutons */
+      .btn-glow, .btn-telegram, .btn-google-sheets {
+        padding: 14px 24px;
+        font-size: 14px;
+        border-radius: 12px;
+      }
+
+      /* Glass cards */
+      .glass-card { border-radius: 20px; padding: 20px; }
+
+      /* Chat container */
+      .chat-container { border-radius: 20px; }
+      .chat-header { padding: 16px; }
+      .chat-messages { padding: 16px; min-height: 250px; max-height: 400px; }
+      .chat-bubble { padding: 12px 16px; font-size: 14px; max-width: 90%; }
+      .chat-input-container { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+      .chat-input { padding: 12px 16px; font-size: 14px; border-radius: 12px; }
+      .chat-send { padding: 12px 20px; border-radius: 12px; font-size: 14px; }
+
+      /* Modals/Overlays */
+      .sheets-overlay { left: 0; top: 60px; padding: 16px; }
+      .sheets-content {
+        padding: 20px;
+        border-radius: 20px;
+        max-height: 85vh;
+        width: 100%;
+        max-width: 100%;
+      }
+      .sheets-header h2 { font-size: 22px; }
+      .sheets-header p { font-size: 14px; }
+      .sheet-card { padding: 16px; border-radius: 16px; gap: 14px; }
+      .sheet-card-icon { width: 44px; height: 44px; border-radius: 12px; }
+      .sheet-card-info h3 { font-size: 14px; }
+
+      /* Loader */
+      .loader-container {
+        min-width: auto;
+        max-width: calc(100vw - 40px);
+        padding: 24px 20px;
+        margin: 0 20px;
+      }
+
+      /* Welcome overlay */
+      .welcome-logo { width: 80px; height: 80px; font-size: 42px; border-radius: 22px; }
+      .welcome-title { font-size: 26px; padding: 0 20px; }
+      .welcome-subtitle { font-size: 14px; padding: 0 20px; }
+
+      /* Toast */
+      .toast {
+        bottom: 20px;
+        padding: 14px 24px;
+        font-size: 14px;
+        border-radius: 12px;
+        max-width: calc(100vw - 40px);
+      }
+
+      /* Config editor - Layout mobile */
+      #config-editor-main { padding: 0; }
+
+      /* Fermer btn */
+      .close-btn {
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE CONFIG EDITOR - Refonte complète      */
+    /* ============================================= */
+    @media (max-width: 900px) {
+      /* Grid phone/excel → stack vertical */
+      #config-editor-main > div[style*="grid-template-columns: 280px"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+      }
+
+      /* iPhone preview - plus petit et centré */
+      #config-editor-main > div > div:first-child {
+        max-width: 240px;
+        margin: 0 auto;
+      }
+
+      /* Excel preview - full width */
+      #config-editor-main > div > div:last-child {
+        width: 100% !important;
+      }
+
+      /* Excel table container */
+      #excel-grid-container {
+        max-height: 250px !important;
+      }
+
+      /* Excel table - scroll horizontal */
+      #excel-preview-table {
+        min-width: 400px !important;
+        font-size: 10px !important;
+      }
+      #excel-preview-table th,
+      #excel-preview-table td {
+        padding: 6px 4px !important;
+        min-width: 50px !important;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE CONFIG PANEL - Keywords & Rules       */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      /* Config panel container */
+      #config-editor-panel {
+        padding: 16px !important;
+        border-radius: 16px !important;
+      }
+
+      /* Panel header */
+      #config-editor-panel > div:first-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+
+      /* Keyword rows */
+      .keyword-row-container {
+        gap: 4px !important;
+      }
+
+      .glass-row {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding: 12px !important;
+      }
+
+      /* Keyword input */
+      .glass-row input[type="text"] {
+        width: 80px !important;
+        min-width: 80px !important;
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+      }
+
+      /* Column select */
+      .glass-row select {
+        min-width: 60px !important;
+        font-size: 12px !important;
+        padding: 8px !important;
+      }
+
+      /* Arrow indicator */
+      .glass-row span[style*="font-size: 18px"] {
+        font-size: 14px !important;
+      }
+
+      /* Note button */
+      .glass-row button[onclick*="addNoteColumn"] {
+        font-size: 11px !important;
+        padding: 4px 6px !important;
+      }
+
+      /* Delete button */
+      .glass-row button[onclick*="removeConfigRow"] {
+        width: 28px !important;
+        height: 28px !important;
+      }
+
+      /* Note sub-row */
+      .glass-row + div[style*="margin-left: 20px"] {
+        margin-left: 8px !important;
+        padding: 6px 10px !important;
+        flex-wrap: wrap !important;
+      }
+
+      /* Add keyword button */
+      button[onclick*="addConfigRow"] {
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+      }
+
+      /* Custom rules section */
+      #custom-rules-section {
+        padding: 12px !important;
+      }
+
+      /* Rule rows */
+      #custom-rules-list > div {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 10px !important;
+      }
+
+      /* Modifier/Valider buttons */
+      button[onclick*="enterEditMode"],
+      button[onclick*="saveConfigEditor"] {
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+        min-width: auto !important;
+      }
+    }
+
+    /* ============================================= */
+    /* VERY SMALL SCREENS (< 400px)                 */
+    /* ============================================= */
+    @media (max-width: 400px) {
+      .main-content { padding: 12px; }
+
+      h1 { font-size: 20px !important; }
+      h2 { font-size: 18px !important; }
+
+      .btn-glow, .btn-telegram {
+        padding: 12px 20px;
+        font-size: 13px;
+      }
+
+      .chat-bubble { max-width: 95%; }
+
+      .sheet-card { flex-direction: column; text-align: center; }
+      .sheet-card-info { min-width: 100%; }
+      .sheet-card-arrow { display: none; }
+
+      /* iPhone preview hidden on very small screens */
+      #config-editor-main > div > div:first-child {
+        display: none !important;
+      }
+
+      /* Keyword row - full width inputs */
+      .glass-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .glass-row input[type="text"],
+      .glass-row select {
+        width: 100% !important;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE STEP 4 - TELEGRAM                     */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      #step-telegram .glass-card {
+        padding: 20px !important;
+      }
+
+      /* Token display */
+      #step-telegram input[readonly] {
+        font-size: 14px !important;
+        padding: 12px !important;
+      }
+
+      /* QR code smaller */
+      #step-telegram img[alt*="QR"] {
+        max-width: 150px !important;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE STEP 5 - SUCCESS                      */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      .check-icon { width: 50px; height: 50px; }
+
+      #step-success h1 { font-size: 22px !important; }
+      #step-success p { font-size: 14px !important; padding: 0 10px; }
+    }
+
+    /* ============================================= */
+    /* SAFE AREA - iPhone notch support             */
+    /* ============================================= */
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .glass { padding-top: calc(12px + env(safe-area-inset-top)) !important; }
+      .toast { bottom: calc(20px + env(safe-area-inset-bottom)); }
+    }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -346,6 +736,19 @@
       <div id="auth-buttons"></div>
     </div>
   </nav>
+  <!-- Mobile Step Progress Indicator -->
+  <div id="mobile-progress" class="mobile-progress">
+    <div class="mobile-progress-steps">
+      <div class="mobile-step active" data-step="1"><span>1</span></div>
+      <div class="mobile-step-line"></div>
+      <div class="mobile-step" data-step="2"><span>2</span></div>
+      <div class="mobile-step-line"></div>
+      <div class="mobile-step" data-step="3"><span>3</span></div>
+      <div class="mobile-step-line"></div>
+      <div class="mobile-step" data-step="4"><span>4</span></div>
+    </div>
+    <div class="mobile-step-label" id="mobile-step-label">Connexion Google</div>
+  </div>
   <div class="flex min-h-screen" style="padding-top: 70px;">
     <aside class="sidebar">
       <div class="mb-6">
@@ -2782,6 +3185,7 @@ DEP 100</div>
 
     // ========== SIDEBAR NAVIGATION ==========
     function updateSidebarStep(stepNum) {
+      // Update desktop sidebar
       for (var i = 1; i <= 4; i++) {
         var stepEl = document.getElementById('step-nav-' + i);
         if (!stepEl) continue;
@@ -2805,6 +3209,41 @@ DEP 100</div>
           stepEl.classList.add('upcoming');
           stepEl.querySelector('.step-number').textContent = i;
         }
+      }
+
+      // Update mobile progress indicator
+      updateMobileProgress(stepNum);
+    }
+
+    function updateMobileProgress(stepNum) {
+      var stepLabels = ['Connexion Google', 'Ton fichier', 'Configuration', 'Telegram'];
+      var mobileSteps = document.querySelectorAll('.mobile-step');
+      var mobileLines = document.querySelectorAll('.mobile-step-line');
+      var mobileLabel = document.getElementById('mobile-step-label');
+
+      mobileSteps.forEach(function(step, index) {
+        var num = index + 1;
+        step.classList.remove('active', 'completed');
+        if (num < stepNum) {
+          step.classList.add('completed');
+          step.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else if (num === stepNum) {
+          step.classList.add('active');
+          step.innerHTML = '<span>' + num + '</span>';
+        } else {
+          step.innerHTML = '<span>' + num + '</span>';
+        }
+      });
+
+      mobileLines.forEach(function(line, index) {
+        line.classList.remove('completed');
+        if (index + 1 < stepNum) {
+          line.classList.add('completed');
+        }
+      });
+
+      if (mobileLabel) {
+        mobileLabel.textContent = stepLabels[stepNum - 1] || '';
       }
     }
 
