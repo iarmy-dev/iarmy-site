@@ -2700,7 +2700,20 @@
     }
     
     function startConnectionCheck() { connectionCheckInterval = setInterval(async function() { try { var { data } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle(); if (data?.telegram_user_id) { clearInterval(connectionCheckInterval); showTelegramConnected(); } } catch (err) {} }, 3000); }
-    function showTelegramConnected() { document.getElementById('telegram-connecting').style.display = 'none'; document.getElementById('telegram-connected').style.display = 'block'; }
+    function showTelegramConnected() {
+      console.log('[TELEGRAM] showTelegramConnected() called');
+      var connectingEl = document.getElementById('telegram-connecting');
+      var connectedEl = document.getElementById('telegram-connected');
+      console.log('[TELEGRAM] telegram-connected element found:', !!connectedEl);
+      if (connectingEl) connectingEl.style.display = 'none';
+      if (connectedEl) {
+        connectedEl.style.display = 'block';
+        console.log('[TELEGRAM] ✅ telegram-connected display set to block');
+        console.log('[TELEGRAM] Content inside:', connectedEl.innerHTML.substring(0, 100));
+      } else {
+        console.error('[TELEGRAM] ❌ telegram-connected NOT FOUND!');
+      }
+    }
     async function checkExistingTelegramConnection() {
       console.log('[TELEGRAM] checkExistingTelegramConnection called, currentUser:', currentUser?.id);
       if (!currentUser) {
