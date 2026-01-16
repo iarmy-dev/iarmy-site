@@ -1272,8 +1272,10 @@
       // Pas de loader ici - on va directement à l'étape 3 qui a son propre état de chargement
       try {
         // Refresh session pour avoir un token frais
+        console.log('[COMPTA] Original session token preview:', session?.access_token?.substring(0, 30) || 'NONE');
         var { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
         var freshSession = refreshData?.session || session;
+        console.log('[COMPTA] Fresh session token preview:', freshSession?.access_token?.substring(0, 30) || 'NONE');
         if (refreshError) {
           console.warn('[COMPTA] Session refresh warning:', refreshError.message);
         } else {
@@ -1305,6 +1307,10 @@
     }
 
     async function startAnalysisWithSheetRead(sheetId, accessToken) {
+      console.log('[ANALYSE] Starting with sheetId:', sheetId);
+      console.log('[ANALYSE] Token present:', !!accessToken);
+      console.log('[ANALYSE] Token preview:', accessToken ? accessToken.substring(0, 50) + '...' : 'MISSING');
+
       // Reset
       analyseExchangeCount = 0;
       analyseChatHistory = [];
