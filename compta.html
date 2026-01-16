@@ -1433,18 +1433,51 @@
               console.log('========================================');
             }
 
-            // FIX: Déduire la colonne date à partir de CB (date = CB - 1 colonne)
-            // Ceci gère les sheets avec 2 zones où la date manuelle est juste à gauche de CB
-            if (parsedConfig.colonnes_a_remplir) {
+            // FIX UNIVERSEL: Trouver la colonne date la plus proche de CB
+            // Scanne les données pour trouver les colonnes avec jours 1-31, prend la plus proche de CB
+            if (parsedConfig.colonnes_a_remplir && excelData && excelData.sheets && excelData.sheets[0]) {
               var cbCol = parsedConfig.colonnes_a_remplir.find(function(c) {
                 return c.nom && c.nom.toUpperCase() === 'CB';
               });
-              if (cbCol && cbCol.colonne && cbCol.colonne.length === 1) {
-                var cbLetter = cbCol.colonne.toUpperCase();
-                var expectedDateCol = String.fromCharCode(cbLetter.charCodeAt(0) - 1);
-                if (parsedConfig.colonne_date !== expectedDateCol) {
-                  console.log('[FIX] Colonne date corrigée: ' + parsedConfig.colonne_date + ' -> ' + expectedDateCol + ' (CB=' + cbLetter + ', donc date=' + expectedDateCol + ')');
-                  parsedConfig.colonne_date = expectedDateCol;
+              if (cbCol && cbCol.colonne) {
+                var cbIndex = cbCol.colonne.toUpperCase().charCodeAt(0) - 65;
+                var allRows = excelData.sheets[0].allRows || [];
+
+                // Chercher toutes les colonnes avec des jours 1-31
+                var dateCandidates = [];
+                for (var colIdx = 0; colIdx < 26; colIdx++) {
+                  var dayCount = 0;
+                  var colLetter = String.fromCharCode(65 + colIdx);
+                  allRows.forEach(function(row) {
+                    if (row.cells) {
+                      var cell = row.cells.find(function(c) { return c.col === colLetter; });
+                      if (cell && cell.val) {
+                        var num = parseInt(cell.val);
+                        if (!isNaN(num) && num >= 1 && num <= 31) dayCount++;
+                      }
+                    }
+                  });
+                  if (dayCount >= 8) { // Au moins 8 jours trouvés
+                    dateCandidates.push({
+                      letter: colLetter,
+                      index: colIdx,
+                      distance: Math.abs(colIdx - cbIndex)
+                    });
+                  }
+                }
+
+                if (dateCandidates.length > 0) {
+                  console.log('[FIX] Colonnes date candidates:', dateCandidates.map(function(c) {
+                    return c.letter + '(dist=' + c.distance + ')';
+                  }).join(', '));
+
+                  // Prendre la plus proche de CB
+                  dateCandidates.sort(function(a, b) { return a.distance - b.distance; });
+                  var bestDate = dateCandidates[0].letter;
+                  if (parsedConfig.colonne_date !== bestDate) {
+                    console.log('[FIX] Colonne date corrigée: ' + parsedConfig.colonne_date + ' -> ' + bestDate + ' (plus proche de CB=' + cbCol.colonne + ')');
+                    parsedConfig.colonne_date = bestDate;
+                  }
                 }
               }
             }
