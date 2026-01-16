@@ -2139,52 +2139,8 @@
     }
     // ========== END CONFIG PREVIEW ==========
 
-    function goToStep(step) { document.querySelectorAll('.step-item').forEach(function(item, i) { item.classList.remove('active', 'completed', 'upcoming'); if (i < step - 1) item.classList.add('completed'); else if (i === step - 1) item.classList.add('active'); else item.classList.add('upcoming'); }); document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); }); document.getElementById('step-' + step).classList.add('active'); if (step === 3) checkExistingTelegramConnection(); }
-
     // ========== EMPTY TEMPLATE FLOW ==========
     var isEmptyTemplateFlow = false;
-
-    function showStepImport() {
-      // Set current year
-      document.getElementById('import-year').textContent = new Date().getFullYear();
-      // Hide all step-content, show step-import
-      document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
-      document.getElementById('step-import').classList.add('active');
-    }
-
-    function chooseEmptyTemplate() {
-      console.log('[COMPTA] User chose empty template');
-      isEmptyTemplateFlow = true;
-      showStepImport();
-    }
-
-    function importPreviousData() {
-      console.log('[COMPTA] User wants to import previous data');
-      // Trigger file input directly - stays on same screen until file selected
-      document.getElementById('file-input').click();
-    }
-
-    async function skipImport() {
-      console.log('[COMPTA] User skipped import - creating empty template');
-      showLoader('Creation du modele...');
-
-      // Check if user has Google access
-      if (!hasGoogleSheetsAccess) {
-        hideLoader();
-        // Show connect google modal
-        document.getElementById('connect-google-overlay').classList.add('active');
-        return;
-      }
-
-      try {
-        // Create empty template directly
-        await createEmptyTemplate();
-      } catch (error) {
-        console.error('[COMPTA] Error creating template:', error);
-        hideLoader();
-        alert('Erreur: ' + error.message);
-      }
-    }
 
     // Fonctions pour les colonnes interactives du template
     var draggedCol = null;
