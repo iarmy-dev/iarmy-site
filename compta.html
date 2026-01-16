@@ -1331,10 +1331,16 @@
       showLoader('1. Lecture du fichier...');
 
       try {
-        console.log('[UPLOAD] Getting session...');
-        var { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) throw new Error('Session expirée');
-        console.log('[UPLOAD] Session OK');
+        console.log('[UPLOAD] Getting fresh session...');
+        // Force refresh to get a valid token
+        var { data: { session }, error: sessionError } = await supabaseClient.auth.refreshSession();
+        if (sessionError || !session) {
+          console.log('[UPLOAD] Refresh failed, trying getSession...');
+          var result = await supabaseClient.auth.getSession();
+          session = result.data.session;
+        }
+        if (!session) throw new Error('Session expirée - reconnecte-toi');
+        console.log('[UPLOAD] Session OK, token expires:', new Date(session.expires_at * 1000).toLocaleString());
 
         // Lire le fichier et convertir en base64 (chunked pour gros fichiers)
         console.log('[UPLOAD] Reading file as ArrayBuffer...');
