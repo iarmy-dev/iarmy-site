@@ -1275,6 +1275,7 @@
         await supabaseClient.from('user_configs').upsert({
           user_id: session.user.id,
           sheet_id: sheetToUse.id,
+          excel_config: {},
           is_active: true
         }, { onConflict: 'user_id' });
         console.log('[COMPTA] ✅ user_configs initialisé avec sheet_id:', sheetToUse.id);
