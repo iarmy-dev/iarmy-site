@@ -128,6 +128,7 @@
     .loader-step.done .loader-step-text { color: rgba(255, 255, 255, 0.6); }
     @keyframes pulseStep { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 107, 53, 0); } }
     @keyframes pulseArrow { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(4px); } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loader-progress { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
     /* Analyse step loader */
     .analyse-step { display: flex; align-items: center; gap: 12px; }
@@ -547,14 +548,37 @@
           <p class="text-white/40">Quand tu envoies un message, voici ce qui s'écrit dans ton tableau</p>
         </div>
 
-        <!-- Loading state -->
-        <div id="config-loading" style="text-align: center; padding: 60px 20px;">
-          <div class="welcome-dots" style="justify-content: center; margin-bottom: 16px;">
-            <div class="welcome-dot"></div>
-            <div class="welcome-dot"></div>
-            <div class="welcome-dot"></div>
+        <!-- Loading state avec étapes détaillées -->
+        <div id="config-loading" style="max-width: 500px; margin: 0 auto; padding: 40px 20px;">
+          <!-- Nom du fichier -->
+          <div style="text-align: center; margin-bottom: 24px;">
+            <span id="loading-filename" style="color: #FF6B35; font-weight: 600; font-size: 16px;">recette 25.xlsx</span>
           </div>
-          <p style="color: rgba(255,255,255,0.5);">Analyse de ton fichier...</p>
+
+          <!-- Étapes de chargement -->
+          <div id="loading-steps" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+            <div class="loading-step" id="load-step-0" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+              <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);">1</div>
+              <span class="step-text" style="font-size: 14px; color: rgba(255,255,255,0.4);">Lecture du fichier</span>
+            </div>
+            <div class="loading-step" id="load-step-1" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+              <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);">2</div>
+              <span class="step-text" style="font-size: 14px; color: rgba(255,255,255,0.4);">Upload vers Google Drive</span>
+            </div>
+            <div class="loading-step" id="load-step-2" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+              <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);">3</div>
+              <span class="step-text" style="font-size: 14px; color: rgba(255,255,255,0.4);">Conversion en Google Sheet</span>
+            </div>
+            <div class="loading-step" id="load-step-3" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+              <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);">4</div>
+              <span class="step-text" style="font-size: 14px; color: rgba(255,255,255,0.4);">Détection des colonnes</span>
+            </div>
+          </div>
+
+          <!-- Barre de progression -->
+          <div style="background: rgba(255,255,255,0.1); border-radius: 4px; height: 4px; overflow: hidden;">
+            <div id="loading-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #FF6B35, #FF8B5E); transition: width 0.3s ease;"></div>
+          </div>
         </div>
 
         <!-- Config Editor (hidden until loaded) -->
@@ -811,6 +835,105 @@ DEP 100</div>
 
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
     function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
+
+    // === STEP 3 LOADING FUNCTIONS (remplace le global loader) ===
+    var step3LoadingSteps = [];
+    var step3CurrentStep = 0;
+
+    function initStep3Loading(filename, steps) {
+      step3LoadingSteps = steps || ['Lecture du fichier', 'Upload vers Google Drive', 'Conversion en Google Sheet', 'Détection des colonnes'];
+      step3CurrentStep = 0;
+
+      // Set filename
+      var filenameEl = document.getElementById('loading-filename');
+      if (filenameEl) filenameEl.textContent = filename || '';
+
+      // Build or reset steps HTML
+      var stepsContainer = document.getElementById('loading-steps');
+      if (stepsContainer) {
+        stepsContainer.innerHTML = step3LoadingSteps.map(function(step, i) {
+          return '<div class="loading-step" id="load-step-' + i + '" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">' +
+            '<div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);">' + (i + 1) + '</div>' +
+            '<span class="step-text" style="font-size: 14px; color: rgba(255,255,255,0.4);">' + step + '</span>' +
+            '</div>';
+        }).join('');
+      }
+
+      // Reset progress bar
+      var progressBar = document.getElementById('loading-progress-bar');
+      if (progressBar) progressBar.style.width = '0%';
+
+      // Show loading, hide editor
+      document.getElementById('config-loading').style.display = 'block';
+      document.getElementById('config-editor-main').style.display = 'none';
+
+      // Activate first step
+      updateStep3Loading(0);
+    }
+
+    function updateStep3Loading(stepIndex) {
+      step3CurrentStep = stepIndex;
+      for (var i = 0; i < step3LoadingSteps.length; i++) {
+        var stepEl = document.getElementById('load-step-' + i);
+        if (!stepEl) continue;
+        var iconEl = stepEl.querySelector('.step-icon');
+        var textEl = stepEl.querySelector('.step-text');
+
+        if (i < stepIndex) {
+          // Done
+          stepEl.style.background = 'rgba(34, 197, 94, 0.1)';
+          stepEl.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+          iconEl.style.background = '#22c55e';
+          iconEl.style.borderColor = '#22c55e';
+          iconEl.style.color = 'white';
+          iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+          textEl.style.color = '#22c55e';
+        } else if (i === stepIndex) {
+          // Active
+          stepEl.style.background = 'rgba(255, 107, 53, 0.1)';
+          stepEl.style.borderColor = 'rgba(255, 107, 53, 0.3)';
+          iconEl.style.background = '#FF6B35';
+          iconEl.style.borderColor = '#FF6B35';
+          iconEl.style.color = 'white';
+          iconEl.innerHTML = '<div class="loading-spinner" style="width: 14px; height: 14px; border: 2px solid transparent; border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>';
+          textEl.style.color = '#FF6B35';
+        } else {
+          // Pending
+          stepEl.style.background = 'rgba(255,255,255,0.03)';
+          stepEl.style.borderColor = 'rgba(255,255,255,0.06)';
+          iconEl.style.background = 'rgba(255,255,255,0.05)';
+          iconEl.style.borderColor = 'rgba(255,255,255,0.1)';
+          iconEl.style.color = 'rgba(255,255,255,0.3)';
+          iconEl.textContent = (i + 1);
+          textEl.style.color = 'rgba(255,255,255,0.4)';
+        }
+      }
+      // Update progress bar
+      var progress = step3LoadingSteps.length > 1 ? (stepIndex / (step3LoadingSteps.length - 1)) * 100 : 0;
+      var progressBar = document.getElementById('loading-progress-bar');
+      if (progressBar) progressBar.style.width = progress + '%';
+    }
+
+    function completeStep3Loading() {
+      // Mark all steps as done
+      for (var i = 0; i < step3LoadingSteps.length; i++) {
+        var stepEl = document.getElementById('load-step-' + i);
+        if (!stepEl) continue;
+        var iconEl = stepEl.querySelector('.step-icon');
+        var textEl = stepEl.querySelector('.step-text');
+
+        stepEl.style.background = 'rgba(34, 197, 94, 0.1)';
+        stepEl.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+        iconEl.style.background = '#22c55e';
+        iconEl.style.borderColor = '#22c55e';
+        iconEl.style.color = 'white';
+        iconEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+        textEl.style.color = '#22c55e';
+      }
+      // Progress bar to 100%
+      var progressBar = document.getElementById('loading-progress-bar');
+      if (progressBar) progressBar.style.width = '100%';
+    }
 
     // Convert ArrayBuffer to Base64 using native Blob/FileReader (fast, no stack overflow)
     function arrayBufferToBase64(buffer) {
@@ -1382,7 +1505,7 @@ DEP 100</div>
     }
 
     async function loadAndAnalyzeSheet(sheetToUse, session) {
-      // Pas de loader ici - on va directement à l'étape 3 qui a son propre état de chargement
+      // On est déjà dans l'étape 3 avec le loading en cours
       try {
         // Refresh session pour avoir un token frais
         console.log('[COMPTA] Original session token preview:', session?.access_token?.substring(0, 30) || 'NONE');
@@ -1410,12 +1533,11 @@ DEP 100</div>
         // 3. Stocker les infos du sheet
         excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name, webViewLink: sheetToUse.webViewLink };
 
-        // 4. Lancer l'analyse (qui va à l'étape 3 et lit les données)
+        // 4. Lancer l'analyse (lecture + détection) - on est déjà à l'étape 3
         await startAnalysisWithSheetRead(sheetToUse.id, freshSession.access_token);
       } catch (error) {
         console.error('[COMPTA] ❌', error);
-        hideLoader();
-        alert('Erreur: ' + error.message);
+        showAnalyseError(error.message);
       }
     }
 
@@ -1428,9 +1550,7 @@ DEP 100</div>
       analyseChatHistory = [];
       pendingQuestions = [];
 
-      // Naviguer vers step-analyse (affiche le loading)
-      goToStep(3);
-
+      // On est déjà à l'étape 3 avec le loading visible
       // S'assurer que le loading est visible et l'éditeur caché
       document.getElementById('config-loading').style.display = 'block';
       document.getElementById('config-editor-main').style.display = 'none';
@@ -1666,11 +1786,13 @@ DEP 100</div>
       console.log('[UPLOAD] === handleFileWithUpload START ===');
       console.log('[UPLOAD] File:', file.name, 'Size:', file.size, 'bytes');
 
-      // Initialiser le loader avec les étapes (sans analyse - c'est l'étape suivante)
-      initLoader(file.name, [
+      // Aller directement à l'étape 3 et utiliser le loading intégré
+      goToStep(3);
+      initStep3Loading(file.name, [
         'Lecture du fichier',
         'Upload vers Google Drive',
-        'Conversion en Google Sheet'
+        'Conversion en Google Sheet',
+        'Détection des colonnes'
       ]);
 
       try {
@@ -1702,7 +1824,7 @@ DEP 100</div>
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
         // Étape 2: Upload vers Google Drive
-        updateLoaderStep(1);
+        updateStep3Loading(1);
         var mimeType = file.type || (file.name.endsWith('.xlsx')
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           : 'application/vnd.ms-excel');
@@ -1732,7 +1854,7 @@ DEP 100</div>
         console.log('[UPLOAD] ✅ File uploaded to Drive:', uploadResult.file.id);
 
         // Étape 3: Conversion en Google Sheet
-        updateLoaderStep(2);
+        updateStep3Loading(2);
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1762,7 +1884,6 @@ DEP 100</div>
         // Vérifier les différences de conversion
         if (convertResult.verification && !convertResult.verification.success) {
           console.log('[UPLOAD] ⚠️ Différences détectées:', convertResult.verification.differences);
-          hideLoader();
           pendingConvertedSheet = sheetToUse;
           pendingCompareUrls = {
             original: convertResult.sheet.originalWebViewLink,
@@ -1772,14 +1893,13 @@ DEP 100</div>
           return;
         }
 
-        // Conversion terminée - passer à l'analyse (étape 3 du wizard)
-        hideLoader();
+        // Conversion terminée - passer à la détection (étape 4 du loading)
+        updateStep3Loading(3);
         await loadAndAnalyzeSheet(sheetToUse, session);
 
       } catch (error) {
         console.error('[UPLOAD] ❌ Error:', error);
-        hideLoader();
-        alert('Erreur: ' + error.message);
+        showAnalyseError(error.message);
       }
     }
 
@@ -1942,95 +2062,102 @@ DEP 100</div>
       var table = document.getElementById('excel-preview-table');
       var today = new Date().getDate();
       var dateCol = pendingConfig ? pendingConfig.colonne_date : null;
+      var headerRow = pendingConfig ? (pendingConfig.ligne_entetes || 4) : 4;
+      var dataRow = pendingConfig ? (pendingConfig.premiere_ligne_donnees || 8) : 8;
+      var todayRow = dataRow + today - 1;
 
       // Récupérer les colonnes utilisées par les mots-clés
       var usedColumns = {};
       configEditorData.forEach(function(row) {
         if (row.column) {
-          usedColumns[row.column] = row.keyword;
+          usedColumns[row.column] = row.keyword.toUpperCase();
         }
       });
 
       // Ajouter la colonne date
       if (dateCol) {
-        usedColumns[dateCol] = 'Jour';
+        usedColumns[dateCol] = 'JOUR';
       }
 
       // Trier les colonnes par ordre alphabétique
       var sortedCols = Object.keys(usedColumns).sort();
 
-      // Générer le HTML du tableau complet
+      // Générer le HTML du tableau simplifié
       var html = '';
 
-      // THEAD: Lettres des colonnes
-      html += '<thead><tr style="background: #2d2d2d; position: sticky; top: 0; z-index: 2;">';
-      html += '<th style="padding: 4px 8px; border: 1px solid #404040; color: #666; font-weight: 500; min-width: 30px; background: #2d2d2d;"></th>';
+      // THEAD: Double header - Lettre de colonne + Nom du mot-clé
+      html += '<thead>';
+
+      // Ligne 1: Lettres des colonnes (style Excel)
+      html += '<tr style="background: #2d2d2d;">';
+      html += '<th style="padding: 6px 10px; border: 1px solid #404040; background: #2d2d2d; color: #666; width: 45px;"></th>';
       sortedCols.forEach(function(col) {
         var isDateCol = col === dateCol;
-        var isUsedCol = usedColumns[col] && !isDateCol;
-        var bgColor = isUsedCol ? 'rgba(34, 197, 94, 0.15)' : '#2d2d2d';
-        html += '<th style="padding: 4px 8px; border: 1px solid #404040; color: ' + (isUsedCol ? '#22C55E' : '#888') + '; font-weight: 600; text-align: center; min-width: 60px; background: ' + bgColor + ';">' + col + '</th>';
-      });
-      html += '</tr></thead>';
-
-      // TBODY
-      html += '<tbody>';
-
-      // Ligne des en-têtes (noms des colonnes) - ligne 4
-      html += '<tr style="background: #252526;">';
-      html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #666; text-align: center; font-size: 10px; background: #2a2a2a;">4</td>';
-      sortedCols.forEach(function(col) {
-        var colName = usedColumns[col];
-        availableColumns.forEach(function(c) {
-          if (c.letter === col && c.name) colName = c.name;
-        });
-        var isDateCol = col === dateCol;
-        var displayName = colName.length > 10 ? colName.substring(0, 10) + '..' : colName;
-        html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 10px; font-weight: 500;">' + displayName + '</td>';
+        html += '<th style="padding: 6px 12px; border: 1px solid #404040; background: ' + (isDateCol ? '#2d2d2d' : 'rgba(34, 197, 94, 0.15)') + '; color: ' + (isDateCol ? '#888' : '#22C55E') + '; font-weight: 700; text-align: center; font-size: 13px; min-width: 70px;">' + col + '</th>';
       });
       html += '</tr>';
 
-      // Lignes de données (jours)
-      // Afficher 7 jours autour d'aujourd'hui
-      var startDay = Math.max(1, today - 3);
-      var endDay = Math.min(31, today + 3);
-
-      for (var day = startDay; day <= endDay; day++) {
-        var isToday = day === today;
-        var rowNum = day + 7; // Ligne Excel approximative
-        var rowBg = isToday ? 'rgba(34, 197, 94, 0.08)' : (day % 2 === 0 ? '#1e1e1e' : '#232323');
-        var rowBorder = isToday ? '2px solid #22C55E' : '1px solid #404040';
-
-        html += '<tr style="background: ' + rowBg + ';">';
-        html += '<td style="padding: 4px 8px; border: 1px solid #404040; color: #666; text-align: center; font-size: 10px; background: #2a2a2a;">' + rowNum + '</td>';
-
-        sortedCols.forEach(function(col) {
-          var isDateCol = col === dateCol;
-          var cellId = isToday ? 'excel-cell-' + col : '';
-          var cellStyle = 'padding: 6px 8px; border: ' + rowBorder + '; text-align: center; font-size: 11px;';
-
-          if (isDateCol) {
-            // Colonne date : afficher le jour
-            cellStyle += ' color: #888;';
-            html += '<td style="' + cellStyle + '">' + day + '</td>';
-          } else if (isToday) {
-            // Cellule d'aujourd'hui : sera remplie par updatePreview
-            cellStyle += ' color: #22C55E; font-weight: 600; background: rgba(34, 197, 94, 0.05);';
-            html += '<td id="' + cellId + '" style="' + cellStyle + '"></td>';
-          } else {
-            // Autres jours : montrer des valeurs fictives grisées
-            var fakeVal = day < today ? (Math.floor(Math.random() * 900) + 100) : '';
-            cellStyle += ' color: #555;';
-            html += '<td style="' + cellStyle + '">' + fakeVal + '</td>';
-          }
+      // Ligne 2: Noms des colonnes (en-têtes Excel ligne 4 environ)
+      html += '<tr style="background: #252526;">';
+      html += '<td style="padding: 4px 10px; border: 1px solid #404040; background: #2a2a2a; color: #666; text-align: center; font-size: 10px;">' + headerRow + '</td>';
+      sortedCols.forEach(function(col) {
+        var keyword = usedColumns[col];
+        var realName = keyword;
+        // Chercher le vrai nom dans availableColumns
+        availableColumns.forEach(function(c) {
+          if (c.letter === col && c.name) realName = c.name;
         });
+        var displayName = realName.length > 8 ? realName.substring(0, 8) + '..' : realName;
+        html += '<td style="padding: 5px 8px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 11px; font-weight: 500;">' + displayName + '</td>';
+      });
+      html += '</tr>';
 
-        html += '</tr>';
-      }
+      html += '</thead>';
 
-      // Ligne "..." pour montrer qu'il y a plus
-      html += '<tr style="background: #1a1a1a;">';
-      html += '<td colspan="' + (sortedCols.length + 1) + '" style="padding: 4px; border: 1px solid #404040; color: #555; text-align: center; font-size: 10px;">⋮ lignes ' + (endDay + 8) + ' à 38 ⋮</td>';
+      // TBODY - Juste 3 lignes : hier, aujourd'hui, demain
+      html += '<tbody>';
+
+      // Ligne d'hier (grisée)
+      var yesterdayDay = today > 1 ? today - 1 : 31;
+      html += '<tr style="background: #1e1e1e; opacity: 0.5;">';
+      html += '<td style="padding: 6px 10px; border: 1px solid #404040; background: #2a2a2a; color: #555; text-align: center; font-size: 10px;">' + (todayRow - 1) + '</td>';
+      sortedCols.forEach(function(col) {
+        var isDateCol = col === dateCol;
+        if (isDateCol) {
+          html += '<td style="padding: 8px; border: 1px solid #404040; color: #555; text-align: center; font-size: 12px;">' + yesterdayDay + '</td>';
+        } else {
+          var fakeVal = Math.floor(Math.random() * 400 + 100);
+          html += '<td style="padding: 8px; border: 1px solid #404040; color: #555; text-align: center; font-size: 12px;">' + fakeVal + '</td>';
+        }
+      });
+      html += '</tr>';
+
+      // LIGNE AUJOURD'HUI (mise en évidence)
+      html += '<tr style="background: rgba(34, 197, 94, 0.12);">';
+      html += '<td style="padding: 6px 10px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.2); color: #22C55E; text-align: center; font-size: 11px; font-weight: 600;">' + todayRow + '</td>';
+      sortedCols.forEach(function(col) {
+        var isDateCol = col === dateCol;
+        if (isDateCol) {
+          html += '<td style="padding: 8px; border: 2px solid #22C55E; color: #22C55E; text-align: center; font-size: 13px; font-weight: 600;">' + today + '</td>';
+        } else {
+          // Cellule où la valeur sera écrite
+          html += '<td id="excel-cell-' + col + '" style="padding: 8px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.08); color: #22C55E; text-align: center; font-size: 14px; font-weight: 700;"></td>';
+        }
+      });
+      html += '</tr>';
+
+      // Ligne de demain (grisée)
+      var tomorrowDay = today < 31 ? today + 1 : 1;
+      html += '<tr style="background: #1e1e1e; opacity: 0.4;">';
+      html += '<td style="padding: 6px 10px; border: 1px solid #404040; background: #2a2a2a; color: #444; text-align: center; font-size: 10px;">' + (todayRow + 1) + '</td>';
+      sortedCols.forEach(function(col) {
+        var isDateCol = col === dateCol;
+        if (isDateCol) {
+          html += '<td style="padding: 8px; border: 1px solid #404040; color: #444; text-align: center; font-size: 12px;">' + tomorrowDay + '</td>';
+        } else {
+          html += '<td style="padding: 8px; border: 1px solid #404040; color: #444; text-align: center; font-size: 12px;">-</td>';
+        }
+      });
       html += '</tr>';
 
       html += '</tbody>';
@@ -2184,12 +2311,16 @@ DEP 100</div>
 
     function updateConfigColumn(index, value) {
       configEditorData[index].column = value;
+      // Reconstruire le tableau Excel pour refléter la nouvelle colonne
+      buildExcelPreview();
     }
 
     function removeConfigRow(index) {
       configEditorData.splice(index, 1);
       renderConfigEditorRows();
       checkSpecialRules();
+      // Reconstruire le tableau Excel
+      buildExcelPreview();
     }
 
     function addConfigRow() {
@@ -2200,6 +2331,8 @@ DEP 100</div>
         aliases: []
       });
       renderConfigEditorRows();
+      // Reconstruire le tableau Excel
+      buildExcelPreview();
     }
 
 
