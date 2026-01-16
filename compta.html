@@ -47,18 +47,24 @@
     #drop-area.dragover svg { stroke: #FF6B35; }
     #drop-area.dragover p { color: #FF8B5E; }
     /* Template column states */
-    .template-col { user-select: none; transition: all 0.2s ease; }
+    .template-col { user-select: none; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s; position: relative; }
     .template-col.editing { background: rgba(255, 107, 53, 0.15) !important; border-color: rgba(255, 107, 53, 0.4) !important; cursor: text !important; box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2); }
     .template-col.editing .drag-handle { opacity: 0.2 !important; }
     .template-col .col-name { cursor: text; }
     .template-col:active:not(.editing) { cursor: grabbing; }
     /* Drag states */
-    .template-col.dragging { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3), 0 0 0 2px rgba(255, 107, 53, 0.4); background: rgba(255, 107, 53, 0.2) !important; border-color: rgba(255, 107, 53, 0.5) !important; z-index: 10; }
-    .template-col.drag-over { transform: translateX(4px); }
-    .template-col.just-dropped { animation: dropBounce 0.3s ease; }
+    .template-col.dragging { opacity: 0.35; transform: scale(0.95); }
+    .template-col.just-dropped { animation: dropBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .template-col.just-added { animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    @keyframes dropBounce { 0% { transform: scale(1.05); } 50% { transform: scale(0.95); } 100% { transform: scale(1); } }
+    @keyframes dropBounce { 0% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
     @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    /* Drop indicator - ligne orange animée entre les colonnes */
+    .drop-indicator { width: 3px; height: 28px; background: linear-gradient(180deg, #FF6B35, #FF8F6B); border-radius: 2px; flex-shrink: 0; animation: indicatorPulse 1s ease-in-out infinite; box-shadow: 0 0 12px rgba(255, 107, 53, 0.7), 0 0 4px rgba(255, 107, 53, 0.9); }
+    @keyframes indicatorPulse { 0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(255, 107, 53, 0.7), 0 0 4px rgba(255, 107, 53, 0.9); } 50% { opacity: 0.8; box-shadow: 0 0 20px rgba(255, 107, 53, 0.9), 0 0 8px rgba(255, 107, 53, 1); } }
+    /* Drag ghost - élément flottant qui suit la souris */
+    .drag-ghost { position: fixed; pointer-events: none; z-index: 10000; padding: 6px 12px; background: rgba(255, 107, 53, 0.2); border: 2px solid #FF6B35; border-radius: 8px; font-size: 12px; color: white; box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4); transform: rotate(3deg) scale(1.05); backdrop-filter: blur(8px); }
+    #template-columns { min-height: 36px; padding: 4px; margin: -4px; border-radius: 12px; transition: background 0.2s; }
+    #template-columns.drag-active { background: rgba(255, 107, 53, 0.05); }
     .chat-container { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 24px; overflow: hidden; max-width: 700px; }
     .chat-header { padding: 20px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); display: flex; align-items: center; gap: 12px; }
     .chat-header-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
@@ -109,9 +115,20 @@
     @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
     .global-loader { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10001; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .global-loader.active { opacity: 1; pointer-events: all; }
-    .loader-spinner { width: 60px; height: 60px; border: 4px solid rgba(255, 107, 53, 0.2); border-top-color: #FF6B35; border-radius: 50%; animation: spinLoader 0.8s linear infinite; margin-bottom: 24px; }
-    @keyframes spinLoader { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 16px; color: rgba(255, 255, 255, 0.6); }
+    .loader-container { background: rgba(30, 30, 30, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 32px 40px; min-width: 320px; max-width: 400px; }
+    .loader-filename { font-size: 15px; color: #FF6B35; font-weight: 600; margin-bottom: 24px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .loader-steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    .loader-step { display: flex; align-items: center; gap: 14px; }
+    .loader-step-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.3s ease; flex-shrink: 0; }
+    .loader-step.pending .loader-step-icon { background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.3); }
+    .loader-step.active .loader-step-icon { background: rgba(255, 107, 53, 0.15); border: 2px solid #FF6B35; color: #FF6B35; animation: pulseStep 1.5s ease-in-out infinite; }
+    .loader-step.done .loader-step-icon { background: rgba(34, 197, 94, 0.2); border: 2px solid #22C55E; color: #22C55E; }
+    .loader-step-text { font-size: 14px; color: rgba(255, 255, 255, 0.4); transition: color 0.3s; }
+    .loader-step.active .loader-step-text { color: rgba(255, 255, 255, 0.9); }
+    .loader-step.done .loader-step-text { color: rgba(255, 255, 255, 0.6); }
+    @keyframes pulseStep { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 107, 53, 0); } }
+    .loader-progress { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
+    .loader-progress-bar { height: 100%; background: linear-gradient(90deg, #FF6B35, #FF8F6B); border-radius: 2px; transition: width 0.5s ease; width: 0%; }
     /* Modal overlay - ne couvre PAS le header/sidebar */
     .sheets-overlay { position: fixed; top: 70px; left: 280px; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .sheets-overlay.active { opacity: 1; pointer-events: all; }
@@ -186,6 +203,20 @@
     .config-preview-sheet-name { display: flex; align-items: center; gap: 12px; font-size: 15px; color: rgba(255, 255, 255, 0.7); margin-bottom: 4px; }
     .config-preview-sheet-name svg { width: 20px; height: 20px; color: #0f9d58; }
     .config-preview-sheet-name strong { color: white; }
+    /* Confidence indicator */
+    .confidence-indicator { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; }
+    .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .confidence-label { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
+    .confidence-value { font-size: 18px; font-weight: 700; }
+    .confidence-value.high { color: #22C55E; }
+    .confidence-value.medium { color: #F59E0B; }
+    .confidence-value.low { color: #EF4444; }
+    .confidence-bar { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+    .confidence-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease, background 0.3s; }
+    .confidence-fill.high { background: linear-gradient(90deg, #22C55E, #16A34A); }
+    .confidence-fill.medium { background: linear-gradient(90deg, #F59E0B, #D97706); }
+    .confidence-fill.low { background: linear-gradient(90deg, #EF4444, #DC2626); }
+    .confidence-reason { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 10px; margin-bottom: 0; line-height: 1.4; }
     .config-preview-table { width: 100%; border-collapse: collapse; margin-top: 24px; border-radius: 12px; overflow: hidden; }
     .config-preview-table th { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; padding: 14px 16px; text-align: center; font-weight: 600; font-size: 13px; border: none; }
     .config-preview-table td { padding: 14px 16px; text-align: center; border: 1px solid rgba(255, 255, 255, 0.06); background: rgba(255, 255, 255, 0.02); font-size: 14px; }
@@ -218,8 +249,11 @@
     <div class="welcome-dots"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
   </div>
   <div class="global-loader" id="global-loader">
-    <div class="loader-spinner"></div>
-    <p class="loader-text" id="loader-text">Chargement...</p>
+    <div class="loader-container">
+      <div class="loader-filename" id="loader-filename"></div>
+      <div class="loader-steps" id="loader-steps"></div>
+      <div class="loader-progress"><div class="loader-progress-bar" id="loader-progress"></div></div>
+    </div>
   </div>
   <div class="sheets-overlay" id="sheets-overlay">
     <div class="sheets-content" style="position: relative;">
@@ -294,6 +328,18 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
           <span>Fichier : <strong id="preview-file-name">-</strong></span>
         </div>
+      </div>
+
+      <!-- Indicateur de confiance -->
+      <div class="confidence-indicator" id="confidence-indicator" style="display: none;">
+        <div class="confidence-header">
+          <span class="confidence-label">Confiance de l'analyse</span>
+          <span class="confidence-value" id="confidence-value">85%</span>
+        </div>
+        <div class="confidence-bar">
+          <div class="confidence-fill" id="confidence-fill"></div>
+        </div>
+        <p class="confidence-reason" id="confidence-reason"></p>
       </div>
 
       <div id="preview-table-container">
@@ -445,7 +491,7 @@
           <p class="text-white/50 mb-3 text-sm leading-relaxed">On te cree un Google Sheet avec tes colonnes :</p>
 
           <!-- Colonnes interactives : drag pour réordonner, double-clic pour modifier, × pour supprimer -->
-          <div class="flex flex-wrap gap-2 mb-3" id="template-columns">
+          <div class="flex flex-wrap gap-2 mb-3" id="template-columns" ondragover="dragColOver(event)" ondrop="dragColEnd(event)">
             <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
               <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
               <span class="col-name" ondblclick="editColName(this)">Date</span>
@@ -624,7 +670,52 @@
 
     function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
     function hideWelcome() { document.getElementById('welcome-overlay').classList.remove('active'); }
-    function showLoader(text) { document.getElementById('loader-text').textContent = text; document.getElementById('global-loader').classList.add('active'); }
+
+    // Loader avec étapes visuelles
+    var loaderSteps = [];
+    var loaderCurrentStep = 0;
+
+    function initLoader(filename, steps) {
+      loaderSteps = steps;
+      loaderCurrentStep = 0;
+      document.getElementById('loader-filename').textContent = filename;
+      var stepsHtml = steps.map(function(step, i) {
+        return '<div class="loader-step pending" id="loader-step-' + i + '">' +
+          '<div class="loader-step-icon">' + (i + 1) + '</div>' +
+          '<span class="loader-step-text">' + step + '</span></div>';
+      }).join('');
+      document.getElementById('loader-steps').innerHTML = stepsHtml;
+      document.getElementById('loader-progress').style.width = '0%';
+      document.getElementById('global-loader').classList.add('active');
+      updateLoaderStep(0);
+    }
+
+    function updateLoaderStep(stepIndex) {
+      loaderCurrentStep = stepIndex;
+      for (var i = 0; i < loaderSteps.length; i++) {
+        var stepEl = document.getElementById('loader-step-' + i);
+        if (!stepEl) continue;
+        stepEl.classList.remove('pending', 'active', 'done');
+        if (i < stepIndex) {
+          stepEl.classList.add('done');
+          stepEl.querySelector('.loader-step-icon').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else if (i === stepIndex) {
+          stepEl.classList.add('active');
+          stepEl.querySelector('.loader-step-icon').textContent = (i + 1);
+        } else {
+          stepEl.classList.add('pending');
+          stepEl.querySelector('.loader-step-icon').textContent = (i + 1);
+        }
+      }
+      var progress = loaderSteps.length > 1 ? (stepIndex / (loaderSteps.length - 1)) * 100 : 0;
+      document.getElementById('loader-progress').style.width = progress + '%';
+    }
+
+    function showLoader(text) {
+      // Fallback simple pour les appels legacy
+      initLoader('', [text]);
+    }
+
     function hideLoader() { document.getElementById('global-loader').classList.remove('active'); }
     function showToast(message, duration) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('active'); setTimeout(function() { toast.classList.remove('active'); }, duration || 3000); }
 
@@ -1146,10 +1237,6 @@
             return; // Wait for user action
           }
 
-          // All good, show success
-          showToast('✅ Fichier prêt ! L\'original reste intact sur ton Drive.');
-          await new Promise(function(r) { setTimeout(r, 1000); });
-
         } catch (error) {
           console.error('[COMPTA] ❌ Conversion error:', error);
           hideLoader();
@@ -1332,7 +1419,14 @@
     async function handleFileWithUpload(file) {
       console.log('[UPLOAD] === handleFileWithUpload START ===');
       console.log('[UPLOAD] File:', file.name, 'Size:', file.size, 'bytes');
-      showLoader('1. Lecture du fichier...');
+
+      // Initialiser le loader avec les étapes
+      initLoader(file.name, [
+        'Lecture du fichier',
+        'Upload vers Google Drive',
+        'Conversion en Google Sheet',
+        'Analyse du contenu'
+      ]);
 
       try {
         console.log('[UPLOAD] Getting fresh session...');
@@ -1346,7 +1440,7 @@
         if (!session) throw new Error('Session expirée - reconnecte-toi');
         console.log('[UPLOAD] Session OK, token expires:', new Date(session.expires_at * 1000).toLocaleString());
 
-        // Lire le fichier et convertir en base64 (chunked pour gros fichiers)
+        // Étape 1: Lire le fichier
         console.log('[UPLOAD] Reading file as ArrayBuffer...');
         var arrayBuffer = await new Promise(function(resolve, reject) {
           var reader = new FileReader();
@@ -1360,16 +1454,14 @@
         console.log('[UPLOAD] Converting to base64...');
         var base64Content = await arrayBufferToBase64(arrayBuffer);
         console.log('[UPLOAD] Base64 conversion complete');
-
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
-        // Upload vers Google Drive
-        showLoader('OK Fichier lu\n2. Upload vers ton Drive...');
+        // Étape 2: Upload vers Google Drive
+        updateLoaderStep(1);
         var mimeType = file.type || (file.name.endsWith('.xlsx')
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           : 'application/vnd.ms-excel');
         console.log('[UPLOAD] Creating JSON Blob...');
-        // Use Blob to avoid stack overflow on large strings
         var jsonBlob = new Blob([
           '{"fileName":', JSON.stringify(file.name),
           ',"fileContent":"', base64Content,
@@ -1394,8 +1486,8 @@
 
         console.log('[UPLOAD] ✅ File uploaded to Drive:', uploadResult.file.id);
 
-        // Maintenant convertir en Google Sheet
-        showLoader('OK Fichier lu\nOK Upload termine\n3. Conversion en Google Sheet...');
+        // Étape 3: Conversion en Google Sheet
+        updateLoaderStep(2);
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1421,11 +1513,10 @@
         };
         console.log('[UPLOAD] ✅ Conversion réussie:', sheetToUse.name);
 
-        hideLoader();
-
         // Vérifier les différences de conversion
         if (convertResult.verification && !convertResult.verification.success) {
           console.log('[UPLOAD] ⚠️ Différences détectées:', convertResult.verification.differences);
+          hideLoader();
           pendingConvertedSheet = sheetToUse;
           pendingCompareUrls = {
             original: convertResult.sheet.originalWebViewLink,
@@ -1435,11 +1526,12 @@
           return;
         }
 
-        showToast('✅ Fichier prêt ! L\'original reste intact sur ton Drive.');
-        await new Promise(function(r) { setTimeout(r, 1000); });
+        // Étape 4: Analyse du contenu
+        updateLoaderStep(3);
 
         // Charger et analyser le Google Sheet
         await loadAndAnalyzeSheet(sheetToUse, session);
+        hideLoader();
 
       } catch (error) {
         console.error('[UPLOAD] ❌ Error:', error);
@@ -1512,6 +1604,30 @@
 
       // Set file name
       document.getElementById('preview-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
+
+      // Show confidence indicator if available
+      var confidenceEl = document.getElementById('confidence-indicator');
+      if (config.confiance !== undefined) {
+        var confidence = Math.min(100, Math.max(0, config.confiance));
+        var level = confidence >= 70 ? 'high' : confidence >= 50 ? 'medium' : 'low';
+
+        document.getElementById('confidence-value').textContent = confidence + '%';
+        document.getElementById('confidence-value').className = 'confidence-value ' + level;
+        document.getElementById('confidence-fill').style.width = confidence + '%';
+        document.getElementById('confidence-fill').className = 'confidence-fill ' + level;
+
+        var reasonEl = document.getElementById('confidence-reason');
+        if (config.raison_confiance) {
+          reasonEl.textContent = config.raison_confiance;
+          reasonEl.style.display = 'block';
+        } else {
+          reasonEl.style.display = 'none';
+        }
+
+        confidenceEl.style.display = 'block';
+      } else {
+        confidenceEl.style.display = 'none';
+      }
 
       // Support both flat and nested config formats
       var headerRowNum = config.ligne_entetes || config.structure?.ligne_entetes || 1;
@@ -1707,13 +1823,19 @@
         return;
       }
 
-      showLoader('Upload de ton fichier Excel...\n\nEnvoi vers Google Drive...');
+      // Initialiser le loader avec les étapes
+      initLoader(pendingLocalFile.name, [
+        'Lecture du fichier',
+        'Upload vers Google Drive',
+        'Conversion en Google Sheet',
+        'Sauvegarde'
+      ]);
 
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Session expirée');
 
-        // Read file and convert to base64 (chunked for large files)
+        // Étape 1: Read file and convert to base64
         var arrayBuffer = await new Promise(function(resolve, reject) {
           var reader = new FileReader();
           reader.onload = function(e) { resolve(e.target.result); };
@@ -1722,7 +1844,8 @@
         });
         var base64Content = await arrayBufferToBase64(arrayBuffer);
 
-        // Upload to Google Drive
+        // Étape 2: Upload to Google Drive
+        updateLoaderStep(1);
         var mimeType = pendingLocalFile.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         var jsonBlob = new Blob([
           '{"fileName":', JSON.stringify(pendingLocalFile.name),
@@ -1743,8 +1866,8 @@
 
         console.log('[COMPTA] File uploaded:', uploadResult.file.id);
 
-        // Convert to Google Sheet
-        showLoader('OK Fichier lu\nOK Upload termine\n3. Conversion en Google Sheet...');
+        // Étape 3: Convert to Google Sheet
+        updateLoaderStep(2);
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1764,7 +1887,8 @@
 
         console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
 
-        showLoader('OK Fichier lu\nOK Upload termine\nOK Conversion terminee\n4. Sauvegarde...');
+        // Étape 4: Sauvegarde
+        updateLoaderStep(3);
 
         // Update excelData with the Google Sheet info
         excelData.sheetId = convertResult.sheet.id;
@@ -1778,7 +1902,6 @@
         }).eq('user_id', currentUser.id);
 
         hideLoader();
-        showToast('✓ Tout est prêt !');
 
         // Clear pending file
         pendingLocalFile = null;
@@ -1794,13 +1917,18 @@
     }
 
     async function uploadStoredFile(base64Content, fileName, mimeType) {
-      showLoader('1. Upload vers ton Drive...');
+      // Initialiser le loader avec les étapes
+      initLoader(fileName, [
+        'Upload vers Google Drive',
+        'Conversion en Google Sheet',
+        'Sauvegarde'
+      ]);
 
       try {
         var { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Session expirée');
 
-        // Upload to Google Drive
+        // Étape 1: Upload to Google Drive
         var finalMimeType = mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
         var jsonBlob = new Blob([
           '{"fileName":', JSON.stringify(fileName),
@@ -1821,8 +1949,8 @@
 
         console.log('[COMPTA] File uploaded:', uploadResult.file.id);
 
-        // Convert to Google Sheet
-        showLoader('OK Upload termine\n2. Conversion en Google Sheet...');
+        // Étape 2: Convert to Google Sheet
+        updateLoaderStep(1);
 
         var convertResponse = await fetch(SUPABASE_URL + '/functions/v1/clever-function', {
           method: 'POST',
@@ -1842,7 +1970,8 @@
 
         console.log('[COMPTA] ✅ Conversion réussie:', convertResult.sheet.name);
 
-        showLoader('OK Upload termine\nOK Conversion terminee\n3. Sauvegarde...');
+        // Étape 3: Sauvegarde
+        updateLoaderStep(2);
 
         // Update excelData with the Google Sheet info
         excelData.sheetId = convertResult.sheet.id;
@@ -1856,7 +1985,6 @@
         }).eq('user_id', currentUser.id);
 
         hideLoader();
-        showToast('✓ Tout est prêt !');
 
         // Now save the config
         await saveConfigAndContinue();
@@ -1918,60 +2046,167 @@
 
     // Fonctions pour les colonnes interactives du template
     var draggedCol = null;
+    var dragGhost = null;
+    var dropIndicator = null;
+    var dropTargetIndex = -1;
 
     function dragColStart(e) {
       draggedCol = e.target.closest('.template-col');
-      if (draggedCol) {
-        // Add dragging class after a tiny delay (so the drag image captures normal state)
-        setTimeout(function() {
-          draggedCol.classList.add('dragging');
-        }, 0);
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', '');
+      if (!draggedCol) return;
+
+      var colName = draggedCol.querySelector('.col-name').textContent;
+
+      // Créer le ghost (élément flottant)
+      dragGhost = document.createElement('div');
+      dragGhost.className = 'drag-ghost';
+      dragGhost.textContent = colName;
+      document.body.appendChild(dragGhost);
+
+      // Créer l'indicateur de drop
+      dropIndicator = document.createElement('div');
+      dropIndicator.className = 'drop-indicator';
+
+      // Cacher l'image de drag par défaut
+      var emptyImg = new Image();
+      emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      e.dataTransfer.setDragImage(emptyImg, 0, 0);
+      e.dataTransfer.effectAllowed = 'move';
+
+      // Activer le mode drag sur le container
+      document.getElementById('template-columns').classList.add('drag-active');
+
+      // Ajouter classe dragging après un délai
+      setTimeout(function() {
+        if (draggedCol) draggedCol.classList.add('dragging');
+      }, 0);
+
+      // Positionner le ghost
+      updateGhostPosition(e.clientX, e.clientY);
+    }
+
+    function updateGhostPosition(x, y) {
+      if (dragGhost) {
+        dragGhost.style.left = (x + 12) + 'px';
+        dragGhost.style.top = (y - 14) + 'px';
       }
     }
 
     function dragColOver(e) {
       e.preventDefault();
-      var target = e.target.closest('.template-col');
+      updateGhostPosition(e.clientX, e.clientY);
 
-      // Remove drag-over from all cols
-      document.querySelectorAll('.template-col.drag-over').forEach(function(col) {
-        col.classList.remove('drag-over');
-      });
+      if (!draggedCol) return;
 
-      if (target && target !== draggedCol && draggedCol) {
-        target.classList.add('drag-over');
+      var container = document.getElementById('template-columns');
+      var cols = Array.from(container.querySelectorAll('.template-col:not(.dragging)'));
+      var addBtn = document.getElementById('add-col-btn');
+      var addInput = document.getElementById('add-col-input');
 
-        var container = document.getElementById('template-columns');
-        var cols = Array.from(container.querySelectorAll('.template-col'));
-        var draggedIndex = cols.indexOf(draggedCol);
-        var targetIndex = cols.indexOf(target);
+      // Trouver la colonne la plus proche (en tenant compte de X et Y pour multi-lignes)
+      var closestCol = null;
+      var closestDist = Infinity;
+      var insertAfter = false;
 
-        if (draggedIndex < targetIndex) {
-          target.after(draggedCol);
+      for (var i = 0; i < cols.length; i++) {
+        var rect = cols[i].getBoundingClientRect();
+        var colCenterX = rect.left + rect.width / 2;
+        var colCenterY = rect.top + rect.height / 2;
+
+        // Distance au centre de la colonne
+        var dist = Math.sqrt(Math.pow(e.clientX - colCenterX, 2) + Math.pow(e.clientY - colCenterY, 2));
+
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestCol = cols[i];
+          // Insérer avant ou après selon si on est à gauche ou droite du centre
+          insertAfter = e.clientX > colCenterX;
+        }
+      }
+
+      // Déterminer l'élément avant lequel insérer
+      var insertBefore = null;
+      var newIndex = -1;
+
+      if (closestCol) {
+        if (insertAfter) {
+          // Insérer après closestCol = avant le suivant
+          var nextSibling = closestCol.nextElementSibling;
+          while (nextSibling && (nextSibling.classList.contains('dragging') || nextSibling === dropIndicator)) {
+            nextSibling = nextSibling.nextElementSibling;
+          }
+          if (nextSibling && nextSibling.classList.contains('template-col')) {
+            insertBefore = nextSibling;
+            newIndex = cols.indexOf(nextSibling);
+          } else {
+            // Insérer à la fin (avant le input ou le bouton +)
+            insertBefore = addInput.classList.contains('hidden') ? addBtn : addInput;
+            newIndex = cols.length;
+          }
         } else {
-          target.before(draggedCol);
+          // Insérer avant closestCol
+          insertBefore = closestCol;
+          newIndex = cols.indexOf(closestCol);
+        }
+      } else {
+        // Pas de colonnes, insérer au début
+        insertBefore = addInput.classList.contains('hidden') ? addBtn : addInput;
+        newIndex = 0;
+      }
+
+      // Si l'index a changé, déplacer l'indicateur
+      if (newIndex !== dropTargetIndex) {
+        dropTargetIndex = newIndex;
+
+        // Retirer l'indicateur s'il existe
+        if (dropIndicator.parentNode) {
+          dropIndicator.remove();
+        }
+
+        // Insérer l'indicateur
+        if (insertBefore) {
+          container.insertBefore(dropIndicator, insertBefore);
         }
       }
     }
 
     function dragColEnd(e) {
-      // Remove all drag states
-      document.querySelectorAll('.template-col.drag-over').forEach(function(col) {
-        col.classList.remove('drag-over');
-      });
+      var container = document.getElementById('template-columns');
+      container.classList.remove('drag-active');
 
-      if (draggedCol) {
+      // Supprimer le ghost
+      if (dragGhost) {
+        dragGhost.remove();
+        dragGhost = null;
+      }
+
+      // Déplacer la colonne à la position de l'indicateur
+      if (draggedCol && dropIndicator && dropIndicator.parentNode) {
+        container.insertBefore(draggedCol, dropIndicator);
         draggedCol.classList.remove('dragging');
         draggedCol.classList.add('just-dropped');
         var dropped = draggedCol;
         setTimeout(function() {
           dropped.classList.remove('just-dropped');
-        }, 300);
-        draggedCol = null;
+        }, 350);
+      } else if (draggedCol) {
+        draggedCol.classList.remove('dragging');
       }
+
+      // Supprimer l'indicateur
+      if (dropIndicator && dropIndicator.parentNode) {
+        dropIndicator.remove();
+      }
+
+      draggedCol = null;
+      dropTargetIndex = -1;
     }
+
+    // Suivre la souris même hors du container
+    document.addEventListener('dragover', function(e) {
+      if (dragGhost) {
+        updateGhostPosition(e.clientX, e.clientY);
+      }
+    });
 
     function removeTemplateCol(btn) {
       var col = btn.closest('.template-col');
