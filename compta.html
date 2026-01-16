@@ -2734,9 +2734,13 @@
         var { data, error } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle();
         console.log('[TELEGRAM] Query result - data:', data, 'error:', error);
         if (data?.telegram_user_id) {
-          console.log('[TELEGRAM] User already connected, showing connected state');
-          document.getElementById('telegram-initial').style.display = 'none';
-          showTelegramConnected();
+          console.log('[TELEGRAM] User already connected! Redirecting to compte.html...');
+          // User déjà connecté → redirection directe vers son espace
+          showToast('Telegram déjà connecté ! Redirection...');
+          setTimeout(function() {
+            window.location.href = 'compte.html';
+          }, 1500);
+          return;
         } else {
           console.log('[TELEGRAM] No existing connection, telegram-initial should be visible');
         }
