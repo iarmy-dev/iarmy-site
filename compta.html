@@ -704,26 +704,22 @@ DEP 100</div>
 
           <!-- Section règles spéciales -->
           <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px;">
-            <div style="font-size: 14px; font-weight: 600; color: white; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 18px;">⚡</span> Règles spéciales
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <div style="font-size: 14px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">⚡</span> Règles de calcul
+              </div>
+              <button onclick="addCustomRule()" style="padding: 6px 14px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 12px; font-weight: 600;">
+                + Ajouter
+              </button>
             </div>
 
-            <div id="special-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
-              <!-- Règle DEP + ESP -->
-              <div id="rule-dep-esp" style="display: none; background: rgba(255, 107, 53, 0.08); border-radius: 12px; padding: 14px;">
-                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-                  <input type="checkbox" id="dep-combine-checkbox" onchange="toggleDepCombine(); updatePreview();" style="width: 22px; height: 22px; accent-color: #FF6B35; cursor: pointer;">
-                  <div style="flex: 1;">
-                    <div style="font-weight: 600; font-size: 14px;">DEP s'ajoute à ESP</div>
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.5);">Ex: ESP 500 + DEP 100 = 600€ écrits dans la colonne ESP</div>
-                  </div>
-                </label>
-              </div>
+            <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Les règles seront générées dynamiquement -->
+            </div>
 
-              <!-- Message si pas de règles -->
-              <div id="no-rules-message" style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 10px;">
-                💡 Des règles spéciales apparaîtront ici si tu as DEP et ESP configurés
-              </div>
+            <!-- Message si pas de règles -->
+            <div id="no-rules-message" style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 12px; text-align: center;">
+              💡 Ajoute une règle pour combiner des valeurs (ex: DEP + ESP → écrit dans ESP)
             </div>
           </div>
 
@@ -2013,14 +2009,26 @@ DEP 100</div>
     function openConfigEditor() {
       console.log('[CONFIG EDITOR] Opening with config:', pendingConfig);
 
-      // Récupérer les colonnes disponibles du sheet
+      // Récupérer les colonnes disponibles du sheet (filtrer les valeurs numériques)
       availableColumns = [];
       if (excelData && excelData.sheets && excelData.sheets[0] && excelData.sheets[0].detectedHeaders) {
-        availableColumns = excelData.sheets[0].detectedHeaders.columns.map(function(c) {
-          return { letter: c.letter, name: c.name };
-        });
+        availableColumns = excelData.sheets[0].detectedHeaders.columns
+          .filter(function(c) {
+            // Filtrer les noms qui sont juste des nombres (ex: "1", "2306.7", "10")
+            if (!c.name) return false;
+            var name = String(c.name).trim();
+            if (name === '') return false;
+            // Si c'est un nombre pur, on l'exclut
+            if (!isNaN(parseFloat(name)) && isFinite(name)) return false;
+            // Si c'est une lettre seule (A, B, C...), on l'exclut aussi
+            if (/^[A-Z]$/i.test(name)) return false;
+            return true;
+          })
+          .map(function(c) {
+            return { letter: c.letter, name: c.name };
+          });
       }
-      console.log('[CONFIG EDITOR] Available columns:', availableColumns);
+      console.log('[CONFIG EDITOR] Available columns (filtered):', availableColumns);
 
       // Convertir la config actuelle en données éditables
       configEditorData = [];
@@ -2031,6 +2039,14 @@ DEP 100</div>
             column: col.colonne,
             aliases: col.aliases || []
           });
+        });
+      }
+
+      // Charger les règles personnalisées existantes
+      customRules = [];
+      if (pendingConfig && pendingConfig.regles_calcul) {
+        customRules = pendingConfig.regles_calcul.map(function(r) {
+          return { sources: r.sources || [], operation: r.operation || 'add', target: r.target || '' };
         });
       }
 
@@ -2137,45 +2153,45 @@ DEP 100</div>
       // TBODY - Juste 3 lignes : hier, aujourd'hui, demain
       html += '<tbody>';
 
-      // Ligne d'hier (grisée)
+      // Ligne d'hier (floutée)
       var yesterdayDay = today > 1 ? today - 1 : 31;
-      html += '<tr style="background: #1e1e1e; opacity: 0.5;">';
-      html += '<td style="padding: 6px 10px; border: 1px solid #404040; background: #2a2a2a; color: #555; text-align: center; font-size: 10px;">' + (todayRow - 1) + '</td>';
+      html += '<tr style="background: #1a1a1a; filter: blur(1px); opacity: 0.4;">';
+      html += '<td style="padding: 5px 8px; border: 1px solid #333; background: #222; color: #444; text-align: center; font-size: 9px;">' + (todayRow - 1) + '</td>';
       sortedCols.forEach(function(col) {
         var isDateCol = col === dateCol;
         if (isDateCol) {
-          html += '<td style="padding: 8px; border: 1px solid #404040; color: #555; text-align: center; font-size: 12px;">' + yesterdayDay + '</td>';
+          html += '<td style="padding: 6px; border: 1px solid #333; color: #444; text-align: center; font-size: 11px;">' + yesterdayDay + '</td>';
         } else {
           var fakeVal = Math.floor(Math.random() * 400 + 100);
-          html += '<td style="padding: 8px; border: 1px solid #404040; color: #555; text-align: center; font-size: 12px;">' + fakeVal + '</td>';
+          html += '<td style="padding: 6px; border: 1px solid #333; color: #444; text-align: center; font-size: 11px;">' + fakeVal + '</td>';
         }
       });
       html += '</tr>';
 
-      // LIGNE AUJOURD'HUI (mise en évidence)
-      html += '<tr style="background: rgba(34, 197, 94, 0.12);">';
-      html += '<td style="padding: 6px 10px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.2); color: #22C55E; text-align: center; font-size: 11px; font-weight: 600;">' + todayRow + '</td>';
+      // LIGNE AUJOURD'HUI (mise en évidence - la star ⭐)
+      html += '<tr style="background: rgba(34, 197, 94, 0.15); box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);">';
+      html += '<td style="padding: 8px 10px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.25); color: #22C55E; text-align: center; font-size: 12px; font-weight: 700;">' + todayRow + '</td>';
       sortedCols.forEach(function(col) {
         var isDateCol = col === dateCol;
         if (isDateCol) {
-          html += '<td style="padding: 8px; border: 2px solid #22C55E; color: #22C55E; text-align: center; font-size: 13px; font-weight: 600;">' + today + '</td>';
+          html += '<td style="padding: 10px 8px; border: 2px solid #22C55E; color: #22C55E; text-align: center; font-size: 15px; font-weight: 700;">' + today + '</td>';
         } else {
           // Cellule où la valeur sera écrite
-          html += '<td id="excel-cell-' + col + '" style="padding: 8px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.08); color: #22C55E; text-align: center; font-size: 14px; font-weight: 700;"></td>';
+          html += '<td id="excel-cell-' + col + '" style="padding: 10px 8px; border: 2px solid #22C55E; background: rgba(34, 197, 94, 0.1); color: #22C55E; text-align: center; font-size: 16px; font-weight: 800;"></td>';
         }
       });
       html += '</tr>';
 
-      // Ligne de demain (grisée)
+      // Ligne de demain (floutée)
       var tomorrowDay = today < 31 ? today + 1 : 1;
-      html += '<tr style="background: #1e1e1e; opacity: 0.4;">';
-      html += '<td style="padding: 6px 10px; border: 1px solid #404040; background: #2a2a2a; color: #444; text-align: center; font-size: 10px;">' + (todayRow + 1) + '</td>';
+      html += '<tr style="background: #1a1a1a; filter: blur(1px); opacity: 0.3;">';
+      html += '<td style="padding: 5px 8px; border: 1px solid #333; background: #222; color: #333; text-align: center; font-size: 9px;">' + (todayRow + 1) + '</td>';
       sortedCols.forEach(function(col) {
         var isDateCol = col === dateCol;
         if (isDateCol) {
-          html += '<td style="padding: 8px; border: 1px solid #404040; color: #444; text-align: center; font-size: 12px;">' + tomorrowDay + '</td>';
+          html += '<td style="padding: 6px; border: 1px solid #333; color: #333; text-align: center; font-size: 11px;">' + tomorrowDay + '</td>';
         } else {
-          html += '<td style="padding: 8px; border: 1px solid #404040; color: #444; text-align: center; font-size: 12px;">-</td>';
+          html += '<td style="padding: 6px; border: 1px solid #333; color: #333; text-align: center; font-size: 11px;">-</td>';
         }
       });
       html += '</tr>';
@@ -2302,31 +2318,120 @@ DEP 100</div>
       checkSpecialRules();
     }
 
-    function checkSpecialRules() {
-      var hasDep = configEditorData.some(function(c) {
-        var kw = c.keyword.toUpperCase();
-        return kw === 'DEP' || kw === 'DÉPENSES' || kw === 'DEPENSES';
-      });
-      var hasEsp = configEditorData.some(function(c) {
-        var kw = c.keyword.toUpperCase();
-        return kw === 'ESP' || kw === 'ESPECES' || kw === 'ESPÈCES';
-      });
+    // ========== RÈGLES PERSONNALISÉES ==========
+    var customRules = []; // Array de { sources: ['DEP', 'ESP'], operation: 'add', target: 'ESP' }
 
-      var ruleDepEsp = document.getElementById('rule-dep-esp');
+    function renderCustomRules() {
+      var container = document.getElementById('custom-rules-container');
       var noRulesMsg = document.getElementById('no-rules-message');
 
-      if (hasDep && hasEsp) {
-        ruleDepEsp.style.display = 'block';
-        noRulesMsg.style.display = 'none';
-      } else {
-        ruleDepEsp.style.display = 'none';
+      if (customRules.length === 0) {
+        container.innerHTML = '';
         noRulesMsg.style.display = 'block';
+        return;
       }
+
+      noRulesMsg.style.display = 'none';
+
+      // Obtenir la liste des mots-clés disponibles
+      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+
+      var html = '';
+      customRules.forEach(function(rule, index) {
+        html += '<div style="background: rgba(255, 107, 53, 0.08); border-radius: 12px; padding: 14px; border: 1px solid rgba(255, 107, 53, 0.2);">';
+        html += '<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">';
+
+        // Sources (les colonnes à additionner)
+        rule.sources.forEach(function(src, srcIdx) {
+          if (srcIdx > 0) {
+            html += '<span style="color: #FF6B35; font-weight: 600; font-size: 16px;">+</span>';
+          }
+          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 6px 10px; color: white; font-size: 13px; font-weight: 600;">';
+          keywords.forEach(function(kw) {
+            var selected = kw === src ? 'selected' : '';
+            html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
+          });
+          html += '</select>';
+        });
+
+        // Bouton ajouter source
+        html += '<button onclick="addRuleSource(' + index + ')" style="width: 26px; height: 26px; background: rgba(255,107,53,0.2); border: none; border-radius: 50%; color: #FF6B35; cursor: pointer; font-size: 14px;" title="Ajouter une colonne">+</button>';
+
+        // Flèche
+        html += '<span style="color: rgba(255,255,255,0.5); font-size: 14px; margin: 0 4px;">→</span>';
+
+        // Target
+        html += '<span style="color: rgba(255,255,255,0.5); font-size: 12px;">écrit dans</span>';
+        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 6px; padding: 6px 10px; color: #22C55E; font-size: 13px; font-weight: 600;">';
+        keywords.forEach(function(kw) {
+          var selected = kw === rule.target ? 'selected' : '';
+          html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
+        });
+        html += '</select>';
+
+        // Supprimer
+        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border: none; border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 16px;" title="Supprimer">×</button>';
+
+        html += '</div>';
+
+        // Description
+        var desc = rule.sources.join(' + ') + ' → ' + rule.target;
+        html += '<div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 8px;">Ex: ' + rule.sources[0] + ' 100 + ' + (rule.sources[1] || rule.sources[0]) + ' 50 = 150€ écrits dans ' + rule.target + '</div>';
+
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+
+    function addCustomRule() {
+      // Obtenir les 2 premiers mots-clés disponibles
+      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+      if (keywords.length < 2) {
+        alert('Tu dois avoir au moins 2 mots-clés configurés pour créer une règle.');
+        return;
+      }
+
+      customRules.push({
+        sources: [keywords[0], keywords[1]],
+        operation: 'add',
+        target: keywords[1]
+      });
+
+      renderCustomRules();
+    }
+
+    function removeCustomRule(index) {
+      customRules.splice(index, 1);
+      renderCustomRules();
+    }
+
+    function updateRuleSource(ruleIndex, sourceIndex, value) {
+      customRules[ruleIndex].sources[sourceIndex] = value;
+      renderCustomRules();
+    }
+
+    function updateRuleTarget(ruleIndex, value) {
+      customRules[ruleIndex].target = value;
+      renderCustomRules();
+    }
+
+    function addRuleSource(ruleIndex) {
+      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+      if (keywords.length > 0) {
+        customRules[ruleIndex].sources.push(keywords[0]);
+        renderCustomRules();
+      }
+    }
+
+    function checkSpecialRules() {
+      // Rendu des règles personnalisées
+      renderCustomRules();
     }
 
     function updateConfigKeyword(index, value) {
       configEditorData[index].keyword = value;
-      checkSpecialRules();
+      renderCustomRules(); // Mettre à jour les règles si les keywords changent
     }
 
     function updateConfigColumn(index, value) {
@@ -2338,7 +2443,7 @@ DEP 100</div>
     function removeConfigRow(index) {
       configEditorData.splice(index, 1);
       renderConfigEditorRows();
-      checkSpecialRules();
+      renderCustomRules();
       // Reconstruire le tableau Excel
       buildExcelPreview();
     }
@@ -2353,12 +2458,6 @@ DEP 100</div>
       renderConfigEditorRows();
       // Reconstruire le tableau Excel
       buildExcelPreview();
-    }
-
-
-    function toggleDepCombine() {
-      depCombineWithEsp = document.getElementById('dep-combine-checkbox').checked;
-      console.log('[CONFIG EDITOR] DEP combine with ESP:', depCombineWithEsp);
     }
 
     function saveConfigEditor() {
@@ -2391,14 +2490,21 @@ DEP 100</div>
       // Mettre à jour pendingConfig
       pendingConfig.colonnes_a_remplir = newColonnes;
 
-      // Ajouter l'option DEP combine
-      if (depCombineWithEsp) {
-        pendingConfig.dep_combine_with_esp = true;
+      // Sauvegarder les règles personnalisées
+      if (customRules.length > 0) {
+        pendingConfig.regles_calcul = customRules.map(function(rule) {
+          return {
+            sources: rule.sources,
+            operation: rule.operation,
+            target: rule.target
+          };
+        });
       } else {
-        delete pendingConfig.dep_combine_with_esp;
+        delete pendingConfig.regles_calcul;
       }
 
       console.log('[CONFIG EDITOR] Updated config:', pendingConfig);
+      console.log('[CONFIG EDITOR] Custom rules:', customRules);
 
       // Sauvegarder la config et aller à l'étape Telegram
       saveAndContinue();
