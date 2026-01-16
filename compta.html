@@ -355,7 +355,7 @@
       <div id="steps-nav">
         <div class="step-item active" id="step-nav-1"><div class="step-number">1</div><span class="step-label">Connexion Google</span></div>
         <div class="step-item upcoming" id="step-nav-2"><div class="step-number">2</div><span class="step-label">Ton fichier</span></div>
-        <div class="step-item upcoming" id="step-nav-3"><div class="step-number">3</div><span class="step-label">Analyse</span></div>
+        <div class="step-item upcoming" id="step-nav-3"><div class="step-number">3</div><span class="step-label">Configuration</span></div>
         <div class="step-item upcoming" id="step-nav-4"><div class="step-number">4</div><span class="step-label">Telegram</span></div>
       </div>
     </aside>
@@ -549,9 +549,17 @@
 
         <!-- Loading state avec étapes détaillées -->
         <div id="config-loading" style="max-width: 500px; margin: 0 auto; padding: 40px 20px;">
-          <!-- Nom du fichier -->
-          <div style="text-align: center; margin-bottom: 24px;">
-            <span id="loading-filename" style="color: #FF6B35; font-weight: 600; font-size: 16px;">recette 25.xlsx</span>
+          <!-- Nom du fichier avec badge élégant -->
+          <div style="text-align: center; margin-bottom: 28px;">
+            <div style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 12px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span id="loading-filename" style="color: #FF8B5E; font-weight: 600; font-size: 14px; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">recette 25.xlsx</span>
+            </div>
           </div>
 
           <!-- Étapes de chargement -->
@@ -686,56 +694,70 @@ DEP 100</div>
             </div>
           </div>
 
-          <!-- Configuration des mots-clés -->
-          <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-              <div style="font-size: 15px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 20px;">🎯</span> Tes mots-clés → colonnes Excel
-              </div>
-              <button onclick="addConfigRow()" style="padding: 8px 16px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">
-                + Ajouter
-              </button>
-            </div>
-
-            <div id="config-editor-rows" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
-              <!-- Les rows seront générées dynamiquement -->
-            </div>
-          </div>
-
-          <!-- Section règles spéciales -->
-          <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-              <div style="font-size: 14px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 18px;">⚡</span> Règles de calcul
-              </div>
-              <button onclick="addCustomRule()" style="padding: 6px 14px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 12px; font-weight: 600;">
-                + Ajouter
-              </button>
-            </div>
-
-            <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
-              <!-- Les règles seront générées dynamiquement -->
-            </div>
-
-            <!-- Message si pas de règles -->
-            <div id="no-rules-message" style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 12px; text-align: center;">
-              💡 Ajoute une règle pour combiner des valeurs (ex: DEP + ESP → écrit dans ESP)
-            </div>
-          </div>
-
-          <!-- Explication finale -->
-          <div style="text-align: center; padding: 16px 0; color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 8px;">
+          <!-- Explication -->
+          <div style="text-align: center; padding: 20px 0 16px 0; color: rgba(255,255,255,0.5); font-size: 14px;">
             👆 Quand tu envoies un message Telegram, les valeurs s'écrivent automatiquement dans ton tableau
           </div>
 
-          <!-- Boutons footer -->
-          <div style="display: flex; gap: 12px;">
-            <button onclick="closeConfigEditor()" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: rgba(255,255,255,0.7); font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s;">
-              ← Retour
+          <!-- Boutons principaux -->
+          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <button onclick="toggleConfigPanel()" id="btn-modify-config" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; color: rgba(255,255,255,0.8); font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span style="font-size: 18px;">⚙️</span> Modifier
             </button>
             <button onclick="saveConfigEditor()" style="flex: 2; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); transition: all 0.2s;">
-              C'est parfait ! Continuer →
+              ✓ C'est parfait ! Continuer →
             </button>
+          </div>
+
+          <!-- Panel de configuration (caché par défaut) -->
+          <div id="config-panel" style="display: none; overflow: hidden; transition: all 0.3s ease;">
+
+            <!-- Configuration des mots-clés -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <div style="font-size: 15px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 20px;">🎯</span> Tes mots-clés → colonnes Excel
+                </div>
+                <button onclick="addConfigRow()" style="padding: 8px 16px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">
+                  + Ajouter
+                </button>
+              </div>
+
+              <div id="config-editor-rows" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+                <!-- Les rows seront générées dynamiquement -->
+              </div>
+            </div>
+
+            <!-- Section règles de calcul -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <div style="font-size: 14px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 18px;">⚡</span> Règles de calcul
+                </div>
+                <button onclick="addCustomRule()" style="padding: 6px 14px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 12px; font-weight: 600;">
+                  + Ajouter
+                </button>
+              </div>
+
+              <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Les règles seront générées dynamiquement -->
+              </div>
+
+              <!-- Message si pas de règles -->
+              <div id="no-rules-message" style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 12px; text-align: center;">
+                💡 Ajoute une règle pour combiner des valeurs (ex: DEP + ESP → écrit dans ESP)
+              </div>
+            </div>
+
+            <!-- Bouton retour dans le panel -->
+            <div style="display: flex; gap: 12px;">
+              <button onclick="closeConfigEditor()" style="flex: 1; padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 14px; cursor: pointer;">
+                ← Changer de fichier
+              </button>
+              <button onclick="toggleConfigPanel()" style="flex: 1; padding: 14px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; color: #22C55E; font-weight: 600; font-size: 14px; cursor: pointer;">
+                ✓ Fermer les options
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -2009,6 +2031,18 @@ DEP 100</div>
     function openConfigEditor() {
       console.log('[CONFIG EDITOR] Opening with config:', pendingConfig);
 
+      // Réinitialiser le panel de config (fermé par défaut)
+      configPanelOpen = false;
+      var panel = document.getElementById('config-panel');
+      var btn = document.getElementById('btn-modify-config');
+      if (panel) panel.style.display = 'none';
+      if (btn) {
+        btn.innerHTML = '<span style="font-size: 18px;">⚙️</span> Modifier';
+        btn.style.background = 'rgba(255,255,255,0.04)';
+        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+        btn.style.color = 'rgba(255,255,255,0.8)';
+      }
+
       // Récupérer les colonnes disponibles du sheet (filtrer les valeurs numériques)
       availableColumns = [];
       if (excelData && excelData.sheets && excelData.sheets[0] && excelData.sheets[0].detectedHeaders) {
@@ -2217,6 +2251,49 @@ DEP 100</div>
       // Réinitialiser le loading pour la prochaine fois
       document.getElementById('config-loading').style.display = 'block';
       document.getElementById('config-editor-main').style.display = 'none';
+      // Fermer le panel de config
+      var panel = document.getElementById('config-panel');
+      if (panel) panel.style.display = 'none';
+    }
+
+    var configPanelOpen = false;
+    function toggleConfigPanel() {
+      var panel = document.getElementById('config-panel');
+      var btn = document.getElementById('btn-modify-config');
+
+      if (!configPanelOpen) {
+        // Ouvrir le panel avec animation
+        panel.style.display = 'block';
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateY(-10px)';
+        setTimeout(function() {
+          panel.style.transition = 'all 0.3s ease';
+          panel.style.opacity = '1';
+          panel.style.transform = 'translateY(0)';
+        }, 10);
+        btn.innerHTML = '<span style="font-size: 18px;">✕</span> Fermer';
+        btn.style.background = 'rgba(255,107,53,0.15)';
+        btn.style.borderColor = 'rgba(255,107,53,0.3)';
+        btn.style.color = '#FF6B35';
+        configPanelOpen = true;
+        // Scroll vers le panel
+        setTimeout(function() {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        // Fermer le panel
+        panel.style.transition = 'all 0.2s ease';
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateY(-10px)';
+        setTimeout(function() {
+          panel.style.display = 'none';
+        }, 200);
+        btn.innerHTML = '<span style="font-size: 18px;">⚙️</span> Modifier';
+        btn.style.background = 'rgba(255,255,255,0.04)';
+        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+        btn.style.color = 'rgba(255,255,255,0.8)';
+        configPanelOpen = false;
+      }
     }
 
     function renderConfigEditorRows() {
