@@ -3065,9 +3065,6 @@ DEP 100</div>
           is_active: true  // IMPORTANT: Le bot filtre sur is_active=true
         };
 
-        console.log('[CONFIG] About to save:', JSON.stringify(configToSave, null, 2));
-        alert('DEBUG - Colonnes: ' + pendingConfig.colonnes_a_remplir.map(function(c) { return c.nom + '→' + c.colonne; }).join(', '));
-
         var result = await supabaseClient
           .from('user_configs')
           .upsert(configToSave, { onConflict: 'user_id' });
@@ -4018,7 +4015,79 @@ DEP 100</div>
       var urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('code') && urlParams.get('state') === 'sheets_auth') { console.log('[COMPTA] 🔄 Callback OAuth Sheets'); await handleSheetsCallback(); }
       await initComptaPage();
+
+      // Si ?edit=true, charger la config existante et ouvrir l'éditeur
+      if (urlParams.get('edit') === 'true') {
+        console.log('[COMPTA] 📝 Mode édition directe demandé');
+        await loadExistingConfigForEdit();
+      }
     });
+
+    async function loadExistingConfigForEdit() {
+      try {
+        var { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        // Charger la config existante
+        var { data: config } = await supabaseClient
+          .from('user_configs')
+          .select('sheet_id, excel_config')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (!config || !config.excel_config) {
+          showToast('Aucune configuration trouvée');
+          return;
+        }
+
+        console.log('[COMPTA] ✅ Config chargée pour édition:', config.excel_config);
+
+        // Restaurer l'état
+        pendingConfig = config.excel_config;
+        excelData = { sheetId: config.sheet_id };
+
+        // Préparer les données pour l'éditeur
+        configEditorData = (pendingConfig.colonnes_a_remplir || []).map(function(col) {
+          return {
+            keyword: col.nom,
+            column: col.colonne,
+            noteColumn: col.noteColumn || null,
+            aliases: col.aliases || []
+          };
+        });
+
+        // Charger les règles personnalisées
+        customRules = (pendingConfig.regles_calcul || []).map(function(rule) {
+          return {
+            sources: rule.sources,
+            operation: rule.operation,
+            target: rule.target
+          };
+        });
+
+        // Construire availableColumns (A-Z)
+        availableColumns = [];
+        for (var i = 0; i < 26; i++) {
+          var letter = String.fromCharCode(65 + i);
+          availableColumns.push({ letter: letter, name: null });
+        }
+
+        // Aller à l'étape 3 et ouvrir le panel de config
+        goToStep(3);
+        setTimeout(function() {
+          renderConfigEditorRows();
+          renderCustomRules();
+          document.getElementById('config-panel').style.display = 'block';
+        }, 100);
+
+        // Nettoyer l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+      } catch (err) {
+        console.error('[COMPTA] Erreur chargement config:', err);
+        showToast('Erreur: ' + err.message);
+      }
+    }
   </script>
 </body>
 </html>
