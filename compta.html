@@ -600,6 +600,64 @@
           <button id="analyse-continue-btn" onclick="goToTelegram()" style="display: none; width: 100%; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 12px; padding: 16px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 16px;">
             Continuer →
           </button>
+
+          <!-- Bouton Modifier la config -->
+          <button id="analyse-modify-btn" onclick="openConfigEditor()" style="display: none; width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 14px; color: rgba(255,255,255,0.7); font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 10px;">
+            Ce n'est pas correct ? Modifier →
+          </button>
+        </div>
+      </div>
+
+      <!-- PANNEAU EDITEUR DE CONFIG -->
+      <div id="config-editor-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
+        <div style="max-width: 600px; margin: 40px auto; background: #111; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
+          <!-- Header -->
+          <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Personnaliser ma config</h2>
+              <p style="font-size: 13px; color: rgba(255,255,255,0.5);">Clique sur les colonnes pour les modifier</p>
+            </div>
+            <button onclick="closeConfigEditor()" style="background: rgba(255,255,255,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: white; font-size: 18px;">×</button>
+          </div>
+
+          <!-- Tableau de config -->
+          <div style="padding: 20px;">
+            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 12px; display: flex;">
+              <span style="flex: 1;">Quand je dis...</span>
+              <span style="flex: 1;">Écrire dans...</span>
+              <span style="width: 40px;"></span>
+            </div>
+
+            <div id="config-editor-rows" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Les rows seront générées dynamiquement -->
+            </div>
+
+            <!-- Bouton ajouter -->
+            <button onclick="addConfigRow()" style="width: 100%; margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.2); border-radius: 12px; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 14px;">
+              + Ajouter une entrée
+            </button>
+
+            <!-- Option spéciale DEP -->
+            <div id="dep-combine-option" style="display: none; margin-top: 20px; padding: 16px; background: rgba(255, 107, 53, 0.08); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px;">
+              <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                <input type="checkbox" id="dep-combine-checkbox" onchange="toggleDepCombine()" style="width: 20px; height: 20px; accent-color: #FF6B35;">
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">DEP s'ajoute à ESP</div>
+                  <div style="font-size: 12px; color: rgba(255,255,255,0.5);">Les dépenses seront ajoutées aux espèces (ex: ESP 500 + DEP 100 = 600)</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 12px;">
+            <button onclick="closeConfigEditor()" style="flex: 1; padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: rgba(255,255,255,0.7); font-weight: 600; cursor: pointer;">
+              Annuler
+            </button>
+            <button onclick="saveConfigEditor()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer;">
+              Valider
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1948,7 +2006,188 @@
         } else {
           document.getElementById('analyse-continue-btn').style.display = 'block';
         }
+        // Toujours afficher le bouton Modifier
+        document.getElementById('analyse-modify-btn').style.display = 'block';
       }, totalDelay);
+    }
+
+    // ========== CONFIG EDITOR FUNCTIONS ==========
+    var configEditorData = [];
+    var availableColumns = []; // Colonnes détectées dans le sheet
+    var depCombineWithEsp = false;
+
+    function openConfigEditor() {
+      console.log('[CONFIG EDITOR] Opening with config:', pendingConfig);
+
+      // Récupérer les colonnes disponibles du sheet
+      availableColumns = [];
+      if (excelData && excelData.sheets && excelData.sheets[0] && excelData.sheets[0].detectedHeaders) {
+        availableColumns = excelData.sheets[0].detectedHeaders.columns.map(function(c) {
+          return { letter: c.letter, name: c.name };
+        });
+      }
+      console.log('[CONFIG EDITOR] Available columns:', availableColumns);
+
+      // Convertir la config actuelle en données éditables
+      configEditorData = [];
+      if (pendingConfig && pendingConfig.colonnes_a_remplir) {
+        pendingConfig.colonnes_a_remplir.forEach(function(col) {
+          configEditorData.push({
+            keyword: col.nom,
+            column: col.colonne,
+            aliases: col.aliases || []
+          });
+        });
+      }
+
+      // Ajouter RAZ si colonne C existe (tableau gauche)
+      var hasRaz = configEditorData.some(function(c) { return c.keyword.toUpperCase() === 'RAZ'; });
+      if (!hasRaz) {
+        // Suggérer d'ajouter RAZ
+      }
+
+      // Vérifier si DEP existe
+      var hasDep = configEditorData.some(function(c) { return c.keyword.toUpperCase() === 'DEP' || c.keyword.toUpperCase() === 'DÉPENSES'; });
+      var hasEsp = configEditorData.some(function(c) { return c.keyword.toUpperCase() === 'ESP'; });
+      if (hasDep && hasEsp) {
+        document.getElementById('dep-combine-option').style.display = 'block';
+      } else {
+        document.getElementById('dep-combine-option').style.display = 'none';
+      }
+
+      renderConfigEditorRows();
+      document.getElementById('config-editor-overlay').style.display = 'block';
+    }
+
+    function closeConfigEditor() {
+      document.getElementById('config-editor-overlay').style.display = 'none';
+    }
+
+    function renderConfigEditorRows() {
+      var container = document.getElementById('config-editor-rows');
+      container.innerHTML = '';
+
+      configEditorData.forEach(function(row, index) {
+        var rowHtml = '<div class="config-row" style="display: flex; gap: 10px; align-items: center; padding: 12px; background: rgba(255,255,255,0.04); border-radius: 12px;">';
+
+        // Input pour le mot-clé
+        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value)" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px; color: white; font-size: 14px;" placeholder="ex: CB, ESP, RAZ...">';
+
+        // Flèche
+        rowHtml += '<span style="color: rgba(255,255,255,0.3);">→</span>';
+
+        // Select pour la colonne
+        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value)" style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px; color: white; font-size: 14px;">';
+
+        // Option pour chaque colonne disponible
+        if (availableColumns.length > 0) {
+          availableColumns.forEach(function(col) {
+            var selected = col.letter === row.column ? 'selected' : '';
+            rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + col.name + ' (' + col.letter + ')</option>';
+          });
+        } else {
+          // Fallback: lettres A-Z
+          for (var i = 0; i < 26; i++) {
+            var letter = String.fromCharCode(65 + i);
+            var selected = letter === row.column ? 'selected' : '';
+            rowHtml += '<option value="' + letter + '" ' + selected + '>Colonne ' + letter + '</option>';
+          }
+        }
+        rowHtml += '</select>';
+
+        // Bouton supprimer
+        rowHtml += '<button onclick="removeConfigRow(' + index + ')" style="width: 36px; height: 36px; background: rgba(239, 68, 68, 0.1); border: none; border-radius: 8px; color: #ef4444; cursor: pointer; font-size: 16px;">×</button>';
+
+        rowHtml += '</div>';
+        container.innerHTML += rowHtml;
+      });
+    }
+
+    function updateConfigKeyword(index, value) {
+      configEditorData[index].keyword = value;
+      checkDepEspOption();
+    }
+
+    function updateConfigColumn(index, value) {
+      configEditorData[index].column = value;
+    }
+
+    function removeConfigRow(index) {
+      configEditorData.splice(index, 1);
+      renderConfigEditorRows();
+      checkDepEspOption();
+    }
+
+    function addConfigRow() {
+      var defaultColumn = availableColumns.length > 0 ? availableColumns[0].letter : 'A';
+      configEditorData.push({
+        keyword: '',
+        column: defaultColumn,
+        aliases: []
+      });
+      renderConfigEditorRows();
+    }
+
+    function checkDepEspOption() {
+      var hasDep = configEditorData.some(function(c) {
+        var kw = c.keyword.toUpperCase();
+        return kw === 'DEP' || kw === 'DÉPENSES' || kw === 'DEPENSES';
+      });
+      var hasEsp = configEditorData.some(function(c) {
+        var kw = c.keyword.toUpperCase();
+        return kw === 'ESP' || kw === 'ESPECES' || kw === 'ESPÈCES';
+      });
+      document.getElementById('dep-combine-option').style.display = (hasDep && hasEsp) ? 'block' : 'none';
+    }
+
+    function toggleDepCombine() {
+      depCombineWithEsp = document.getElementById('dep-combine-checkbox').checked;
+      console.log('[CONFIG EDITOR] DEP combine with ESP:', depCombineWithEsp);
+    }
+
+    function saveConfigEditor() {
+      console.log('[CONFIG EDITOR] Saving config:', configEditorData);
+
+      // Reconstruire colonnes_a_remplir
+      var newColonnes = [];
+      configEditorData.forEach(function(row) {
+        if (row.keyword.trim()) {
+          // Générer des aliases basiques
+          var kw = row.keyword.trim();
+          var kwLower = kw.toLowerCase();
+          var aliases = [kwLower];
+
+          // Aliases standards
+          if (kwLower === 'cb') aliases = ['cb', 'carte', 'carte bancaire', 'card', 'tpe'];
+          else if (kwLower === 'esp') aliases = ['esp', 'espèces', 'especes', 'cash', 'liquide'];
+          else if (kwLower === 'tr') aliases = ['tr', 'ticket resto', 'ticket restaurant', 'titres resto'];
+          else if (kwLower === 'raz' || kwLower === 'recette' || kwLower === 'recettes') aliases = ['raz', 'recette', 'recettes', 'ca', 'ttc', 'ticket z', 'ticketz'];
+          else if (kwLower === 'dep' || kwLower === 'dépenses' || kwLower === 'depenses') aliases = ['dep', 'dépense', 'dépenses', 'depense', 'depenses', 'frais'];
+
+          newColonnes.push({
+            nom: kw.toUpperCase(),
+            colonne: row.column,
+            aliases: aliases
+          });
+        }
+      });
+
+      // Mettre à jour pendingConfig
+      pendingConfig.colonnes_a_remplir = newColonnes;
+
+      // Ajouter l'option DEP combine
+      if (depCombineWithEsp) {
+        pendingConfig.dep_combine_with_esp = true;
+      } else {
+        delete pendingConfig.dep_combine_with_esp;
+      }
+
+      console.log('[CONFIG EDITOR] Updated config:', pendingConfig);
+
+      // Fermer l'éditeur et rafraîchir l'affichage
+      closeConfigEditor();
+      showAnalyseResult(pendingConfig);
+      showToast('Configuration mise à jour !');
     }
 
     function addAnalyseBotMessage(text) {
