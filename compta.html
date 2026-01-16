@@ -709,48 +709,48 @@ DEP 100</div>
             </button>
           </div>
 
-          <!-- Panel de configuration (caché par défaut) -->
-          <div id="config-panel" style="display: none; overflow: hidden; transition: all 0.3s ease;">
+          <!-- Panel de configuration (caché par défaut) - LIQUID GLASS -->
+          <div id="config-panel" style="display: none; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
 
-            <!-- Configuration des mots-clés - ULTRA ÉPURÉ -->
-            <div style="background: rgba(255,255,255,0.02); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;">
+            <!-- Configuration des mots-clés - GLASS EFFECT -->
+            <div class="glass-config-section" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s ease;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <span style="font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500;">Mots-clés</span>
-                <button onclick="addConfigRow()" style="padding: 4px 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.5)';this.style.color='#FF6B35'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)'">
+                <span style="font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 0.5px;">Mots-clés</span>
+                <button onclick="addConfigRow()" class="glass-btn-add" style="padding: 6px 14px; background: rgba(255,107,53,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: rgba(255,107,53,0.8); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,107,53,0.1);" onmouseover="this.style.background='rgba(255,107,53,0.2)';this.style.boxShadow='0 4px 16px rgba(255,107,53,0.2)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(255,107,53,0.1)';this.style.boxShadow='0 2px 8px rgba(255,107,53,0.1)';this.style.transform='translateY(0)'">
                   + nouveau
                 </button>
               </div>
 
-              <div id="config-editor-rows" style="display: flex; flex-direction: column; gap: 8px;">
+              <div id="config-editor-rows" style="display: flex; flex-direction: column; gap: 10px;">
                 <!-- Les rows seront générées dynamiquement -->
               </div>
             </div>
 
-            <!-- Section règles de calcul - ULTRA ÉPURÉ -->
-            <div style="background: rgba(255,255,255,0.02); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px;">
+            <!-- Section règles de calcul - GLASS EFFECT -->
+            <div class="glass-config-section" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s ease;">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <span style="font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500;">Règles</span>
-                <button onclick="addCustomRule()" style="padding: 4px 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(255,107,53,0.5)';this.style.color='#FF6B35'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.4)'">
+                <span style="font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 0.5px;">Règles</span>
+                <button onclick="addCustomRule()" class="glass-btn-add" style="padding: 6px 14px; background: rgba(255,107,53,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: rgba(255,107,53,0.8); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,107,53,0.1);" onmouseover="this.style.background='rgba(255,107,53,0.2)';this.style.boxShadow='0 4px 16px rgba(255,107,53,0.2)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(255,107,53,0.1)';this.style.boxShadow='0 2px 8px rgba(255,107,53,0.1)';this.style.transform='translateY(0)'">
                   + nouvelle
                 </button>
               </div>
 
-              <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 8px;">
+              <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
                 <!-- Les règles seront générées dynamiquement -->
               </div>
 
               <!-- Message si pas de règles -->
-              <div id="no-rules-message" style="color: rgba(255,255,255,0.3); font-size: 11px; padding: 8px; text-align: center;">
+              <div id="no-rules-message" style="color: rgba(255,255,255,0.35); font-size: 11px; padding: 12px; text-align: center; font-style: italic;">
                 Combine des valeurs (ex: DEP + ESP → ESP)
               </div>
             </div>
 
-            <!-- Boutons bas du panel -->
-            <div style="display: flex; gap: 10px; padding-top: 4px;">
-              <button onclick="closeConfigEditor()" style="padding: 10px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.4)'">
+            <!-- Boutons bas du panel - GLASS -->
+            <div style="display: flex; gap: 12px; padding-top: 6px;">
+              <button onclick="closeConfigEditor()" style="padding: 12px 18px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.5); font-size: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.8)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.color='rgba(255,255,255,0.5)';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(0,0,0,0.2)'">
                 ← Autre fichier
               </button>
-              <button onclick="toggleConfigPanel()" style="margin-left: auto; padding: 10px 16px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 8px; color: rgba(34, 197, 94, 0.8); font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(34, 197, 94, 0.15)'" onmouseout="this.style.background='rgba(34, 197, 94, 0.08)'">
+              <button onclick="toggleConfigPanel()" style="margin-left: auto; padding: 12px 20px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); backdrop-filter: blur(10px); border: 1px solid rgba(34,197,94,0.25); border-radius: 12px; color: #4ade80; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(34,197,94,0.15);" onmouseover="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.15))';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(34,197,94,0.25)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08))';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(34,197,94,0.15)'">
                 Fermer ✓
               </button>
             </div>
@@ -2297,17 +2297,17 @@ DEP 100</div>
       container.innerHTML = '';
 
       configEditorData.forEach(function(row, index) {
-        // Ligne ultra simple: [KEYWORD] → [Column]
-        var rowHtml = '<div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">';
+        // Ligne GLASS: [KEYWORD] → [Column]
+        var rowHtml = '<div class="glass-row" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\';this.style.borderColor=\'rgba(255,255,255,0.12)\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\';this.style.borderColor=\'rgba(255,255,255,0.08)\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)\'">';
 
-        // Input mot-clé (compact, orange)
-        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 70px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 6px 10px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase;" placeholder="...">';
+        // Input mot-clé (glass orange)
+        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 72px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 10px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; box-shadow: 0 2px 6px rgba(255,107,53,0.15), inset 0 1px 0 rgba(255,255,255,0.1); transition: all 0.2s;" placeholder="..." onfocus="this.style.boxShadow=\'0 0 0 2px rgba(255,107,53,0.3), 0 4px 12px rgba(255,107,53,0.2)\'" onblur="this.style.boxShadow=\'0 2px 6px rgba(255,107,53,0.15), inset 0 1px 0 rgba(255,255,255,0.1)\'">';
 
-        // Flèche
-        rowHtml += '<span style="color: rgba(255,255,255,0.25); font-size: 14px;">→</span>';
+        // Flèche avec glow subtil
+        rowHtml += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; text-shadow: 0 0 10px rgba(255,255,255,0.1);">→</span>';
 
-        // Select colonne (nom en premier)
-        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 10px; color: rgba(255,255,255,0.7); font-size: 12px; cursor: pointer; appearance: none; background-image: url(\'data:image/svg+xml;utf8,<svg fill=\"white\" opacity=\"0.4\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>\'); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding-right: 28px;">';
+        // Select colonne (glass style)
+        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: rgba(255,255,255,0.8); font-size: 12px; cursor: pointer; appearance: none; background-image: url(\'data:image/svg+xml;utf8,<svg fill=\"white\" opacity=\"0.5\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>\'); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; padding-right: 30px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
 
         // Options: nom de colonne en premier
         if (availableColumns.length > 0) {
@@ -2326,8 +2326,8 @@ DEP 100</div>
         }
         rowHtml += '</select>';
 
-        // Bouton supprimer (discret)
-        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 24px; height: 24px; background: transparent; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; transition: all 0.2s; border-radius: 4px;" onmouseover="this.style.color=\'#ef4444\';this.style.background=\'rgba(239,68,68,0.1)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.2)\';this.style.background=\'transparent\'">×</button>';
+        // Bouton supprimer (glass hover)
+        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; transition: all 0.25s ease; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\';this.style.borderColor=\'rgba(239,68,68,0.3)\';this.style.boxShadow=\'0 2px 8px rgba(239,68,68,0.2)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\';this.style.borderColor=\'transparent\';this.style.boxShadow=\'none\'">×</button>';
 
         rowHtml += '</div>';
         container.innerHTML += rowHtml;
@@ -2412,15 +2412,15 @@ DEP 100</div>
 
       var html = '';
       customRules.forEach(function(rule, index) {
-        // Ligne ultra simple: [A] + [B] → [C]
-        html += '<div style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">';
+        // Ligne GLASS: [A] + [B] → [C]
+        html += '<div class="glass-row" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.15)\'">';
 
         // Sources (les colonnes à additionner)
         rule.sources.forEach(function(src, srcIdx) {
           if (srcIdx > 0) {
-            html += '<span style="color: rgba(255,255,255,0.3); font-size: 13px;">+</span>';
+            html += '<span style="color: rgba(255,255,255,0.4); font-size: 14px; font-weight: 500; text-shadow: 0 0 8px rgba(255,255,255,0.1);">+</span>';
           }
-          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="width: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 600; text-align: center;">';
+          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="width: 65px; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 7px 8px; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
           keywords.forEach(function(kw) {
             var selected = kw === src ? 'selected' : '';
             html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
@@ -2428,22 +2428,22 @@ DEP 100</div>
           html += '</select>';
         });
 
-        // Bouton ajouter source (très discret)
-        html += '<button onclick="addRuleSource(' + index + ')" style="width: 20px; height: 20px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); border-radius: 4px; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.borderColor=\'rgba(255,107,53,0.5)\';this.style.color=\'#FF6B35\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.2)\';this.style.color=\'rgba(255,255,255,0.3)\'" title="Ajouter">+</button>';
+        // Bouton ajouter source (glass)
+        html += '<button onclick="addRuleSource(' + index + ')" style="width: 22px; height: 22px; background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); border-radius: 6px; color: rgba(255,107,53,0.6); cursor: pointer; font-size: 13px; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background=\'rgba(255,107,53,0.2)\';this.style.color=\'#FF6B35\';this.style.boxShadow=\'0 2px 8px rgba(255,107,53,0.2)\'" onmouseout="this.style.background=\'rgba(255,107,53,0.08)\';this.style.color=\'rgba(255,107,53,0.6)\';this.style.boxShadow=\'none\'" title="Ajouter">+</button>';
 
-        // Flèche
-        html += '<span style="color: rgba(255,255,255,0.25); font-size: 14px; margin: 0 4px;">→</span>';
+        // Flèche avec glow
+        html += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; margin: 0 4px; text-shadow: 0 0 10px rgba(255,255,255,0.1);">→</span>';
 
-        // Target
-        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="width: 60px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 6px; padding: 6px 8px; color: #22C55E; font-size: 12px; font-weight: 600; text-align: center;">';
+        // Target (green glass)
+        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="width: 65px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 7px 8px; color: #4ade80; font-size: 12px; font-weight: 600; text-align: center; box-shadow: 0 2px 6px rgba(34,197,94,0.1), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
         keywords.forEach(function(kw) {
           var selected = kw === rule.target ? 'selected' : '';
           html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
         });
         html += '</select>';
 
-        // Supprimer (discret)
-        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 24px; height: 24px; background: transparent; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; transition: all 0.2s; border-radius: 4px;" onmouseover="this.style.color=\'#ef4444\';this.style.background=\'rgba(239,68,68,0.1)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.2)\';this.style.background=\'transparent\'">×</button>';
+        // Supprimer (glass hover)
+        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; transition: all 0.25s ease; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\';this.style.borderColor=\'rgba(239,68,68,0.3)\';this.style.boxShadow=\'0 2px 8px rgba(239,68,68,0.2)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\';this.style.borderColor=\'transparent\';this.style.boxShadow=\'none\'">×</button>';
 
         html += '</div>';
       });
