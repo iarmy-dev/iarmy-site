@@ -191,6 +191,13 @@
     .btn-google-sheets.connected { background: linear-gradient(135deg, #0f9d58, #0a7e3e); color: white; }
     @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; padding: 24px; } }
 
+    /* Mini logo animé pour sidebar */
+    .sidebar-module-logo { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .sidebar-logo-tg { width: 28px; height: 28px; }
+    .sidebar-logo-arrow { color: rgba(255,255,255,0.3); font-size: 10px; animation: arrowPulse 1.5s ease-in-out infinite; }
+    @keyframes arrowPulse { 0%, 100% { opacity: 0.3; transform: translateX(0); } 50% { opacity: 0.8; transform: translateX(2px); } }
+    .sidebar-logo-sheet { width: 28px; height: 28px; }
+
     /* Config Preview Modal */
     .config-preview-overlay { position: fixed; inset: 0; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(30px); z-index: 10003; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
     .config-preview-overlay.active { opacity: 1; pointer-events: all; }
@@ -480,8 +487,14 @@
   <div class="flex min-h-screen" style="padding-top: 70px;">
     <aside class="sidebar">
       <div class="mb-6">
-        <span class="text-xs text-white/30 uppercase tracking-wider">Activation</span>
-        <div class="text-lg font-semibold mt-1" style="color: #FF6B35;">Compta Express</div>
+        <!-- Mini logo animé Telegram → Sheets -->
+        <div class="sidebar-module-logo">
+          <svg class="sidebar-logo-tg" viewBox="0 0 240 240"><defs><linearGradient id="tg-mini" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-mini)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d2e4ef" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s2.9-.9 4.1.8c.4.6.5 1.3.4 2.3-.5 8.3-14.2 90.2-14.2 90.2s-.8 3.3-3.7 3.4c-2 .1-5.1-1.3-6.9-2.4-1.5-.9-27.5-17.6-37.1-25.7-.8-.7-1.7-2-.1-3.6 3.7-3.6 8-8 17-16.5 2-1.9 4-6.3-4.4-1.1l-23.3 15.6s-2.7 1.7-7.6.2c-1.7-.5-3.6-1.1-6.3-2-2.4-.8-4.9-1.7-4.2-3.5.5-1.2 1.4-2.2 4.8-3.5z"/></svg>
+          <span class="sidebar-logo-arrow">→</span>
+          <svg class="sidebar-logo-sheet" viewBox="0 0 56 56"><defs><linearGradient id="sheet-mini" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#0a7e3e"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sheet-mini)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/></svg>
+        </div>
+        <div style="font-size: 15px; font-weight: 700; color: white;">Compta Express</div>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px;">Configuration du module</div>
       </div>
       <div id="steps-nav">
         <div class="step-item active" id="step-nav-1"><div class="step-number">1</div><span class="step-label">Connexion Google</span></div>
@@ -1731,7 +1744,7 @@
       document.getElementById('summary-cards').innerHTML = cardsHtml;
 
       // Seuils de confiance
-      var SCORE_HIGH = 85;    // >= 85% : tout est bon, on valide
+      var SCORE_HIGH = 90;    // >= 90% : tout est bon, on valide direct
       var SCORE_LOW = 70;     // < 70% : on propose "partir de zéro"
       var MAX_EXCHANGES = 3;  // Après 3 échanges sans succès, on propose "partir de zéro"
 
