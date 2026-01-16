@@ -128,6 +128,15 @@
     .loader-step.done .loader-step-text { color: rgba(255, 255, 255, 0.6); }
     @keyframes pulseStep { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 107, 53, 0); } }
     .loader-progress { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
+    /* Analyse step loader */
+    .analyse-step { display: flex; align-items: center; gap: 12px; }
+    .analyse-step-icon { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; transition: all 0.3s ease; flex-shrink: 0; }
+    .analyse-step.pending .analyse-step-icon { background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.25); }
+    .analyse-step.active .analyse-step-icon { background: rgba(255, 107, 53, 0.15); border: 2px solid #FF6B35; color: #FF6B35; animation: pulseStep 1.5s ease-in-out infinite; }
+    .analyse-step.done .analyse-step-icon { background: rgba(34, 197, 94, 0.2); border: 2px solid #22C55E; color: #22C55E; }
+    .analyse-step-text { font-size: 13px; color: rgba(255, 255, 255, 0.35); transition: color 0.3s; }
+    .analyse-step.active .analyse-step-text { color: rgba(255, 255, 255, 0.9); font-weight: 500; }
+    .analyse-step.done .analyse-step-text { color: rgba(255, 255, 255, 0.5); }
     .loader-progress-bar { height: 100%; background: linear-gradient(90deg, #FF6B35, #FF8F6B); border-radius: 2px; transition: width 0.5s ease; width: 0%; }
     /* Modal overlay - ne couvre PAS le header/sidebar */
     .sheets-overlay { position: fixed; top: 70px; left: 280px; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -531,67 +540,57 @@
       <div class="step-content" id="step-analyse">
         <div class="mb-2"><span class="text-white/30 text-sm">Etape 3/4</span></div>
         <h1 class="text-3xl font-bold mb-3" id="analyse-title">Analyse en cours...</h1>
-        <p class="text-white/40 mb-6" id="analyse-subtitle">Je lis ton fichier</p>
+        <p class="text-white/40 mb-6" id="analyse-subtitle"></p>
 
-        <!-- Zone principale analyse -->
+        <!-- Zone principale analyse - Vue Live -->
         <div class="glass-card p-6 max-w-2xl mx-auto">
-          <!-- Score + Résumé -->
-          <div id="analyse-result" style="display: none;">
-            <!-- Score en haut à gauche -->
-            <div style="display: flex; align-items: flex-start; gap: 24px; margin-bottom: 24px;">
-              <div id="analyse-score-circle" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; background: conic-gradient(#22C55E 92%, rgba(255,255,255,0.1) 0); flex-shrink: 0;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(20,20,20,0.95); display: flex; align-items: center; justify-content: center;">
-                  <span id="analyse-score-text">92%</span>
-                </div>
-              </div>
-              <div style="flex: 1;">
-                <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px;" id="analyse-file-name">Fichier</div>
-                <div id="analyse-columns-summary" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                  <!-- Colonnes détectées en tags -->
-                </div>
+
+          <!-- Header avec score + nom fichier (toujours visible) -->
+          <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px;">
+            <!-- Score Circle -->
+            <div id="analyse-score-circle" style="width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%); flex-shrink: 0; transition: background 0.5s ease;">
+              <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(20,20,20,0.95); display: flex; align-items: center; justify-content: center;">
+                <span id="analyse-score-text" style="font-size: 26px; font-weight: 800; color: rgba(255,255,255,0.3); transition: color 0.3s;">0%</span>
               </div>
             </div>
-
-            <!-- Questions/Problèmes si score < 90% -->
-            <div id="analyse-questions" style="display: none; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-              <div style="font-weight: 600; font-size: 13px; margin-bottom: 10px; color: #FBBF24;">Quelques questions :</div>
-              <div id="analyse-questions-list" style="font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6;">
-                <!-- Questions générées -->
-              </div>
-            </div>
-
-            <!-- Options si config incertaine -->
-            <div id="analyse-uncertain" style="display: none; background: rgba(255, 107, 53, 0.06); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-              <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">Config incertaine</div>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button onclick="switchToFreshStart()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; padding: 10px 16px; color: white; font-weight: 600; font-size: 13px; cursor: pointer;">
-                  Partir de zero (recommande)
-                </button>
-                <button onclick="forceValidateConfig()" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 16px; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 13px; cursor: pointer;">
-                  Valider quand meme
-                </button>
-              </div>
+            <!-- File info -->
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 15px; color: rgba(255,255,255,0.9); margin-bottom: 4px;" id="analyse-file-name">...</div>
+              <div style="font-size: 13px; color: rgba(255,255,255,0.4);" id="analyse-status">Lecture du fichier...</div>
             </div>
           </div>
 
-          <!-- Chat intégré pour régler les détails -->
-          <div id="analyse-chat" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; margin-top: 16px;">
-            <div id="analyse-chat-messages" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px; padding-right: 8px;">
-              <!-- Messages du chat -->
+          <!-- Live Feed - Détections qui apparaissent -->
+          <div id="analyse-live-feed" style="min-height: 120px; margin-bottom: 20px;">
+            <!-- Les détections apparaissent ici une par une -->
+          </div>
+
+          <!-- Zone Q&A (si besoin d'affiner) -->
+          <div id="analyse-qa" style="display: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+            <div id="analyse-qa-question" style="background: rgba(255, 107, 53, 0.08); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+              <div style="font-size: 14px; color: rgba(255,255,255,0.9);" id="analyse-current-question"></div>
             </div>
             <div style="display: flex; gap: 10px;">
-              <input type="text" id="analyse-chat-input" placeholder="Ex: CB est en colonne N..." style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; color: white; font-size: 14px;">
+              <input type="text" id="analyse-chat-input" placeholder="Ta réponse..." style="flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; color: white; font-size: 14px;">
               <button onclick="sendAnalyseMessage()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; padding: 12px 20px; color: white; font-weight: 600; cursor: pointer;">
-                Envoyer
+                OK
               </button>
             </div>
           </div>
 
-          <!-- Loader pendant l'analyse -->
-          <div id="analyse-loading" style="text-align: center; padding: 40px 0;">
-            <div class="welcome-dots" style="justify-content: center; margin-bottom: 16px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
-            <p style="color: rgba(255,255,255,0.5);">Analyse en cours...</p>
+          <!-- Options si config incertaine -->
+          <div id="analyse-uncertain" style="display: none; background: rgba(255, 107, 53, 0.06); border: 1px solid rgba(255, 107, 53, 0.2); border-radius: 12px; padding: 14px;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">Structure difficile à lire</div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button onclick="switchToFreshStart()" style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; padding: 10px 16px; color: white; font-weight: 600; font-size: 13px; cursor: pointer;">
+                Utiliser un modele vierge
+              </button>
+              <button onclick="forceValidateConfig()" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 10px 16px; color: rgba(255,255,255,0.6); font-weight: 500; font-size: 13px; cursor: pointer;">
+                Continuer quand meme
+              </button>
+            </div>
           </div>
+        </div>
 
           <!-- Bouton Continuer (quand score OK) -->
           <button id="analyse-continue-btn" onclick="goToTelegram()" style="display: none; width: 100%; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 12px; padding: 16px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 16px;">
@@ -1266,12 +1265,12 @@
     }
 
     async function loadAndAnalyzeSheet(sheetToUse, session) {
-      showLoader('Analyse de "' + sheetToUse.name + '"...');
+      // Pas de loader ici - on va directement à l'étape 3 qui a son propre état de chargement
       try {
         // 1. Mettre à jour google_credentials avec le sheet sélectionné
         await supabaseClient.from('google_credentials').update({ sheet_id: sheetToUse.id, sheet_name: sheetToUse.name }).eq('user_id', session.user.id);
 
-        // 2. Créer/mettre à jour user_configs avec le sheet_id (config vide pour l'instant, sera complétée par l'AI)
+        // 2. Créer/mettre à jour user_configs avec le sheet_id
         await supabaseClient.from('user_configs').upsert({
           user_id: session.user.id,
           sheet_id: sheetToUse.id,
@@ -1280,17 +1279,100 @@
         }, { onConflict: 'user_id' });
         console.log('[COMPTA] ✅ user_configs initialisé avec sheet_id:', sheetToUse.id);
 
-        // 3. Lire les données du sheet
-        var response = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ sheetId: sheetToUse.id }) });
-        var result = await response.json();
-        if (!result.success) throw new Error(result.error);
-        excelData = result.excelData;
-        excelData.sheetId = sheetToUse.id; // Ajouter le sheetId pour la sauvegarde finale
-        excelData.sheetName = sheetToUse.name;
-        console.log('[COMPTA] 📊 Données Sheet:', excelData);
+        // 3. Stocker les infos du sheet
+        excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name };
+
+        // 4. Lancer l'analyse (qui va à l'étape 3 et lit les données)
+        await startAnalysisWithSheetRead(sheetToUse.id, session.access_token);
+      } catch (error) {
+        console.error('[COMPTA] ❌', error);
         hideLoader();
-        await startAnalysis();
-      } catch (error) { console.error('[COMPTA] ❌', error); hideLoader(); alert('Erreur: ' + error.message); }
+        alert('Erreur: ' + error.message);
+      }
+    }
+
+    async function startAnalysisWithSheetRead(sheetId, accessToken) {
+      // Reset
+      analyseExchangeCount = 0;
+      analyseChatHistory = [];
+      pendingQuestions = [];
+
+      // Naviguer vers step-analyse
+      goToStep(3);
+
+      // Reset de la vue live
+      document.getElementById('analyse-title').textContent = 'Analyse en cours...';
+      document.getElementById('analyse-subtitle').textContent = '';
+      document.getElementById('analyse-file-name').textContent = excelData?.fileName || excelData?.sheetName || 'Fichier';
+      document.getElementById('analyse-status').textContent = 'Lecture du Google Sheet...';
+      document.getElementById('analyse-score-text').textContent = '0%';
+      document.getElementById('analyse-score-text').style.color = 'rgba(255,255,255,0.3)';
+      document.getElementById('analyse-score-circle').style.background = 'conic-gradient(rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%)';
+      document.getElementById('analyse-live-feed').innerHTML = '<div style="text-align: center; padding: 30px 0;"><div class="welcome-dots" style="justify-content: center; margin-bottom: 12px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div><span style="color: rgba(255,255,255,0.4); font-size: 13px;">Lecture des donnees...</span></div>';
+      document.getElementById('analyse-qa').style.display = 'none';
+      document.getElementById('analyse-uncertain').style.display = 'none';
+      document.getElementById('analyse-continue-btn').style.display = 'none';
+
+      // Reset analyse steps
+      updateAnalyseStep(0);
+
+      isWaitingForAI = true;
+      try {
+        // Etape 1: Lecture du Google Sheet
+        console.log('[ANALYSE] Reading Google Sheet:', sheetId);
+        var readResponse = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + accessToken,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ sheetId: sheetId })
+        });
+
+        var readResult = await readResponse.json();
+        if (!readResult.success) throw new Error(readResult.error || 'Lecture echouee');
+
+        console.log('[ANALYSE] Sheet data received:', readResult.excelData?.fileName);
+
+        // Mettre a jour excelData avec les vraies donnees du sheet
+        excelData = readResult.excelData;
+        excelData.sheetId = sheetId;
+        excelData.isGoogleSheet = true;
+
+        // Etape 1 done
+        updateAnalyseStep(1);
+        document.getElementById('analyse-status').textContent = 'Detection des colonnes...';
+        document.getElementById('analyse-live-feed').innerHTML = '<div style="text-align: center; padding: 30px 0;"><div class="welcome-dots" style="justify-content: center; margin-bottom: 12px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div><span style="color: rgba(255,255,255,0.4); font-size: 13px;">Detection des colonnes...</span></div>';
+
+        // Etape 2: Analyse avec Claude
+        var stepTimer = setTimeout(function() { updateAnalyseStep(2); }, 1500);
+        var response = await callAPI('analyze');
+        clearTimeout(stepTimer);
+
+        // Toutes les etapes done
+        updateAnalyseStep(3);
+
+        var cleanResponse = response.trim();
+        if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            var parsedConfig = JSON.parse(jsonMatch[0]);
+            console.log('[ANALYSE] Config detectee:', parsedConfig);
+            showAnalyseResult(parsedConfig);
+          } catch (parseErr) {
+            console.error('[ANALYSE] JSON parse error:', parseErr);
+            showAnalyseError("Erreur d'analyse. Reessaie ?");
+          }
+        } else {
+          showAnalyseError("Je n'ai pas pu analyser le fichier.");
+        }
+      } catch (err) {
+        console.error('[ANALYSE] Error:', err);
+        showAnalyseError("Erreur: " + err.message);
+      }
+      isWaitingForAI = false;
     }
 
     async function updateNavBar() {
@@ -1390,7 +1472,7 @@
             excelData.sheets.push({ name: sheetName, allRows: allRows, rowCount: range.e.r, colCount: range.e.c + 1, formulas: formulas, detectedHeaders: detectedHeaders });
           });
           await startAnalysis();
-        } catch (err) { console.error(err); addBotMessage("Hmm, j'ai eu un problème. Tu peux réessayer ?"); }
+        } catch (err) { console.error(err); showAnalyseError("Erreur de lecture. Réessaie avec un autre fichier ?"); }
       };
       reader.readAsArrayBuffer(file);
     }
@@ -1399,12 +1481,11 @@
       console.log('[UPLOAD] === handleFileWithUpload START ===');
       console.log('[UPLOAD] File:', file.name, 'Size:', file.size, 'bytes');
 
-      // Initialiser le loader avec les étapes
+      // Initialiser le loader avec les étapes (sans analyse - c'est l'étape suivante)
       initLoader(file.name, [
         'Lecture du fichier',
         'Upload vers Google Drive',
-        'Conversion en Google Sheet',
-        'Analyse du contenu'
+        'Conversion en Google Sheet'
       ]);
 
       try {
@@ -1505,12 +1586,9 @@
           return;
         }
 
-        // Étape 4: Analyse du contenu
-        updateLoaderStep(3);
-
-        // Charger et analyser le Google Sheet
-        await loadAndAnalyzeSheet(sheetToUse, session);
+        // Conversion terminée - passer à l'analyse (étape 3 du wizard)
         hideLoader();
+        await loadAndAnalyzeSheet(sheetToUse, session);
 
       } catch (error) {
         console.error('[UPLOAD] ❌ Error:', error);
@@ -1525,23 +1603,64 @@
     
     async function callAPI(mode) { var response = await fetch(SUPABASE_URL + '/functions/v1/clever-processor', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY }, body: JSON.stringify({ excelData: excelData, chatHistory: chatHistory, mode: mode }) }); var result = await response.json(); if (result.error) throw new Error(result.error); return result.response; }
     
+    function updateAnalyseStep(stepIndex) {
+      for (var i = 0; i < 3; i++) {
+        var stepEl = document.getElementById('analyse-step-' + i);
+        if (!stepEl) continue;
+        stepEl.classList.remove('pending', 'active', 'done');
+        var iconEl = stepEl.querySelector('.analyse-step-icon');
+        if (i < stepIndex) {
+          stepEl.classList.add('done');
+          iconEl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else if (i === stepIndex) {
+          stepEl.classList.add('active');
+          iconEl.textContent = (i + 1);
+        } else {
+          stepEl.classList.add('pending');
+          iconEl.textContent = (i + 1);
+        }
+      }
+      var progress = stepIndex >= 2 ? 100 : (stepIndex + 1) * 33;
+      document.getElementById('analyse-progress').style.width = progress + '%';
+    }
+
     async function startAnalysis() {
-      // Reset du compteur d'échanges pour ce nouveau fichier
+      // Reset
       analyseExchangeCount = 0;
       analyseChatHistory = [];
+      pendingQuestions = [];
 
-      // Naviguer vers step-analyse et afficher le loader
+      // Naviguer vers step-analyse
       goToStep(3);
-      document.getElementById('analyse-loading').style.display = 'block';
-      document.getElementById('analyse-result').style.display = 'none';
-      document.getElementById('analyse-chat').style.display = 'none';
-      document.getElementById('analyse-continue-btn').style.display = 'none';
+
+      // Reset de la vue live
       document.getElementById('analyse-title').textContent = 'Analyse en cours...';
-      document.getElementById('analyse-subtitle').textContent = 'Je lis ton fichier';
+      document.getElementById('analyse-subtitle').textContent = '';
+      document.getElementById('analyse-file-name').textContent = excelData?.fileName || excelData?.sheetName || 'Fichier';
+      document.getElementById('analyse-status').textContent = 'Lecture du fichier...';
+      document.getElementById('analyse-score-text').textContent = '0%';
+      document.getElementById('analyse-score-text').style.color = 'rgba(255,255,255,0.3)';
+      document.getElementById('analyse-score-circle').style.background = 'conic-gradient(rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%)';
+      document.getElementById('analyse-live-feed').innerHTML = '<div style="text-align: center; padding: 30px 0;"><div class="welcome-dots" style="justify-content: center; margin-bottom: 12px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div><span style="color: rgba(255,255,255,0.4); font-size: 13px;">Detection des colonnes...</span></div>';
+      document.getElementById('analyse-qa').style.display = 'none';
+      document.getElementById('analyse-uncertain').style.display = 'none';
+      document.getElementById('analyse-continue-btn').style.display = 'none';
 
       isWaitingForAI = true;
       try {
+        // Simuler la progression pendant l'appel API
+        var stepTimer1 = setTimeout(function() { updateAnalyseStep(1); }, 800);
+        var stepTimer2 = setTimeout(function() { updateAnalyseStep(2); }, 2000);
+
         var response = await callAPI('analyze');
+
+        // Clear timers si l'API répond vite
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+
+        // Marquer toutes les étapes comme done
+        updateAnalyseStep(3);
+
         var cleanResponse = response.trim();
         if (cleanResponse.includes('```json')) cleanResponse = cleanResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         var jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
@@ -1596,117 +1715,130 @@
     var pendingConfig = null;
     var analyseChatHistory = [];
     var analyseExchangeCount = 0;
+    var pendingQuestions = [];
     var SCORE_HIGH = 90;
     var SCORE_LOW = 70;
     var MAX_EXCHANGES = 3;
+
+    function askNextQuestion() {
+      if (pendingQuestions.length > 0) {
+        var q = pendingQuestions[0]; // Toujours la première (liste régénérée à chaque fois)
+        addAnalyseBotMessage(q.text);
+      } else {
+        // Plus de questions → montrer bouton continuer
+        addAnalyseBotMessage("Parfait ! J'ai toutes les infos. Tu peux continuer.");
+        document.getElementById('analyse-continue-btn').style.display = 'block';
+      }
+    }
 
     function showAnalyseResult(config) {
       pendingConfig = config;
       console.log('[ANALYSE] Showing result:', config);
 
-      // Cacher le loader, montrer le résultat
-      document.getElementById('analyse-loading').style.display = 'none';
-      document.getElementById('analyse-result').style.display = 'block';
-
-      // Mettre à jour le titre
       var confidence = config.confiance !== undefined ? Math.min(100, Math.max(0, config.confiance)) : 85;
       var scoreColor = confidence >= 80 ? '#22C55E' : confidence >= 60 ? '#F59E0B' : '#EF4444';
-
-      if (confidence >= 90) {
-        document.getElementById('analyse-title').textContent = 'Parfait !';
-        document.getElementById('analyse-subtitle').textContent = "J'ai bien compris ton fichier";
-      } else if (confidence >= 70) {
-        document.getElementById('analyse-title').textContent = 'Analyse terminee';
-        document.getElementById('analyse-subtitle').textContent = 'Quelques points a verifier';
-      } else {
-        document.getElementById('analyse-title').textContent = 'Quelques doutes';
-        document.getElementById('analyse-subtitle').textContent = 'On va regler ca ensemble';
-      }
-
-      // Score circle
-      var scoreCircle = document.getElementById('analyse-score-circle');
-      scoreCircle.style.background = 'conic-gradient(' + scoreColor + ' ' + confidence + '%, rgba(255,255,255,0.1) 0)';
-      document.getElementById('analyse-score-text').textContent = confidence + '%';
-      document.getElementById('analyse-score-text').style.color = scoreColor;
-
-      // Nom du fichier
-      document.getElementById('analyse-file-name').textContent = excelData?.sheetName || excelData?.fileName || 'Fichier';
-
-      // Tags des colonnes détectées
-      var tagsHtml = '';
       var icons = { 'cb': '💳', 'carte': '💳', 'esp': '💵', 'espece': '💵', 'especes': '💵', 'tr': '🎟️', 'ticket': '🎟️', 'depense': '📉', 'depenses': '📉', 'date': '📅' };
 
-      if (config.colonne_date) {
-        tagsHtml += '<span style="background: rgba(34, 197, 94, 0.15); color: #22C55E; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;">📅 Date: ' + config.colonne_date + '</span>';
-      }
+      // Préparer les items à afficher
+      var detectedItems = [];
+      if (config.onglet) detectedItems.push({ icon: '📋', label: 'Onglet', value: config.onglet });
+      if (config.colonne_date) detectedItems.push({ icon: '📅', label: 'Date', value: 'colonne ' + config.colonne_date });
       if (config.colonnes_a_remplir) {
         config.colonnes_a_remplir.forEach(function(col) {
           var icon = icons[col.nom.toLowerCase()] || '📊';
-          tagsHtml += '<span style="background: rgba(34, 197, 94, 0.15); color: #22C55E; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;">' + icon + ' ' + col.nom + ': ' + col.colonne + '</span>';
+          detectedItems.push({ icon: icon, label: col.nom, value: 'colonne ' + col.colonne });
         });
       }
-      document.getElementById('analyse-columns-summary').innerHTML = tagsHtml;
 
-      // Gérer l'affichage selon le score
-      var showUncertain = (confidence < SCORE_LOW) || (analyseExchangeCount >= MAX_EXCHANGES);
-      var showQuestions = (confidence < SCORE_HIGH) && !showUncertain;
+      // Vider le feed
+      var feedEl = document.getElementById('analyse-live-feed');
+      feedEl.innerHTML = '';
 
-      // Reset
-      document.getElementById('analyse-questions').style.display = 'none';
-      document.getElementById('analyse-uncertain').style.display = 'none';
-      document.getElementById('analyse-chat').style.display = 'none';
-      document.getElementById('analyse-continue-btn').style.display = 'none';
-
-      if (showUncertain) {
-        // Score trop bas ou trop d'échanges
-        document.getElementById('analyse-uncertain').style.display = 'block';
-      } else if (showQuestions) {
-        // Score moyen → montrer les questions + chat
-        document.getElementById('analyse-questions').style.display = 'block';
-        document.getElementById('analyse-chat').style.display = 'block';
-
-        // Générer les questions basées sur les problèmes
-        var questions = [];
-        if (config.scoring_detail) {
-          var sd = config.scoring_detail;
-          if (sd.colonne_cb && sd.colonne_cb.penalty < 0) questions.push('Dans quelle colonne se trouve <strong>CB/Carte</strong> ?');
-          if (sd.colonne_especes && sd.colonne_especes.penalty < 0) questions.push('Dans quelle colonne se trouve <strong>Especes</strong> ?');
-          if (sd.colonne_date && sd.colonne_date.penalty < -5) questions.push('Dans quelle colonne se trouve la <strong>Date</strong> ?');
-          if (sd.format_date && sd.format_date.penalty < 0) questions.push('Quel est le format de date ? (ex: DD/MM/YYYY)');
-          if (sd.onglet && sd.onglet.penalty < 0) questions.push('Quel onglet utiliser pour la saisie ?');
+      // Animation du score (de 0 à final)
+      var currentScore = 0;
+      var scoreInterval = setInterval(function() {
+        currentScore += 2;
+        if (currentScore >= confidence) {
+          currentScore = confidence;
+          clearInterval(scoreInterval);
         }
-        if (questions.length === 0) {
-          questions.push('Est-ce que cette configuration te semble correcte ?');
-        }
-        document.getElementById('analyse-questions-list').innerHTML = questions.map(function(q) { return '• ' + q; }).join('<br>');
+        document.getElementById('analyse-score-text').textContent = currentScore + '%';
+        var currentColor = currentScore >= 80 ? '#22C55E' : currentScore >= 60 ? '#F59E0B' : '#EF4444';
+        document.getElementById('analyse-score-text').style.color = currentColor;
+        document.getElementById('analyse-score-circle').style.background = 'conic-gradient(' + currentColor + ' ' + currentScore + '%, rgba(255,255,255,0.1) 0)';
+      }, 30);
 
-        // Message initial dans le chat
-        if (analyseChatHistory.length === 0) {
-          addAnalyseBotMessage("Reponds a une question ci-dessus, ou dis-moi ce qui ne va pas.");
-        }
-      } else {
-        // Score >= 90%
-        if (confidence >= 98) {
-          // Score parfait → message + auto-continue après 2s
-          document.getElementById('analyse-title').textContent = 'Parfait ! ✨';
-          document.getElementById('analyse-subtitle').textContent = 'Configuration detectee automatiquement';
-          document.getElementById('analyse-continue-btn').style.display = 'block';
-          document.getElementById('analyse-continue-btn').textContent = 'Passage a Telegram dans 2s...';
-          document.getElementById('analyse-continue-btn').disabled = true;
-          setTimeout(function() {
-            goToTelegram();
-          }, 2000);
+      // Afficher les items un par un
+      detectedItems.forEach(function(item, index) {
+        setTimeout(function() {
+          var itemHtml = '<div class="detected-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.08); border-radius: 10px; margin-bottom: 8px; animation: fadeInUp 0.3s ease;">';
+          itemHtml += '<span style="font-size: 18px;">' + item.icon + '</span>';
+          itemHtml += '<div><div style="font-weight: 600; font-size: 13px; color: #22C55E;">' + item.label + '</div>';
+          itemHtml += '<div style="font-size: 12px; color: rgba(255,255,255,0.5);">' + item.value + '</div></div>';
+          itemHtml += '<span style="margin-left: auto; color: #22C55E;">✓</span></div>';
+          feedEl.innerHTML += itemHtml;
+        }, 300 + (index * 200));
+      });
+
+      // Après affichage des items, mettre à jour le statut et gérer le flow
+      var totalDelay = 300 + (detectedItems.length * 200) + 300;
+      setTimeout(function() {
+        // Mettre à jour titre et statut
+        document.getElementById('analyse-status').textContent = confidence + '% de confiance';
+
+        if (confidence >= 90) {
+          document.getElementById('analyse-title').textContent = 'Analyse terminee ✓';
+          document.getElementById('analyse-subtitle').textContent = 'Structure detectee avec succes';
+        } else if (confidence >= 70) {
+          document.getElementById('analyse-title').textContent = 'Analyse terminee';
+          document.getElementById('analyse-subtitle').textContent = 'Quelques precisions necessaires';
         } else {
-          // Score bon mais pas parfait → bouton continuer
-          document.getElementById('analyse-continue-btn').style.display = 'block';
+          document.getElementById('analyse-title').textContent = 'Analyse terminee';
+          document.getElementById('analyse-subtitle').textContent = 'Structure complexe detectee';
         }
-      }
+
+        // Gérer l'affichage selon le score
+        var showUncertain = (confidence < SCORE_LOW) || (analyseExchangeCount >= MAX_EXCHANGES);
+        var showQuestions = (confidence < SCORE_HIGH) && !showUncertain;
+
+        if (showUncertain) {
+          document.getElementById('analyse-uncertain').style.display = 'block';
+        } else if (showQuestions) {
+          // Générer les questions
+          pendingQuestions = [];
+          if (config.scoring_detail) {
+            var sd = config.scoring_detail;
+            if (sd.colonne_date && sd.colonne_date.penalty < -5) pendingQuestions.push({ key: 'date', text: 'Dans quelle colonne se trouve la Date ? (ex: A, B, M...)' });
+            if (sd.colonne_cb && sd.colonne_cb.penalty < 0) pendingQuestions.push({ key: 'cb', text: 'Dans quelle colonne se trouve CB/Carte bancaire ?' });
+            if (sd.colonne_especes && sd.colonne_especes.penalty < 0) pendingQuestions.push({ key: 'especes', text: 'Dans quelle colonne se trouve Espèces ?' });
+            if (sd.onglet && sd.onglet.penalty < 0) pendingQuestions.push({ key: 'onglet', text: 'Quel onglet utiliser pour la saisie ?' });
+          }
+
+          if (pendingQuestions.length > 0) {
+            // Afficher la zone Q&A avec la première question
+            document.getElementById('analyse-qa').style.display = 'block';
+            document.getElementById('analyse-current-question').textContent = pendingQuestions[0].text;
+          } else {
+            document.getElementById('analyse-continue-btn').style.display = 'block';
+          }
+        } else {
+          // Score >= 90%
+          if (confidence >= 98) {
+            document.getElementById('analyse-continue-btn').style.display = 'block';
+            document.getElementById('analyse-continue-btn').textContent = 'Continuer automatiquement...';
+            setTimeout(function() { goToTelegram(); }, 1500);
+          } else {
+            document.getElementById('analyse-continue-btn').style.display = 'block';
+          }
+        }
+      }, totalDelay);
     }
 
     function addAnalyseBotMessage(text) {
       var html = '<div style="display: flex; gap: 8px; margin-bottom: 10px;">';
       html += '<div style="width: 24px; height: 24px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; flex-shrink: 0;">i</div>';
-      html += '<div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5; max-width: 90%;">' + text + '</div>';
+      var formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html += '<div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5; max-width: 90%;">' + formattedText + '</div>';
       html += '</div>';
       var container = document.getElementById('analyse-chat-messages');
       container.innerHTML += html;
@@ -1788,6 +1920,9 @@
     }
 
     function goToTelegram() {
+      console.log('[COMPTA] 🚀 goToTelegram called');
+      console.log('[COMPTA] pendingConfig:', pendingConfig);
+      console.log('[COMPTA] excelData:', excelData);
       // Sauvegarder la config et aller à Telegram
       confirmConfig();
     }
@@ -1869,11 +2004,22 @@
     }
 
     async function confirmConfig() {
-      if (!pendingConfig) return;
+      console.log('[COMPTA] 📋 confirmConfig called');
+      if (!pendingConfig) {
+        console.log('[COMPTA] ❌ pendingConfig is null, returning');
+        return;
+      }
 
-      // Check if we need Google access (local file without Google connected)
+      // Si on a déjà un sheetId (Google Sheet sélectionné ou fichier converti), sauvegarder directement
+      if (excelData?.sheetId) {
+        console.log('[COMPTA] ✅ sheetId existe, sauvegarde directe');
+        await saveConfigAndContinue();
+        return;
+      }
+
+      // Fichier local pas encore uploadé
       var isLocalFile = !excelData?.isGoogleSheet && !excelData?.sheetId;
-      console.log('[COMPTA] isLocalFile:', isLocalFile, 'hasGoogleSheetsAccess:', hasGoogleSheetsAccess);
+      console.log('[COMPTA] isLocalFile:', isLocalFile, 'hasGoogleSheetsAccess:', hasGoogleSheetsAccess, 'pendingLocalFile:', pendingLocalFile);
 
       if (isLocalFile && !hasGoogleSheetsAccess) {
         // Show the "connect Google" modal
@@ -1889,7 +2035,8 @@
         return;
       }
 
-      // Otherwise, save directly (Google Sheet already selected)
+      // Fallback - sauvegarder directement
+      console.log('[COMPTA] ✅ Appel saveConfigAndContinue (fallback)...');
       await saveConfigAndContinue();
     }
 
@@ -1905,15 +2052,14 @@
       var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
       if (saveError) {
         console.error('[COMPTA] ❌ Erreur sauvegarde:', saveError);
-        addBotMessage("Oups, erreur lors de la sauvegarde. Réessaie ?");
+        alert('Erreur lors de la sauvegarde. Réessaie ?');
         return;
       }
       console.log('[COMPTA] ✅ Config sauvegardée!');
       finalConfig = pendingConfig;
 
-      var colonnes = pendingConfig.colonnes_a_remplir?.map(function(c) { return c.nom; }).join(', ') || 'CB, ESP, TR, Dépenses';
-      addBotMessage('✅ Parfait ! Configuration validée !\n\n📊 Colonnes : ' + colonnes + '\n\nDernière étape : connecte Telegram ! 🚀');
-      setTimeout(function() { goToStep(4); }, 1500);
+      // Aller directement à l'étape Telegram
+      goToStep(4);
     }
 
     function closeConnectGoogleOverlay() {
