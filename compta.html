@@ -563,16 +563,24 @@
 
     // Convert ArrayBuffer to Base64 using native Blob/FileReader (fast, no stack overflow)
     function arrayBufferToBase64(buffer) {
+      console.log('[BASE64] Starting conversion, buffer size:', buffer.byteLength);
       return new Promise(function(resolve, reject) {
         var blob = new Blob([buffer]);
+        console.log('[BASE64] Blob created, size:', blob.size);
         var reader = new FileReader();
         reader.onload = function() {
+          console.log('[BASE64] FileReader onload triggered');
           // Result is "data:application/octet-stream;base64,XXXXX"
           var dataUrl = reader.result;
+          console.log('[BASE64] DataURL length:', dataUrl.length);
           var base64 = dataUrl.split(',')[1];
+          console.log('[BASE64] Base64 extracted, length:', base64.length);
           resolve(base64);
         };
-        reader.onerror = reject;
+        reader.onerror = function(e) {
+          console.error('[BASE64] FileReader error:', e);
+          reject(e);
+        };
         reader.readAsDataURL(blob);
       });
     }
@@ -1179,10 +1187,15 @@
         dropArea.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); dropArea.classList.add('dragover'); });
         dropArea.addEventListener('dragleave', function(e) { e.preventDefault(); e.stopPropagation(); dropArea.classList.remove('dragover'); });
         dropArea.addEventListener('drop', function(e) {
+          console.log('[DROP] Drop event triggered');
           e.preventDefault();
           e.stopPropagation();
           dropArea.classList.remove('dragover');
-          if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+          console.log('[DROP] Files count:', e.dataTransfer.files.length);
+          if (e.dataTransfer.files.length > 0) {
+            console.log('[DROP] Calling handleFile...');
+            handleFile(e.dataTransfer.files[0]);
+          }
         });
       }
 
@@ -1198,7 +1211,9 @@
     function detectHeaderRow(rows) { var bestRow = null, bestScore = 0; rows.forEach(function(row) { if (row.row === '...') return; var score = 0; row.cells.forEach(function(cell) { var val = String(cell.val).toLowerCase(); HEADER_KEYWORDS.forEach(function(kw) { if (val.includes(kw)) score++; }); }); if (score > bestScore) { bestScore = score; bestRow = row; } }); return bestRow; }
     
     async function handleFile(file) {
+      console.log('[HANDLE_FILE] START - file:', file.name, 'size:', file.size);
       var ext = '.' + file.name.split('.').pop().toLowerCase();
+      console.log('[HANDLE_FILE] Extension:', ext);
       if (!['.xlsx', '.xls', '.csv'].includes(ext)) { alert('Format non supporté'); return; }
 
       // Store file for potential later upload (after Google auth)
@@ -1208,7 +1223,9 @@
       }
 
       // Si l'utilisateur a accès à Google Sheets, uploader et convertir directement
+      console.log('[HANDLE_FILE] hasGoogleSheetsAccess:', hasGoogleSheetsAccess);
       if (hasGoogleSheetsAccess && ext !== '.csv') {
+        console.log('[HANDLE_FILE] Calling handleFileWithUpload...');
         await handleFileWithUpload(file);
         return;
       }
@@ -1246,20 +1263,30 @@
     }
 
     async function handleFileWithUpload(file) {
+      console.log('[UPLOAD] === handleFileWithUpload START ===');
+      console.log('[UPLOAD] File:', file.name, 'Size:', file.size, 'bytes');
       showLoader('1. Lecture du fichier...');
 
       try {
+        console.log('[UPLOAD] Getting session...');
         var { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) throw new Error('Session expirée');
+        console.log('[UPLOAD] Session OK');
 
         // Lire le fichier et convertir en base64 (chunked pour gros fichiers)
+        console.log('[UPLOAD] Reading file as ArrayBuffer...');
         var arrayBuffer = await new Promise(function(resolve, reject) {
           var reader = new FileReader();
-          reader.onload = function(e) { resolve(e.target.result); };
+          reader.onload = function(e) {
+            console.log('[UPLOAD] ArrayBuffer read complete, size:', e.target.result.byteLength);
+            resolve(e.target.result);
+          };
           reader.onerror = reject;
           reader.readAsArrayBuffer(file);
         });
+        console.log('[UPLOAD] Converting to base64...');
         var base64Content = await arrayBufferToBase64(arrayBuffer);
+        console.log('[UPLOAD] Base64 conversion complete');
 
         console.log('[UPLOAD] File read, size:', base64Content.length, 'chars (base64)');
 
@@ -1268,12 +1295,15 @@
         var mimeType = file.type || (file.name.endsWith('.xlsx')
           ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           : 'application/vnd.ms-excel');
+        console.log('[UPLOAD] Creating JSON Blob...');
         // Use Blob to avoid stack overflow on large strings
         var jsonBlob = new Blob([
           '{"fileName":', JSON.stringify(file.name),
           ',"fileContent":"', base64Content,
           '","mimeType":', JSON.stringify(mimeType), '}'
         ], { type: 'application/json' });
+        console.log('[UPLOAD] Blob created, size:', jsonBlob.size, 'bytes');
+        console.log('[UPLOAD] Starting fetch to upload-to-drive...');
         var uploadResponse = await fetch(SUPABASE_URL + '/functions/v1/upload-to-drive', {
           method: 'POST',
           headers: {
@@ -1282,6 +1312,7 @@
           },
           body: jsonBlob
         });
+        console.log('[UPLOAD] Fetch complete, status:', uploadResponse.status);
 
         var uploadResult = await uploadResponse.json();
         console.log('[UPLOAD] Upload result:', uploadResult);
