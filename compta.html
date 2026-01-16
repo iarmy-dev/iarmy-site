@@ -1289,8 +1289,6 @@
         excelData.sheetName = sheetToUse.name;
         console.log('[COMPTA] 📊 Données Sheet:', excelData);
         hideLoader();
-        showToast('✅ "' + sheetToUse.name + '" chargé !');
-        goToStep(2);
         await startAnalysis();
       } catch (error) { console.error('[COMPTA] ❌', error); hideLoader(); alert('Erreur: ' + error.message); }
     }
