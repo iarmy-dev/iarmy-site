@@ -3061,7 +3061,8 @@ DEP 100</div>
         var configToSave = {
           user_id: session.user.id,
           sheet_id: excelData.sheetId,
-          excel_config: pendingConfig
+          excel_config: pendingConfig,
+          is_active: true  // IMPORTANT: Le bot filtre sur is_active=true
         };
 
         var result = await supabaseClient
