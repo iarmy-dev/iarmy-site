@@ -1271,12 +1271,21 @@
     async function loadAndAnalyzeSheet(sheetToUse, session) {
       // Pas de loader ici - on va directement à l'étape 3 qui a son propre état de chargement
       try {
+        // Refresh session pour avoir un token frais
+        var { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        var freshSession = refreshData?.session || session;
+        if (refreshError) {
+          console.warn('[COMPTA] Session refresh warning:', refreshError.message);
+        } else {
+          console.log('[COMPTA] Session refreshed OK');
+        }
+
         // 1. Mettre à jour google_credentials avec le sheet sélectionné
-        await supabaseClient.from('google_credentials').update({ sheet_id: sheetToUse.id, sheet_name: sheetToUse.name }).eq('user_id', session.user.id);
+        await supabaseClient.from('google_credentials').update({ sheet_id: sheetToUse.id, sheet_name: sheetToUse.name }).eq('user_id', freshSession.user.id);
 
         // 2. Créer/mettre à jour user_configs avec le sheet_id
         await supabaseClient.from('user_configs').upsert({
-          user_id: session.user.id,
+          user_id: freshSession.user.id,
           sheet_id: sheetToUse.id,
           excel_config: {},
           is_active: true
@@ -1287,7 +1296,7 @@
         excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name, webViewLink: sheetToUse.webViewLink };
 
         // 4. Lancer l'analyse (qui va à l'étape 3 et lit les données)
-        await startAnalysisWithSheetRead(sheetToUse.id, session.access_token);
+        await startAnalysisWithSheetRead(sheetToUse.id, freshSession.access_token);
       } catch (error) {
         console.error('[COMPTA] ❌', error);
         hideLoader();
