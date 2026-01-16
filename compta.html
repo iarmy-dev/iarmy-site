@@ -127,6 +127,7 @@
     .loader-step.active .loader-step-text { color: rgba(255, 255, 255, 0.9); }
     .loader-step.done .loader-step-text { color: rgba(255, 255, 255, 0.6); }
     @keyframes pulseStep { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 107, 53, 0); } }
+    @keyframes pulseArrow { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(4px); } }
     .loader-progress { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
     /* Analyse step loader */
     .analyse-step { display: flex; align-items: center; gap: 12px; }
@@ -543,7 +544,7 @@
         <div style="text-align: center; margin-bottom: 32px;">
           <div class="mb-2"><span class="text-white/30 text-sm">Étape 3/4</span></div>
           <h1 class="text-3xl font-bold mb-2">Configure ton assistant</h1>
-          <p class="text-white/40">Vérifie que tout est correct, modifie si besoin</p>
+          <p class="text-white/40">Quand tu envoies un message, voici ce qui s'écrit dans ton tableau</p>
         </div>
 
         <!-- Loading state -->
@@ -557,54 +558,138 @@
         </div>
 
         <!-- Config Editor (hidden until loaded) -->
-        <div id="config-editor-main" style="display: none; max-width: 1000px; margin: 0 auto;">
+        <div id="config-editor-main" style="display: none; max-width: 1100px; margin: 0 auto;">
 
-          <!-- Main content: 2 colonnes -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <!-- Main content: Phone + Excel côte à côte -->
+          <div style="display: grid; grid-template-columns: 280px 1fr; gap: 32px; margin-bottom: 28px; align-items: start;">
 
-            <!-- COLONNE GAUCHE: Aperçu message Telegram -->
-            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
-              <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">📱</span> Aperçu du message
-              </div>
+            <!-- GAUCHE: iPhone avec Telegram -->
+            <div style="position: relative;">
+              <!-- iPhone Frame -->
+              <div style="background: #1a1a1a; border-radius: 40px; padding: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.4), inset 0 0 0 2px #333;">
+                <!-- Notch -->
+                <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 80px; height: 24px; background: #1a1a1a; border-radius: 0 0 14px 14px; z-index: 10;"></div>
 
-              <!-- Fake Telegram bubble -->
-              <div style="background: #1E3A5F; border-radius: 16px 16px 16px 4px; padding: 14px 16px; margin-bottom: 16px;">
-                <div id="preview-message-content" style="font-size: 14px; line-height: 1.6; white-space: pre-line;">CB 1000
+                <!-- Screen -->
+                <div style="background: #0e1621; border-radius: 32px; overflow: hidden; min-height: 420px;">
+                  <!-- Telegram Header -->
+                  <div style="background: #17212b; padding: 40px 12px 12px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">i</div>
+                    <div>
+                      <div style="font-weight: 600; font-size: 14px;">iArmy Bot</div>
+                      <div style="font-size: 11px; color: #6ab3f3;">en ligne</div>
+                    </div>
+                  </div>
+
+                  <!-- Chat Area -->
+                  <div style="padding: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end;">
+                    <!-- User Message Bubble -->
+                    <div style="align-self: flex-end; max-width: 85%;">
+                      <div style="background: #2b5278; border-radius: 16px 16px 4px 16px; padding: 10px 14px;">
+                        <div id="preview-message-content" style="font-size: 13px; line-height: 1.5; white-space: pre-line; color: white;">CB 1000
 ESP 500
-TR 50</div>
-                <div style="font-size: 11px; color: rgba(255,255,255,0.4); text-align: right; margin-top: 6px;">14:32 ✓✓</div>
+TR 50
+DEP 100</div>
+                        <div style="font-size: 10px; color: rgba(255,255,255,0.4); text-align: right; margin-top: 4px;">14:32 ✓✓</div>
+                      </div>
+                    </div>
+
+                    <!-- Bot Response -->
+                    <div style="align-self: flex-start; max-width: 85%; margin-top: 12px;">
+                      <div style="background: #182533; border-radius: 16px 16px 16px 4px; padding: 10px 14px;">
+                        <div style="font-size: 12px; color: #22C55E;">✓ Données enregistrées !</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Input Bar -->
+                  <div style="padding: 8px 12px; background: #17212b; display: flex; align-items: center; gap: 8px;">
+                    <div style="flex: 1; background: #242f3d; border-radius: 20px; padding: 8px 14px; font-size: 12px; color: rgba(255,255,255,0.4);">Message...</div>
+                    <div style="width: 32px; height: 32px; background: #2b5278; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <!-- Mini tableau résultat -->
-              <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 14px;">
-                <div style="font-size: 12px; color: #22C55E; font-weight: 600; margin-bottom: 10px;">📊 Ce qui s'écrit dans ton tableau:</div>
-                <div id="preview-table-result" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                  <!-- Généré dynamiquement -->
-                </div>
+              <!-- Label sous le téléphone -->
+              <div style="text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4);">
+                📱 Ton message Telegram
               </div>
             </div>
 
-            <!-- COLONNE DROITE: Configuration -->
-            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08);">
-              <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">🎯</span> Tes mots-clés
+            <!-- DROITE: Mini Excel -->
+            <div>
+              <!-- Excel Frame -->
+              <div style="background: #1e1e1e; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
+                <!-- Excel Header Bar -->
+                <div style="background: #217346; padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12.06L9.93 8.89H8.22L7.13 10.9L7.09 10.96L7.06 11.03Q6.8 10.5 6.5 9.96 6.25 9.43 5.97 8.89H4.16L6.05 12.08L4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H12V15.75M13.88 11.38V8.25H12V11.38M13.88 7V4.5H8.25V7M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38M20.75 7V4.5H15.13V7Z"/></svg>
+                  <span id="excel-filename" style="font-size: 12px; font-weight: 500; color: white;">recette 25.xlsx</span>
+                </div>
+
+                <!-- Excel Grid -->
+                <div style="overflow-x: auto;">
+                  <table id="excel-preview-table" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead>
+                      <tr style="background: #2d2d2d;">
+                        <th style="padding: 6px 10px; border: 1px solid #404040; color: #888; font-weight: 500; min-width: 40px;"></th>
+                        <!-- Colonnes générées dynamiquement -->
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Ligne headers (noms des colonnes) -->
+                      <tr id="excel-header-row" style="background: #252526;">
+                        <td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">4</td>
+                        <!-- Cellules générées dynamiquement -->
+                      </tr>
+                      <!-- Ligne des valeurs (jour actuel) -->
+                      <tr id="excel-value-row" style="background: #1e1e1e;">
+                        <td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;" id="excel-day-cell">16</td>
+                        <!-- Cellules générées dynamiquement -->
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Excel Footer -->
+                <div style="background: #2d2d2d; padding: 6px 12px; display: flex; align-items: center; gap: 12px; border-top: 1px solid #404040;">
+                  <div id="excel-sheet-tab" style="background: #1e1e1e; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; color: white; border: 1px solid #404040; border-bottom: none; margin-bottom: -1px;">janv</div>
+                  <div style="font-size: 10px; color: #666;">+ Autre feuille</div>
+                </div>
               </div>
 
-              <div id="config-editor-rows" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;">
-                <!-- Les rows seront générées dynamiquement -->
+              <!-- Label sous l'Excel -->
+              <div style="text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4);">
+                📊 Ton Google Sheet
               </div>
 
-              <!-- Bouton ajouter -->
-              <button onclick="addConfigRow()" style="width: 100%; margin-top: 12px; padding: 12px; background: rgba(255,107,53,0.1); border: 1px dashed rgba(255,107,53,0.3); border-radius: 10px; color: #FF6B35; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">
-                + Ajouter un mot-clé
+              <!-- Flèche de connexion visuelle -->
+              <div style="position: absolute; left: 280px; top: 180px; width: 32px; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 24px; color: #22C55E; animation: pulseArrow 1.5s ease-in-out infinite;">→</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuration des mots-clés -->
+          <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+              <div style="font-size: 15px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 20px;">🎯</span> Tes mots-clés → colonnes Excel
+              </div>
+              <button onclick="addConfigRow()" style="padding: 8px 16px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF6B35; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;">
+                + Ajouter
               </button>
+            </div>
+
+            <div id="config-editor-rows" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+              <!-- Les rows seront générées dynamiquement -->
             </div>
           </div>
 
           <!-- Section règles spéciales -->
           <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px;">
-            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <div style="font-size: 14px; font-weight: 600; color: white; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
               <span style="font-size: 18px;">⚡</span> Règles spéciales
             </div>
 
@@ -615,25 +700,25 @@ TR 50</div>
                   <input type="checkbox" id="dep-combine-checkbox" onchange="toggleDepCombine(); updatePreview();" style="width: 22px; height: 22px; accent-color: #FF6B35; cursor: pointer;">
                   <div style="flex: 1;">
                     <div style="font-weight: 600; font-size: 14px;">DEP s'ajoute à ESP</div>
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.5);">Ex: ESP 500 + DEP 100 = 600 dans la colonne ESP</div>
+                    <div style="font-size: 12px; color: rgba(255,255,255,0.5);">Ex: ESP 500 + DEP 100 = 600€ écrits dans la colonne ESP</div>
                   </div>
                 </label>
               </div>
 
               <!-- Message si pas de règles -->
-              <div id="no-rules-message" style="color: rgba(255,255,255,0.3); font-size: 13px; text-align: center; padding: 10px;">
-                Aucune règle spéciale détectée
+              <div id="no-rules-message" style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 10px;">
+                💡 Des règles spéciales apparaîtront ici si tu as DEP et ESP configurés
               </div>
             </div>
           </div>
 
           <!-- Boutons footer -->
           <div style="display: flex; gap: 12px;">
-            <button onclick="closeConfigEditor()" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: rgba(255,255,255,0.7); font-weight: 600; font-size: 15px; cursor: pointer;">
+            <button onclick="closeConfigEditor()" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; color: rgba(255,255,255,0.7); font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s;">
               ← Retour
             </button>
-            <button onclick="saveConfigEditor()" style="flex: 2; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);">
-              C'est bon ! Continuer →
+            <button onclick="saveConfigEditor()" style="flex: 2; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); transition: all 0.2s;">
+              C'est parfait ! Continuer →
             </button>
           </div>
         </div>
@@ -1833,11 +1918,83 @@ TR 50</div>
         });
       }
 
+      // Mettre à jour le nom du fichier Excel
+      var filenameEl = document.getElementById('excel-filename');
+      if (filenameEl && excelData) {
+        filenameEl.textContent = excelData.fileName || excelData.sheetName || 'Fichier.xlsx';
+      }
+
+      // Mettre à jour l'onglet Excel
+      var sheetTabEl = document.getElementById('excel-sheet-tab');
+      if (sheetTabEl && pendingConfig && pendingConfig.onglet) {
+        sheetTabEl.textContent = pendingConfig.onglet;
+      }
+
+      // Mettre à jour le jour actuel
+      var dayCell = document.getElementById('excel-day-cell');
+      if (dayCell) {
+        dayCell.textContent = new Date().getDate();
+      }
+
       // Vérifier si DEP et ESP existent pour afficher la règle spéciale
       checkSpecialRules();
 
+      // Construire le tableau Excel
+      buildExcelPreview();
+
       // Afficher les lignes éditables
       renderConfigEditorRows();
+    }
+
+    function buildExcelPreview() {
+      // Récupérer les colonnes utilisées par les mots-clés
+      var usedColumns = {};
+      configEditorData.forEach(function(row) {
+        if (row.column) {
+          usedColumns[row.column] = row.keyword;
+        }
+      });
+
+      // Ajouter la colonne date si disponible
+      var dateCol = pendingConfig ? pendingConfig.colonne_date : null;
+      if (dateCol) {
+        usedColumns[dateCol] = 'Jour';
+      }
+
+      // Trier les colonnes par ordre alphabétique
+      var sortedCols = Object.keys(usedColumns).sort();
+
+      // Construire le header du tableau
+      var headerRow = document.querySelector('#excel-preview-table thead tr');
+      var headerHtml = '<th style="padding: 6px 10px; border: 1px solid #404040; color: #888; font-weight: 500; min-width: 40px;"></th>';
+      sortedCols.forEach(function(col) {
+        headerHtml += '<th style="padding: 6px 12px; border: 1px solid #404040; color: #888; font-weight: 500; text-align: center;">' + col + '</th>';
+      });
+      headerRow.innerHTML = headerHtml;
+
+      // Construire la ligne des noms de colonnes
+      var namesRow = document.getElementById('excel-header-row');
+      var namesHtml = '<td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">4</td>';
+      sortedCols.forEach(function(col) {
+        var colName = usedColumns[col];
+        // Trouver le vrai nom dans availableColumns
+        availableColumns.forEach(function(c) {
+          if (c.letter === col && c.name) colName = c.name;
+        });
+        var isHighlight = col !== dateCol;
+        var bgColor = isHighlight ? 'rgba(34, 197, 94, 0.1)' : 'transparent';
+        namesHtml += '<td style="padding: 6px 12px; border: 1px solid #404040; color: #aaa; text-align: center; font-size: 11px; background: ' + bgColor + ';">' + colName + '</td>';
+      });
+      namesRow.innerHTML = namesHtml;
+
+      // Construire la ligne des valeurs (vide pour l'instant, sera remplie par updatePreview)
+      var valuesRow = document.getElementById('excel-value-row');
+      var day = new Date().getDate();
+      var valuesHtml = '<td style="padding: 6px 10px; border: 1px solid #404040; color: #888; text-align: center; font-size: 11px;">' + (day + 3) + '</td>';
+      sortedCols.forEach(function(col) {
+        valuesHtml += '<td id="excel-cell-' + col + '" style="padding: 6px 12px; border: 1px solid #404040; color: white; text-align: center; font-weight: 500;"></td>';
+      });
+      valuesRow.innerHTML = valuesHtml;
     }
 
     function closeConfigEditor() {
@@ -1853,22 +2010,25 @@ TR 50</div>
       container.innerHTML = '';
 
       configEditorData.forEach(function(row, index) {
-        var rowHtml = '<div class="config-row" style="display: flex; gap: 8px; align-items: center; padding: 10px 12px; background: rgba(255,255,255,0.04); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">';
+        // Card compacte pour chaque mot-clé
+        var rowHtml = '<div class="config-card" style="background: rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s;">';
 
-        // Badge mot-clé (éditable)
-        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 80px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 6px; padding: 8px 10px; color: white; font-size: 13px; font-weight: 600; text-align: center; text-transform: uppercase;" placeholder="MOT">';
+        // Ligne du haut: mot-clé éditable + bouton supprimer
+        rowHtml += '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">';
+        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="flex: 1; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; padding: 8px 12px; color: white; font-size: 14px; font-weight: 700; text-align: center; text-transform: uppercase;" placeholder="MOT-CLÉ">';
+        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.1); border: none; border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 16px; transition: all 0.2s;" onmouseover="this.style.background=\'rgba(239,68,68,0.2)\'" onmouseout="this.style.background=\'rgba(239,68,68,0.1)\'">×</button>';
+        rowHtml += '</div>';
 
-        // Flèche animée
-        rowHtml += '<span style="color: #22C55E; font-size: 16px;">→</span>';
-
-        // Select pour la colonne (plus joli)
-        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 6px; padding: 8px 10px; color: #22C55E; font-size: 13px; font-weight: 500;">';
+        // Ligne du bas: flèche + select colonne
+        rowHtml += '<div style="display: flex; align-items: center; gap: 8px;">';
+        rowHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 11px;">écrit dans</span>';
+        rowHtml += '<select onchange="updateConfigColumn(' + index + ', this.value); updatePreview();" style="flex: 1; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 6px; padding: 6px 10px; color: #22C55E; font-size: 12px; font-weight: 500; cursor: pointer;">';
 
         // Option pour chaque colonne disponible
         if (availableColumns.length > 0) {
           availableColumns.forEach(function(col) {
             var selected = col.letter === row.column ? 'selected' : '';
-            var displayName = col.name.length > 15 ? col.name.substring(0, 15) + '...' : col.name;
+            var displayName = col.letter + ' - ' + (col.name.length > 12 ? col.name.substring(0, 12) + '...' : col.name);
             rowHtml += '<option value="' + col.letter + '" ' + selected + '>' + displayName + '</option>';
           });
         } else {
@@ -1879,9 +2039,7 @@ TR 50</div>
           }
         }
         rowHtml += '</select>';
-
-        // Bouton supprimer (plus discret)
-        rowHtml += '<button onclick="removeConfigRow(' + index + '); updatePreview();" style="width: 28px; height: 28px; background: transparent; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; color: #ef4444; cursor: pointer; font-size: 14px; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">×</button>';
+        rowHtml += '</div>';
 
         rowHtml += '</div>';
         container.innerHTML += rowHtml;
@@ -1891,9 +2049,9 @@ TR 50</div>
     }
 
     function updatePreview() {
-      // Générer le message de prévisualisation
+      // Générer le message de prévisualisation et les valeurs Excel
       var messageLines = [];
-      var tableResults = [];
+      var excelValues = {}; // colonne -> valeur
 
       configEditorData.forEach(function(row) {
         if (row.keyword.trim()) {
@@ -1901,34 +2059,46 @@ TR 50</div>
           var sampleValue = keyword === 'CB' ? '1000' : keyword === 'ESP' ? '500' : keyword === 'TR' ? '50' : keyword === 'DEP' ? '100' : keyword === 'RAZ' ? '1500' : '200';
           messageLines.push(keyword + ' ' + sampleValue);
 
-          // Trouver le nom de la colonne
-          var colName = row.column;
-          availableColumns.forEach(function(c) {
-            if (c.letter === row.column) colName = c.name;
-          });
-
-          tableResults.push({
-            keyword: keyword,
-            value: sampleValue,
-            column: colName
-          });
+          // Stocker la valeur pour la cellule Excel
+          if (row.column) {
+            excelValues[row.column] = sampleValue;
+          }
         }
       });
 
-      // Mettre à jour le message
-      document.getElementById('preview-message-content').textContent = messageLines.join('\n') || 'CB 1000\nESP 500';
+      // Mettre à jour le message Telegram
+      var msgEl = document.getElementById('preview-message-content');
+      if (msgEl) {
+        msgEl.textContent = messageLines.join('\n') || 'CB 1000\nESP 500';
+      }
 
-      // Mettre à jour le tableau résultat
-      var tableHtml = '';
-      tableResults.forEach(function(item) {
-        tableHtml += '<div style="background: rgba(34, 197, 94, 0.2); border-radius: 6px; padding: 6px 10px; font-size: 12px;">';
-        tableHtml += '<span style="font-weight: 600; color: #22C55E;">' + item.keyword + '</span>';
-        tableHtml += '<span style="color: rgba(255,255,255,0.5);"> → </span>';
-        tableHtml += '<span style="color: white;">' + item.value + '</span>';
-        tableHtml += '<span style="color: rgba(255,255,255,0.3); font-size: 10px;"> (' + item.column + ')</span>';
-        tableHtml += '</div>';
+      // Mettre à jour les cellules Excel avec animation
+      Object.keys(excelValues).forEach(function(col) {
+        var cell = document.getElementById('excel-cell-' + col);
+        if (cell) {
+          var oldValue = cell.textContent;
+          var newValue = excelValues[col];
+          cell.textContent = newValue;
+          // Animation flash si la valeur change
+          if (oldValue !== newValue) {
+            cell.style.background = 'rgba(34, 197, 94, 0.3)';
+            cell.style.transition = 'background 0.3s';
+            setTimeout(function() {
+              cell.style.background = 'transparent';
+            }, 300);
+          }
+        }
       });
-      document.getElementById('preview-table-result').innerHTML = tableHtml || '<span style="color: rgba(255,255,255,0.3);">Ajoute des mots-clés</span>';
+
+      // Mettre à jour le jour dans la colonne date
+      var dateCol = pendingConfig ? pendingConfig.colonne_date : null;
+      if (dateCol) {
+        var dateCell = document.getElementById('excel-cell-' + dateCol);
+        if (dateCell) {
+          dateCell.textContent = new Date().getDate();
+          dateCell.style.color = '#888';
+        }
+      }
 
       // Vérifier les règles spéciales
       checkSpecialRules();
