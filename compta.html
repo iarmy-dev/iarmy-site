@@ -1321,8 +1321,28 @@
       updateAnalyseStep(0);
 
       isWaitingForAI = true;
+      var progressScore = 0;
+      var progressInterval = null;
+
+      // Animation du score pendant l'analyse
+      function animateProgressTo(target, speed) {
+        if (progressInterval) clearInterval(progressInterval);
+        progressInterval = setInterval(function() {
+          if (progressScore < target) {
+            progressScore += 1;
+            document.getElementById('analyse-score-text').textContent = progressScore + '%';
+            var color = progressScore >= 60 ? '#F59E0B' : 'rgba(255,255,255,0.4)';
+            document.getElementById('analyse-score-text').style.color = color;
+            document.getElementById('analyse-score-circle').style.background = 'conic-gradient(' + color + ' ' + progressScore + '%, rgba(255,255,255,0.1) 0)';
+          } else {
+            clearInterval(progressInterval);
+          }
+        }, speed || 50);
+      }
+
       try {
-        // Etape 1: Lecture du Google Sheet
+        // Etape 1: Lecture du Google Sheet (0% -> 25%)
+        animateProgressTo(25, 80);
         console.log('[ANALYSE] Reading Google Sheet:', sheetId);
         var readResponse = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
           method: 'POST',
@@ -1344,15 +1364,20 @@
         excelData.sheetId = sheetId;
         excelData.isGoogleSheet = true;
 
-        // Etape 1 done
+        // Etape 1 done (25% -> 40%)
         updateAnalyseStep(1);
+        animateProgressTo(40, 60);
         document.getElementById('analyse-status').textContent = 'Detection des colonnes...';
         document.getElementById('analyse-live-feed').innerHTML = '<div style="text-align: center; padding: 30px 0;"><div class="welcome-dots" style="justify-content: center; margin-bottom: 12px;"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div><span style="color: rgba(255,255,255,0.4); font-size: 13px;">Detection des colonnes...</span></div>';
 
-        // Etape 2: Analyse avec Claude
-        var stepTimer = setTimeout(function() { updateAnalyseStep(2); }, 1500);
+        // Etape 2: Analyse avec Claude (40% -> 70%)
+        var stepTimer = setTimeout(function() {
+          updateAnalyseStep(2);
+          animateProgressTo(70, 100);
+        }, 1500);
         var response = await callAPI('analyze');
         clearTimeout(stepTimer);
+        if (progressInterval) clearInterval(progressInterval);
 
         // Toutes les etapes done
         updateAnalyseStep(3);
@@ -1763,13 +1788,19 @@
       var feedEl = document.getElementById('analyse-live-feed');
       feedEl.innerHTML = '';
 
-      // Animation du score (de 0 à final)
-      var currentScore = 0;
+      // Animation du score (depuis valeur actuelle jusqu'au final)
+      var currentScoreText = document.getElementById('analyse-score-text').textContent;
+      var currentScore = parseInt(currentScoreText) || 0;
       var scoreInterval = setInterval(function() {
-        currentScore += 2;
-        if (currentScore >= confidence) {
-          currentScore = confidence;
+        if (currentScore < confidence) {
+          currentScore += 2;
+          if (currentScore > confidence) currentScore = confidence;
+        } else if (currentScore > confidence) {
+          currentScore -= 2;
+          if (currentScore < confidence) currentScore = confidence;
+        } else {
           clearInterval(scoreInterval);
+          return;
         }
         document.getElementById('analyse-score-text').textContent = currentScore + '%';
         var currentColor = currentScore >= 80 ? '#22C55E' : currentScore >= 60 ? '#F59E0B' : '#EF4444';
