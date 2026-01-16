@@ -1847,39 +1847,13 @@
 
         // Gérer l'affichage selon le score
         var showUncertain = (confidence < SCORE_LOW) || (analyseExchangeCount >= MAX_EXCHANGES);
-        var showQuestions = (confidence < SCORE_HIGH) && !showUncertain;
-
+        // Logique simple:
+        // - Score < 70% → Structure difficile, proposer modele vierge
+        // - Score >= 70% → Bouton Continuer
         if (showUncertain) {
           document.getElementById('analyse-uncertain').style.display = 'block';
-        } else if (showQuestions) {
-          // Générer les questions
-          pendingQuestions = [];
-          // Ne poser des questions que si la valeur n'est PAS detectee
-          if (!config.colonne_date) pendingQuestions.push({ key: 'date', text: 'Dans quelle colonne se trouve la Date ? (ex: A, B, M...)' });
-          // CB et ESP sont dans colonnes_a_remplir, pas besoin de questions si elles y sont
-          var hasCB = config.colonnes_a_remplir?.some(function(c) { return c.nom.toLowerCase() === 'cb' || c.nom.toLowerCase() === 'carte'; });
-          var hasESP = config.colonnes_a_remplir?.some(function(c) { return c.nom.toLowerCase() === 'esp' || c.nom.toLowerCase() === 'especes'; });
-          if (!hasCB) pendingQuestions.push({ key: 'cb', text: 'Dans quelle colonne se trouve CB/Carte bancaire ?' });
-          if (!hasESP) pendingQuestions.push({ key: 'especes', text: 'Dans quelle colonne se trouve Espèces ?' });
-          // Onglet: question seulement si non detecte
-          if (!config.onglet) pendingQuestions.push({ key: 'onglet', text: 'Quel onglet utiliser pour la saisie ?' });
-
-          if (pendingQuestions.length > 0) {
-            // Afficher la zone Q&A avec la première question
-            document.getElementById('analyse-qa').style.display = 'block';
-            document.getElementById('analyse-current-question').textContent = pendingQuestions[0].text;
-          } else {
-            document.getElementById('analyse-continue-btn').style.display = 'block';
-          }
         } else {
-          // Score >= 90%
-          if (confidence >= 98) {
-            document.getElementById('analyse-continue-btn').style.display = 'block';
-            document.getElementById('analyse-continue-btn').textContent = 'Continuer automatiquement...';
-            setTimeout(function() { goToTelegram(); }, 1500);
-          } else {
-            document.getElementById('analyse-continue-btn').style.display = 'block';
-          }
+          document.getElementById('analyse-continue-btn').style.display = 'block';
         }
       }, totalDelay);
     }
