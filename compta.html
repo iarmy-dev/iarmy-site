@@ -3060,10 +3060,13 @@ DEP 100</div>
 
         var configToSave = {
           user_id: session.user.id,
-          sheet_id: excelData.sheetId,
+          sheet_id: excelData?.sheetId || null,
           excel_config: pendingConfig,
           is_active: true  // IMPORTANT: Le bot filtre sur is_active=true
         };
+
+        console.log('[CONFIG] About to save:', JSON.stringify(configToSave, null, 2));
+        alert('DEBUG - Colonnes: ' + pendingConfig.colonnes_a_remplir.map(function(c) { return c.nom + '→' + c.colonne; }).join(', '));
 
         var result = await supabaseClient
           .from('user_configs')
