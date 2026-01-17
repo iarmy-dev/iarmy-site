@@ -943,11 +943,13 @@
 
           <!-- STYLES TABLEAU EXCEL -->
           <style>
-            .sheet-col { padding: 10px 12px; text-align: left; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.08); position: relative; transition: background 0.15s; }
+            .sheet-col { padding: 10px 12px; text-align: left; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.08); position: relative; transition: all 0.15s; }
             .sheet-col:last-child { border-right: none; }
-            .sheet-col-editable { cursor: pointer; }
+            .sheet-col-editable { cursor: grab; }
             .sheet-col-editable:hover { background: rgba(33, 115, 70, 0.3); }
             .sheet-col-editable:hover .col-name { border-bottom: 1px dashed rgba(255,255,255,0.4); }
+            .sheet-col-editable.dragging { opacity: 0.5; cursor: grabbing; transform: scale(0.95); }
+            .sheet-col-editable.dragover { background: rgba(74, 222, 128, 0.3); box-shadow: inset 0 0 0 2px #4ade80; }
             .sheet-col-editable .col-delete { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); opacity: 0; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 16px; transition: all 0.15s; }
             .sheet-col-editable:hover .col-delete { opacity: 1; }
             .sheet-col-editable .col-delete:hover { color: #ef4444; }
@@ -2417,7 +2419,8 @@
         headersHtml += '<th class="sheet-col ' + editableClass + '" data-index="' + i + '" ' +
           'draggable="' + (!isFixed) + '" ' +
           'ondragstart="sheetDragStart(event, ' + i + ')" ' +
-          'ondragover="sheetDragOver(event)" ' +
+          'ondragover="sheetDragOver(event, ' + i + ')" ' +
+          'ondragend="sheetDragEnd()" ' +
           'ondrop="sheetDrop(event, ' + i + ')">' +
           '<span class="col-name" onclick="sheetStartEdit(' + i + ')">' + col.name + '</span>' +
           (!isFixed ? '<span class="col-delete" onclick="event.stopPropagation();sheetRemoveCol(' + i + ')">×</span>' : '') +
@@ -2505,14 +2508,31 @@
       }
       sheetDragIndex = index;
       e.dataTransfer.effectAllowed = 'move';
+      // Ajouter classe dragging
+      var th = document.querySelector('.sheet-col[data-index="' + index + '"]');
+      if (th) th.classList.add('dragging');
     }
 
-    function sheetDragOver(e) {
+    function sheetDragOver(e, index) {
       e.preventDefault();
+      if (sheetDragIndex === -1 || index === undefined) return;
+      // Ajouter classe dragover sur la cible
+      document.querySelectorAll('.sheet-col').forEach(function(el) { el.classList.remove('dragover'); });
+      var th = document.querySelector('.sheet-col[data-index="' + index + '"]');
+      if (th && index !== sheetDragIndex) th.classList.add('dragover');
+    }
+
+    function sheetDragEnd() {
+      // Nettoyer toutes les classes
+      document.querySelectorAll('.sheet-col').forEach(function(el) {
+        el.classList.remove('dragging', 'dragover');
+      });
+      sheetDragIndex = -1;
     }
 
     function sheetDrop(e, targetIndex) {
       e.preventDefault();
+      document.querySelectorAll('.sheet-col').forEach(function(el) { el.classList.remove('dragging', 'dragover'); });
       if (sheetDragIndex === -1 || sheetDragIndex === targetIndex) {
         sheetDragIndex = -1;
         return;
@@ -2542,14 +2562,22 @@
 
       // Parser le message
       var parsed = {};
+      var foundKeywordWithoutNumber = null;
       sheetEditorColumns.forEach(function(col) {
         if (col.name === 'Date' || col.name === 'Notes') return;
         var aliases = col.aliases || [col.name.toLowerCase()];
         aliases.forEach(function(alias) {
+          // Check si le mot-clé est présent avec un nombre
           var regex = new RegExp('\\b' + alias + '\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
           var match = text.match(regex);
           if (match) {
             parsed[col.name] = parseFloat(match[1].replace(',', '.'));
+          } else {
+            // Check si le mot-clé est présent sans nombre
+            var kwOnly = new RegExp('\\b' + alias + '\\b', 'i');
+            if (kwOnly.test(text) && !foundKeywordWithoutNumber) {
+              foundKeywordWithoutNumber = col.name.toLowerCase();
+            }
           }
         });
       });
@@ -2570,8 +2598,14 @@
       var keys = Object.keys(parsed);
 
       if (keys.length === 0) {
-        var kws = sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; }).map(function(c) { return c.name.toLowerCase(); }).join(', ');
-        html += '<div class="tg-bubble tg-bot error">❌ Mots-clés: ' + kws + '</div>';
+        if (foundKeywordWithoutNumber) {
+          // Mot-clé trouvé mais pas de montant → hint
+          html += '<div class="tg-bubble tg-bot">💡 Ajoute le montant : <b>' + foundKeywordWithoutNumber + ' 450</b></div>';
+        } else {
+          // Aucun mot-clé reconnu → exemple
+          var example = sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; }).slice(0,2).map(function(c,i) { return c.name.toLowerCase() + ' ' + (450 - i*100); }).join(' ');
+          html += '<div class="tg-bubble tg-bot">💡 Exemple : <b>' + example + '</b></div>';
+        }
       } else {
         var items = keys.map(function(k) { return k + ': ' + parsed[k].toFixed(2) + '€'; }).join(' · ');
         html += '<div class="tg-bubble tg-bot success">✅ ' + items + '</div>';
