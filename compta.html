@@ -1406,7 +1406,6 @@
         window.history.replaceState({}, document.title, window.location.pathname);
         hasGoogleSheetsAccess = true;
         hideLoader();
-        showToast('✅ Google Sheets connecté !');
         updateGoogleSheetsButton();
 
         // Check if we have a pending config to process (user was validating when they connected)
@@ -1713,14 +1712,13 @@
         if (!result.success) throw new Error(result.error);
         if (result.sheets?.length > 0) {
           showSheetsOverlay(result.sheets);
-          showToast('Liste actualisee !');
         } else {
           showNoSheetsMessage();
         }
       } catch (error) {
         console.error('[SHEETS] Refresh error:', error);
         hideLoader();
-        alert('Erreur: ' + error.message);
+        console.error('Erreur refresh:', error.message);
       }
     }
 
@@ -2666,7 +2664,6 @@
         .then(function(result) {
           if (result.error) {
             console.error('[SHEET EDITOR] Save error:', result.error);
-            alert('Erreur: ' + result.error.message);
             return;
           }
           console.log('[SHEET EDITOR] Config saved!');
@@ -4401,7 +4398,6 @@
       }).eq('user_id', currentUser.id);
 
       hideLoader();
-      showToast('Fichier cree !');
 
       // Stocker les infos du sheet pour l'étape 3
       excelData = {
