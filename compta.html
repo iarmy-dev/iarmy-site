@@ -2436,13 +2436,14 @@
       var rowsHtml = '';
       for (var d = 1; d <= 5; d++) {
         var opacity = d <= 2 ? 1 : (d === 3 ? 0.6 : (d === 4 ? 0.3 : 0.15));
-        rowsHtml += '<tr style="opacity: ' + opacity + ';">';
+        var isFirstRow = d === 1;
+        rowsHtml += '<tr style="opacity: ' + opacity + ';" ' + (isFirstRow ? 'id="sheet-preview-row"' : '') + '>';
         sheetEditorColumns.forEach(function(col, ci) {
           var val = '';
           if (col.name === 'Date') {
             val = (d < 10 ? '0' : '') + d + '/' + (month < 10 ? '0' : '') + month;
           }
-          rowsHtml += '<td class="sheet-cell">' + val + '</td>';
+          rowsHtml += '<td class="sheet-cell" ' + (isFirstRow ? 'data-col="' + col.name + '"' : '') + '>' + val + '</td>';
         });
         rowsHtml += '<td></td></tr>';
       }
@@ -2612,6 +2613,22 @@
       }
 
       chatArea.innerHTML = html;
+
+      // Mettre à jour le tableau Excel avec les valeurs parsées
+      sheetEditorColumns.forEach(function(col) {
+        var cell = document.querySelector('#sheet-preview-row td[data-col="' + col.name + '"]');
+        if (cell) {
+          if (parsed[col.name] !== undefined) {
+            cell.textContent = parsed[col.name].toFixed(2) + ' €';
+            cell.style.color = '#4ade80';
+            cell.style.fontWeight = '600';
+          } else if (col.name !== 'Date') {
+            cell.textContent = '';
+            cell.style.color = '';
+            cell.style.fontWeight = '';
+          }
+        }
+      });
     }
 
     function addEditorRule() {
