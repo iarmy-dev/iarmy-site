@@ -4174,7 +4174,17 @@ DEP 100</div>
 
       hideLoader();
       showToast('Fichier cree !');
-      goToStep(4);
+
+      // Stocker les infos du sheet pour l'étape 3
+      excelData = {
+        fileName: result.sheet.name,
+        sheetId: result.sheet.id,
+        sheetName: result.sheet.name,
+        webViewLink: result.sheet.webViewLink
+      };
+
+      // Aller à l'étape 3 pour voir/configurer
+      goToStep(3);
     }
     // ========== END EMPTY TEMPLATE FLOW ==========
 
