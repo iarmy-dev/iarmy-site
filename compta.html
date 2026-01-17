@@ -984,39 +984,28 @@
             </div>
           </div>
 
-          <!-- PREVIEW TELEGRAM - Style conversation -->
+          <!-- PREVIEW TELEGRAM -->
           <div class="glass-card" style="padding: 0; margin-bottom: 24px; overflow: hidden;">
-            <!-- Header Telegram -->
-            <div style="background: linear-gradient(135deg, #2AABEE, #229ED9); padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
-              <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 14px;">🤖</span>
-              </div>
-              <div>
-                <div style="font-weight: 600; font-size: 13px;">iArmy Bot</div>
-                <div style="font-size: 10px; opacity: 0.7;">en ligne</div>
-              </div>
+            <!-- Header compact -->
+            <div style="background: linear-gradient(135deg, #2AABEE, #229ED9); padding: 10px 14px; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">🤖</span>
+              <span style="font-weight: 600; font-size: 12px;">Teste ta config</span>
             </div>
-            <!-- Zone de conversation -->
-            <div id="telegram-chat-area" style="background: #0e1621; padding: 16px; min-height: 120px; display: flex; flex-direction: column; gap: 8px;">
-              <!-- Bulle bot (gauche) - état initial -->
-              <div class="tg-bubble tg-bot">
-                <span style="color: rgba(255,255,255,0.5);">Envoie un message pour tester...</span>
-              </div>
+            <!-- Zone conversation - HAUTEUR FIXE -->
+            <div id="telegram-chat-area" style="background: #0e1621; padding: 12px; height: 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+              <div class="tg-bubble tg-bot">Écris ci-dessous pour tester...</div>
             </div>
-            <!-- Input de message -->
-            <div style="background: #17212b; padding: 10px 12px; display: flex; gap: 10px; align-items: center;">
-              <input type="text" id="telegram-test-input" placeholder="Écris un message..." oninput="updateTelegramPreview()" onkeydown="if(event.key==='Enter')updateTelegramPreview()" style="flex: 1; background: #242f3d; border: none; border-radius: 20px; padding: 10px 16px; color: white; font-size: 13px; outline: none;">
-              <button onclick="updateTelegramPreview()" style="width: 36px; height: 36px; background: #2AABEE; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-              </button>
+            <!-- Input simple -->
+            <div style="background: #17212b; padding: 8px 10px;">
+              <input type="text" id="telegram-test-input" placeholder="cb 450 esp 120 tr 80" oninput="updateTelegramPreview()" style="width: 100%; background: #242f3d; border: none; border-radius: 16px; padding: 8px 14px; color: white; font-size: 13px; outline: none; box-sizing: border-box;">
             </div>
           </div>
           <style>
-            .tg-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
-            .tg-user { background: #2b5278; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-            .tg-bot { background: #182533; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
-            .tg-bot.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
-            .tg-bot.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+            .tg-bubble { max-width: 80%; padding: 6px 10px; border-radius: 10px; font-size: 12px; line-height: 1.35; word-break: break-word; }
+            .tg-user { background: #2b5278; color: white; align-self: flex-end; border-bottom-right-radius: 3px; }
+            .tg-bot { background: #182533; color: rgba(255,255,255,0.7); align-self: flex-start; border-bottom-left-radius: 3px; }
+            .tg-bot.success { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.2); color: white; }
+            .tg-bot.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: rgba(255,255,255,0.8); }
           </style>
 
           <!-- RÈGLES (accordion) -->
@@ -2547,24 +2536,19 @@
 
       var text = input.value.trim();
       if (!text) {
-        chatArea.innerHTML = '<div class="tg-bubble tg-bot"><span style="color: rgba(255,255,255,0.5);">Envoie un message pour tester...</span></div>';
+        chatArea.innerHTML = '<div class="tg-bubble tg-bot">Écris ci-dessous pour tester...</div>';
         return;
       }
 
       // Parser le message
       var parsed = {};
-      console.log('[PREVIEW] Parsing:', text);
-      console.log('[PREVIEW] Columns:', sheetEditorColumns);
-
       sheetEditorColumns.forEach(function(col) {
         if (col.name === 'Date' || col.name === 'Notes') return;
         var aliases = col.aliases || [col.name.toLowerCase()];
-        console.log('[PREVIEW] Checking column:', col.name, 'aliases:', aliases);
         aliases.forEach(function(alias) {
           var regex = new RegExp('\\b' + alias + '\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
           var match = text.match(regex);
           if (match) {
-            console.log('[PREVIEW] Match found:', alias, '=', match[1]);
             parsed[col.name] = parseFloat(match[1].replace(',', '.'));
           }
         });
@@ -2581,25 +2565,16 @@
         }
       });
 
-      // Construire les bulles de conversation
-      var html = '';
-
-      // Bulle utilisateur (droite)
-      html += '<div class="tg-bubble tg-user">' + text + '</div>';
-
-      // Bulle bot (gauche)
+      // Construire les bulles
+      var html = '<div class="tg-bubble tg-user">' + text + '</div>';
       var keys = Object.keys(parsed);
+
       if (keys.length === 0) {
-        html += '<div class="tg-bubble tg-bot error">❌ Je ne reconnais pas ces mots-clés.<br><span style="font-size: 11px; opacity: 0.7;">Essaie: ' + sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; }).map(function(c) { return c.name.toLowerCase(); }).join(', ') + '</span></div>';
+        var kws = sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; }).map(function(c) { return c.name.toLowerCase(); }).join(', ');
+        html += '<div class="tg-bubble tg-bot error">❌ Mots-clés: ' + kws + '</div>';
       } else {
-        var botMsg = '✅ <b>Enregistré !</b><br>';
-        var today = new Date();
-        var dateStr = (today.getDate() < 10 ? '0' : '') + today.getDate() + '/' + ((today.getMonth() + 1) < 10 ? '0' : '') + (today.getMonth() + 1);
-        botMsg += '<span style="opacity: 0.6;">📅 ' + dateStr + '</span><br>';
-        keys.forEach(function(k) {
-          botMsg += '• ' + k + ': <b>' + parsed[k].toFixed(2) + ' €</b><br>';
-        });
-        html += '<div class="tg-bubble tg-bot success">' + botMsg + '</div>';
+        var items = keys.map(function(k) { return k + ': ' + parsed[k].toFixed(2) + '€'; }).join(' · ');
+        html += '<div class="tg-bubble tg-bot success">✅ ' + items + '</div>';
       }
 
       chatArea.innerHTML = html;
