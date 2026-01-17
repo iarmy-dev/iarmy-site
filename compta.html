@@ -810,114 +810,18 @@
         <p class="text-white/40 mb-8">Choisis l'option qui te convient</p>
 
         <!-- Option 1: Créer mon fichier (RECOMMANDÉ) -->
-        <div class="glass-card p-6 mb-5 max-w-2xl mx-auto" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-xl">+</div>
-            <div>
-              <h3 class="text-lg font-semibold">Creer mon fichier</h3>
-              <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">RECOMMANDE</span>
+        <div class="glass-card p-6 mb-5 max-w-lg mx-auto cursor-pointer hover:border-orange-500/50 transition-all" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));" onclick="createEmptyTemplate()">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-2xl flex-shrink-0">+</div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="text-lg font-semibold">Creer mon fichier</h3>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">RECOMMANDE</span>
+              </div>
+              <p class="text-sm text-white/40">On te cree un Google Sheet pret a l'emploi</p>
             </div>
+            <svg class="w-5 h-5 text-white/30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
           </div>
-
-          <!-- Preview côte à côte -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-            <!-- Telegram Preview -->
-            <div class="bg-black/30 rounded-xl p-4 border border-white/5">
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-6 h-6 rounded-full bg-[#2AABEE] flex items-center justify-content-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white" class="mx-auto"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
-                </div>
-                <span class="text-xs text-white/50">Telegram</span>
-              </div>
-              <!-- Input test -->
-              <div class="mb-3">
-                <input type="text" id="tpl-test-input" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-[#2AABEE]/50" placeholder="Teste: cb 450 esp 120 tr 80" oninput="updateTemplatePreview()">
-              </div>
-              <!-- Messages -->
-              <div class="space-y-2" id="tpl-telegram-preview">
-                <div class="bg-[#2AABEE]/20 rounded-lg rounded-bl-sm px-3 py-2 text-xs text-white/70 max-w-[85%]">
-                  Tape un message ci-dessus...
-                </div>
-              </div>
-            </div>
-
-            <!-- Sheet Preview -->
-            <div class="bg-black/30 rounded-xl p-4 border border-white/5">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-[#0F9D58] flex items-center justify-center">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="white" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="white" stroke-width="1.5"/></svg>
-                  </div>
-                  <span class="text-xs text-white/50">Google Sheet</span>
-                </div>
-                <span class="text-xs text-white/30">double-clic = renommer</span>
-              </div>
-              <!-- Table preview -->
-              <div class="overflow-x-auto">
-                <table class="w-full text-xs" id="tpl-sheet-preview">
-                  <thead>
-                    <tr id="tpl-sheet-headers" class="bg-[#FF6B35]">
-                      <!-- Headers générés dynamiquement -->
-                    </tr>
-                  </thead>
-                  <tbody id="tpl-sheet-body" class="text-white/60">
-                    <!-- Rows générées dynamiquement -->
-                  </tbody>
-                </table>
-              </div>
-              <p class="text-white/20 text-xs mt-2 flex items-center gap-1">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="5" cy="12" r="2"/></svg>
-                Glisse les colonnes pour reordonner
-              </p>
-            </div>
-          </div>
-
-          <!-- Options -->
-          <div class="flex flex-wrap items-center gap-4 mb-5">
-            <div class="flex items-center gap-2">
-              <label class="text-xs text-white/50">Commencer en:</label>
-              <select id="tpl-start-month" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none cursor-pointer" onchange="updateTemplatePreview()">
-                <option value="1">Janvier</option>
-                <option value="2">Fevrier</option>
-                <option value="3">Mars</option>
-                <option value="4">Avril</option>
-                <option value="5">Mai</option>
-                <option value="6">Juin</option>
-                <option value="7">Juillet</option>
-                <option value="8">Aout</option>
-                <option value="9">Septembre</option>
-                <option value="10">Octobre</option>
-                <option value="11">Novembre</option>
-                <option value="12">Decembre</option>
-              </select>
-              <select id="tpl-start-year" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none cursor-pointer">
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Règles (optionnel, plié par défaut) -->
-          <details class="mb-5">
-            <summary class="cursor-pointer text-xs text-white/40 hover:text-white/60 flex items-center gap-2">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-              Regles avancees (optionnel)
-            </summary>
-            <div class="mt-3 p-3 bg-white/5 rounded-lg">
-              <p class="text-xs text-white/40 mb-2">Ex: Depenses s'ajoutent aux Especes</p>
-              <div id="tpl-rules-list" class="space-y-2">
-                <!-- Règles ajoutées ici -->
-              </div>
-              <button onclick="addTemplateRule()" class="mt-2 text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Ajouter une regle
-              </button>
-            </div>
-          </details>
-
-          <button onclick="createEmptyTemplate()" class="btn-glow w-full">
-            Creer mon fichier
-          </button>
         </div>
 
         <!-- Option 2: J'ai déjà un fichier -->
@@ -1515,7 +1419,6 @@ DEP 100</div>
       document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
       document.getElementById('step-choice').classList.add('active');
       updateSidebarStep(2); // Étape 2 = Ton fichier (après Google connecté)
-      initTemplatePreview(); // Init interactive preview
     }
 
     async function checkGoogleSheetsAccess() {
@@ -3383,7 +3286,6 @@ DEP 100</div>
         // Étape 1 = Connexion Google
         if (hasGoogleSheetsAccess) {
           document.getElementById('step-choice').classList.add('active');
-          initTemplatePreview();
         } else {
           document.getElementById('step-auth').classList.add('active');
         }
@@ -3391,7 +3293,6 @@ DEP 100</div>
       } else if (stepNum === 2) {
         // Étape 2 = Choix du fichier
         document.getElementById('step-choice').classList.add('active');
-        initTemplatePreview();
         updateSidebarStep(2);
       } else if (stepNum === 3) {
         // Étape 3 = Analyse (page intégrée)
@@ -4202,21 +4103,15 @@ DEP 100</div>
       var { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) throw new Error('Session expirée');
 
-      var columns = getTemplateColumns();
-      if (columns.length === 0) {
-        alert('Ajoute au moins une colonne !');
-        return;
-      }
-
-      // Get selected month and year
-      var startMonth = parseInt(document.getElementById('tpl-start-month')?.value || (new Date().getMonth() + 1));
-      var startYear = parseInt(document.getElementById('tpl-start-year')?.value || new Date().getFullYear());
+      // Default columns for standard restaurant accounting
+      var columns = ['Date', 'CB', 'ESP', 'TR', 'RAZ', 'Notes'];
+      var currentYear = new Date().getFullYear();
 
       showLoader('Creation du modele vierge...');
 
-      console.log('[COMPTA] Creating template with columns:', columns, 'month:', startMonth, 'year:', startYear);
+      console.log('[COMPTA] Creating template with default columns:', columns);
 
-      // Create a new Google Sheet with custom columns
+      // Create a new Google Sheet with default columns
       var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
         method: 'POST',
         headers: {
@@ -4226,9 +4121,8 @@ DEP 100</div>
         },
         body: JSON.stringify({
           templateType: 'compta',
-          year: startYear,
-          startMonth: startMonth,
-          customColumns: columns  // Pass user's custom columns
+          year: currentYear,
+          customColumns: columns
         })
       });
 
@@ -4237,32 +4131,20 @@ DEP 100</div>
 
       console.log('[COMPTA] Template created:', result.sheet);
 
-      // Build config dynamically based on user's columns
-      var colLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      var colonnesARemplir = [];
-      columns.forEach(function(colName, index) {
-        var lowerName = colName.toLowerCase();
-        // Skip date column (handled separately) and notes (not fillable via bot)
-        if (lowerName !== 'date' && lowerName !== 'notes') {
-          colonnesARemplir.push({
-            nom: colName,
-            colonne: colLetters[index],
-            aliases: [lowerName, lowerName.replace(/\s+/g, '')]
-          });
-        }
-      });
-
-      // Build rules from user's custom rules
-      var regles = tplRules.filter(function(r) { return r.src1 && r.src2 && r.target; });
-
+      // Default config for standard columns
       var defaultConfig = {
-        onglet: 'Recettes ' + startYear,
+        onglet: 'Recettes ' + currentYear,
         ligne_entetes: 1,
         premiere_ligne_donnees: 2,
         colonne_date: 'A',
         format_date: 'DD/MM/YYYY',
-        colonnes_a_remplir: colonnesARemplir,
-        regles: regles  // User's custom rules (e.g., DEP + ESP → ESP)
+        colonnes_a_remplir: [
+          { nom: 'CB', colonne: 'B', aliases: ['cb', 'carte', 'card', 'cartebancaire', 'cartebleue'] },
+          { nom: 'ESP', colonne: 'C', aliases: ['esp', 'especes', 'espèces', 'cash', 'liquide'] },
+          { nom: 'TR', colonne: 'D', aliases: ['tr', 'ticket', 'tickets', 'ticketresto', 'resto'] },
+          { nom: 'RAZ', colonne: 'E', aliases: ['raz', 'total', 'caisse', 'z', 'ticketz'] }
+        ],
+        regles: []  // User can add rules later in settings
       };
 
       // Save to database
