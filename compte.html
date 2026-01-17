@@ -7,198 +7,212 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #030303; color: white; min-height: 100vh; }
+    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
+
+    /* Fond animé + Orbs */
     .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.15; }
+    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.12; animation-delay: -7s; }
+    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.08; animation-delay: -3s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
+
+    /* Glass effect */
+    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+    /* Logo */
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; }
+
+    /* Nav */
     .nav-user-section { display: flex; align-items: center; gap: 12px; }
-    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; transition: all 0.3s; font-weight: 500; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; transition: all 0.3s; }
     .nav-profile:hover { background: rgba(255,255,255,0.08); }
     .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
-    .btn-logout { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.3); padding: 10px 20px; border-radius: 12px; font-weight: 500; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: all 0.3s; }
-    .btn-logout:hover { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1)); transform: translateY(-2px); }
-    .btn-primary { background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 14px 28px; border-radius: 14px; font-weight: 600; border: none; color: white; cursor: pointer; transition: all 0.4s; text-decoration: none; display: inline-block; }
-    .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
-    .card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
-    .profile-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,107,53,0.3); margin-bottom: 24px; }
+    .btn-logout { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); padding: 10px 16px; border-radius: 12px; font-weight: 500; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: all 0.3s; }
+    .btn-logout:hover { background: rgba(239,68,68,0.2); }
 
-    /* Modal styles */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.active { display: flex; }
-    .modal-content { background: rgba(10,10,10,0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); }
-    .modal-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: rgba(10,10,10,0.98); backdrop-filter: blur(20px); z-index: 10; }
-    .modal-body { padding: 24px; }
-    .modal-close { background: none; border: none; color: white/50; font-size: 24px; cursor: pointer; padding: 8px; }
-    .config-row { display: flex; gap: 12px; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; }
-    .config-input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; }
-    .config-input:focus { outline: none; border-color: #FF6B35; }
-    .config-select { padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 80px; }
-    .btn-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-    .btn-add { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3); color: #FF6B35; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 8px; }
-    .btn-save { background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 16px; }
-    .section-title { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 12px; font-weight: 500; }
-    .rule-row { display: flex; gap: 8px; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap; }
-    .rule-tag { padding: 6px 12px; background: rgba(255,107,53,0.15); border-radius: 6px; font-size: 13px; color: #FF8B5E; }
+    /* Avatar */
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,107,53,0.3); }
+
+    /* Section titles */
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
+
+    /* Module card */
+    .module-card { padding: 24px; transition: all 0.3s; }
+    .module-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .module-icon { width: 48px; height: 48px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05)); border: 1px solid rgba(255,107,53,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .module-badge { padding: 4px 10px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 20px; font-size: 11px; font-weight: 600; color: #22C55E; }
+    .module-badge.inactive { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
+
+    /* Module info row */
+    .module-info { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 13px; color: rgba(255,255,255,0.5); }
+    .module-info a { color: #22C55E; text-decoration: none; }
+    .module-info a:hover { text-decoration: underline; }
+    .info-dot { width: 4px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 50%; }
+
+    /* Settings button */
+    .btn-settings { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; color: white; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.3s; }
+    .btn-settings:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+
+    /* Access card */
+    .access-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 8px; }
+    .access-item:last-child { margin-bottom: 0; }
+    .access-left { display: flex; align-items: center; gap: 12px; }
+    .access-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .access-icon.google { background: rgba(66,133,244,0.15); }
+    .access-icon.telegram { background: rgba(0,136,204,0.15); }
+    .access-status { font-size: 12px; padding: 4px 10px; border-radius: 6px; }
+    .access-status.connected { background: rgba(34,197,94,0.1); color: #22C55E; }
+    .access-status.pending { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+
+    /* Billing placeholder */
+    .billing-placeholder { text-align: center; padding: 32px; color: rgba(255,255,255,0.4); }
+    .billing-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .module-info { flex-direction: column; gap: 8px; }
+      .info-dot { display: none; }
+    }
   </style>
 </head>
 <body class="bg-gradient-animate">
-  <div id="main-content">
-    <nav class="glass fixed top-0 left-0 right-0 z-50">
-      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-3">
-          <div class="logo-i">i</div>
-          <span class="font-semibold text-lg">iArmy</span>
-        </a>
-        <div id="auth-buttons"></div>
-      </div>
-    </nav>
+  <!-- Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 
-    <section class="min-h-screen pt-32 px-6">
-      <div class="max-w-4xl mx-auto">
-        <div class="text-center mb-12">
-          <img id="profile-avatar" class="profile-avatar-large mx-auto" src="" alt="Avatar">
-          <h1 class="text-4xl font-bold mb-2" id="profile-name">Mon Compte</h1>
-          <p class="text-white/50" id="profile-email"></p>
-        </div>
-        
-        <div class="card">
-          <h2 class="text-2xl font-bold mb-6">Mes modules</h2>
-          <div class="space-y-4">
-            <div class="p-4 bg-white/5 rounded-xl">
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="font-semibold">🤖 Compta Express</h3>
-                  <p class="text-sm text-white/50">Robot comptable Telegram</p>
-                </div>
-                <a href="compta.html" class="btn-primary text-sm px-6 py-2">Configurer →</a>
-              </div>
-              <div id="compta-details" class="space-y-3 pt-4 border-t border-white/10" style="display: none;">
-                <div class="flex items-center justify-between">
-                  <span class="text-white/60 text-sm">📊 Google Sheet</span>
-                  <a id="sheet-link" href="#" target="_blank" class="text-sm text-green-400 hover:text-green-300 flex items-center gap-1">
-                    Ouvrir ↗
-                  </a>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-white/60 text-sm">📱 Telegram</span>
-                  <span id="telegram-status" class="text-sm text-white/40">Non connecté</span>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-white/60 text-sm">⚙️ Colonnes</span>
-                  <span id="config-columns" class="text-sm text-white/40">-</span>
-                </div>
-                <div class="pt-3 border-t border-white/10">
-                  <button onclick="openConfigEditor()" class="w-full block text-center py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-sm font-medium text-white/80 hover:text-white transition-all cursor-pointer">
-                    ✏️ Modifier la configuration
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card">
-          <h2 class="text-2xl font-bold mb-6">Paramètres</h2>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-              <div>
-                <h3 class="font-semibold">Connexion</h3>
-                <p class="text-sm text-white/50" id="provider-info">Google</p>
-              </div>
-              <span class="text-green-400 text-sm">✓ Actif</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Modal Éditeur de Configuration -->
-  <div id="config-modal" class="modal-overlay" onclick="if(event.target === this) closeConfigEditor()">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="text-xl font-bold">⚙️ Configuration Compta</h2>
-        <button class="modal-close" onclick="closeConfigEditor()">×</button>
-      </div>
-      <div class="modal-body">
-        <!-- Explication simple -->
-        <div style="background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
-          <div style="font-size: 13px; color: #FF8B5E; margin-bottom: 6px; font-weight: 600;">💡 Comment ça marche ?</div>
-          <div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5;">
-            Quand tu tapes <span style="color: #22C55E; font-weight: 500;">cb 1000 esp 500</span> sur Telegram, le bot écrit automatiquement les montants dans les bonnes colonnes de ton Excel.
-          </div>
-        </div>
-
-        <!-- Mots-clés -->
-        <div class="mb-6">
-          <div class="section-title">📝 Mots-clés → Colonnes Excel</div>
-          <p class="text-xs text-white/40 mb-3">Associe chaque mot-clé à une colonne de ton fichier</p>
-          <div id="keywords-list"></div>
-          <button class="btn-add" onclick="addKeyword()">+ Ajouter un mot-clé</button>
-        </div>
-
-        <!-- Règles de calcul -->
-        <div class="mb-6">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <div class="section-title" style="margin: 0;">🔢 Règles de calcul</div>
-            <span style="font-size: 10px; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; color: rgba(255,255,255,0.4);">optionnel</span>
-          </div>
-          <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
-            <div style="font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6;">
-              <strong style="color: rgba(255,255,255,0.7);">Exemple :</strong> Tu veux que les dépenses s'ajoutent aux espèces ?<br>
-              → Crée le mot-clé <span style="color: #FF6B35;">DEP</span> sans colonne, puis ajoute la règle <span style="color: #22C55E;">DEP + ESP → ESP</span><br>
-              → Quand tu tapes <span style="color: white;">esp 500 dep 100</span>, le bot écrira <span style="color: #22C55E;">600</span> dans ESP
-            </div>
-          </div>
-          <div id="rules-list"></div>
-          <button class="btn-add" onclick="addRule()">+ Ajouter une règle</button>
-        </div>
-
-        <!-- Toast -->
-        <div id="modal-toast" style="display: none; padding: 12px 16px; background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.3); border-radius: 10px; color: #22C55E; text-align: center; margin-bottom: 16px;"></div>
-
-        <!-- Bouton sauvegarder -->
-        <button class="btn-save" onclick="saveConfig()">💾 Sauvegarder</button>
-      </div>
+  <!-- Nav -->
+  <nav class="glass fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="logo-i">i</div>
+        <span class="font-semibold text-lg">iArmy</span>
+      </a>
+      <div id="auth-buttons"></div>
     </div>
-  </div>
+  </nav>
+
+  <!-- Content -->
+  <main class="relative z-10 pt-28 pb-16 px-6">
+    <div class="max-w-2xl mx-auto">
+
+      <!-- Profile Header -->
+      <div class="text-center mb-10">
+        <img id="profile-avatar" class="profile-avatar mx-auto mb-4" src="" alt="">
+        <h1 class="text-2xl font-bold mb-1" id="profile-name">-</h1>
+        <p class="text-sm text-white/40" id="profile-email">-</p>
+      </div>
+
+      <!-- Modules Section -->
+      <div class="mb-8">
+        <div class="section-label">Mes modules</div>
+
+        <!-- Module: Compta Express -->
+        <div class="glass-card module-card" id="module-compta">
+          <div class="module-header">
+            <div class="flex items-center gap-4">
+              <div class="module-icon">🤖</div>
+              <div>
+                <h3 class="font-semibold text-lg">Compta Express</h3>
+                <p class="text-sm text-white/40">Robot comptable Telegram</p>
+              </div>
+            </div>
+            <span class="module-badge" id="compta-badge">Actif</span>
+          </div>
+
+          <!-- Quick info -->
+          <div class="module-info" id="compta-info" style="display: none;">
+            <span>📊 <a id="sheet-link" href="#" target="_blank">Ouvrir le fichier</a></span>
+            <span class="info-dot"></span>
+            <span id="telegram-status">📱 Non connecté</span>
+            <span class="info-dot"></span>
+            <span id="config-keywords">⚙️ -</span>
+          </div>
+
+          <!-- Settings button -->
+          <a href="compta-settings.html" class="btn-settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Paramètres du module
+          </a>
+        </div>
+      </div>
+
+      <!-- Accès Section -->
+      <div class="mb-8">
+        <div class="section-label">Accès connectés</div>
+        <div class="glass-card" style="padding: 16px;">
+          <div class="access-item">
+            <div class="access-left">
+              <div class="access-icon google">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm">Google</div>
+                <div class="text-xs text-white/40" id="google-email">-</div>
+              </div>
+            </div>
+            <span class="access-status connected">Connecté</span>
+          </div>
+          <div class="access-item">
+            <div class="access-left">
+              <div class="access-icon telegram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#0088CC"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+              </div>
+              <div>
+                <div class="font-medium text-sm">Telegram</div>
+                <div class="text-xs text-white/40" id="telegram-user">-</div>
+              </div>
+            </div>
+            <span class="access-status pending" id="telegram-badge">En attente</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facturation Section -->
+      <div class="mb-8">
+        <div class="section-label">Facturation</div>
+        <div class="glass-card">
+          <div class="billing-placeholder">
+            <div class="billing-icon">💳</div>
+            <p class="font-medium mb-1">Bientôt disponible</p>
+            <p class="text-sm">Gérez vos abonnements ici</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
 
   <script>
-    console.log('[COMPTE] 🚀 Init');
-    
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
+
     async function init() {
-      console.log('[COMPTE] 🔍 Vérification session...');
-      
       const { data: { session } } = await supabaseClient.auth.getSession();
-      
+
       if (!session) {
-        console.log('[COMPTE] ❌ Non connecté, redirection...');
         window.location.href = 'index.html';
         return;
       }
-      
-      console.log('[COMPTE] ✅ Connecté:', session.user.email);
 
       const user = session.user;
       const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
       const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
-      const provider = user.app_metadata?.provider || 'email';
-      
-      // Afficher profil
+
+      // Profile
       document.getElementById('profile-avatar').src = userAvatar;
       document.getElementById('profile-name').textContent = userName;
       document.getElementById('profile-email').textContent = user.email;
-      document.getElementById('provider-info').textContent = provider === 'google' ? 'Google' : 'Email';
-      
-      // Navbar
+      document.getElementById('google-email').textContent = user.email;
+
+      // Nav
       document.getElementById('auth-buttons').innerHTML = `
         <div class="nav-user-section">
           <a href="compte.html" class="nav-profile">
@@ -206,287 +220,65 @@
             <span>${userName.split(' ')[0]}</span>
           </a>
           <button onclick="signOut()" class="btn-logout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-            <span>Déconnexion</span>
           </button>
         </div>
       `;
-      
-      // Créer profil si nécessaire
-      try {
-        const { error } = await supabaseClient.from('profiles').select('id').eq('id', user.id).single();
-        if (error && error.code === 'PGRST116') {
-          await supabaseClient.from('profiles').insert({ id: user.id, email: user.email, name: userName, plan: 'free' });
-        }
-      } catch (e) {}
 
-      // Charger les détails du module Compta
-      await loadComptaDetails(user.id);
+      // Load module data
+      await loadModuleData(user.id);
     }
 
-    async function loadComptaDetails(userId) {
+    async function loadModuleData(userId) {
       try {
-        // Récupérer la config utilisateur (avec sheet_id)
         const { data: config } = await supabaseClient
           .from('user_configs')
           .select('sheet_id, excel_config')
           .eq('user_id', userId)
           .single();
 
-        // Récupérer le statut Telegram
         const { data: telegramLink } = await supabaseClient
           .from('telegram_links')
           .select('telegram_user_id')
           .eq('user_id', userId)
           .maybeSingle();
 
-        // Afficher les détails si on a des données
+        // Show info if configured
         if (config?.sheet_id || telegramLink?.telegram_user_id) {
-          document.getElementById('compta-details').style.display = 'block';
+          document.getElementById('compta-info').style.display = 'flex';
 
-          // Google Sheet link
           if (config?.sheet_id) {
-            const sheetLink = document.getElementById('sheet-link');
-            sheetLink.href = 'https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit';
-            sheetLink.innerHTML = (config.excel_config?.onglet || 'Mon fichier') + ' ↗';
-          } else {
-            document.getElementById('sheet-link').parentElement.style.display = 'none';
+            document.getElementById('sheet-link').href = 'https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit';
           }
 
-          // Telegram status
           if (telegramLink?.telegram_user_id) {
-            document.getElementById('telegram-status').innerHTML = '<span class="text-green-400">✓ Connecté</span>';
+            document.getElementById('telegram-status').innerHTML = '📱 <span style="color: #22C55E;">Connecté</span>';
+            document.getElementById('telegram-user').textContent = 'ID: ' + telegramLink.telegram_user_id;
+            document.getElementById('telegram-badge').textContent = 'Connecté';
+            document.getElementById('telegram-badge').className = 'access-status connected';
           }
 
-          // Colonnes configurées
           if (config?.excel_config?.colonnes_a_remplir) {
             const cols = config.excel_config.colonnes_a_remplir.map(c => c.nom).join(', ');
-            document.getElementById('config-columns').innerHTML = '<span class="text-white/70">' + cols + '</span>';
+            document.getElementById('config-keywords').textContent = '⚙️ ' + cols;
           }
+        } else {
+          document.getElementById('compta-badge').textContent = 'À configurer';
+          document.getElementById('compta-badge').className = 'module-badge inactive';
         }
 
-        console.log('[COMPTE] Config loaded:', { sheetId: config?.sheet_id, telegram: !!telegramLink?.telegram_user_id });
       } catch (err) {
-        console.log('[COMPTE] No config found (normal for new users)');
+        console.log('No config found');
       }
     }
-    
+
     async function signOut() {
-      console.log('[COMPTE] 👋 Déconnexion...');
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
-    }
-
-    // ===== ÉDITEUR DE CONFIGURATION =====
-    let currentConfig = null;
-    let configKeywords = [];
-    let configRules = [];
-
-    async function openConfigEditor() {
-      console.log('[COMPTE] 📝 Ouverture éditeur config');
-
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) return;
-
-      // Charger la config existante
-      const { data: config } = await supabaseClient
-        .from('user_configs')
-        .select('sheet_id, excel_config')
-        .eq('user_id', session.user.id)
-        .single();
-
-      currentConfig = config;
-
-      // Charger les mots-clés
-      configKeywords = (config?.excel_config?.colonnes_a_remplir || []).map(c => ({
-        nom: c.nom,
-        colonne: c.colonne || '',
-        noteColumn: c.noteColumn || '',
-        aliases: c.aliases || []
-      }));
-
-      // Charger les règles
-      configRules = (config?.excel_config?.regles_calcul || []).map(r => ({
-        sources: r.sources || [],
-        operation: r.operation || 'add',
-        target: r.target || ''
-      }));
-
-      renderKeywords();
-      renderRules();
-      document.getElementById('config-modal').classList.add('active');
-    }
-
-    function closeConfigEditor() {
-      document.getElementById('config-modal').classList.remove('active');
-    }
-
-    function renderKeywords() {
-      const container = document.getElementById('keywords-list');
-      const columns = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-
-      container.innerHTML = configKeywords.map((kw, idx) => `
-        <div class="config-row" style="flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px;">
-            <input type="text" class="config-input" value="${kw.nom}" placeholder="Mot-clé (ex: CB)" onchange="updateKeyword(${idx}, 'nom', this.value)" style="flex: 1; min-width: 80px;">
-            <span style="color: rgba(255,255,255,0.3);">→</span>
-            <select class="config-select" onchange="updateKeyword(${idx}, 'colonne', this.value)" title="Colonne Excel où écrire">
-              <option value="" ${!kw.colonne ? 'selected' : ''}>Aucune</option>
-              ${columns.map(c => `<option value="${c}" ${kw.colonne === c ? 'selected' : ''}>Col ${c}</option>`).join('')}
-            </select>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <select class="config-select" onchange="updateKeyword(${idx}, 'noteColumn', this.value)" title="Colonne pour le motif/note (optionnel)" style="font-size: 12px; padding: 8px 10px; min-width: 90px; color: rgba(255,255,255,0.5);">
-              <option value="" ${!kw.noteColumn ? 'selected' : ''}>📝 Note</option>
-              ${columns.map(c => `<option value="${c}" ${kw.noteColumn === c ? 'selected' : ''}>Note → ${c}</option>`).join('')}
-            </select>
-            <button class="btn-delete" onclick="deleteKeyword(${idx})">✕</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderRules() {
-      const container = document.getElementById('rules-list');
-      const keywords = configKeywords.map(k => k.nom).filter(n => n);
-
-      if (configRules.length === 0) {
-        container.innerHTML = '<p class="text-white/30 text-sm text-center py-2">Aucune règle</p>';
-        return;
-      }
-
-      container.innerHTML = configRules.map((rule, idx) => `
-        <div class="rule-row">
-          <select class="config-select" onchange="updateRuleSource(${idx}, 0, this.value)" style="min-width: 70px;">
-            <option value="">...</option>
-            ${keywords.map(k => `<option value="${k}" ${rule.sources[0] === k ? 'selected' : ''}>${k}</option>`).join('')}
-          </select>
-          <span style="color: #FF6B35; font-weight: bold;">+</span>
-          <select class="config-select" onchange="updateRuleSource(${idx}, 1, this.value)" style="min-width: 70px;">
-            <option value="">...</option>
-            ${keywords.map(k => `<option value="${k}" ${rule.sources[1] === k ? 'selected' : ''}>${k}</option>`).join('')}
-          </select>
-          <span style="color: rgba(255,255,255,0.5);">→</span>
-          <select class="config-select" onchange="updateRuleTarget(${idx}, this.value)" style="min-width: 70px;">
-            <option value="">...</option>
-            ${keywords.map(k => `<option value="${k}" ${rule.target === k ? 'selected' : ''}>${k}</option>`).join('')}
-          </select>
-          <button class="btn-delete" onclick="deleteRule(${idx})">✕</button>
-        </div>
-      `).join('');
-    }
-
-    function addKeyword() {
-      configKeywords.push({ nom: '', colonne: '', noteColumn: '', aliases: [] });
-      renderKeywords();
-      renderRules(); // Mettre à jour les options des règles
-    }
-
-    function updateKeyword(idx, field, value) {
-      if (field === 'nom') {
-        configKeywords[idx][field] = value.toUpperCase();
-        // Auto-générer les aliases basiques
-        const nom = value.toUpperCase();
-        configKeywords[idx].aliases = [nom.toLowerCase()];
-        renderRules(); // Mettre à jour les options des règles
-      } else {
-        configKeywords[idx][field] = value;
-      }
-    }
-
-    function deleteKeyword(idx) {
-      configKeywords.splice(idx, 1);
-      renderKeywords();
-      renderRules();
-    }
-
-    function addRule() {
-      configRules.push({ sources: ['', ''], operation: 'add', target: '' });
-      renderRules();
-    }
-
-    function updateRuleSource(ruleIdx, sourceIdx, value) {
-      configRules[ruleIdx].sources[sourceIdx] = value;
-    }
-
-    function updateRuleTarget(ruleIdx, value) {
-      configRules[ruleIdx].target = value;
-    }
-
-    function deleteRule(idx) {
-      configRules.splice(idx, 1);
-      renderRules();
-    }
-
-    async function saveConfig() {
-      console.log('[COMPTE] 💾 Sauvegarde config...');
-
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) return;
-
-      // Filtrer les mots-clés vides
-      const validKeywords = configKeywords.filter(k => k.nom.trim() !== '');
-
-      // Filtrer les règles valides
-      const validRules = configRules.filter(r =>
-        r.sources[0] && r.sources[1] && r.target
-      );
-
-      // Construire la nouvelle config
-      const newExcelConfig = {
-        ...(currentConfig?.excel_config || {}),
-        colonnes_a_remplir: validKeywords.map(k => ({
-          nom: k.nom,
-          colonne: k.colonne || null,
-          noteColumn: k.noteColumn || null,
-          aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()]
-        })),
-        regles_calcul: validRules.map(r => ({
-          sources: r.sources,
-          operation: r.operation,
-          target: r.target
-        }))
-      };
-
-      // Sauvegarder
-      const { error } = await supabaseClient
-        .from('user_configs')
-        .update({
-          excel_config: newExcelConfig,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', session.user.id);
-
-      if (error) {
-        console.error('[COMPTE] Erreur sauvegarde:', error);
-        showModalToast('Erreur: ' + error.message, false);
-        return;
-      }
-
-      console.log('[COMPTE] ✅ Config sauvegardée');
-      showModalToast('Configuration sauvegardée !', true);
-
-      // Mettre à jour l'affichage des colonnes
-      const cols = validKeywords.map(c => c.nom).join(', ');
-      document.getElementById('config-columns').innerHTML = '<span class="text-white/70">' + cols + '</span>';
-
-      // Fermer après 1s
-      setTimeout(() => {
-        closeConfigEditor();
-      }, 1000);
-    }
-
-    function showModalToast(message, success) {
-      const toast = document.getElementById('modal-toast');
-      toast.textContent = message;
-      toast.style.display = 'block';
-      toast.style.background = success ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
-      toast.style.borderColor = success ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
-      toast.style.color = success ? '#22C55E' : '#ef4444';
     }
 
     document.addEventListener('DOMContentLoaded', init);

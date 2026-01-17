@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres Compta - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; overflow-x: hidden; }
+
+    /* Fond avec orbs plus lumineux */
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); animation: float 20s ease-in-out infinite; pointer-events: none; z-index: 0; }
+    .orb-1 { width: 600px; height: 600px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -200px; right: -100px; opacity: 0.2; }
+    .orb-2 { width: 500px; height: 500px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -150px; left: -100px; opacity: 0.15; animation-delay: -7s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(20px, -20px) scale(1.02); } }
+
+    /* Header */
+    .page-header { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .page-title { margin-top: 24px; }
+    .page-title h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .page-title p { color: rgba(255,255,255,0.4); font-size: 14px; }
+
+    /* Main content */
+    main { max-width: 600px; margin: 0 auto; padding: 32px 24px 80px; position: relative; z-index: 10; }
+
+    /* Section */
+    .section { margin-bottom: 40px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+    .section-badge { font-size: 10px; padding: 3px 8px; background: rgba(255,255,255,0.06); border-radius: 4px; color: rgba(255,255,255,0.4); }
+
+    /* Card */
+    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; }
+
+    /* Keyword row */
+    .keyword-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 10px; transition: all 0.2s; }
+    .keyword-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+    .keyword-name { flex: 1; min-width: 0; }
+    .keyword-name input { width: 100%; background: transparent; border: none; color: white; font-size: 15px; font-weight: 500; }
+    .keyword-name input:focus { outline: none; }
+    .keyword-name input::placeholder { color: rgba(255,255,255,0.3); }
+    .keyword-arrow { color: rgba(255,255,255,0.2); font-size: 14px; }
+    .keyword-col { display: flex; align-items: center; gap: 4px; }
+    .keyword-col select { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 12px; color: #FF8B5E; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .keyword-col select:focus { outline: none; }
+    .keyword-col select.empty { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
+    .keyword-note select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 10px; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; }
+    .keyword-note select:focus { outline: none; }
+    .keyword-delete { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; padding: 4px; font-size: 18px; transition: color 0.2s; }
+    .keyword-delete:hover { color: #ef4444; }
+
+    /* Add button */
+    .btn-add { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; background: transparent; border: 2px dashed rgba(255,255,255,0.1); border-radius: 14px; color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .btn-add:hover { border-color: rgba(255,107,53,0.4); color: #FF8B5E; background: rgba(255,107,53,0.05); }
+
+    /* Rule row */
+    .rule-row { display: flex; align-items: center; gap: 8px; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+    .rule-row select { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: white; font-size: 13px; cursor: pointer; min-width: 70px; }
+    .rule-row select:focus { outline: none; border-color: rgba(255,107,53,0.5); }
+    .rule-operator { color: #FF6B35; font-weight: 700; font-size: 16px; }
+    .rule-arrow { color: rgba(255,255,255,0.3); }
+
+    /* Info link */
+    .info-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 10px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.6); font-size: 14px; }
+    .info-value { color: #22C55E; font-size: 14px; }
+    .info-value a { color: #22C55E; text-decoration: none; }
+    .info-value a:hover { text-decoration: underline; }
+
+    /* Save button */
+    .save-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px 24px; background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); z-index: 100; }
+    .save-bar-inner { max-width: 600px; margin: 0 auto; display: flex; gap: 12px; }
+    .btn-save { flex: 1; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.4); }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Toast */
+    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px); padding: 14px 24px; background: rgba(34,197,94,0.95); border-radius: 12px; color: white; font-weight: 500; font-size: 14px; opacity: 0; transition: all 0.3s; z-index: 1000; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { background: rgba(239,68,68,0.95); }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 24px; color: rgba(255,255,255,0.3); font-size: 14px; }
+
+    /* Coming soon */
+    .coming-soon { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 40px; color: rgba(255,255,255,0.3); font-size: 14px; }
+    .coming-soon-icon { font-size: 24px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <!-- Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Header -->
+  <header class="page-header">
+    <a href="compte.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Retour au compte
+    </a>
+    <div class="page-title">
+      <h1>🤖 Compta Express</h1>
+      <p>Configure ton robot comptable</p>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+
+    <!-- Mots-clés -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Mots-clés Telegram</span>
+      </div>
+      <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">
+        Quand tu tapes un mot-clé + montant, le bot l'écrit dans la colonne correspondante.
+      </p>
+      <div id="keywords-list"></div>
+      <button class="btn-add" onclick="addKeyword()">+ Ajouter un mot-clé</button>
+    </div>
+
+    <!-- Règles de calcul -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Règles de calcul</span>
+        <span class="section-badge">optionnel</span>
+      </div>
+      <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 16px;">
+        Additionne automatiquement plusieurs mots-clés.
+      </p>
+      <div id="rules-list"></div>
+      <button class="btn-add" onclick="addRule()">+ Ajouter une règle</button>
+    </div>
+
+    <!-- Connexions -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Connexions</span>
+      </div>
+      <div class="card">
+        <div class="info-row">
+          <span class="info-label">
+            <span>📊</span>
+            Google Sheets
+          </span>
+          <span class="info-value" id="sheet-info">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">
+            <span>📱</span>
+            Telegram
+          </span>
+          <span class="info-value" id="telegram-info">Non connecté</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exports (coming soon) -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Exports PDF</span>
+        <span class="section-badge">bientôt</span>
+      </div>
+      <div class="card">
+        <div class="coming-soon">
+          <span class="coming-soon-icon">📄</span>
+          <span>Bientôt disponible</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Save bar -->
+  <div class="save-bar">
+    <div class="save-bar-inner">
+      <button class="btn-save" onclick="saveConfig()" id="btn-save">Sauvegarder</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentConfig = null;
+    let configKeywords = [];
+    let configRules = [];
+    const columns = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      await loadConfig(session.user.id);
+    }
+
+    async function loadConfig(userId) {
+      try {
+        const { data: config } = await supabaseClient
+          .from('user_configs')
+          .select('sheet_id, excel_config')
+          .eq('user_id', userId)
+          .single();
+
+        const { data: telegramLink } = await supabaseClient
+          .from('telegram_links')
+          .select('telegram_user_id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        currentConfig = config;
+
+        // Load keywords
+        configKeywords = (config?.excel_config?.colonnes_a_remplir || []).map(c => ({
+          nom: c.nom,
+          colonne: c.colonne || '',
+          noteColumn: c.noteColumn || '',
+          aliases: c.aliases || []
+        }));
+
+        // Load rules
+        configRules = (config?.excel_config?.regles_calcul || []).map(r => ({
+          sources: r.sources || [],
+          operation: r.operation || 'add',
+          target: r.target || ''
+        }));
+
+        // Update UI
+        renderKeywords();
+        renderRules();
+
+        // Connections info
+        if (config?.sheet_id) {
+          document.getElementById('sheet-info').innerHTML = `<a href="https://docs.google.com/spreadsheets/d/${config.sheet_id}/edit" target="_blank">Ouvrir ↗</a>`;
+        }
+
+        if (telegramLink?.telegram_user_id) {
+          document.getElementById('telegram-info').innerHTML = '<span style="color: #22C55E;">Connecté</span>';
+        }
+
+      } catch (err) {
+        console.log('No config');
+      }
+    }
+
+    function renderKeywords() {
+      const container = document.getElementById('keywords-list');
+
+      if (configKeywords.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucun mot-clé configuré</div>';
+        return;
+      }
+
+      container.innerHTML = configKeywords.map((kw, idx) => `
+        <div class="keyword-row">
+          <div class="keyword-name">
+            <input type="text" value="${kw.nom}" placeholder="Mot-clé" onchange="updateKeyword(${idx}, 'nom', this.value)">
+          </div>
+          <span class="keyword-arrow">→</span>
+          <div class="keyword-col">
+            <select onchange="updateKeyword(${idx}, 'colonne', this.value)" class="${!kw.colonne ? 'empty' : ''}">
+              <option value="" ${!kw.colonne ? 'selected' : ''}>Col</option>
+              ${columns.map(c => `<option value="${c}" ${kw.colonne === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="keyword-note">
+            <select onchange="updateKeyword(${idx}, 'noteColumn', this.value)">
+              <option value="" ${!kw.noteColumn ? 'selected' : ''}>📝</option>
+              ${columns.map(c => `<option value="${c}" ${kw.noteColumn === c ? 'selected' : ''}>📝${c}</option>`).join('')}
+            </select>
+          </div>
+          <button class="keyword-delete" onclick="deleteKeyword(${idx})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function renderRules() {
+      const container = document.getElementById('rules-list');
+      const keywords = configKeywords.map(k => k.nom).filter(n => n);
+
+      if (configRules.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune règle</div>';
+        return;
+      }
+
+      container.innerHTML = configRules.map((rule, idx) => `
+        <div class="rule-row">
+          <select onchange="updateRuleSource(${idx}, 0, this.value)">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.sources[0] === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <span class="rule-operator">+</span>
+          <select onchange="updateRuleSource(${idx}, 1, this.value)">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.sources[1] === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <span class="rule-arrow">→</span>
+          <select onchange="updateRuleTarget(${idx}, this.value)">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.target === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <button class="keyword-delete" onclick="deleteRule(${idx})">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addKeyword() {
+      configKeywords.push({ nom: '', colonne: '', noteColumn: '', aliases: [] });
+      renderKeywords();
+      renderRules();
+    }
+
+    function updateKeyword(idx, field, value) {
+      if (field === 'nom') {
+        configKeywords[idx][field] = value.toUpperCase();
+        configKeywords[idx].aliases = [value.toLowerCase()];
+        renderRules();
+      } else {
+        configKeywords[idx][field] = value;
+      }
+      // Update select style
+      renderKeywords();
+    }
+
+    function deleteKeyword(idx) {
+      configKeywords.splice(idx, 1);
+      renderKeywords();
+      renderRules();
+    }
+
+    function addRule() {
+      configRules.push({ sources: ['', ''], operation: 'add', target: '' });
+      renderRules();
+    }
+
+    function updateRuleSource(ruleIdx, sourceIdx, value) {
+      configRules[ruleIdx].sources[sourceIdx] = value;
+    }
+
+    function updateRuleTarget(ruleIdx, value) {
+      configRules[ruleIdx].target = value;
+    }
+
+    function deleteRule(idx) {
+      configRules.splice(idx, 1);
+      renderRules();
+    }
+
+    async function saveConfig() {
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      btn.textContent = 'Sauvegarde...';
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      const validKeywords = configKeywords.filter(k => k.nom.trim() !== '');
+      const validRules = configRules.filter(r => r.sources[0] && r.sources[1] && r.target);
+
+      const newExcelConfig = {
+        ...(currentConfig?.excel_config || {}),
+        colonnes_a_remplir: validKeywords.map(k => ({
+          nom: k.nom,
+          colonne: k.colonne || null,
+          noteColumn: k.noteColumn || null,
+          aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()]
+        })),
+        regles_calcul: validRules.map(r => ({
+          sources: r.sources,
+          operation: r.operation,
+          target: r.target
+        }))
+      };
+
+      const { error } = await supabaseClient
+        .from('user_configs')
+        .update({
+          excel_config: newExcelConfig,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', session.user.id);
+
+      btn.disabled = false;
+      btn.textContent = 'Sauvegarder';
+
+      if (error) {
+        showToast('Erreur: ' + error.message, true);
+        return;
+      }
+
+      showToast('Configuration sauvegardée');
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(() => toast.className = 'toast', 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
