@@ -27,37 +27,36 @@
     .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; display: flex; align-items: center; }
     .btn-logout:hover { opacity: 0.8; }
 
-    .container { max-width: 360px; margin: 0 auto; padding: 90px 16px 40px; position: relative; z-index: 10; }
+    .container { max-width: 320px; margin: 0 auto; padding: 90px 20px 40px; position: relative; z-index: 10; }
 
-    /* Profile - compact */
-    .profile-box { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 14px; }
-    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); flex-shrink: 0; }
+    /* Profile - compact inline */
+    .profile-box { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .profile-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); flex-shrink: 0; }
     .profile-info { flex: 1; min-width: 0; }
-    .profile-name { font-size: 14px; font-weight: 600; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .profile-email { font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-name { font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-email { font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Section */
-    .section-title { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Modules Grid - petits carrés */
-    .modules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-    .module-card { background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 14px; padding: 14px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; }
-    .module-card:hover { transform: scale(1.03); border-color: rgba(255,107,53,0.5); box-shadow: 0 8px 20px rgba(255,107,53,0.2); }
-    .module-icon { font-size: 28px; margin-bottom: 8px; }
-    .module-name { font-size: 11px; font-weight: 600; text-align: center; margin-bottom: 4px; }
-    .module-badge { font-size: 8px; padding: 2px 6px; background: rgba(34,197,94,0.2); color: #4ade80; border-radius: 10px; }
-    .module-badge.inactive { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+    /* Modules Grid - PETITS carrés fixes */
+    .modules-grid { display: flex; gap: 12px; margin-bottom: 24px; }
+    .module-card { width: 80px; height: 80px; background: linear-gradient(135deg, rgba(255,107,53,0.12) 0%, rgba(255,107,53,0.03) 100%); border: 1px solid rgba(255,107,53,0.3); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; }
+    .module-card:hover { transform: scale(1.05); border-color: rgba(255,107,53,0.6); box-shadow: 0 6px 16px rgba(255,107,53,0.25); }
+    .module-icon { font-size: 24px; margin-bottom: 4px; }
+    .module-name { font-size: 10px; font-weight: 600; }
+    .module-badge { display: none; }
 
     /* Coming soon */
-    .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); opacity: 0.5; pointer-events: none; }
+    .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); opacity: 0.4; pointer-events: none; }
 
-    /* Infos row - compact */
-    .info-row { display: flex; gap: 8px; margin-bottom: 20px; }
-    .info-box { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; text-align: center; }
-    .info-box.active { border-color: rgba(34,197,94,0.25); }
-    .info-icon { font-size: 14px; margin-bottom: 3px; }
-    .info-label { font-size: 9px; color: rgba(255,255,255,0.4); }
-    .info-status { font-size: 8px; color: #4ade80; font-weight: 600; margin-top: 2px; }
+    /* Infos row - compact chips */
+    .info-row { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+    .info-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
+    .info-box.active { border-color: rgba(34,197,94,0.3); }
+    .info-icon { font-size: 12px; }
+    .info-label { font-size: 9px; color: rgba(255,255,255,0.5); }
+    .info-status { font-size: 9px; color: #4ade80; font-weight: 600; }
     .info-status.pending { color: rgba(255,255,255,0.25); }
 
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
@@ -103,33 +102,23 @@
       </div>
     </div>
 
-    <!-- Connexions - compact row -->
+    <!-- Connexions - chips inline -->
     <div class="section-title">Connexions</div>
     <div class="info-row">
       <div class="info-box active">
-        <div class="info-icon">🔗</div>
-        <div class="info-label">Google</div>
-        <div class="info-status">✓</div>
+        <span class="info-icon">🔗</span>
+        <span class="info-label">Google</span>
+        <span class="info-status">✓</span>
       </div>
       <div class="info-box" id="telegram-conn">
-        <div class="info-icon">📱</div>
-        <div class="info-label">Telegram</div>
-        <div class="info-status pending" id="telegram-status">-</div>
+        <span class="info-icon">📱</span>
+        <span class="info-label">Telegram</span>
+        <span class="info-status pending" id="telegram-status">-</span>
       </div>
       <div class="info-box" id="sheet-conn">
-        <div class="info-icon">📊</div>
-        <div class="info-label">Sheets</div>
-        <div class="info-status pending" id="sheet-status">-</div>
-      </div>
-    </div>
-
-    <!-- Facturation - compact -->
-    <div class="section-title">Facturation</div>
-    <div class="info-row">
-      <div class="info-box" style="opacity: 0.5;">
-        <div class="info-icon">💳</div>
-        <div class="info-label">Abonnement</div>
-        <div class="info-status pending">Bientôt</div>
+        <span class="info-icon">📊</span>
+        <span class="info-label">Sheets</span>
+        <span class="info-status pending" id="sheet-status">-</span>
       </div>
     </div>
   </div>
