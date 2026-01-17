@@ -4156,20 +4156,24 @@ DEP 100</div>
         regles: []  // User can add rules later in settings
       };
 
-      // Save to database
-      var { error: saveError } = await supabaseClient.from('compta_configs').upsert({
+      // Save to user_configs
+      var { error: saveError } = await supabaseClient.from('user_configs').upsert({
         user_id: currentUser.id,
         sheet_id: result.sheet.id,
-        sheet_name: result.sheet.name,
-        config: defaultConfig,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        excel_config: defaultConfig,
+        is_active: true
       }, { onConflict: 'user_id' });
 
       if (saveError) throw saveError;
 
+      // Also update google_credentials with sheet info
+      await supabaseClient.from('google_credentials').update({
+        sheet_id: result.sheet.id,
+        sheet_name: result.sheet.name
+      }).eq('user_id', currentUser.id);
+
       hideLoader();
-      showToast('Modele cree avec succes !');
+      showToast('Fichier cree !');
       goToStep(4);
     }
     // ========== END EMPTY TEMPLATE FLOW ==========
