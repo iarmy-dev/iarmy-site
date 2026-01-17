@@ -809,76 +809,112 @@
         <h1 class="text-3xl font-bold mb-3">Comment veux-tu commencer ?</h1>
         <p class="text-white/40 mb-8">Choisis l'option qui te convient</p>
 
-        <!-- Option 1: Fichier vierge (RECOMMANDÉ) -->
-        <div class="glass-card p-8 mb-5 max-w-lg mx-auto" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-2xl">+</div>
+        <!-- Option 1: Créer mon fichier (RECOMMANDÉ) -->
+        <div class="glass-card p-6 mb-5 max-w-2xl mx-auto" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-xl">+</div>
             <div>
-              <h3 class="text-xl font-semibold">Partir de zero</h3>
+              <h3 class="text-lg font-semibold">Creer mon fichier</h3>
               <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">RECOMMANDE</span>
             </div>
           </div>
-          <p class="text-white/50 mb-3 text-sm leading-relaxed">On te cree un Google Sheet avec tes colonnes :</p>
 
-          <!-- Colonnes interactives : drag pour réordonner, double-clic pour modifier, × pour supprimer -->
-          <div class="flex flex-wrap gap-2 mb-3" id="template-columns" ondragover="dragColOver(event)" ondrop="dragColEnd(event)">
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">Date</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">CB</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">Especes</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">Ticket Resto</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">Depenses</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <span class="template-col group px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 flex items-center gap-2 transition-all hover:border-white/20 cursor-grab active:cursor-grabbing" draggable="true" ondragstart="dragColStart(event)" ondragover="dragColOver(event)" ondragend="dragColEnd(event)">
-              <svg class="drag-handle opacity-30 group-hover:opacity-60 flex-shrink-0" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-              <span class="col-name" ondblclick="editColName(this)">Notes</span>
-              <button class="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400" onclick="event.stopPropagation(); removeTemplateCol(this)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </span>
-            <!-- Input pour ajouter colonne (caché par défaut) -->
-            <div id="add-col-input" class="hidden">
-              <input type="text" id="new-col-name" class="px-3 py-1.5 rounded-lg text-xs bg-white/10 border border-orange-500/50 text-white outline-none w-24" placeholder="Nom..." maxlength="20" onkeydown="handleNewColKey(event)" onblur="cancelAddCol()">
+          <!-- Preview côte à côte -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            <!-- Telegram Preview -->
+            <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 rounded-full bg-[#2AABEE] flex items-center justify-content-center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white" class="mx-auto"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+                </div>
+                <span class="text-xs text-white/50">Telegram</span>
+              </div>
+              <!-- Input test -->
+              <div class="mb-3">
+                <input type="text" id="tpl-test-input" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-[#2AABEE]/50" placeholder="Teste: cb 450 esp 120 tr 80" oninput="updateTemplatePreview()">
+              </div>
+              <!-- Messages -->
+              <div class="space-y-2" id="tpl-telegram-preview">
+                <div class="bg-[#2AABEE]/20 rounded-lg rounded-bl-sm px-3 py-2 text-xs text-white/70 max-w-[85%]">
+                  Tape un message ci-dessus...
+                </div>
+              </div>
             </div>
-            <!-- Bouton ajouter colonne -->
-            <button id="add-col-btn" onclick="showAddColInput()" class="px-3 py-1.5 rounded-lg text-xs border border-dashed border-white/20 text-white/40 hover:border-orange-500/50 hover:text-orange-400 hover:bg-orange-500/5 transition-all flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Ajouter
-            </button>
+
+            <!-- Sheet Preview -->
+            <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded bg-[#0F9D58] flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="white" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="white" stroke-width="1.5"/></svg>
+                  </div>
+                  <span class="text-xs text-white/50">Google Sheet</span>
+                </div>
+                <span class="text-xs text-white/30">double-clic = renommer</span>
+              </div>
+              <!-- Table preview -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs" id="tpl-sheet-preview">
+                  <thead>
+                    <tr id="tpl-sheet-headers" class="bg-[#FF6B35]">
+                      <!-- Headers générés dynamiquement -->
+                    </tr>
+                  </thead>
+                  <tbody id="tpl-sheet-body" class="text-white/60">
+                    <!-- Rows générées dynamiquement -->
+                  </tbody>
+                </table>
+              </div>
+              <p class="text-white/20 text-xs mt-2 flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="5" cy="12" r="2"/></svg>
+                Glisse les colonnes pour reordonner
+              </p>
+            </div>
           </div>
 
-          <p class="text-white/30 text-xs mb-5 flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            Glisse pour reordonner, double-clic pour modifier
-          </p>
+          <!-- Options -->
+          <div class="flex flex-wrap items-center gap-4 mb-5">
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-white/50">Commencer en:</label>
+              <select id="tpl-start-month" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none cursor-pointer" onchange="updateTemplatePreview()">
+                <option value="1">Janvier</option>
+                <option value="2">Fevrier</option>
+                <option value="3">Mars</option>
+                <option value="4">Avril</option>
+                <option value="5">Mai</option>
+                <option value="6">Juin</option>
+                <option value="7">Juillet</option>
+                <option value="8">Aout</option>
+                <option value="9">Septembre</option>
+                <option value="10">Octobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Decembre</option>
+              </select>
+              <select id="tpl-start-year" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none cursor-pointer">
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Règles (optionnel, plié par défaut) -->
+          <details class="mb-5">
+            <summary class="cursor-pointer text-xs text-white/40 hover:text-white/60 flex items-center gap-2">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Regles avancees (optionnel)
+            </summary>
+            <div class="mt-3 p-3 bg-white/5 rounded-lg">
+              <p class="text-xs text-white/40 mb-2">Ex: Depenses s'ajoutent aux Especes</p>
+              <div id="tpl-rules-list" class="space-y-2">
+                <!-- Règles ajoutées ici -->
+              </div>
+              <button onclick="addTemplateRule()" class="mt-2 text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ajouter une regle
+              </button>
+            </div>
+          </details>
+
           <button onclick="createEmptyTemplate()" class="btn-glow w-full">
             Creer mon fichier
           </button>
@@ -1479,6 +1515,7 @@ DEP 100</div>
       document.querySelectorAll('.step-content').forEach(function(c) { c.classList.remove('active'); });
       document.getElementById('step-choice').classList.add('active');
       updateSidebarStep(2); // Étape 2 = Ton fichier (après Google connecté)
+      initTemplatePreview(); // Init interactive preview
     }
 
     async function checkGoogleSheetsAccess() {
@@ -3346,6 +3383,7 @@ DEP 100</div>
         // Étape 1 = Connexion Google
         if (hasGoogleSheetsAccess) {
           document.getElementById('step-choice').classList.add('active');
+          initTemplatePreview();
         } else {
           document.getElementById('step-auth').classList.add('active');
         }
@@ -3353,6 +3391,7 @@ DEP 100</div>
       } else if (stepNum === 2) {
         // Étape 2 = Choix du fichier
         document.getElementById('step-choice').classList.add('active');
+        initTemplatePreview();
         updateSidebarStep(2);
       } else if (stepNum === 3) {
         // Étape 3 = Analyse (page intégrée)
@@ -3947,14 +3986,217 @@ DEP 100</div>
       input.select();
     }
 
+    // ========== TEMPLATE PREVIEW SYSTEM ==========
+    var tplColumns = ['Date', 'CB', 'ESP', 'TR', 'RAZ', 'Notes'];
+    var tplRules = [];
+    var tplDragIndex = -1;
+
     function getTemplateColumns() {
-      var cols = [];
-      document.querySelectorAll('#template-columns .template-col .col-name').forEach(function(span) {
-        var text = span.textContent.trim();
-        if (text) cols.push(text);
-      });
-      return cols;
+      return tplColumns.slice(); // Return copy of array
     }
+
+    function initTemplatePreview() {
+      // Set current month
+      var now = new Date();
+      var monthSelect = document.getElementById('tpl-start-month');
+      var yearSelect = document.getElementById('tpl-start-year');
+      if (monthSelect) monthSelect.value = now.getMonth() + 1;
+      if (yearSelect) yearSelect.value = now.getFullYear();
+
+      renderTemplatePreview();
+    }
+
+    function renderTemplatePreview() {
+      var headersRow = document.getElementById('tpl-sheet-headers');
+      var tbody = document.getElementById('tpl-sheet-body');
+      if (!headersRow || !tbody) return;
+
+      // Render headers
+      var headersHtml = '';
+      tplColumns.forEach(function(col, i) {
+        var isDate = col.toLowerCase() === 'date';
+        headersHtml += '<th class="px-2 py-1.5 text-white font-semibold text-left whitespace-nowrap ' + (isDate ? '' : 'cursor-grab') + '" ' +
+          'draggable="' + (!isDate) + '" ' +
+          'ondragstart="tplDragStart(event, ' + i + ')" ' +
+          'ondragover="tplDragOver(event, ' + i + ')" ' +
+          'ondrop="tplDrop(event, ' + i + ')" ' +
+          'ondblclick="tplRenameCol(' + i + ')">' +
+          '<div class="flex items-center gap-1">' +
+          (!isDate ? '<span class="opacity-40 text-[10px]">⋮⋮</span>' : '') +
+          '<span class="tpl-col-name">' + col + '</span>' +
+          (!isDate ? '<button onclick="event.stopPropagation();tplRemoveCol(' + i + ')" class="opacity-0 hover:opacity-100 text-white/40 hover:text-red-400 ml-1">×</button>' : '') +
+          '</div></th>';
+      });
+      // Add column button
+      headersHtml += '<th class="px-2 py-1.5"><button onclick="tplAddCol()" class="text-white/50 hover:text-white text-lg">+</button></th>';
+      headersRow.innerHTML = headersHtml;
+
+      // Render sample rows
+      var month = parseInt(document.getElementById('tpl-start-month')?.value || 1);
+      var year = parseInt(document.getElementById('tpl-start-year')?.value || 2025);
+      var daysInMonth = new Date(year, month, 0).getDate();
+
+      var rowsHtml = '';
+      // Show first 3 days + ... + total
+      for (var d = 1; d <= Math.min(3, daysInMonth); d++) {
+        rowsHtml += '<tr class="border-t border-white/5">';
+        tplColumns.forEach(function(col, i) {
+          var val = '';
+          if (col.toLowerCase() === 'date') {
+            val = (d < 10 ? '0' : '') + d + '/' + (month < 10 ? '0' : '') + month;
+          }
+          rowsHtml += '<td class="px-2 py-1 tpl-cell" data-col="' + i + '">' + val + '</td>';
+        });
+        rowsHtml += '<td></td></tr>';
+      }
+      // Ellipsis row
+      rowsHtml += '<tr class="border-t border-white/5 text-white/30"><td class="px-2 py-1">...</td>';
+      for (var i = 1; i < tplColumns.length; i++) rowsHtml += '<td></td>';
+      rowsHtml += '<td></td></tr>';
+      // Total row
+      rowsHtml += '<tr class="border-t border-white/10 font-semibold bg-white/5">';
+      tplColumns.forEach(function(col, i) {
+        var val = col.toLowerCase() === 'date' ? 'TOTAL' : '=SUM';
+        rowsHtml += '<td class="px-2 py-1">' + val + '</td>';
+      });
+      rowsHtml += '<td></td></tr>';
+
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function updateTemplatePreview() {
+      var input = document.getElementById('tpl-test-input');
+      var tgPreview = document.getElementById('tpl-telegram-preview');
+      if (!input || !tgPreview) return;
+
+      var text = input.value.trim();
+      if (!text) {
+        tgPreview.innerHTML = '<div class="bg-[#2AABEE]/20 rounded-lg rounded-bl-sm px-3 py-2 text-xs text-white/70 max-w-[85%]">Tape un message ci-dessus...</div>';
+        // Clear cell highlights
+        document.querySelectorAll('.tpl-cell').forEach(function(c) { c.textContent = ''; c.classList.remove('bg-green-500/20'); });
+        renderTemplatePreview();
+        return;
+      }
+
+      // Parse the message
+      var parsed = {};
+      tplColumns.forEach(function(col) {
+        if (col.toLowerCase() === 'date' || col.toLowerCase() === 'notes') return;
+        var regex = new RegExp('\\b' + col.toLowerCase() + '\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
+        var match = text.toLowerCase().match(regex);
+        if (match) {
+          parsed[col] = parseFloat(match[1].replace(',', '.'));
+        }
+      });
+
+      // Apply rules
+      tplRules.forEach(function(rule) {
+        if (rule.src1 && rule.src2 && rule.target) {
+          var v1 = parsed[rule.src1] || 0;
+          var v2 = parsed[rule.src2] || 0;
+          if (v1 > 0 || v2 > 0) {
+            parsed[rule.target] = (parsed[rule.target] || 0) + v1 + v2;
+          }
+        }
+      });
+
+      // Show Telegram preview
+      var parsedList = Object.keys(parsed).map(function(k) { return k + ': ' + parsed[k] + '€'; }).join('<br>');
+      tgPreview.innerHTML =
+        '<div class="bg-white/10 rounded-lg rounded-br-sm px-3 py-2 text-xs text-white max-w-[85%] ml-auto">' + text + '</div>' +
+        '<div class="bg-[#2AABEE]/20 rounded-lg rounded-bl-sm px-3 py-2 text-xs text-white/90 max-w-[85%] mt-2">' +
+        '<div class="text-green-400 mb-1">✓ Enregistre !</div>' +
+        (parsedList || '<span class="text-white/40">Aucun mot-cle detecte</span>') +
+        '</div>';
+
+      // Update sheet preview cells (first data row)
+      renderTemplatePreview();
+      setTimeout(function() {
+        var firstRowCells = document.querySelectorAll('#tpl-sheet-body tr:first-child .tpl-cell');
+        firstRowCells.forEach(function(cell) {
+          var colIndex = parseInt(cell.dataset.col);
+          var colName = tplColumns[colIndex];
+          if (parsed[colName]) {
+            cell.textContent = parsed[colName] + '€';
+            cell.classList.add('bg-green-500/20', 'text-green-400');
+          }
+        });
+      }, 10);
+    }
+
+    function tplAddCol() {
+      var name = prompt('Nom de la colonne:');
+      if (name && name.trim()) {
+        tplColumns.push(name.trim());
+        renderTemplatePreview();
+      }
+    }
+
+    function tplRemoveCol(index) {
+      if (tplColumns[index].toLowerCase() === 'date') return;
+      tplColumns.splice(index, 1);
+      renderTemplatePreview();
+    }
+
+    function tplRenameCol(index) {
+      var current = tplColumns[index];
+      var newName = prompt('Nouveau nom:', current);
+      if (newName && newName.trim() && newName !== current) {
+        tplColumns[index] = newName.trim();
+        renderTemplatePreview();
+      }
+    }
+
+    function tplDragStart(e, index) {
+      if (tplColumns[index].toLowerCase() === 'date') { e.preventDefault(); return; }
+      tplDragIndex = index;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function tplDragOver(e, index) {
+      e.preventDefault();
+      if (tplDragIndex === -1 || index === 0) return;
+    }
+
+    function tplDrop(e, targetIndex) {
+      e.preventDefault();
+      if (tplDragIndex === -1 || targetIndex === 0 || tplDragIndex === targetIndex) {
+        tplDragIndex = -1;
+        return;
+      }
+      var col = tplColumns.splice(tplDragIndex, 1)[0];
+      tplColumns.splice(targetIndex, 0, col);
+      tplDragIndex = -1;
+      renderTemplatePreview();
+    }
+
+    function addTemplateRule() {
+      var cols = tplColumns.filter(function(c) { return c.toLowerCase() !== 'date' && c.toLowerCase() !== 'notes'; });
+      if (cols.length < 2) { alert('Il faut au moins 2 colonnes'); return; }
+
+      tplRules.push({ src1: '', src2: '', target: '' });
+      renderTemplateRules();
+    }
+
+    function renderTemplateRules() {
+      var container = document.getElementById('tpl-rules-list');
+      if (!container) return;
+
+      var cols = tplColumns.filter(function(c) { return c.toLowerCase() !== 'date' && c.toLowerCase() !== 'notes'; });
+      var opts = '<option value="">...</option>' + cols.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+
+      container.innerHTML = tplRules.map(function(rule, i) {
+        return '<div class="flex items-center gap-2 text-xs">' +
+          '<select class="bg-white/10 border border-white/10 rounded px-2 py-1 text-white" onchange="tplRules[' + i + '].src1=this.value">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
+          '<span class="text-orange-400">+</span>' +
+          '<select class="bg-white/10 border border-white/10 rounded px-2 py-1 text-white" onchange="tplRules[' + i + '].src2=this.value">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
+          '<span class="text-white/40">→</span>' +
+          '<select class="bg-white/10 border border-white/10 rounded px-2 py-1 text-white" onchange="tplRules[' + i + '].target=this.value">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
+          '<button onclick="tplRules.splice(' + i + ',1);renderTemplateRules()" class="text-red-400 hover:text-red-300">×</button>' +
+          '</div>';
+      }).join('');
+    }
+    // ========== END TEMPLATE PREVIEW ==========
 
     async function createEmptyTemplate() {
       var { data: { session } } = await supabaseClient.auth.getSession();
@@ -3966,9 +4208,13 @@ DEP 100</div>
         return;
       }
 
+      // Get selected month and year
+      var startMonth = parseInt(document.getElementById('tpl-start-month')?.value || (new Date().getMonth() + 1));
+      var startYear = parseInt(document.getElementById('tpl-start-year')?.value || new Date().getFullYear());
+
       showLoader('Creation du modele vierge...');
 
-      console.log('[COMPTA] Creating template with columns:', columns);
+      console.log('[COMPTA] Creating template with columns:', columns, 'month:', startMonth, 'year:', startYear);
 
       // Create a new Google Sheet with custom columns
       var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
@@ -3980,7 +4226,8 @@ DEP 100</div>
         },
         body: JSON.stringify({
           templateType: 'compta',
-          year: new Date().getFullYear(),
+          year: startYear,
+          startMonth: startMonth,
           customColumns: columns  // Pass user's custom columns
         })
       });
@@ -4005,13 +4252,17 @@ DEP 100</div>
         }
       });
 
+      // Build rules from user's custom rules
+      var regles = tplRules.filter(function(r) { return r.src1 && r.src2 && r.target; });
+
       var defaultConfig = {
-        onglet: 'Recettes ' + new Date().getFullYear(),
+        onglet: 'Recettes ' + startYear,
         ligne_entetes: 1,
         premiere_ligne_donnees: 2,
         colonne_date: 'A',
         format_date: 'DD/MM/YYYY',
-        colonnes_a_remplir: colonnesARemplir
+        colonnes_a_remplir: colonnesARemplir,
+        regles: regles  // User's custom rules (e.g., DEP + ESP → ESP)
       };
 
       // Save to database
