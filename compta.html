@@ -4108,6 +4108,8 @@ DEP 100</div>
 
     async function createEmptyTemplate() {
       var { data: { session } } = await supabaseClient.auth.getSession();
+      console.log('[COMPTA] Session:', session);
+      console.log('[COMPTA] Access token:', session?.access_token?.substring(0, 50) + '...');
       if (!session) throw new Error('Session expirée');
 
       // Default columns for standard restaurant accounting
