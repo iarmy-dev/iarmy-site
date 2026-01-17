@@ -939,169 +939,79 @@
         </div>
 
         <!-- Config Editor (hidden until loaded) -->
-        <div id="config-editor-main" style="display: none; max-width: 1100px; margin: 0 auto;">
+        <div id="config-editor-main" style="display: none; max-width: 600px; margin: 0 auto;">
 
-          <!-- Main content: Phone + Excel côte à côte -->
-          <div style="display: grid; grid-template-columns: 280px 1fr; gap: 32px; margin-bottom: 28px; align-items: start;">
+          <!-- TABLEAU EXCEL ÉDITABLE -->
+          <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+            <!-- Header avec nom du fichier -->
+            <div style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="white" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="white" stroke-width="1.5"/></svg>
+              <span id="sheet-editor-name" style="font-weight: 600; font-size: 14px;">Mon fichier</span>
+              <a id="open-sheet-link" href="#" target="_blank" style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.7); text-decoration: none;">Ouvrir ↗</a>
+            </div>
 
-            <!-- GAUCHE: iPhone avec Telegram -->
+            <!-- Tableau éditable avec fade -->
             <div style="position: relative;">
-              <!-- iPhone Frame -->
-              <div style="background: #1a1a1a; border-radius: 40px; padding: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.4), inset 0 0 0 2px #333;">
-                <!-- Notch -->
-                <div style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 80px; height: 24px; background: #1a1a1a; border-radius: 0 0 14px 14px; z-index: 10;"></div>
-
-                <!-- Screen -->
-                <div style="background: #0e1621; border-radius: 32px; overflow: hidden; min-height: 420px;">
-                  <!-- Telegram Header -->
-                  <div style="background: #17212b; padding: 40px 12px 12px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">i</div>
-                    <div>
-                      <div style="font-weight: 600; font-size: 14px;">iArmy Bot</div>
-                      <div style="font-size: 11px; color: #6ab3f3;">en ligne</div>
-                    </div>
-                  </div>
-
-                  <!-- Chat Area -->
-                  <div style="padding: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end;">
-                    <!-- User Message Bubble -->
-                    <div style="align-self: flex-end; max-width: 85%;">
-                      <div style="background: #2b5278; border-radius: 16px 16px 4px 16px; padding: 10px 14px;">
-                        <div id="preview-message-content" style="font-size: 13px; line-height: 1.5; white-space: pre-line; color: white;">CB 1000
-ESP 500
-TR 50
-DEP 100</div>
-                        <div style="font-size: 10px; color: rgba(255,255,255,0.4); text-align: right; margin-top: 4px;">14:32 ✓✓</div>
-                      </div>
-                    </div>
-
-                    <!-- Bot Response -->
-                    <div style="align-self: flex-start; max-width: 85%; margin-top: 12px;">
-                      <div style="background: #182533; border-radius: 16px 16px 16px 4px; padding: 10px 14px;">
-                        <div style="font-size: 12px; color: #22C55E;">✓ Données enregistrées !</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Input Bar -->
-                  <div style="padding: 8px 12px; background: #17212b; display: flex; align-items: center; gap: 8px;">
-                    <div style="flex: 1; background: #242f3d; border-radius: 20px; padding: 8px 14px; font-size: 12px; color: rgba(255,255,255,0.4);">Message...</div>
-                    <div style="width: 32px; height: 32px; background: #2b5278; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Label sous le téléphone -->
-              <div style="text-align: center; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4);">
-                📱 Ton message Telegram
-              </div>
+              <table id="sheet-editor-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                  <tr id="sheet-editor-headers" style="background: rgba(255,107,53,0.15);">
+                    <!-- Headers générés par JS -->
+                  </tr>
+                </thead>
+                <tbody id="sheet-editor-body">
+                  <!-- Rows générées par JS -->
+                </tbody>
+              </table>
+              <!-- Effet fade en bas -->
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, transparent, #030303); pointer-events: none;"></div>
             </div>
 
-            <!-- DROITE: Mini Excel complet -->
-            <div style="flex: 1;">
-              <!-- Excel Frame -->
-              <div style="background: #1e1e1e; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
-                <!-- Excel Header Bar -->
-                <div style="background: #217346; padding: 8px 12px; display: flex; align-items: center; gap: 8px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.08V19.92Q22 20.26 21.76 20.5 21.5 20.75 21.17 20.75H7.83Q7.5 20.75 7.24 20.5 7 20.26 7 19.92V17H2.83Q2.5 17 2.24 16.76 2 16.5 2 16.17V7.83Q2 7.5 2.24 7.24 2.5 7 2.83 7H7V4.08Q7 3.74 7.24 3.5 7.5 3.25 7.83 3.25M7 13.06L8.18 15.28H9.97L8 12.06L9.93 8.89H8.22L7.13 10.9L7.09 10.96L7.06 11.03Q6.8 10.5 6.5 9.96 6.25 9.43 5.97 8.89H4.16L6.05 12.08L4 15.28H5.78M13.88 19.5V17H8.25V19.5M13.88 15.75V12.63H12V15.75M13.88 11.38V8.25H12V11.38M13.88 7V4.5H8.25V7M20.75 19.5V17H15.13V19.5M20.75 15.75V12.63H15.13V15.75M20.75 11.38V8.25H15.13V11.38M20.75 7V4.5H15.13V7Z"/></svg>
-                  <span id="excel-filename" style="font-size: 12px; font-weight: 500; color: white;">recette 25.xlsx</span>
-                  <div style="margin-left: auto; display: flex; gap: 4px;">
-                    <div style="width: 10px; height: 10px; background: #ff5f57; border-radius: 50%;"></div>
-                    <div style="width: 10px; height: 10px; background: #ffbd2e; border-radius: 50%;"></div>
-                    <div style="width: 10px; height: 10px; background: #28ca42; border-radius: 50%;"></div>
-                  </div>
-                </div>
-
-                <!-- Excel Grid Container -->
-                <div id="excel-grid-container" style="overflow-x: auto; max-height: 320px; overflow-y: auto;">
-                  <!-- Le tableau sera généré dynamiquement par buildExcelPreview() -->
-                  <table id="excel-preview-table" style="width: 100%; border-collapse: collapse; font-size: 11px; min-width: 500px;">
-                  </table>
-                </div>
-
-                <!-- Excel Footer avec onglets -->
-                <div style="background: #2d2d2d; padding: 6px 12px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #404040;">
-                  <div id="excel-sheet-tab" style="background: #217346; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; color: white; margin-bottom: -6px; font-weight: 500;">janv</div>
-                  <div style="background: #3d3d3d; padding: 4px 10px; border-radius: 4px 4px 0 0; font-size: 10px; color: #888; margin-bottom: -6px;">+ autres</div>
-                  <a id="open-sheet-link" href="#" target="_blank" style="margin-left: auto; font-size: 10px; color: #6ab3f3; text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                    Ouvrir dans Google Sheets ↗
-                  </a>
-                </div>
-              </div>
-
-              <!-- Indicateur de zone - simplifié, tooltip discret -->
-              <div id="excel-zone-indicator" style="display: none; margin-top: 8px;">
-                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(34, 197, 94, 0.08); border-radius: 6px; cursor: help;" title="Ton fichier a des colonnes avec formules (protégées) et des colonnes de saisie (où tu écris)">
-                  <span style="font-size: 10px;">✓</span>
-                  <span class="zone-desc" style="font-size: 10px; color: rgba(34, 197, 94, 0.8);">Colonnes de saisie détectées</span>
-                </div>
-              </div>
+            <!-- Instructions -->
+            <div style="padding: 12px 16px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 16px; font-size: 11px; color: rgba(255,255,255,0.4);">
+              <span>✏️ Clic = renommer</span>
+              <span>↔️ Glisser = réordonner</span>
+              <span>➕ Ajouter colonne</span>
             </div>
           </div>
 
-          <!-- Explication -->
-          <div style="text-align: center; padding: 20px 0 16px 0; color: rgba(255,255,255,0.5); font-size: 14px;">
-            👆 Quand tu envoies un message Telegram, les valeurs s'écrivent automatiquement dans ton tableau
+          <!-- PREVIEW TELEGRAM -->
+          <div class="glass-card" style="padding: 16px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+              <div style="width: 24px; height: 24px; background: #2AABEE; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+              </div>
+              <span style="font-size: 13px; font-weight: 500;">Teste ton bot</span>
+            </div>
+            <!-- Input de test -->
+            <input type="text" id="telegram-test-input" placeholder="Ex: cb 450 esp 120 tr 80" oninput="updateTelegramPreview()" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 14px; color: white; font-size: 13px; outline: none; margin-bottom: 12px;" onfocus="this.style.borderColor='rgba(42,171,238,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            <!-- Preview du résultat -->
+            <div id="telegram-preview-result" style="background: rgba(42,171,238,0.1); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: rgba(255,255,255,0.7); min-height: 40px;">
+              <span style="color: rgba(255,255,255,0.4);">Tape un message pour voir le résultat...</span>
+            </div>
           </div>
 
-          <!-- Boutons principaux avec effets glass -->
-          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-            <button onclick="toggleConfigPanel()" id="btn-modify-config" style="flex: 1; padding: 16px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; color: rgba(255,255,255,0.8); font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)';this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 10px rgba(0,0,0,0.2)';this.style.borderColor='rgba(255,255,255,0.12)'">
-              <span style="font-size: 18px;">⚙️</span> Modifier
-            </button>
-            <button onclick="saveConfigEditor()" id="btn-validate-config" style="flex: 2; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(34, 197, 94, 0.5)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(34, 197, 94, 0.3)'">
-              ✓ C'est parfait ! Continuer →
-            </button>
-          </div>
-
-          <!-- Panel de configuration (caché par défaut) - LIQUID GLASS -->
-          <div id="config-panel" style="display: none; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
-
-            <!-- Configuration des mots-clés - GLASS EFFECT -->
-            <div class="glass-config-section" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s ease;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <span style="font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 0.5px;">Mots-clés</span>
-                <button onclick="addConfigRow()" class="glass-btn-add" style="padding: 6px 14px; background: rgba(255,107,53,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: rgba(255,107,53,0.8); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,107,53,0.1);" onmouseover="this.style.background='rgba(255,107,53,0.2)';this.style.boxShadow='0 4px 16px rgba(255,107,53,0.2)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(255,107,53,0.1)';this.style.boxShadow='0 2px 8px rgba(255,107,53,0.1)';this.style.transform='translateY(0)'">
-                  + nouveau
-                </button>
+          <!-- RÈGLES (accordion) -->
+          <details class="glass-card" style="padding: 0; margin-bottom: 24px;">
+            <summary style="padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;"><path d="M9 18l6-6-6-6"/></svg>
+              Règles avancées
+              <span style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.3);">optionnel</span>
+            </summary>
+            <div style="padding: 0 16px 16px 16px;">
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: Les dépenses s'ajoutent aux espèces</p>
+              <div id="rules-editor-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                <!-- Règles générées par JS -->
               </div>
-
-              <div id="config-editor-rows" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- Les rows seront générées dynamiquement -->
-              </div>
-            </div>
-
-            <!-- Section règles de calcul - GLASS EFFECT -->
-            <div class="glass-config-section" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s ease;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                <span style="font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 0.5px;">Règles</span>
-                <button onclick="addCustomRule()" class="glass-btn-add" style="padding: 6px 14px; background: rgba(255,107,53,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: rgba(255,107,53,0.8); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(255,107,53,0.1);" onmouseover="this.style.background='rgba(255,107,53,0.2)';this.style.boxShadow='0 4px 16px rgba(255,107,53,0.2)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(255,107,53,0.1)';this.style.boxShadow='0 2px 8px rgba(255,107,53,0.1)';this.style.transform='translateY(0)'">
-                  + nouvelle
-                </button>
-              </div>
-
-              <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- Les règles seront générées dynamiquement -->
-              </div>
-
-              <!-- Message si pas de règles -->
-              <div id="no-rules-message" style="color: rgba(255,255,255,0.35); font-size: 11px; padding: 12px; text-align: center; font-style: italic;">
-                Combine des valeurs (ex: DEP + ESP → ESP)
-              </div>
-            </div>
-
-            <!-- Boutons bas du panel - GLASS -->
-            <div style="display: flex; gap: 12px; padding-top: 6px;">
-              <button onclick="closeConfigEditor()" style="padding: 12px 18px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.5); font-size: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.8)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.color='rgba(255,255,255,0.5)';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(0,0,0,0.2)'">
-                ← Autre fichier
-              </button>
-              <button onclick="saveConfigEditor()" style="margin-left: auto; padding: 12px 20px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); backdrop-filter: blur(10px); border: 1px solid rgba(34,197,94,0.25); border-radius: 12px; color: #4ade80; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(34,197,94,0.15);" onmouseover="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.15))';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(34,197,94,0.25)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08))';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(34,197,94,0.15)'">
-                💾 Sauvegarder
+              <button onclick="addEditorRule()" style="padding: 8px 14px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: #FF8B5E; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.2)'" onmouseout="this.style.background='rgba(255,107,53,0.1)'">
+                + Ajouter une règle
               </button>
             </div>
-          </div>
+          </details>
+
+          <!-- BOUTON CONTINUER -->
+          <button onclick="saveAndContinue()" class="btn-glow" style="width: 100%; padding: 16px; font-size: 15px;">
+            Continuer →
+          </button>
         </div>
       </div>
 
@@ -2437,15 +2347,268 @@ DEP 100</div>
 
     function showAnalyseResult(config) {
       pendingConfig = config;
-      console.log('[ANALYSE] Showing result, opening config editor:', config);
+      console.log('[ANALYSE] Showing result with config:', config);
 
-      // Cacher le loading et afficher directement l'éditeur de config
+      // Cacher le loading et afficher l'éditeur
       document.getElementById('config-loading').style.display = 'none';
       document.getElementById('config-editor-main').style.display = 'block';
 
-      // Initialiser et ouvrir l'éditeur
-      openConfigEditor();
+      // Initialiser le nouvel éditeur de tableau
+      initSheetEditor(config);
     }
+
+    // ========== NOUVEL ÉDITEUR DE TABLEAU ==========
+    var sheetEditorColumns = [];
+    var sheetEditorRules = [];
+    var sheetDragIndex = -1;
+
+    function initSheetEditor(config) {
+      console.log('[SHEET EDITOR] Init with config:', config);
+
+      // Extraire les colonnes de la config
+      sheetEditorColumns = [{ name: 'Date', editable: false }];
+      if (config && config.colonnes_a_remplir) {
+        config.colonnes_a_remplir.forEach(function(col) {
+          sheetEditorColumns.push({ name: col.nom, colonne: col.colonne, aliases: col.aliases || [] });
+        });
+      }
+      sheetEditorColumns.push({ name: 'Notes', editable: false });
+
+      // Extraire les règles
+      sheetEditorRules = (config && config.regles) ? config.regles.slice() : [];
+
+      // Mettre à jour le nom du fichier
+      var nameEl = document.getElementById('sheet-editor-name');
+      var linkEl = document.getElementById('open-sheet-link');
+      if (nameEl && excelData) nameEl.textContent = excelData.fileName || 'Mon fichier';
+      if (linkEl && excelData && excelData.webViewLink) linkEl.href = excelData.webViewLink;
+
+      // Rendre le tableau
+      renderSheetEditor();
+      renderEditorRules();
+    }
+
+    function renderSheetEditor() {
+      var headersRow = document.getElementById('sheet-editor-headers');
+      var tbody = document.getElementById('sheet-editor-body');
+      if (!headersRow || !tbody) return;
+
+      // Générer les headers
+      var headersHtml = '';
+      sheetEditorColumns.forEach(function(col, i) {
+        var isFixed = col.name === 'Date' || col.name === 'Notes';
+        headersHtml += '<th style="padding: 10px 12px; text-align: left; font-weight: 600; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); ' + (isFixed ? '' : 'cursor: grab;') + '" ' +
+          'draggable="' + (!isFixed) + '" ' +
+          'ondragstart="sheetDragStart(event, ' + i + ')" ' +
+          'ondragover="sheetDragOver(event)" ' +
+          'ondrop="sheetDrop(event, ' + i + ')" ' +
+          'onclick="sheetRenameCol(' + i + ')">' +
+          '<span class="col-name">' + col.name + '</span>' +
+          (!isFixed ? '<button onclick="event.stopPropagation();sheetRemoveCol(' + i + ')" style="margin-left: 8px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 14px; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity=1;this.style.color=\'#ef4444\'" onmouseout="this.style.opacity=0;this.style.color=\'rgba(255,255,255,0.3)\'">×</button>' : '') +
+          '</th>';
+      });
+      // Bouton ajouter
+      headersHtml += '<th style="padding: 10px 8px; text-align: center;"><button onclick="sheetAddCol()" style="background: rgba(255,107,53,0.2); border: none; border-radius: 6px; color: #FF8B5E; padding: 4px 10px; cursor: pointer; font-size: 12px;">+</button></th>';
+      headersRow.innerHTML = headersHtml;
+
+      // Générer les lignes de données (exemples)
+      var now = new Date();
+      var month = now.getMonth() + 1;
+      var rowsHtml = '';
+      for (var d = 1; d <= 5; d++) {
+        var opacity = d <= 2 ? 1 : (d === 3 ? 0.6 : (d === 4 ? 0.3 : 0.15));
+        rowsHtml += '<tr style="opacity: ' + opacity + ';">';
+        sheetEditorColumns.forEach(function(col, i) {
+          var val = '';
+          if (col.name === 'Date') {
+            val = (d < 10 ? '0' : '') + d + '/' + (month < 10 ? '0' : '') + month;
+          }
+          rowsHtml += '<td style="padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);">' + val + '</td>';
+        });
+        rowsHtml += '<td></td></tr>';
+      }
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function sheetAddCol() {
+      var name = prompt('Nom de la colonne:');
+      if (name && name.trim()) {
+        // Insérer avant Notes
+        var insertIndex = sheetEditorColumns.length - 1;
+        sheetEditorColumns.splice(insertIndex, 0, { name: name.trim(), colonne: '', aliases: [name.trim().toLowerCase()] });
+        renderSheetEditor();
+        updateTelegramPreview();
+      }
+    }
+
+    function sheetRemoveCol(index) {
+      if (sheetEditorColumns[index].name === 'Date' || sheetEditorColumns[index].name === 'Notes') return;
+      if (confirm('Supprimer la colonne "' + sheetEditorColumns[index].name + '" ?')) {
+        sheetEditorColumns.splice(index, 1);
+        renderSheetEditor();
+        updateTelegramPreview();
+      }
+    }
+
+    function sheetRenameCol(index) {
+      var col = sheetEditorColumns[index];
+      if (col.name === 'Date' || col.name === 'Notes') return;
+      var newName = prompt('Nouveau nom:', col.name);
+      if (newName && newName.trim() && newName !== col.name) {
+        col.name = newName.trim();
+        col.aliases = [newName.trim().toLowerCase()];
+        renderSheetEditor();
+        updateTelegramPreview();
+      }
+    }
+
+    function sheetDragStart(e, index) {
+      if (sheetEditorColumns[index].name === 'Date' || sheetEditorColumns[index].name === 'Notes') {
+        e.preventDefault();
+        return;
+      }
+      sheetDragIndex = index;
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function sheetDragOver(e) {
+      e.preventDefault();
+    }
+
+    function sheetDrop(e, targetIndex) {
+      e.preventDefault();
+      if (sheetDragIndex === -1 || sheetDragIndex === targetIndex) {
+        sheetDragIndex = -1;
+        return;
+      }
+      // Ne pas déplacer vers Date ou Notes
+      if (sheetEditorColumns[targetIndex].name === 'Date' || sheetEditorColumns[targetIndex].name === 'Notes') {
+        sheetDragIndex = -1;
+        return;
+      }
+      var col = sheetEditorColumns.splice(sheetDragIndex, 1)[0];
+      sheetEditorColumns.splice(targetIndex, 0, col);
+      sheetDragIndex = -1;
+      renderSheetEditor();
+      updateTelegramPreview();
+    }
+
+    function updateTelegramPreview() {
+      var input = document.getElementById('telegram-test-input');
+      var result = document.getElementById('telegram-preview-result');
+      if (!input || !result) return;
+
+      var text = input.value.trim();
+      if (!text) {
+        result.innerHTML = '<span style="color: rgba(255,255,255,0.4);">Tape un message pour voir le résultat...</span>';
+        return;
+      }
+
+      // Parser le message
+      var parsed = {};
+      sheetEditorColumns.forEach(function(col) {
+        if (col.name === 'Date' || col.name === 'Notes') return;
+        var aliases = col.aliases || [col.name.toLowerCase()];
+        aliases.forEach(function(alias) {
+          var regex = new RegExp('\\b' + alias + '\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
+          var match = text.match(regex);
+          if (match) {
+            parsed[col.name] = parseFloat(match[1].replace(',', '.'));
+          }
+        });
+      });
+
+      // Appliquer les règles
+      sheetEditorRules.forEach(function(rule) {
+        if (rule.src1 && rule.src2 && rule.target) {
+          var v1 = parsed[rule.src1] || 0;
+          var v2 = parsed[rule.src2] || 0;
+          if (v1 > 0 || v2 > 0) {
+            parsed[rule.target] = (parsed[rule.target] || 0) + v1 + v2;
+          }
+        }
+      });
+
+      // Afficher le résultat
+      var keys = Object.keys(parsed);
+      if (keys.length === 0) {
+        result.innerHTML = '<span style="color: #f59e0b;">⚠️ Aucun mot-clé reconnu</span>';
+      } else {
+        var html = '<span style="color: #22c55e;">✓ Enregistré :</span><br>';
+        keys.forEach(function(k) {
+          html += '<span style="margin-left: 8px;">' + k + ': ' + parsed[k] + '€</span><br>';
+        });
+        result.innerHTML = html;
+      }
+    }
+
+    function addEditorRule() {
+      sheetEditorRules.push({ src1: '', src2: '', target: '' });
+      renderEditorRules();
+    }
+
+    function renderEditorRules() {
+      var container = document.getElementById('rules-editor-list');
+      if (!container) return;
+
+      var cols = sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; });
+      var opts = '<option value="">...</option>' + cols.map(function(c) { return '<option value="' + c.name + '">' + c.name + '</option>'; }).join('');
+
+      container.innerHTML = sheetEditorRules.map(function(rule, i) {
+        return '<div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">' +
+          '<select onchange="sheetEditorRules[' + i + '].src1=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
+          '<span style="color: #FF8B5E;">+</span>' +
+          '<select onchange="sheetEditorRules[' + i + '].src2=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
+          '<span style="color: rgba(255,255,255,0.4);">→</span>' +
+          '<select onchange="sheetEditorRules[' + i + '].target=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
+          '<button onclick="sheetEditorRules.splice(' + i + ',1);renderEditorRules()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">×</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    function saveAndContinue() {
+      // Construire la config à partir de l'éditeur
+      var colLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      var colonnesARemplir = [];
+      sheetEditorColumns.forEach(function(col, i) {
+        if (col.name !== 'Date' && col.name !== 'Notes') {
+          colonnesARemplir.push({
+            nom: col.name,
+            colonne: colLetters[i],
+            aliases: col.aliases || [col.name.toLowerCase()]
+          });
+        }
+      });
+
+      var configToSave = {
+        user_id: currentUser.id,
+        sheet_id: excelData?.sheetId,
+        excel_config: {
+          onglet: pendingConfig?.onglet || 'Recettes ' + new Date().getFullYear(),
+          ligne_entetes: pendingConfig?.ligne_entetes || 1,
+          premiere_ligne_donnees: pendingConfig?.premiere_ligne_donnees || 2,
+          colonne_date: 'A',
+          format_date: 'DD/MM/YYYY',
+          colonnes_a_remplir: colonnesARemplir,
+          regles: sheetEditorRules.filter(function(r) { return r.src1 && r.src2 && r.target; })
+        },
+        is_active: true
+      };
+
+      console.log('[SHEET EDITOR] Saving config:', configToSave);
+
+      supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' })
+        .then(function(result) {
+          if (result.error) {
+            console.error('[SHEET EDITOR] Save error:', result.error);
+            alert('Erreur: ' + result.error.message);
+            return;
+          }
+          console.log('[SHEET EDITOR] Config saved!');
+          goToStep(4);
+        });
+    }
+    // ========== FIN NOUVEL ÉDITEUR ==========
 
     // ========== CONFIG EDITOR FUNCTIONS ==========
     var configEditorData = [];
