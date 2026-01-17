@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paramètres Compta - iArmy</title>
+  <title>Réglages Compta - iArmy</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
     .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -22,144 +22,131 @@
     .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
     .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
-    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
 
-    .container { max-width: 500px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; }
+    .nav-user-section { display: flex; align-items: center; gap: 10px; }
+    .nav-profile { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration: none; color: white; font-weight: 500; font-size: 13px; transition: all 0.2s; }
+    .nav-profile:hover { background: rgba(255,255,255,0.08); }
+    .nav-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+
+    .container { max-width: 400px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; }
 
     /* Loading */
-    .loading-overlay { position: fixed; inset: 0; background: rgba(3,3,3,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,107,53,0.2); border-top-color: #FF6B35; border-radius: 50%; animation: spin 1s linear infinite; }
+    .loading-overlay { position: fixed; inset: 0; background: rgba(3,3,3,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid rgba(255,107,53,0.2); border-top-color: #FF6B35; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Preview Card */
-    .preview-card { background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 2px solid rgba(255,107,53,0.25); border-radius: 20px; padding: 20px; margin-bottom: 28px; }
-    .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .preview-title { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
-    .preview-badge { font-size: 9px; padding: 3px 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 20px; color: #4ade80; display: none; }
-    .preview-badge.show { display: inline-block; }
-    .preview-input { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 15px; font-family: inherit; margin-bottom: 16px; }
+    /* Header page */
+    .page-header { text-align: center; margin-bottom: 24px; }
+    .page-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .page-subtitle { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+    /* Preview Card - compact */
+    .preview-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
+    .preview-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 14px; color: white; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
     .preview-input:focus { outline: none; border-color: #FF6B35; }
-    .preview-input::placeholder { color: rgba(255,255,255,0.3); }
-    .preview-row { display: flex; gap: 12px; }
-    .preview-box { flex: 1; background: rgba(0,0,0,0.3); border-radius: 14px; padding: 14px; min-height: 80px; }
-    .preview-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .tg-bubble { background: #2AABEE; padding: 10px 14px; border-radius: 16px 16px 16px 4px; font-size: 14px; display: inline-block; max-width: 100%; word-break: break-word; }
-    .sheet-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .sheet-col { background: rgba(15,157,88,0.25); color: #4ade80; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; min-width: 24px; text-align: center; }
-    .sheet-val { color: white; font-weight: 600; font-size: 14px; }
-    .sheet-note { color: rgba(255,255,255,0.4); font-size: 11px; font-style: italic; }
-    .sheet-rule { background: rgba(255,107,53,0.1); border: 1px dashed rgba(255,107,53,0.3); border-radius: 8px; padding: 6px 10px; margin-top: 8px; font-size: 11px; color: #FF8B5E; }
-    .empty-state { color: rgba(255,255,255,0.25); font-size: 13px; }
+    .preview-input::placeholder { color: rgba(255,255,255,0.25); }
+    .preview-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .preview-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; }
+    .preview-label { font-size: 9px; color: rgba(255,255,255,0.35); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .tg-bubble { background: #2AABEE; padding: 8px 12px; border-radius: 12px 12px 12px 4px; font-size: 13px; display: inline-block; }
+    .sheet-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .sheet-col { font-size: 10px; font-weight: 700; color: #4ade80; }
+    .sheet-val { color: white; font-weight: 600; font-size: 13px; }
+    .empty-state { color: rgba(255,255,255,0.2); font-size: 12px; }
 
     /* Section */
-    .section { margin-bottom: 24px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .section-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-    .section-badge { font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.06); border-radius: 4px; color: rgba(255,255,255,0.3); text-transform: none; letter-spacing: 0; }
-    .section-count { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .section { margin-bottom: 20px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .section-title { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-count { font-size: 10px; color: rgba(255,255,255,0.25); }
+    .section-badge { font-size: 8px; padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 4px; color: rgba(255,255,255,0.3); margin-left: 6px; }
 
-    /* Keywords list */
-    .kw-list { display: flex; flex-direction: column; gap: 8px; }
-    .kw-row { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 14px; transition: all 0.2s; }
-    .kw-row:hover { border-color: rgba(255,255,255,0.12); }
-    .kw-row.incomplete { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.03); }
-    .kw-name { background: none; border: none; color: white; font-weight: 600; font-size: 15px; width: 70px; font-family: inherit; }
-    .kw-name:focus { outline: none; }
-    .kw-name::placeholder { color: rgba(255,255,255,0.2); }
-    .kw-arrow { color: rgba(255,255,255,0.2); font-size: 12px; }
-    .kw-select { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 6px 10px; color: #FF8B5E; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; min-width: 50px; }
-    .kw-select:focus { outline: none; }
-    .kw-select.empty { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.3); }
-    .kw-note { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 6px 8px; color: rgba(255,255,255,0.4); font-size: 11px; font-family: inherit; cursor: pointer; }
-    .kw-note.active { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #4ade80; }
-    .kw-del { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; padding: 4px; margin-left: auto; transition: color 0.2s; }
+    /* Keywords grid - 2 colonnes */
+    .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kw-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; position: relative; transition: all 0.2s; }
+    .kw-card:hover { border-color: rgba(255,255,255,0.12); }
+    .kw-card.incomplete { border-color: rgba(239,68,68,0.3); }
+    .kw-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .kw-name-input { background: none; border: none; color: white; font-weight: 700; font-size: 15px; width: 60px; font-family: inherit; }
+    .kw-name-input:focus { outline: none; }
+    .kw-name-input::placeholder { color: rgba(255,255,255,0.2); }
+    .kw-del { background: none; border: none; color: rgba(255,255,255,0.15); cursor: pointer; font-size: 14px; padding: 2px; }
     .kw-del:hover { color: #ef4444; }
-    .kw-hint { font-size: 10px; color: rgba(255,255,255,0.25); margin-left: 4px; }
+    .kw-bottom { display: flex; align-items: center; gap: 6px; }
+    .kw-arrow { color: rgba(255,255,255,0.15); font-size: 10px; }
+    .kw-col-select { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.25); border-radius: 6px; padding: 4px 8px; color: #FF8B5E; font-size: 11px; font-weight: 600; font-family: inherit; cursor: pointer; }
+    .kw-col-select:focus { outline: none; }
+    .kw-col-select.empty { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.25); }
+    .kw-note-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 4px 6px; color: rgba(255,255,255,0.3); font-size: 10px; font-family: inherit; cursor: pointer; }
+    .kw-note-select.active { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #4ade80; }
 
-    .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 8px; }
+    .btn-add { width: 100%; padding: 10px; background: transparent; border: 1px dashed rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.3); font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 8px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
 
-    /* Rules */
-    .rule-row { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; flex-wrap: wrap; transition: all 0.2s; }
-    .rule-row:hover { border-color: rgba(255,255,255,0.12); }
-    .rule-select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; color: white; font-size: 12px; font-family: inherit; cursor: pointer; }
+    /* Rules - compact */
+    .rule-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .rule-select { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: white; font-size: 11px; font-family: inherit; cursor: pointer; }
     .rule-select:focus { outline: none; border-color: #FF6B35; }
-    .rule-op { color: #FF6B35; font-weight: 700; }
-    .rule-arrow { color: rgba(255,255,255,0.25); }
-    .rule-help { width: 100%; font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 4px; font-style: italic; }
+    .rule-op { color: #FF6B35; font-weight: 700; font-size: 12px; }
+    .rule-arrow { color: rgba(255,255,255,0.2); font-size: 10px; }
 
-    /* Connexions */
-    .conn-list { display: flex; flex-direction: column; gap: 8px; }
-    .conn-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px 16px; }
-    .conn-left { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-    .conn-status { font-size: 12px; color: #4ade80; font-weight: 500; }
+    /* Connexions - compact */
+    .conn-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; }
+    .conn-label { font-size: 13px; }
+    .conn-status { font-size: 11px; color: #4ade80; font-weight: 500; }
     .conn-status a { color: inherit; text-decoration: none; }
     .conn-status a:hover { text-decoration: underline; }
-    .conn-status.pending { color: rgba(255,255,255,0.3); }
+    .conn-status.pending { color: rgba(255,255,255,0.25); }
 
-    /* Save */
-    .btn-save { width: 100%; padding: 16px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: inherit; margin-top: 8px; position: relative; overflow: hidden; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(34,197,94,0.3); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
-    .btn-save.saving { pointer-events: none; }
-    .btn-save.saving::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 1.5s infinite; }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    /* Save button */
+    .btn-save { width: 100%; padding: 14px; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; border-radius: 12px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: inherit; }
+    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* Toast */
-    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 12px 24px; background: #22C55E; border-radius: 12px; color: white; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 1000; }
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 10px 20px; background: #22C55E; border-radius: 10px; color: white; font-size: 13px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 1000; }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.error { background: #ef4444; }
 
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: #FF8B5E; }
-
-    @media (max-width: 500px) { .preview-row { flex-direction: column; } }
   </style>
 </head>
 <body class="bg-gradient-animate">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Loading -->
   <div class="loading-overlay" id="loading">
     <div class="loading-spinner"></div>
   </div>
 
   <nav class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-      <a href="compte.html" class="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Retour
-      </a>
-      <a href="index.html" class="flex items-center gap-3">
+      <a href="compte.html" class="flex items-center gap-3">
         <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
-      <a href="compte.html">
-        <img src="" class="nav-avatar" id="nav-avatar" alt="">
-      </a>
+      <div id="auth-section"></div>
     </div>
   </nav>
 
   <div class="container">
-    <h1 style="font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 6px;">Compta Express</h1>
-    <p style="font-size: 13px; color: rgba(255,255,255,0.4); text-align: center; margin-bottom: 28px;">Configure ton robot comptable</p>
+    <div class="page-header">
+      <div class="page-title">Compta Express</div>
+      <div class="page-subtitle">Configure ton robot</div>
+    </div>
 
-    <!-- Live Preview -->
+    <!-- Preview -->
     <div class="preview-card">
-      <div class="preview-header">
-        <span class="preview-title">Testeur en direct</span>
-        <span class="preview-badge" id="rule-badge">Regle appliquee</span>
-      </div>
-      <input type="text" class="preview-input" id="test-input" placeholder="Teste : cb 1200 esp 800 (achat pain) tr 150" oninput="updatePreview()">
+      <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100" oninput="updatePreview()">
       <div class="preview-row">
         <div class="preview-box">
           <div class="preview-label">Telegram</div>
-          <div id="preview-tg"><span class="empty-state">Tape un message...</span></div>
+          <div id="preview-tg"><span class="empty-state">...</span></div>
         </div>
         <div class="preview-box">
-          <div class="preview-label">Google Sheets</div>
-          <div id="preview-sheet"><span class="empty-state">Resultat ici</span></div>
+          <div class="preview-label">Sheet</div>
+          <div id="preview-sheet"><span class="empty-state">...</span></div>
         </div>
       </div>
     </div>
@@ -168,47 +155,45 @@
     <div class="section">
       <div class="section-header">
         <div class="section-title">Mots-cles</div>
-        <span class="section-count" id="kw-count">0 configures</span>
+        <span class="section-count" id="kw-count">0</span>
       </div>
-      <div class="kw-list" id="kw-list"></div>
-      <button class="btn-add" onclick="addKw()">+ Ajouter un mot-cle</button>
+      <div class="kw-grid" id="kw-grid"></div>
+      <button class="btn-add" onclick="addKw()">+ Ajouter</button>
     </div>
 
     <!-- Rules -->
     <div class="section">
       <div class="section-header">
-        <div class="section-title">Regles de calcul <span class="section-badge">optionnel</span></div>
-        <span class="section-count" id="rules-count">0 regles</span>
+        <div class="section-title">Regles<span class="section-badge">optionnel</span></div>
+        <span class="section-count" id="rules-count">0</span>
       </div>
       <div id="rules-list"></div>
-      <button class="btn-add" onclick="addRule()">+ Ajouter une regle</button>
+      <button class="btn-add" onclick="addRule()">+ Ajouter</button>
     </div>
 
     <!-- Connexions -->
     <div class="section">
       <div class="section-title">Connexions</div>
-      <div class="conn-list">
-        <div class="conn-row">
-          <div class="conn-left">Google Sheets</div>
-          <div class="conn-status pending" id="info-sheet">-</div>
-        </div>
-        <div class="conn-row">
-          <div class="conn-left">Telegram</div>
-          <div class="conn-status pending" id="info-tg">-</div>
-        </div>
+      <div class="conn-row">
+        <span class="conn-label">Google Sheets</span>
+        <span class="conn-status pending" id="info-sheet">-</span>
+      </div>
+      <div class="conn-row">
+        <span class="conn-label">Telegram</span>
+        <span class="conn-status pending" id="info-tg">-</span>
       </div>
     </div>
 
     <button class="btn-save" id="save-btn" onclick="saveConfig()">Sauvegarder</button>
   </div>
 
-  <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
-    <div style="display: flex; justify-content: center; gap: 24px; font-size: 13px;">
+  <footer style="padding: 24px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
+    <div style="display: flex; justify-content: center; gap: 20px; font-size: 12px;">
       <a href="index.html">Accueil</a>
       <a href="compte.html">Compte</a>
       <a href="mailto:contact@iarmy.fr">Contact</a>
     </div>
-    <p style="color: rgba(255,255,255,0.25); font-size: 11px; text-align: center; margin-top: 12px;">2026 iArmy</p>
+    <p style="color: rgba(255,255,255,0.2); font-size: 10px; text-align: center; margin-top: 10px;">2026 iArmy</p>
   </footer>
 
   <div class="toast" id="toast"></div>
@@ -218,14 +203,26 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let config = null, keywords = [], rules = [];
+    let config = null, keywords = [], rules = [], sheetHeaders = {};
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) { location.href = 'index.html'; return; }
-      const avatar = session.user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${session.user.email}&background=FF6B35&color=fff`;
-      document.getElementById('nav-avatar').src = avatar;
+
+      const user = session.user;
+      const userName = user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || 'User';
+      const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
+
+      document.getElementById('auth-section').innerHTML = `
+        <div class="nav-user-section">
+          <a href="compte.html" class="nav-profile">
+            <img src="${userAvatar}" class="nav-avatar">
+            <span>${userName}</span>
+          </a>
+        </div>
+      `;
+
       await loadConfig(session.user.id);
       document.getElementById('loading').style.display = 'none';
     }
@@ -235,8 +232,24 @@
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
       config = cfg;
-      keywords = (cfg?.excel_config?.colonnes_a_remplir || []).map(c => ({ nom: c.nom, colonne: c.colonne || '', noteColumn: c.noteColumn || '', aliases: c.aliases || [] }));
-      rules = (cfg?.excel_config?.regles_calcul || []).map(r => ({ sources: r.sources || [], target: r.target || '' }));
+
+      // Extraire les headers du sheet si disponibles
+      if (cfg?.excel_config?.colonnes_detectees) {
+        cfg.excel_config.colonnes_detectees.forEach(c => {
+          if (c.colonne && c.nom) sheetHeaders[c.colonne] = c.nom;
+        });
+      }
+
+      keywords = (cfg?.excel_config?.colonnes_a_remplir || []).map(c => ({
+        nom: c.nom,
+        colonne: c.colonne || '',
+        noteColumn: c.noteColumn || '',
+        aliases: c.aliases || []
+      }));
+      rules = (cfg?.excel_config?.regles_calcul || []).map(r => ({
+        sources: r.sources || [],
+        target: r.target || ''
+      }));
 
       render();
 
@@ -253,31 +266,46 @@
       }
     }
 
-    function render() { renderKw(); renderRules(); updatePreview(); updateCounts(); }
+    function render() {
+      renderKw();
+      renderRules();
+      updatePreview();
+      updateCounts();
+    }
 
     function updateCounts() {
       const validKw = keywords.filter(k => k.nom && k.colonne).length;
       const validRules = rules.filter(r => r.sources[0] && r.sources[1] && r.target).length;
-      document.getElementById('kw-count').textContent = `${validKw} configure${validKw > 1 ? 's' : ''}`;
-      document.getElementById('rules-count').textContent = `${validRules} regle${validRules > 1 ? 's' : ''}`;
+      document.getElementById('kw-count').textContent = validKw;
+      document.getElementById('rules-count').textContent = validRules;
+    }
+
+    function getColLabel(col) {
+      if (!col) return 'Col';
+      const header = sheetHeaders[col];
+      return header ? `${col}` : col;
     }
 
     function renderKw() {
-      document.getElementById('kw-list').innerHTML = keywords.map((k, i) => {
+      document.getElementById('kw-grid').innerHTML = keywords.map((k, i) => {
         const incomplete = k.nom && !k.colonne;
         return `
-        <div class="kw-row ${incomplete ? 'incomplete' : ''}">
-          <input class="kw-name" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" placeholder="CB">
-          <span class="kw-arrow">vers</span>
-          <select class="kw-select ${!k.colonne?'empty':''}" onchange="updKw(${i},'colonne',this.value)" title="Colonne dans le Sheet">
-            <option value="">Col</option>
-            ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}</option>`).join('')}
-          </select>
-          <select class="kw-note ${k.noteColumn?'active':''}" onchange="updKw(${i},'noteColumn',this.value)" title="Colonne pour les notes (texte entre parentheses)">
-            <option value="">Note</option>
-            ${cols.map(c=>`<option value="${c}" ${k.noteColumn===c?'selected':''}>${c}</option>`).join('')}
-          </select>
-          <button class="kw-del" onclick="delKw(${i})" title="Supprimer">x</button>
+        <div class="kw-card ${incomplete ? 'incomplete' : ''}">
+          <div class="kw-top">
+            <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" placeholder="CB">
+            <button class="kw-del" onclick="delKw(${i})">x</button>
+          </div>
+          <div class="kw-bottom">
+            <span class="kw-arrow">vers</span>
+            <select class="kw-col-select ${!k.colonne?'empty':''}" onchange="updKw(${i},'colonne',this.value)">
+              <option value="">Col</option>
+              ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}${sheetHeaders[c]?' ('+sheetHeaders[c]+')':''}</option>`).join('')}
+            </select>
+            <select class="kw-note-select ${k.noteColumn?'active':''}" onchange="updKw(${i},'noteColumn',this.value)">
+              <option value="">Note</option>
+              ${cols.map(c=>`<option value="${c}" ${k.noteColumn===c?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
         </div>
       `}).join('');
     }
@@ -285,7 +313,7 @@
     function renderRules() {
       const names = keywords.map(k=>k.nom).filter(n=>n);
       document.getElementById('rules-list').innerHTML = rules.map((r,i) => `
-        <div class="rule-row">
+        <div class="rule-card">
           <select class="rule-select" onchange="rules[${i}].sources[0]=this.value;render()">
             <option value="">...</option>
             ${names.map(n=>`<option value="${n}" ${r.sources[0]===n?'selected':''}>${n}</option>`).join('')}
@@ -295,13 +323,12 @@
             <option value="">...</option>
             ${names.map(n=>`<option value="${n}" ${r.sources[1]===n?'selected':''}>${n}</option>`).join('')}
           </select>
-          <span class="rule-arrow">ajoute a</span>
+          <span class="rule-arrow">→</span>
           <select class="rule-select" onchange="rules[${i}].target=this.value;render()">
             <option value="">...</option>
             ${names.map(n=>`<option value="${n}" ${r.target===n?'selected':''}>${n}</option>`).join('')}
           </select>
           <button class="kw-del" onclick="rules.splice(${i},1);render()">x</button>
-          ${r.sources[0] && r.sources[1] && r.target ? `<div class="rule-help">Ex: ${r.sources[0]} 100 + ${r.sources[1]} 50 = ${r.target} recoit 150</div>` : ''}
         </div>
       `).join('');
     }
@@ -319,57 +346,36 @@
       const txt = document.getElementById('test-input').value.trim();
       const tgEl = document.getElementById('preview-tg');
       const shEl = document.getElementById('preview-sheet');
-      const ruleBadge = document.getElementById('rule-badge');
 
       if (!txt) {
-        tgEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
-        shEl.innerHTML = '<span class="empty-state">Resultat ici</span>';
-        ruleBadge.classList.remove('show');
+        tgEl.innerHTML = '<span class="empty-state">...</span>';
+        shEl.innerHTML = '<span class="empty-state">...</span>';
         return;
       }
 
       tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
 
       const parsed = {};
-      const notes = {};
-
       for (const k of keywords) {
         if (!k.nom) continue;
-        // Pattern qui capture le montant et optionnellement une note entre parentheses
-        const re = new RegExp(`\\b${k.nom.toLowerCase()}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)(?:\\s*\\(([^)]+)\\))?`, 'i');
+        const re = new RegExp(`\\b${k.nom.toLowerCase()}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
         const m = txt.toLowerCase().match(re);
-        if (m) {
-          parsed[k.nom] = parseFloat(m[1].replace(',','.'));
-          if (m[2]) notes[k.nom] = m[2].trim();
-        }
+        if (m) parsed[k.nom] = parseFloat(m[1].replace(',','.'));
       }
 
-      // Appliquer les regles
-      let ruleApplied = false;
       for (const r of rules) {
         if (r.sources[0] && r.sources[1] && r.target) {
           const v1 = parsed[r.sources[0]] || 0;
           const v2 = parsed[r.sources[1]] || 0;
           if (v1 > 0 || v2 > 0) {
             parsed[r.target] = (parsed[r.target] || 0) + v1 + v2;
-            ruleApplied = true;
           }
         }
       }
 
-      ruleBadge.classList.toggle('show', ruleApplied);
-
       const rows = keywords.filter(k => k.nom && k.colonne && parsed[k.nom] > 0)
-        .map(k => {
-          let html = `<div class="sheet-row"><span class="sheet-col">${k.colonne}</span><span class="sheet-val">${parsed[k.nom].toFixed(0)}E</span>`;
-          if (notes[k.nom] && k.noteColumn) {
-            html += `<span class="sheet-note">${k.noteColumn}: ${notes[k.nom]}</span>`;
-          }
-          html += '</div>';
-          return html;
-        });
-
-      shEl.innerHTML = rows.length ? rows.join('') : '<span class="empty-state">Aucun mot-cle detecte</span>';
+        .map(k => `<div class="sheet-row"><span class="sheet-col">${k.nom}:</span><span class="sheet-val">${parsed[k.nom].toFixed(0)}E</span></div>`);
+      shEl.innerHTML = rows.length ? rows.join('') : '<span class="empty-state">-</span>';
     }
 
     function escapeHtml(text) {
@@ -380,30 +386,40 @@
 
     async function saveConfig() {
       const btn = document.getElementById('save-btn');
-      btn.classList.add('saving');
       btn.disabled = true;
       btn.textContent = 'Sauvegarde...';
 
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { btn.disabled = false; btn.classList.remove('saving'); btn.textContent = 'Sauvegarder'; return; }
+      if (!session) { btn.disabled = false; btn.textContent = 'Sauvegarder'; return; }
 
       const validKw = keywords.filter(k => k.nom.trim());
       const validRules = rules.filter(r => r.sources[0] && r.sources[1] && r.target);
 
       const newCfg = {
         ...(config?.excel_config || {}),
-        colonnes_a_remplir: validKw.map(k => ({ nom: k.nom, colonne: k.colonne||null, noteColumn: k.noteColumn||null, aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()] })),
-        regles_calcul: validRules.map(r => ({ sources: r.sources, operation: 'add', target: r.target }))
+        colonnes_a_remplir: validKw.map(k => ({
+          nom: k.nom,
+          colonne: k.colonne || null,
+          noteColumn: k.noteColumn || null,
+          aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()]
+        })),
+        regles_calcul: validRules.map(r => ({
+          sources: r.sources,
+          operation: 'add',
+          target: r.target
+        }))
       };
 
-      const { error } = await supabaseClient.from('user_configs').update({ excel_config: newCfg, updated_at: new Date().toISOString() }).eq('user_id', session.user.id);
+      const { error } = await supabaseClient.from('user_configs').update({
+        excel_config: newCfg,
+        updated_at: new Date().toISOString()
+      }).eq('user_id', session.user.id);
 
       btn.disabled = false;
-      btn.classList.remove('saving');
       btn.textContent = 'Sauvegarder';
 
       if (error) { toast('Erreur: ' + error.message, true); return; }
-      toast('Modifications sauvegardees !');
+      toast('Sauvegarde OK');
     }
 
     function toast(msg, err=false) {
