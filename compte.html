@@ -27,36 +27,49 @@
     .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; display: flex; align-items: center; }
     .btn-logout:hover { opacity: 0.8; }
 
-    .container { max-width: 320px; margin: 0 auto; padding: 90px 20px 40px; position: relative; z-index: 10; }
+    .container { max-width: 400px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; text-align: center; }
 
-    /* Profile - compact inline */
-    .profile-box { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-    .profile-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); flex-shrink: 0; }
-    .profile-info { flex: 1; min-width: 0; }
-    .profile-name { font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .profile-email { font-size: 10px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Profile - centré */
+    .profile-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; }
+    .profile-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.4); margin-bottom: 10px; }
+    .profile-name { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+    .profile-email { font-size: 11px; color: rgba(255,255,255,0.4); }
 
     /* Section */
-    .section-title { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Modules Grid - PETITS carrés fixes */
-    .modules-grid { display: flex; gap: 12px; margin-bottom: 24px; }
-    .module-card { width: 80px; height: 80px; background: linear-gradient(135deg, rgba(255,107,53,0.12) 0%, rgba(255,107,53,0.03) 100%); border: 1px solid rgba(255,107,53,0.3); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; }
-    .module-card:hover { transform: scale(1.05); border-color: rgba(255,107,53,0.6); box-shadow: 0 6px 16px rgba(255,107,53,0.25); }
-    .module-icon { font-size: 24px; margin-bottom: 4px; }
-    .module-name { font-size: 10px; font-weight: 600; }
-    .module-badge { display: none; }
+    /* Modules Grid - carrés moyens centrés */
+    .modules-grid { display: flex; gap: 16px; margin-bottom: 32px; justify-content: center; }
+    .module-card { width: 140px; height: 140px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; padding: 16px; }
+    .module-card:hover { transform: translateY(-4px); border-color: rgba(255,107,53,0.5); box-shadow: 0 12px 30px rgba(255,107,53,0.2); }
+
+    /* Animation logos dans module */
+    .module-anim { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .module-anim svg { width: 28px; height: 28px; }
+    .logo-tg { animation: pulseTg 2s ease-in-out infinite; }
+    @keyframes pulseTg { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .pulse-dot { width: 4px; height: 4px; background: #FF6B35; border-radius: 50%; animation: pulseDot 1.5s ease-in-out infinite; }
+    .pulse-dot:nth-child(2) { animation-delay: 0.2s; }
+    .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulseDot { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    .logo-sheet { animation: pulseSheet 2s ease-in-out infinite; }
+    @keyframes pulseSheet { 0%, 40%, 100% { transform: scale(1); } 70% { transform: scale(1.1); } }
+
+    .module-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .module-badge { font-size: 9px; padding: 3px 10px; background: rgba(34,197,94,0.15); color: #4ade80; border-radius: 12px; font-weight: 600; }
+    .module-badge.inactive { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
 
     /* Coming soon */
-    .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); opacity: 0.4; pointer-events: none; }
+    .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); opacity: 0.4; pointer-events: none; }
+    .module-card.soon .module-anim { opacity: 0.3; }
 
-    /* Infos row - compact chips */
-    .info-row { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-    .info-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
-    .info-box.active { border-color: rgba(34,197,94,0.3); }
+    /* Infos row - chips centrés */
+    .info-row { display: flex; gap: 8px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+    .info-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; }
+    .info-box.active { border-color: rgba(34,197,94,0.25); }
     .info-icon { font-size: 12px; }
-    .info-label { font-size: 9px; color: rgba(255,255,255,0.5); }
-    .info-status { font-size: 9px; color: #4ade80; font-weight: 600; }
+    .info-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .info-status { font-size: 10px; color: #4ade80; font-weight: 600; }
     .info-status.pending { color: rgba(255,255,255,0.25); }
 
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
@@ -78,25 +91,35 @@
   </nav>
 
   <div class="container">
-    <!-- Profile compact -->
+    <!-- Profile centré -->
     <div class="profile-box">
       <img id="profile-avatar" class="profile-avatar" src="" alt="">
-      <div class="profile-info">
-        <div class="profile-name" id="profile-name">-</div>
-        <div class="profile-email" id="profile-email">-</div>
-      </div>
+      <div class="profile-name" id="profile-name">-</div>
+      <div class="profile-email" id="profile-email">-</div>
     </div>
 
-    <!-- Modules - petits carrés -->
+    <!-- Modules -->
     <div class="section-title">Modules</div>
     <div class="modules-grid">
       <a href="compta-settings.html" class="module-card">
-        <div class="module-icon">🧾</div>
-        <div class="module-name">Compta</div>
+        <div class="module-anim">
+          <div class="logo-tg">
+            <svg viewBox="0 0 240 240"><defs><linearGradient id="tg" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d2e4ef" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138c.897.306 1.377 1.152 1.377 1.152.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18z"/></svg>
+          </div>
+          <div class="pulse-dot"></div>
+          <div class="pulse-dot"></div>
+          <div class="pulse-dot"></div>
+          <div class="logo-sheet">
+            <svg viewBox="0 0 56 56"><defs><linearGradient id="sh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#0a7e3e"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sh)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/></svg>
+          </div>
+        </div>
+        <div class="module-name">Compta Express</div>
         <span class="module-badge" id="compta-badge">Actif</span>
       </a>
       <div class="module-card soon">
-        <div class="module-icon">👥</div>
+        <div class="module-anim">
+          <div style="font-size: 28px;">👥</div>
+        </div>
         <div class="module-name">Personnel</div>
         <span class="module-badge inactive">Bientôt</span>
       </div>
