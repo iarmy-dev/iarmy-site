@@ -956,7 +956,14 @@
             .sheet-col-add { padding: 10px 8px; text-align: center; }
             .sheet-col-add span { display: inline-block; background: rgba(33, 115, 70, 0.3); border: 1px dashed rgba(33, 115, 70, 0.5); border-radius: 6px; color: #4ade80; padding: 2px 10px; cursor: pointer; font-size: 14px; transition: all 0.15s; }
             .sheet-col-add span:hover { background: rgba(33, 115, 70, 0.5); border-style: solid; }
-            .sheet-cell { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); }
+            .sheet-cell { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); transition: all 0.2s; }
+            .sheet-cell.value-pop { animation: cellPop 0.3s ease-out; }
+            @keyframes cellPop {
+              0% { transform: scale(0.8); opacity: 0; }
+              50% { transform: scale(1.1); }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            .sheet-cell.has-value { background: rgba(74, 222, 128, 0.08); }
             .sheet-edit-input { background: rgba(255,255,255,0.1); border: 1px solid #4ade80; border-radius: 4px; padding: 4px 8px; color: white; font-size: 13px; font-weight: 600; width: 80px; outline: none; }
           </style>
 
@@ -2614,18 +2621,25 @@
 
       chatArea.innerHTML = html;
 
-      // Mettre à jour le tableau Excel avec les valeurs parsées
+      // Mettre à jour le tableau Excel avec les valeurs parsées + animation
       sheetEditorColumns.forEach(function(col) {
         var cell = document.querySelector('#sheet-preview-row td[data-col="' + col.name + '"]');
         if (cell) {
+          var oldValue = cell.textContent;
           if (parsed[col.name] !== undefined) {
-            cell.textContent = parsed[col.name].toFixed(2) + ' €';
-            cell.style.color = '#4ade80';
-            cell.style.fontWeight = '600';
+            var newValue = parsed[col.name].toFixed(2) + ' €';
+            if (oldValue !== newValue) {
+              cell.textContent = newValue;
+              cell.style.color = '#4ade80';
+              cell.style.fontWeight = '600';
+              cell.classList.add('has-value', 'value-pop');
+              setTimeout(function() { cell.classList.remove('value-pop'); }, 300);
+            }
           } else if (col.name !== 'Date') {
             cell.textContent = '';
             cell.style.color = '';
             cell.style.fontWeight = '';
+            cell.classList.remove('has-value');
           }
         }
       });
