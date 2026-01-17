@@ -1201,7 +1201,25 @@ DEP 100</div>
     const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
     
     let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null, pendingLocalFile = null;
-    const HEADER_KEYWORDS = ['cb', 'esp', 'tr', 'date', 'jour', 'recette', 'total', 'dépense', 'depense', 'espèce', 'espece', 'carte', 'ticket', 'chèque', 'cheque', 'virement', 'vente', 'ca', 'tva', 'ht', 'ttc', 'montant'];
+    // Liste exhaustive de termes comptables pour la détection (jamais de hardcoding d'exclusions)
+    const HEADER_KEYWORDS = [
+      // Carte Bancaire
+      'cb', 'carte', 'cartes', 'visa', 'mastercard', 'tpe', 'terminal', 'bancaire',
+      // Espèces
+      'esp', 'espèces', 'especes', 'espèce', 'espece', 'cash', 'liquide', 'numéraire', 'numeraire', 'monnaie',
+      // Tickets Restaurant
+      'tr', 'ticket resto', 'ticket restaurant', 'titres resto', 'titre repas', 'edenred', 'sodexo', 'swile', 'apetiz', 'chèque déjeuner', 'cheque dejeuner',
+      // Dépenses
+      'dep', 'dép', 'dépense', 'dépenses', 'depense', 'depenses', 'frais', 'charges', 'achats', 'sorties', 'décaissement',
+      // Recettes / CA / Total
+      'raz', 'recette', 'recettes', 'ca', 'chiffre', 'ttc', 'total', 'ticket z', 'ticketz', 'z de caisse', 'lecture z', 'rapport z', 'clôture', 'cloture', 'encaissement', 'ventes', 'vente',
+      // Dates
+      'date', 'jour', 'jours',
+      // Autres
+      'avoir', 'remise', 'réduction', 'annulation', 'pourboire', 'tips', 'service', 'tva', 'ht', 'montant', 'virement', 'chèque', 'cheque',
+      // Réel vs Déclaré
+      'réel', 'reel', 'déclaré', 'declare', 'saisi', 'manuel'
+    ];
 
     function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
     function hideWelcome() { document.getElementById('welcome-overlay').classList.remove('active'); }
@@ -2158,6 +2176,56 @@ DEP 100</div>
     }
     
     function detectHeaderRow(rows) { var bestRow = null, bestScore = 0; rows.forEach(function(row) { if (row.row === '...') return; var score = 0; row.cells.forEach(function(cell) { var val = String(cell.val).toLowerCase(); HEADER_KEYWORDS.forEach(function(kw) { if (val.includes(kw)) score++; }); }); if (score > bestScore) { bestScore = score; bestRow = row; } }); return bestRow; }
+
+    // Vérifie si un texte contient un terme comptable
+    function isAccountingTerm(text) {
+      if (!text) return false;
+      var normalized = text.toLowerCase().trim();
+      return HEADER_KEYWORDS.some(function(kw) { return normalized.includes(kw); });
+    }
+
+    // Scanne plusieurs lignes pour trouver tous les noms d'une colonne (priorise les termes comptables)
+    function collectColumnNames(allRows, colLetter, headerRowNum) {
+      var names = [];
+      var scanRange = 5; // Scanner 5 lignes autour du header
+      allRows.forEach(function(row) {
+        if (row.row === '...') return;
+        if (Math.abs(row.row - headerRowNum) > scanRange) return;
+        row.cells.forEach(function(cell) {
+          if (cell.col === colLetter && cell.val) {
+            var val = String(cell.val).trim();
+            if (val && val.length > 1 && val.length < 50 && isNaN(Number(val))) {
+              if (!names.includes(val)) names.push(val);
+            }
+          }
+        });
+      });
+      return names;
+    }
+
+    // Trouve le meilleur nom pour une colonne (terme comptable prioritaire)
+    function findBestName(names) {
+      if (!names || names.length === 0) return null;
+      for (var i = 0; i < names.length; i++) {
+        if (isAccountingTerm(names[i])) return names[i];
+      }
+      return names[0]; // Fallback au premier nom trouvé
+    }
+
+    // Construit les headers avec noms alternatifs
+    function buildHeadersWithAlternatives(headerRow, allRows) {
+      if (!headerRow) return null;
+      var columns = headerRow.cells.map(function(c) {
+        var allNames = collectColumnNames(allRows, c.col, headerRow.row);
+        var bestName = findBestName(allNames) || c.val;
+        return {
+          letter: c.col,
+          name: bestName,
+          alternativeNames: allNames.filter(function(n) { return n !== bestName; })
+        };
+      });
+      return { rowNumber: headerRow.row, columns: columns };
+    }
     
     async function handleFile(file) {
       console.log('[HANDLE_FILE] START - file:', file.name, 'size:', file.size);
@@ -2199,7 +2267,8 @@ DEP 100</div>
             for (var row = 0; row <= maxRows; row++) { var rowData = readRow(row); if (rowData.length > 0) allRows.push({ row: row + 1, cells: rowData }); }
             if (range.e.r > 100) { allRows.push({ row: '...', cells: [{ col: '-', val: '(lignes ' + 101 + ' à ' + (range.e.r + 1) + ' masquées)' }] }); }
             var headerRow = detectHeaderRow(allRows);
-            var detectedHeaders = headerRow ? { rowNumber: headerRow.row, columns: headerRow.cells.map(function(c) { return { letter: c.col, name: c.val }; }) } : null;
+            // Utiliser la nouvelle fonction qui scanne plusieurs lignes et priorise les termes comptables
+            var detectedHeaders = buildHeadersWithAlternatives(headerRow, allRows);
             // Capturer TOUTES les formules (jusqu'à 100 max)
             var formulas = {}; var formulaCount = 0;
             for (var cellRef in sheet) { if (cellRef[0] !== '!' && sheet[cellRef].f && formulaCount < 100) { formulas[cellRef] = sheet[cellRef].f; formulaCount++; } }
