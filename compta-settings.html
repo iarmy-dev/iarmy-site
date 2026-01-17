@@ -12,6 +12,16 @@
     * { font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0a0a0a; color: white; min-height: 100vh; overflow-x: hidden; }
 
+    /* Nav */
+    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; }
+    .nav-user-section { display: flex; align-items: center; gap: 12px; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; transition: all 0.3s; }
+    .nav-profile:hover { background: rgba(255,255,255,0.08); }
+    .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+    .btn-logout { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); padding: 10px 16px; border-radius: 12px; font-weight: 500; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: all 0.3s; }
+    .btn-logout:hover { background: rgba(239,68,68,0.2); }
+
     /* Fond avec orbs plus lumineux */
     .orb { position: fixed; border-radius: 50%; filter: blur(120px); animation: float 20s ease-in-out infinite; pointer-events: none; z-index: 0; }
     .orb-1 { width: 600px; height: 600px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -200px; right: -100px; opacity: 0.2; }
@@ -99,8 +109,19 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
+  <!-- Nav -->
+  <nav class="glass fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="logo-i">i</div>
+        <span class="font-semibold text-lg">iArmy</span>
+      </a>
+      <div id="auth-buttons"></div>
+    </div>
+  </nav>
+
   <!-- Header -->
-  <header class="page-header">
+  <header class="page-header" style="padding-top: 80px;">
     <a href="compte.html" class="back-link">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Retour au compte
@@ -205,7 +226,33 @@
         return;
       }
 
+      const user = session.user;
+      const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
+      const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+
+      // Nav
+      document.getElementById('auth-buttons').innerHTML = `
+        <div class="nav-user-section">
+          <a href="compte.html" class="nav-profile">
+            <img src="${userAvatar}" class="nav-avatar">
+            <span>${userName.split(' ')[0]}</span>
+          </a>
+          <button onclick="signOut()" class="btn-logout">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      `;
+
       await loadConfig(session.user.id);
+    }
+
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
     }
 
     async function loadConfig(userId) {
