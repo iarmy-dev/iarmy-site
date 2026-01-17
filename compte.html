@@ -30,20 +30,23 @@
     .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; color: rgba(255,255,255,0.3); transition: all 0.2s; display: flex; align-items: center; border-radius: 6px; }
     .btn-logout:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
 
-    .container { max-width: 400px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; text-align: center; }
+    .container { max-width: 420px; margin: 0 auto; padding: 90px 16px 30px; position: relative; z-index: 10; text-align: center; }
+
+    /* Glass card */
+    .main-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 28px 24px; }
 
     /* Profile - centré */
-    .profile-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; }
+    .profile-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .profile-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.4); margin-bottom: 10px; }
     .profile-name { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
     .profile-email { font-size: 11px; color: rgba(255,255,255,0.4); }
 
     /* Section */
-    .section-title { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Modules Grid - carrés moyens centrés */
-    .modules-grid { display: flex; gap: 16px; margin-bottom: 32px; justify-content: center; }
-    .module-card { width: 140px; height: 140px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; padding: 16px; }
+    /* Modules Grid - carrés compacts */
+    .modules-grid { display: flex; gap: 12px; margin-bottom: 20px; justify-content: center; }
+    .module-card { width: 120px; height: 120px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; padding: 12px; }
     .module-card:hover { transform: translateY(-4px); border-color: rgba(255,107,53,0.5); box-shadow: 0 12px 30px rgba(255,107,53,0.2); }
 
     /* Animation logos dans module */
@@ -94,8 +97,9 @@
   </nav>
 
   <div class="container">
-    <!-- Profile centré -->
-    <div class="profile-box">
+    <div class="main-card">
+      <!-- Profile centré -->
+      <div class="profile-box">
       <img id="profile-avatar" class="profile-avatar" src="" alt="">
       <div class="profile-name" id="profile-name">-</div>
       <div class="profile-email" id="profile-email">-</div>
@@ -146,6 +150,7 @@
         <span class="info-label">Sheets</span>
         <span class="info-status pending" id="sheet-status">-</span>
       </div>
+    </div>
     </div>
   </div>
 
