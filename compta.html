@@ -4108,6 +4108,13 @@ DEP 100</div>
           stepAnalyse.style.display = 'block';
         }
 
+        // Cacher le loading, afficher l'éditeur
+        var configLoading = document.getElementById('config-loading');
+        if (configLoading) configLoading.style.display = 'none';
+
+        var configEditorMain = document.getElementById('config-editor-main');
+        if (configEditorMain) configEditorMain.style.display = 'block';
+
         // Render et ouvrir le panel
         renderConfigEditorRows();
         renderCustomRules();
@@ -4115,6 +4122,10 @@ DEP 100</div>
         if (configPanel) {
           configPanel.style.display = 'block';
         }
+
+        // Mettre à jour la preview Excel
+        buildExcelPreview();
+        updateTelegramPreview();
 
         // Nettoyer l'URL
         window.history.replaceState({}, document.title, window.location.pathname);

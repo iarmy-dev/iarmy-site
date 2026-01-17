@@ -23,8 +23,26 @@
     .btn-logout:hover { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.1)); transform: translateY(-2px); }
     .btn-primary { background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 14px 28px; border-radius: 14px; font-weight: 600; border: none; color: white; cursor: pointer; transition: all 0.4s; text-decoration: none; display: inline-block; }
     .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
-    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 32px; margin-bottom: 24px; }
+    .card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); }
     .profile-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,107,53,0.3); margin-bottom: 24px; }
+
+    /* Modal styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: rgba(10,10,10,0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); }
+    .modal-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: rgba(10,10,10,0.98); backdrop-filter: blur(20px); z-index: 10; }
+    .modal-body { padding: 24px; }
+    .modal-close { background: none; border: none; color: white/50; font-size: 24px; cursor: pointer; padding: 8px; }
+    .config-row { display: flex; gap: 12px; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; }
+    .config-input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; }
+    .config-input:focus { outline: none; border-color: #FF6B35; }
+    .config-select { padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; min-width: 80px; }
+    .btn-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    .btn-add { background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.3); color: #FF6B35; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 8px; }
+    .btn-save { background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 16px; }
+    .section-title { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 12px; font-weight: 500; }
+    .rule-row { display: flex; gap: 8px; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+    .rule-tag { padding: 6px 12px; background: rgba(255,107,53,0.15); border-radius: 6px; font-size: 13px; color: #FF8B5E; }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -74,9 +92,9 @@
                   <span id="config-columns" class="text-sm text-white/40">-</span>
                 </div>
                 <div class="pt-3 border-t border-white/10">
-                  <a href="compta.html?edit=true" class="w-full block text-center py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-sm font-medium text-white/80 hover:text-white transition-all">
-                    ⚙️ Modifier la configuration
-                  </a>
+                  <button onclick="openConfigEditor()" class="w-full block text-center py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-sm font-medium text-white/80 hover:text-white transition-all cursor-pointer">
+                    ✏️ Modifier la configuration
+                  </button>
                 </div>
               </div>
             </div>
@@ -97,6 +115,38 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Modal Éditeur de Configuration -->
+  <div id="config-modal" class="modal-overlay" onclick="if(event.target === this) closeConfigEditor()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="text-xl font-bold">⚙️ Configuration Compta</h2>
+        <button class="modal-close" onclick="closeConfigEditor()">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Mots-clés -->
+        <div class="mb-6">
+          <div class="section-title">📝 Mots-clés → Colonnes</div>
+          <div id="keywords-list"></div>
+          <button class="btn-add" onclick="addKeyword()">+ Ajouter un mot-clé</button>
+        </div>
+
+        <!-- Règles de calcul -->
+        <div class="mb-6">
+          <div class="section-title">🔢 Règles de calcul (optionnel)</div>
+          <p class="text-xs text-white/40 mb-3">Ex: DEP + ESP → ESP (les dépenses s'ajoutent aux espèces)</p>
+          <div id="rules-list"></div>
+          <button class="btn-add" onclick="addRule()">+ Ajouter une règle</button>
+        </div>
+
+        <!-- Toast -->
+        <div id="modal-toast" style="display: none; padding: 12px 16px; background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.3); border-radius: 10px; color: #22C55E; text-align: center; margin-bottom: 16px;"></div>
+
+        <!-- Bouton sauvegarder -->
+        <button class="btn-save" onclick="saveConfig()">💾 Sauvegarder</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -212,7 +262,203 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
-    
+
+    // ===== ÉDITEUR DE CONFIGURATION =====
+    let currentConfig = null;
+    let configKeywords = [];
+    let configRules = [];
+
+    async function openConfigEditor() {
+      console.log('[COMPTE] 📝 Ouverture éditeur config');
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      // Charger la config existante
+      const { data: config } = await supabaseClient
+        .from('user_configs')
+        .select('sheet_id, excel_config')
+        .eq('user_id', session.user.id)
+        .single();
+
+      currentConfig = config;
+
+      // Charger les mots-clés
+      configKeywords = (config?.excel_config?.colonnes_a_remplir || []).map(c => ({
+        nom: c.nom,
+        colonne: c.colonne || '',
+        aliases: c.aliases || []
+      }));
+
+      // Charger les règles
+      configRules = (config?.excel_config?.regles_calcul || []).map(r => ({
+        sources: r.sources || [],
+        operation: r.operation || 'add',
+        target: r.target || ''
+      }));
+
+      renderKeywords();
+      renderRules();
+      document.getElementById('config-modal').classList.add('active');
+    }
+
+    function closeConfigEditor() {
+      document.getElementById('config-modal').classList.remove('active');
+    }
+
+    function renderKeywords() {
+      const container = document.getElementById('keywords-list');
+      const columns = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+
+      container.innerHTML = configKeywords.map((kw, idx) => `
+        <div class="config-row">
+          <input type="text" class="config-input" value="${kw.nom}" placeholder="Mot-clé (ex: CB)" onchange="updateKeyword(${idx}, 'nom', this.value)" style="flex: 1;">
+          <span style="color: rgba(255,255,255,0.3);">→</span>
+          <select class="config-select" onchange="updateKeyword(${idx}, 'colonne', this.value)">
+            <option value="" ${!kw.colonne ? 'selected' : ''}>- (règle)</option>
+            ${columns.map(c => `<option value="${c}" ${kw.colonne === c ? 'selected' : ''}>${c}</option>`).join('')}
+          </select>
+          <button class="btn-delete" onclick="deleteKeyword(${idx})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function renderRules() {
+      const container = document.getElementById('rules-list');
+      const keywords = configKeywords.map(k => k.nom).filter(n => n);
+
+      if (configRules.length === 0) {
+        container.innerHTML = '<p class="text-white/30 text-sm text-center py-2">Aucune règle</p>';
+        return;
+      }
+
+      container.innerHTML = configRules.map((rule, idx) => `
+        <div class="rule-row">
+          <select class="config-select" onchange="updateRuleSource(${idx}, 0, this.value)" style="min-width: 70px;">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.sources[0] === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <span style="color: #FF6B35; font-weight: bold;">+</span>
+          <select class="config-select" onchange="updateRuleSource(${idx}, 1, this.value)" style="min-width: 70px;">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.sources[1] === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <span style="color: rgba(255,255,255,0.5);">→</span>
+          <select class="config-select" onchange="updateRuleTarget(${idx}, this.value)" style="min-width: 70px;">
+            <option value="">...</option>
+            ${keywords.map(k => `<option value="${k}" ${rule.target === k ? 'selected' : ''}>${k}</option>`).join('')}
+          </select>
+          <button class="btn-delete" onclick="deleteRule(${idx})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addKeyword() {
+      configKeywords.push({ nom: '', colonne: '', aliases: [] });
+      renderKeywords();
+      renderRules(); // Mettre à jour les options des règles
+    }
+
+    function updateKeyword(idx, field, value) {
+      configKeywords[idx][field] = value.toUpperCase();
+      if (field === 'nom') {
+        // Auto-générer les aliases basiques
+        const nom = value.toUpperCase();
+        configKeywords[idx].aliases = [nom.toLowerCase()];
+      }
+      renderRules(); // Mettre à jour les options des règles
+    }
+
+    function deleteKeyword(idx) {
+      configKeywords.splice(idx, 1);
+      renderKeywords();
+      renderRules();
+    }
+
+    function addRule() {
+      configRules.push({ sources: ['', ''], operation: 'add', target: '' });
+      renderRules();
+    }
+
+    function updateRuleSource(ruleIdx, sourceIdx, value) {
+      configRules[ruleIdx].sources[sourceIdx] = value;
+    }
+
+    function updateRuleTarget(ruleIdx, value) {
+      configRules[ruleIdx].target = value;
+    }
+
+    function deleteRule(idx) {
+      configRules.splice(idx, 1);
+      renderRules();
+    }
+
+    async function saveConfig() {
+      console.log('[COMPTE] 💾 Sauvegarde config...');
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      // Filtrer les mots-clés vides
+      const validKeywords = configKeywords.filter(k => k.nom.trim() !== '');
+
+      // Filtrer les règles valides
+      const validRules = configRules.filter(r =>
+        r.sources[0] && r.sources[1] && r.target
+      );
+
+      // Construire la nouvelle config
+      const newExcelConfig = {
+        ...(currentConfig?.excel_config || {}),
+        colonnes_a_remplir: validKeywords.map(k => ({
+          nom: k.nom,
+          colonne: k.colonne || null,
+          aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()]
+        })),
+        regles_calcul: validRules.map(r => ({
+          sources: r.sources,
+          operation: r.operation,
+          target: r.target
+        }))
+      };
+
+      // Sauvegarder
+      const { error } = await supabaseClient
+        .from('user_configs')
+        .update({
+          excel_config: newExcelConfig,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', session.user.id);
+
+      if (error) {
+        console.error('[COMPTE] Erreur sauvegarde:', error);
+        showModalToast('Erreur: ' + error.message, false);
+        return;
+      }
+
+      console.log('[COMPTE] ✅ Config sauvegardée');
+      showModalToast('Configuration sauvegardée !', true);
+
+      // Mettre à jour l'affichage des colonnes
+      const cols = validKeywords.map(c => c.nom).join(', ');
+      document.getElementById('config-columns').innerHTML = '<span class="text-white/70">' + cols + '</span>';
+
+      // Fermer après 1s
+      setTimeout(() => {
+        closeConfigEditor();
+      }, 1000);
+    }
+
+    function showModalToast(message, success) {
+      const toast = document.getElementById('modal-toast');
+      toast.textContent = message;
+      toast.style.display = 'block';
+      toast.style.background = success ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
+      toast.style.borderColor = success ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)';
+      toast.style.color = success ? '#22C55E' : '#ef4444';
+    }
+
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
