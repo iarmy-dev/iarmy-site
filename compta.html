@@ -1150,8 +1150,8 @@ DEP 100</div>
               <button onclick="closeConfigEditor()" style="padding: 12px 18px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.5); font-size: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.8)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.color='rgba(255,255,255,0.5)';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(0,0,0,0.2)'">
                 ← Autre fichier
               </button>
-              <button onclick="toggleConfigPanel()" style="margin-left: auto; padding: 12px 20px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); backdrop-filter: blur(10px); border: 1px solid rgba(34,197,94,0.25); border-radius: 12px; color: #4ade80; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(34,197,94,0.15);" onmouseover="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.15))';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(34,197,94,0.25)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08))';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(34,197,94,0.15)'">
-                Fermer ✓
+              <button onclick="saveConfigEditor()" style="margin-left: auto; padding: 12px 20px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); backdrop-filter: blur(10px); border: 1px solid rgba(34,197,94,0.25); border-radius: 12px; color: #4ade80; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(34,197,94,0.15);" onmouseover="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.15))';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(34,197,94,0.25)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08))';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(34,197,94,0.15)'">
+                💾 Sauvegarder
               </button>
             </div>
           </div>
@@ -2408,6 +2408,7 @@ DEP 100</div>
 
     // ========== ANALYSE FUNCTIONS (Step 3 intégré) ==========
     var pendingConfig = null;
+    var isEditMode = false; // True quand on édite depuis le profil
     var analyseChatHistory = [];
     var analyseExchangeCount = 0;
     var pendingQuestions = [];
@@ -3072,9 +3073,17 @@ DEP 100</div>
         if (result.error) throw result.error;
 
         console.log('[CONFIG] Saved successfully');
-        showToast('Configuration sauvegardée !');
+        showToast('✅ Configuration sauvegardée !');
 
-        // Aller à l'étape Telegram
+        // Si on est en mode édition, rester sur la page (ou retourner au profil)
+        if (isEditMode) {
+          setTimeout(function() {
+            window.location.href = 'compte.html';
+          }, 1000);
+          return;
+        }
+
+        // Sinon, aller à l'étape Telegram
         goToTelegram();
 
       } catch (err) {
@@ -4048,6 +4057,9 @@ DEP 100</div>
         }
 
         console.log('[COMPTA] ✅ Config chargée pour édition:', config.excel_config);
+
+        // Mode édition activé
+        isEditMode = true;
 
         // Restaurer l'état
         pendingConfig = config.excel_config;
