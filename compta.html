@@ -941,20 +941,37 @@
         <!-- Config Editor (hidden until loaded) -->
         <div id="config-editor-main" style="display: none; max-width: 600px; margin: 0 auto;">
 
+          <!-- STYLES TABLEAU EXCEL -->
+          <style>
+            .sheet-col { padding: 10px 12px; text-align: left; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.08); position: relative; transition: background 0.15s; }
+            .sheet-col:last-child { border-right: none; }
+            .sheet-col-editable { cursor: pointer; }
+            .sheet-col-editable:hover { background: rgba(33, 115, 70, 0.3); }
+            .sheet-col-editable:hover .col-name { border-bottom: 1px dashed rgba(255,255,255,0.4); }
+            .sheet-col-editable .col-delete { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); opacity: 0; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 16px; transition: all 0.15s; }
+            .sheet-col-editable:hover .col-delete { opacity: 1; }
+            .sheet-col-editable .col-delete:hover { color: #ef4444; }
+            .sheet-col-add { padding: 10px 8px; text-align: center; }
+            .sheet-col-add span { display: inline-block; background: rgba(33, 115, 70, 0.3); border: 1px dashed rgba(33, 115, 70, 0.5); border-radius: 6px; color: #4ade80; padding: 2px 10px; cursor: pointer; font-size: 14px; transition: all 0.15s; }
+            .sheet-col-add span:hover { background: rgba(33, 115, 70, 0.5); border-style: solid; }
+            .sheet-cell { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); }
+            .sheet-edit-input { background: rgba(255,255,255,0.1); border: 1px solid #4ade80; border-radius: 4px; padding: 4px 8px; color: white; font-size: 13px; font-weight: 600; width: 80px; outline: none; }
+          </style>
+
           <!-- TABLEAU EXCEL ÉDITABLE -->
-          <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
-            <!-- Header avec nom du fichier -->
-            <div style="background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
+          <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 24px; border: 1px solid rgba(33, 115, 70, 0.3);">
+            <!-- Header avec nom du fichier - EXCEL GREEN -->
+            <div style="background: linear-gradient(135deg, #1D6F42, #217346); padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="white" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="white" stroke-width="1.5"/></svg>
               <span id="sheet-editor-name" style="font-weight: 600; font-size: 14px;">Mon fichier</span>
-              <a id="open-sheet-link" href="#" target="_blank" style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.7); text-decoration: none;">Ouvrir ↗</a>
+              <a id="open-sheet-link" href="#" target="_blank" style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 4px;">Ouvrir <span style="font-size: 10px;">↗</span></a>
             </div>
 
             <!-- Tableau éditable avec fade -->
             <div style="position: relative;">
               <table id="sheet-editor-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
                 <thead>
-                  <tr id="sheet-editor-headers" style="background: rgba(255,107,53,0.15);">
+                  <tr id="sheet-editor-headers" style="background: rgba(33, 115, 70, 0.2);">
                     <!-- Headers générés par JS -->
                   </tr>
                 </thead>
@@ -965,30 +982,42 @@
               <!-- Effet fade en bas -->
               <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to bottom, transparent, #030303); pointer-events: none;"></div>
             </div>
-
-            <!-- Instructions -->
-            <div style="padding: 12px 16px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 16px; font-size: 11px; color: rgba(255,255,255,0.4);">
-              <span>✏️ Clic = renommer</span>
-              <span>↔️ Glisser = réordonner</span>
-              <span>➕ Ajouter colonne</span>
-            </div>
           </div>
 
-          <!-- PREVIEW TELEGRAM -->
-          <div class="glass-card" style="padding: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-              <div style="width: 24px; height: 24px; background: #2AABEE; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/></svg>
+          <!-- PREVIEW TELEGRAM - Style conversation -->
+          <div class="glass-card" style="padding: 0; margin-bottom: 24px; overflow: hidden;">
+            <!-- Header Telegram -->
+            <div style="background: linear-gradient(135deg, #2AABEE, #229ED9); padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
+              <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 14px;">🤖</span>
               </div>
-              <span style="font-size: 13px; font-weight: 500;">Teste ton bot</span>
+              <div>
+                <div style="font-weight: 600; font-size: 13px;">iArmy Bot</div>
+                <div style="font-size: 10px; opacity: 0.7;">en ligne</div>
+              </div>
             </div>
-            <!-- Input de test -->
-            <input type="text" id="telegram-test-input" placeholder="Ex: cb 450 esp 120 tr 80" oninput="updateTelegramPreview()" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 14px; color: white; font-size: 13px; outline: none; margin-bottom: 12px;" onfocus="this.style.borderColor='rgba(42,171,238,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
-            <!-- Preview du résultat -->
-            <div id="telegram-preview-result" style="background: rgba(42,171,238,0.1); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: rgba(255,255,255,0.7); min-height: 40px;">
-              <span style="color: rgba(255,255,255,0.4);">Tape un message pour voir le résultat...</span>
+            <!-- Zone de conversation -->
+            <div id="telegram-chat-area" style="background: #0e1621; padding: 16px; min-height: 120px; display: flex; flex-direction: column; gap: 8px;">
+              <!-- Bulle bot (gauche) - état initial -->
+              <div class="tg-bubble tg-bot">
+                <span style="color: rgba(255,255,255,0.5);">Envoie un message pour tester...</span>
+              </div>
+            </div>
+            <!-- Input de message -->
+            <div style="background: #17212b; padding: 10px 12px; display: flex; gap: 10px; align-items: center;">
+              <input type="text" id="telegram-test-input" placeholder="Écris un message..." oninput="updateTelegramPreview()" onkeydown="if(event.key==='Enter')updateTelegramPreview()" style="flex: 1; background: #242f3d; border: none; border-radius: 20px; padding: 10px 16px; color: white; font-size: 13px; outline: none;">
+              <button onclick="updateTelegramPreview()" style="width: 36px; height: 36px; background: #2AABEE; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
             </div>
           </div>
+          <style>
+            .tg-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
+            .tg-user { background: #2b5278; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+            .tg-bot { background: #182533; color: white; align-self: flex-start; border-bottom-left-radius: 4px; }
+            .tg-bot.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
+            .tg-bot.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+          </style>
 
           <!-- RÈGLES (accordion) -->
           <details class="glass-card" style="padding: 0; margin-bottom: 24px;">
@@ -998,7 +1027,7 @@
               <span style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.3);">optionnel</span>
             </summary>
             <div style="padding: 0 16px 16px 16px;">
-              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: Les dépenses s'ajoutent aux espèces</p>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: Si tu tapes "total", ça additionne CB + ESP</p>
               <div id="rules-editor-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
                 <!-- Règles générées par JS -->
               </div>
@@ -2397,18 +2426,18 @@
       var headersHtml = '';
       sheetEditorColumns.forEach(function(col, i) {
         var isFixed = col.name === 'Date' || col.name === 'Notes';
-        headersHtml += '<th style="padding: 10px 12px; text-align: left; font-weight: 600; color: white; border-bottom: 1px solid rgba(255,255,255,0.1); ' + (isFixed ? '' : 'cursor: grab;') + '" ' +
+        var editableClass = isFixed ? '' : 'sheet-col-editable';
+        headersHtml += '<th class="sheet-col ' + editableClass + '" data-index="' + i + '" ' +
           'draggable="' + (!isFixed) + '" ' +
           'ondragstart="sheetDragStart(event, ' + i + ')" ' +
           'ondragover="sheetDragOver(event)" ' +
-          'ondrop="sheetDrop(event, ' + i + ')" ' +
-          'onclick="sheetRenameCol(' + i + ')">' +
-          '<span class="col-name">' + col.name + '</span>' +
-          (!isFixed ? '<button onclick="event.stopPropagation();sheetRemoveCol(' + i + ')" style="margin-left: 8px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 14px; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity=1;this.style.color=\'#ef4444\'" onmouseout="this.style.opacity=0;this.style.color=\'rgba(255,255,255,0.3)\'">×</button>' : '') +
+          'ondrop="sheetDrop(event, ' + i + ')">' +
+          '<span class="col-name" onclick="sheetStartEdit(' + i + ')">' + col.name + '</span>' +
+          (!isFixed ? '<span class="col-delete" onclick="event.stopPropagation();sheetRemoveCol(' + i + ')">×</span>' : '') +
           '</th>';
       });
       // Bouton ajouter
-      headersHtml += '<th style="padding: 10px 8px; text-align: center;"><button onclick="sheetAddCol()" style="background: rgba(255,107,53,0.2); border: none; border-radius: 6px; color: #FF8B5E; padding: 4px 10px; cursor: pointer; font-size: 12px;">+</button></th>';
+      headersHtml += '<th class="sheet-col-add"><span onclick="sheetAddCol()">+</span></th>';
       headersRow.innerHTML = headersHtml;
 
       // Générer les lignes de données (exemples)
@@ -2418,48 +2447,68 @@
       for (var d = 1; d <= 5; d++) {
         var opacity = d <= 2 ? 1 : (d === 3 ? 0.6 : (d === 4 ? 0.3 : 0.15));
         rowsHtml += '<tr style="opacity: ' + opacity + ';">';
-        sheetEditorColumns.forEach(function(col, i) {
+        sheetEditorColumns.forEach(function(col, ci) {
           var val = '';
           if (col.name === 'Date') {
             val = (d < 10 ? '0' : '') + d + '/' + (month < 10 ? '0' : '') + month;
           }
-          rowsHtml += '<td style="padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);">' + val + '</td>';
+          rowsHtml += '<td class="sheet-cell">' + val + '</td>';
         });
         rowsHtml += '<td></td></tr>';
       }
       tbody.innerHTML = rowsHtml;
     }
 
-    function sheetAddCol() {
-      var name = prompt('Nom de la colonne:');
-      if (name && name.trim()) {
-        // Insérer avant Notes
-        var insertIndex = sheetEditorColumns.length - 1;
-        sheetEditorColumns.splice(insertIndex, 0, { name: name.trim(), colonne: '', aliases: [name.trim().toLowerCase()] });
-        renderSheetEditor();
-        updateTelegramPreview();
+    function sheetStartEdit(index) {
+      var col = sheetEditorColumns[index];
+      if (col.name === 'Date' || col.name === 'Notes') return;
+
+      var th = document.querySelector('.sheet-col[data-index="' + index + '"]');
+      if (!th) return;
+
+      var currentName = col.name;
+      th.innerHTML = '<input type="text" class="sheet-edit-input" value="' + currentName + '" ' +
+        'onblur="sheetFinishEdit(' + index + ', this.value)" ' +
+        'onkeydown="if(event.key===\'Enter\'){this.blur()}if(event.key===\'Escape\'){this.value=\'' + currentName + '\';this.blur()}" ' +
+        'autofocus>';
+
+      var input = th.querySelector('input');
+      if (input) {
+        input.focus();
+        input.select();
       }
+    }
+
+    function sheetFinishEdit(index, newName) {
+      var col = sheetEditorColumns[index];
+      if (newName && newName.trim() && newName.trim() !== col.name) {
+        col.name = newName.trim();
+        col.aliases = [newName.trim().toLowerCase()];
+      }
+      renderSheetEditor();
+      updateTelegramPreview();
+    }
+
+    function sheetAddCol() {
+      // Insérer avant Notes avec un nom par défaut
+      var insertIndex = sheetEditorColumns.length - 1;
+      var newColName = 'Col' + (sheetEditorColumns.length - 1);
+      sheetEditorColumns.splice(insertIndex, 0, { name: newColName, colonne: '', aliases: [newColName.toLowerCase()] });
+      renderSheetEditor();
+      // Démarrer l'édition immédiatement
+      setTimeout(function() { sheetStartEdit(insertIndex); }, 50);
     }
 
     function sheetRemoveCol(index) {
       if (sheetEditorColumns[index].name === 'Date' || sheetEditorColumns[index].name === 'Notes') return;
-      if (confirm('Supprimer la colonne "' + sheetEditorColumns[index].name + '" ?')) {
-        sheetEditorColumns.splice(index, 1);
-        renderSheetEditor();
-        updateTelegramPreview();
-      }
+      sheetEditorColumns.splice(index, 1);
+      renderSheetEditor();
+      updateTelegramPreview();
     }
 
+    // Ancienne fonction conservée pour compatibilité
     function sheetRenameCol(index) {
-      var col = sheetEditorColumns[index];
-      if (col.name === 'Date' || col.name === 'Notes') return;
-      var newName = prompt('Nouveau nom:', col.name);
-      if (newName && newName.trim() && newName !== col.name) {
-        col.name = newName.trim();
-        col.aliases = [newName.trim().toLowerCase()];
-        renderSheetEditor();
-        updateTelegramPreview();
-      }
+      sheetStartEdit(index);
     }
 
     function sheetDragStart(e, index) {
@@ -2495,24 +2544,29 @@
 
     function updateTelegramPreview() {
       var input = document.getElementById('telegram-test-input');
-      var result = document.getElementById('telegram-preview-result');
-      if (!input || !result) return;
+      var chatArea = document.getElementById('telegram-chat-area');
+      if (!input || !chatArea) return;
 
       var text = input.value.trim();
       if (!text) {
-        result.innerHTML = '<span style="color: rgba(255,255,255,0.4);">Tape un message pour voir le résultat...</span>';
+        chatArea.innerHTML = '<div class="tg-bubble tg-bot"><span style="color: rgba(255,255,255,0.5);">Envoie un message pour tester...</span></div>';
         return;
       }
 
       // Parser le message
       var parsed = {};
+      console.log('[PREVIEW] Parsing:', text);
+      console.log('[PREVIEW] Columns:', sheetEditorColumns);
+
       sheetEditorColumns.forEach(function(col) {
         if (col.name === 'Date' || col.name === 'Notes') return;
         var aliases = col.aliases || [col.name.toLowerCase()];
+        console.log('[PREVIEW] Checking column:', col.name, 'aliases:', aliases);
         aliases.forEach(function(alias) {
           var regex = new RegExp('\\b' + alias + '\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
           var match = text.match(regex);
           if (match) {
+            console.log('[PREVIEW] Match found:', alias, '=', match[1]);
             parsed[col.name] = parseFloat(match[1].replace(',', '.'));
           }
         });
@@ -2529,17 +2583,28 @@
         }
       });
 
-      // Afficher le résultat
+      // Construire les bulles de conversation
+      var html = '';
+
+      // Bulle utilisateur (droite)
+      html += '<div class="tg-bubble tg-user">' + text + '</div>';
+
+      // Bulle bot (gauche)
       var keys = Object.keys(parsed);
       if (keys.length === 0) {
-        result.innerHTML = '<span style="color: #f59e0b;">⚠️ Aucun mot-clé reconnu</span>';
+        html += '<div class="tg-bubble tg-bot error">❌ Je ne reconnais pas ces mots-clés.<br><span style="font-size: 11px; opacity: 0.7;">Essaie: ' + sheetEditorColumns.filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; }).map(function(c) { return c.name.toLowerCase(); }).join(', ') + '</span></div>';
       } else {
-        var html = '<span style="color: #22c55e;">✓ Enregistré :</span><br>';
+        var botMsg = '✅ <b>Enregistré !</b><br>';
+        var today = new Date();
+        var dateStr = (today.getDate() < 10 ? '0' : '') + today.getDate() + '/' + ((today.getMonth() + 1) < 10 ? '0' : '') + (today.getMonth() + 1);
+        botMsg += '<span style="opacity: 0.6;">📅 ' + dateStr + '</span><br>';
         keys.forEach(function(k) {
-          html += '<span style="margin-left: 8px;">' + k + ': ' + parsed[k] + '€</span><br>';
+          botMsg += '• ' + k + ': <b>' + parsed[k].toFixed(2) + ' €</b><br>';
         });
-        result.innerHTML = html;
+        html += '<div class="tg-bubble tg-bot success">' + botMsg + '</div>';
       }
+
+      chatArea.innerHTML = html;
     }
 
     function addEditorRule() {
