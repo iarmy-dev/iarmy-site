@@ -3554,15 +3554,17 @@
 
     function addCustomRule() {
       var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+      console.log('[RULES] addCustomRule - configEditorData:', configEditorData.length, 'keywords:', keywords);
+
       if (keywords.length < 2) {
-        alert('Tu dois avoir au moins 2 mots-clés configurés pour créer une règle.');
+        showToast('Configure d\'abord tes mots-clés (CB, ESP, TR...)');
         return;
       }
 
       customRules.push({
         sources: [keywords[0], keywords[1]],
         operations: ['+'],
-        target: keywords[1],
+        target: keywords[0],
         createTarget: false
       });
 
