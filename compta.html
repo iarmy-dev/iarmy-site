@@ -1036,7 +1036,7 @@
           </details>
 
           <!-- BOUTON CONTINUER -->
-          <button onclick="saveAndContinue()" class="btn-glow" style="width: 100%; padding: 16px; font-size: 15px;">
+          <button onclick="saveEditorAndContinue()" class="btn-glow" style="width: 100%; padding: 16px; font-size: 15px;">
             Continuer →
           </button>
         </div>
@@ -2669,8 +2669,56 @@
       }).join('');
     }
 
-    function saveAndContinue() {
-      // Construire la config à partir de l'éditeur
+    async function saveEditorAndContinue() {
+      // Construire les colonnes à partir de l'éditeur
+      var columns = sheetEditorColumns.map(function(col) { return col.name; });
+      var currentYear = new Date().getFullYear();
+
+      // Si le fichier n'existe pas encore, le créer
+      if (!excelData || !excelData.sheetId) {
+        showLoader('Création de ton fichier...');
+
+        try {
+          var { data: { session } } = await supabaseClient.auth.getSession();
+          if (!session) throw new Error('Session expirée');
+
+          // Créer le fichier avec les colonnes personnalisées
+          var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token,
+              'apikey': SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({
+              templateType: 'compta-pro',
+              year: currentYear,
+              customColumns: columns
+            })
+          });
+
+          var result = await response.json();
+          if (!result.success) throw new Error(result.error || 'Échec de la création');
+
+          console.log('[SHEET EDITOR] Sheet created:', result.sheet);
+
+          // Mettre à jour excelData avec le nouveau fichier
+          excelData = {
+            fileName: result.sheet.name,
+            sheetId: result.sheet.id,
+            sheetName: result.sheet.name,
+            webViewLink: result.sheet.webViewLink
+          };
+
+          hideLoader();
+        } catch (err) {
+          hideLoader();
+          console.error('[SHEET EDITOR] Create error:', err);
+          return;
+        }
+      }
+
+      // Construire la config
       var colLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       var colonnesARemplir = [];
       sheetEditorColumns.forEach(function(col, i) {
@@ -2685,11 +2733,11 @@
 
       var configToSave = {
         user_id: currentUser.id,
-        sheet_id: excelData?.sheetId,
+        sheet_id: excelData.sheetId,
         excel_config: {
-          onglet: pendingConfig?.onglet || 'Recettes ' + new Date().getFullYear(),
-          ligne_entetes: pendingConfig?.ligne_entetes || 1,
-          premiere_ligne_donnees: pendingConfig?.premiere_ligne_donnees || 2,
+          onglet: 'Janvier ' + currentYear,
+          ligne_entetes: 1,
+          premiere_ligne_donnees: 2,
           colonne_date: 'A',
           format_date: 'DD/MM/YYYY',
           colonnes_a_remplir: colonnesARemplir,
@@ -2700,15 +2748,21 @@
 
       console.log('[SHEET EDITOR] Saving config:', configToSave);
 
-      supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' })
-        .then(function(result) {
-          if (result.error) {
-            console.error('[SHEET EDITOR] Save error:', result.error);
-            return;
-          }
-          console.log('[SHEET EDITOR] Config saved!');
-          goToStep(4);
-        });
+      // Sauvegarder la config
+      var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
+      if (saveError) {
+        console.error('[SHEET EDITOR] Save error:', saveError);
+        return;
+      }
+
+      // Mettre à jour google_credentials
+      await supabaseClient.from('google_credentials').update({
+        sheet_id: excelData.sheetId,
+        sheet_name: excelData.sheetName
+      }).eq('user_id', currentUser.id);
+
+      console.log('[SHEET EDITOR] Config saved!');
+      goToStep(4);
     }
     // ========== FIN NOUVEL ÉDITEUR ==========
 
@@ -4372,42 +4426,14 @@
     // ========== END TEMPLATE PREVIEW ==========
 
     async function createEmptyTemplate() {
-      var { data: { session } } = await supabaseClient.auth.getSession();
-      console.log('[COMPTA] Session:', session);
-      console.log('[COMPTA] Access token:', session?.access_token?.substring(0, 50) + '...');
-      if (!session) throw new Error('Session expirée');
+      // NE PAS créer le fichier maintenant - juste aller à la preview
+      // Le fichier sera créé quand l'utilisateur clique "Continuer"
 
-      // Default columns for standard restaurant accounting
-      var columns = ['Date', 'CB', 'ESP', 'TR', 'RAZ', 'Notes'];
       var currentYear = new Date().getFullYear();
 
-      showLoader('Creation du modele vierge...');
-
-      console.log('[COMPTA] Creating template with default columns:', columns);
-
-      // Create a new Google Sheet with default columns
-      var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + session.access_token,
-          'apikey': SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-          templateType: 'compta',
-          year: currentYear,
-          customColumns: columns
-        })
-      });
-
-      var result = await response.json();
-      if (!result.success) throw new Error(result.error || 'Echec de la creation');
-
-      console.log('[COMPTA] Template created:', result.sheet);
-
-      // Default config for standard columns
+      // Config par défaut pour preview
       var defaultConfig = {
-        onglet: 'Recettes ' + currentYear,
+        onglet: 'Janvier ' + currentYear,
         ligne_entetes: 1,
         premiere_ligne_donnees: 2,
         colonne_date: 'A',
@@ -4416,38 +4442,25 @@
           { nom: 'CB', colonne: 'B', aliases: ['cb', 'carte', 'card', 'cartebancaire', 'cartebleue'] },
           { nom: 'ESP', colonne: 'C', aliases: ['esp', 'especes', 'espèces', 'cash', 'liquide'] },
           { nom: 'TR', colonne: 'D', aliases: ['tr', 'ticket', 'tickets', 'ticketresto', 'resto'] },
-          { nom: 'RAZ', colonne: 'E', aliases: ['raz', 'total', 'caisse', 'z', 'ticketz'] }
+          { nom: 'DEP', colonne: 'E', aliases: ['dep', 'depense', 'depenses', 'dépense', 'dépenses'] },
+          { nom: 'RAZ', colonne: 'F', aliases: ['raz', 'total', 'caisse', 'z', 'ticketz'] }
         ],
-        regles: []  // User can add rules later in settings
+        regles: []
       };
 
-      // Save to user_configs
-      var { error: saveError } = await supabaseClient.from('user_configs').upsert({
-        user_id: currentUser.id,
-        sheet_id: result.sheet.id,
-        excel_config: defaultConfig,
-        is_active: true
-      }, { onConflict: 'user_id' });
-
-      if (saveError) throw saveError;
-
-      // Also update google_credentials with sheet info
-      await supabaseClient.from('google_credentials').update({
-        sheet_id: result.sheet.id,
-        sheet_name: result.sheet.name
-      }).eq('user_id', currentUser.id);
-
-      hideLoader();
-
-      // Stocker les infos du sheet pour l'étape 3
+      // Pas de sheet créé encore - on met des infos temporaires
       excelData = {
-        fileName: result.sheet.name,
-        sheetId: result.sheet.id,
-        sheetName: result.sheet.name,
-        webViewLink: result.sheet.webViewLink
+        fileName: 'Compta ' + currentYear + ' - iArmy',
+        sheetId: null, // Pas encore créé
+        sheetName: null,
+        webViewLink: null
       };
 
-      // Aller à l'étape 3 et afficher directement l'éditeur (pas de loading)
+      // Cacher le lien "Ouvrir" puisque le fichier n'existe pas encore
+      var openLink = document.getElementById('open-sheet-link');
+      if (openLink) openLink.style.display = 'none';
+
+      // Aller à l'étape 3 et afficher l'éditeur
       goToStep(3);
       showAnalyseResult(defaultConfig);
     }
