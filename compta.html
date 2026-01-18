@@ -1241,7 +1241,16 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const GOOGLE_CLIENT_ID = '550060390462-snigimufjktpnf13ip48cv5ioork1ur0.apps.googleusercontent.com';
     
-    let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null, pendingLocalFile = null;
+    let currentUser = null, userProvider = null, hasGoogleSheetsAccess = false, excelData = null, chatHistory = [], finalConfig = null, isWaitingForAI = false, connectionCheckInterval = null, pendingLocalFile = null, hasUnsavedChanges = false;
+
+    // Warning si l'utilisateur quitte avec des modifications non sauvegardées
+    window.addEventListener('beforeunload', function(e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'Tu as des modifications non sauvegardées. Es-tu sûr de vouloir quitter ?';
+        return e.returnValue;
+      }
+    });
     // Liste exhaustive de termes comptables pour la détection (jamais de hardcoding d'exclusions)
     const HEADER_KEYWORDS = [
       // Carte Bancaire
@@ -2665,6 +2674,7 @@
       if (newName && newName.trim() && newName.trim() !== col.name) {
         col.name = newName.trim();
         col.aliases = [newName.trim().toLowerCase()];
+        hasUnsavedChanges = true;
       }
       renderSheetEditor();
       updateTelegramPreview();
@@ -2675,6 +2685,7 @@
       var insertIndex = sheetEditorColumns.length - 1;
       var newColName = 'Col' + (sheetEditorColumns.length - 1);
       sheetEditorColumns.splice(insertIndex, 0, { name: newColName, colonne: '', aliases: [newColName.toLowerCase()] });
+      hasUnsavedChanges = true;
       renderSheetEditor();
       // Démarrer l'édition immédiatement
       setTimeout(function() { sheetStartEdit(insertIndex); }, 50);
@@ -2683,6 +2694,7 @@
     function sheetRemoveCol(index) {
       if (sheetEditorColumns[index].name === 'Date' || sheetEditorColumns[index].name === 'Notes') return;
       sheetEditorColumns.splice(index, 1);
+      hasUnsavedChanges = true;
       renderSheetEditor();
       updateTelegramPreview();
     }
@@ -2736,6 +2748,7 @@
       var col = sheetEditorColumns.splice(sheetDragIndex, 1)[0];
       sheetEditorColumns.splice(targetIndex, 0, col);
       sheetDragIndex = -1;
+      hasUnsavedChanges = true;
       renderSheetEditor();
       updateTelegramPreview();
     }
@@ -2869,6 +2882,7 @@
 
     function addEditorRule() {
       sheetEditorRules.push({ src1: '', op: '+', src2: '', target: '' });
+      hasUnsavedChanges = true;
       renderEditorRules();
     }
 
@@ -2882,18 +2896,18 @@
       container.innerHTML = sheetEditorRules.map(function(rule, i) {
         // Assurer que op existe (compatibilité anciennes règles)
         if (!rule.op) rule.op = '+';
-        var opSelect = '<select onchange="sheetEditorRules[' + i + '].op=this.value;updateTelegramPreview()" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 4px 8px; color: #FF8B5E; font-size: 14px; font-weight: 600; width: 40px; text-align: center;">' +
+        var opSelect = '<select onchange="sheetEditorRules[' + i + '].op=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 4px 8px; color: #FF8B5E; font-size: 14px; font-weight: 600; width: 40px; text-align: center;">' +
           '<option value="+"' + (rule.op === '+' ? ' selected' : '') + '>+</option>' +
           '<option value="-"' + (rule.op === '-' ? ' selected' : '') + '>−</option>' +
           '</select>';
 
         return '<div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">' +
-          '<select onchange="sheetEditorRules[' + i + '].src1=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
+          '<select onchange="sheetEditorRules[' + i + '].src1=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
           opSelect +
-          '<select onchange="sheetEditorRules[' + i + '].src2=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
+          '<select onchange="sheetEditorRules[' + i + '].src2=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
           '<span style="color: rgba(255,255,255,0.4);">→</span>' +
-          '<select onchange="sheetEditorRules[' + i + '].target=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
-          '<button onclick="sheetEditorRules.splice(' + i + ',1);renderEditorRules()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">×</button>' +
+          '<select onchange="sheetEditorRules[' + i + '].target=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
+          '<button onclick="sheetEditorRules.splice(' + i + ',1);hasUnsavedChanges=true;renderEditorRules()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">×</button>' +
           '</div>';
       }).join('');
     }
@@ -3011,6 +3025,7 @@
       }).eq('user_id', currentUser.id);
 
       console.log('[SHEET EDITOR] Config saved!');
+      hasUnsavedChanges = false;
       goToStep(4);
     }
     // ========== FIN NOUVEL ÉDITEUR ==========
@@ -4110,6 +4125,7 @@
       }
       console.log('[COMPTA] ✅ Config sauvegardée!');
       finalConfig = pendingConfig;
+      hasUnsavedChanges = false;
 
       // Aller directement à l'étape Telegram
       console.log('[COMPTA] 🚀 Navigation vers step 4 (Telegram)...');
