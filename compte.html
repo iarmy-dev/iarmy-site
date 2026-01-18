@@ -173,6 +173,16 @@
     </div>
     </div>
 
+    <!-- Actions rapides -->
+    <div style="margin-top: 16px; display: flex; gap: 10px;">
+      <button onclick="resetConfig()" style="flex: 1; padding: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; color: #f87171; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+        🔄 Nouveau fichier
+      </button>
+      <a href="compta.html" style="flex: 1; padding: 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 10px; color: #FF8B5E; font-size: 12px; cursor: pointer; text-decoration: none; text-align: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.2)'" onmouseout="this.style.background='rgba(255,107,53,0.1)'">
+        ⚙️ Modifier config
+      </a>
+    </div>
+
     <!-- Export Comptable -->
     <div class="main-card" id="export-section" style="margin-top: 16px; display: none;">
       <div class="section-title" style="margin-bottom: 16px;">📥 Export Comptable</div>
@@ -590,6 +600,32 @@
 
       XLSX.utils.book_append_sheet(wb, ws, monthName);
       XLSX.writeFile(wb, filename + '.xlsx');
+    }
+
+    async function resetConfig() {
+      if (!confirm('Supprimer ta config actuelle et créer un nouveau fichier iArmy ?')) return;
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+          alert('Session expirée');
+          return;
+        }
+
+        // Supprimer la config
+        const { error } = await supabaseClient
+          .from('user_configs')
+          .delete()
+          .eq('user_id', session.user.id);
+
+        if (error) throw error;
+
+        alert('Config supprimée ! Tu vas être redirigé pour créer un nouveau fichier.');
+        window.location.href = 'compta.html';
+      } catch (err) {
+        console.error('Reset error:', err);
+        alert('Erreur: ' + err.message);
+      }
     }
 
     async function signOut() {
