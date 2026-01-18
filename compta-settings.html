@@ -242,8 +242,8 @@
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <div>
-            <div style="font-size: 13px; font-weight: 500;">Envoi automatique</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Reçois l'export par email chaque fin de mois</div>
+            <div style="font-size: 13px; font-weight: 500;">📧 Envoi à la comptable</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">L'export est envoyé automatiquement par email</div>
           </div>
           <label style="position: relative; width: 44px; height: 24px;">
             <input type="checkbox" id="auto-export-toggle" onchange="toggleAutoExport()" style="opacity: 0; width: 0; height: 0;">
@@ -271,8 +271,8 @@
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <div style="font-size: 13px; font-weight: 500;">Rappel Telegram</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Notification avant la fin du mois</div>
+            <div style="font-size: 13px; font-weight: 500;">🔔 Rappel d'export</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Te rappelle de vérifier tes données avant clôture</div>
           </div>
           <label style="position: relative; width: 44px; height: 24px;">
             <input type="checkbox" id="reminder-toggle" onchange="toggleReminder()" style="opacity: 0; width: 0; height: 0;">
@@ -291,8 +291,8 @@
     </div>
 
     <!-- Lien discret pour nouveau fichier -->
-    <div style="text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
-      <button onclick="resetConfig()" style="background: none; border: none; color: rgba(255,255,255,0.3); font-size: 12px; cursor: pointer; padding: 8px 16px;">Recommencer avec un nouveau fichier</button>
+    <div style="text-align: center; margin-top: 40px;">
+      <button onclick="resetConfig()" style="background: none; border: none; color: rgba(255,255,255,0.25); font-size: 11px; cursor: pointer; padding: 8px 16px; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">↻ Nouveau fichier</button>
     </div>
   </div>
 
