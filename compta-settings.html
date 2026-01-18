@@ -84,11 +84,23 @@
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
 
     /* Rules */
-    .rule-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rule-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .rule-terms { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
     .rule-select { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: white; font-size: 13px; font-family: inherit; cursor: pointer; }
     .rule-select:focus { outline: none; border-color: #FF6B35; }
-    .rule-op { color: #FF6B35; font-weight: 700; font-size: 14px; }
+    .rule-op-select { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 6px 8px; color: #FF8B5E; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; width: 44px; text-align: center; }
+    .rule-op-select:focus { outline: none; }
+    .rule-bottom { display: flex; align-items: center; gap: 8px; }
     .rule-arrow { color: rgba(255,255,255,0.25); font-size: 12px; }
+    .rule-add-term { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; color: rgba(255,255,255,0.4); font-size: 11px; cursor: pointer; }
+    .rule-add-term:hover { border-color: #FF6B35; color: #FF8B5E; }
+    .rule-del-term { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 11px; padding: 2px 4px; }
+    .rule-del-term:hover { color: #ef4444; }
+
+    /* Preview amélioré */
+    .preview-result { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .preview-calc { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .preview-calc-result { color: #4ade80; font-weight: 600; }
 
     /* Connexions */
     .conn-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; }
@@ -138,16 +150,19 @@
 
     <!-- Preview -->
     <div class="preview-card">
-      <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100" oninput="updatePreview()">
+      <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100 tr 50" oninput="updatePreview()">
       <div class="preview-row">
         <div class="preview-box">
-          <div class="preview-label">Telegram</div>
-          <div id="preview-tg"><span class="empty-state">...</span></div>
+          <div class="preview-label">Parsé</div>
+          <div id="preview-parsed"><span class="empty-state">Tape un message...</span></div>
         </div>
         <div class="preview-box">
-          <div class="preview-label">Sheet</div>
-          <div id="preview-sheet"><span class="empty-state">...</span></div>
+          <div class="preview-label">Résultat</div>
+          <div id="preview-result"><span class="empty-state">Après règles...</span></div>
         </div>
+      </div>
+      <div class="preview-result" id="preview-rules-detail" style="display: none;">
+        <div class="preview-calc" id="preview-calc"></div>
       </div>
     </div>
 
@@ -229,6 +244,9 @@
     let config = null, keywords = [], rules = [], sheetHeaders = {};
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+    // Nouveau format règles: { terms: [{name, op}], target }
+    // op: '+' ou '-' (premier terme toujours '+')
+
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) { location.href = 'index.html'; return; }
@@ -253,17 +271,12 @@
     async function loadConfig(userId) {
       const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
 
-      // Si pas de config, rediriger vers la création
-      if (!cfg) {
-        window.location.href = 'compta.html';
-        return;
-      }
+      if (!cfg) { window.location.href = 'compta.html'; return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
       config = cfg;
 
-      // Extraire les headers du sheet si disponibles
       if (cfg?.excel_config?.colonnes_detectees) {
         cfg.excel_config.colonnes_detectees.forEach(c => {
           if (c.colonne && c.nom) sheetHeaders[c.colonne] = c.nom;
@@ -276,10 +289,22 @@
         noteColumn: c.noteColumn || '',
         aliases: c.aliases || []
       }));
-      rules = (cfg?.excel_config?.regles_calcul || []).map(r => ({
-        sources: r.sources || [],
-        target: r.target || ''
-      }));
+
+      // Convertir ancien format règles vers nouveau
+      rules = (cfg?.excel_config?.regles_calcul || []).map(r => {
+        // Nouveau format avec terms
+        if (r.terms && Array.isArray(r.terms)) {
+          return { terms: r.terms, target: r.target || '' };
+        }
+        // Ancien format avec sources array
+        if (r.sources && Array.isArray(r.sources)) {
+          return {
+            terms: r.sources.map((s, idx) => ({ name: s, op: '+' })),
+            target: r.target || ''
+          };
+        }
+        return { terms: [{ name: '', op: '+' }], target: '' };
+      });
 
       render();
 
@@ -289,13 +314,11 @@
       if (cfg?.sheet_id) {
         sheetEl.innerHTML = `<a href="https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit" target="_blank">Ouvrir</a>`;
         sheetEl.classList.remove('pending');
-        // Afficher section export
         document.getElementById('export-section').style.display = 'block';
-        // Sélectionner le mois en cours
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
       }
       if (tg?.telegram_user_id) {
-        tgEl.textContent = 'Connecte';
+        tgEl.textContent = 'Connecté';
         tgEl.classList.remove('pending');
       }
     }
@@ -309,15 +332,9 @@
 
     function updateCounts() {
       const validKw = keywords.filter(k => k.nom && k.colonne).length;
-      const validRules = rules.filter(r => r.sources[0] && r.sources[1] && r.target).length;
+      const validRules = rules.filter(r => r.terms.some(t => t.name) && r.target).length;
       document.getElementById('kw-count').textContent = validKw;
       document.getElementById('rules-count').textContent = validRules;
-    }
-
-    function getColLabel(col) {
-      if (!col) return 'Col';
-      const header = sheetHeaders[col];
-      return header ? `${col}` : col;
     }
 
     function renderKw() {
@@ -327,10 +344,10 @@
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
           <div class="kw-top">
             <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" placeholder="CB">
-            <button class="kw-del" onclick="delKw(${i})">x</button>
+            <button class="kw-del" onclick="delKw(${i})">×</button>
           </div>
           <div class="kw-bottom">
-            <span class="kw-arrow">vers</span>
+            <span class="kw-arrow">→</span>
             <select class="kw-col-select ${!k.colonne?'empty':''}" onchange="updKw(${i},'colonne',this.value)">
               <option value="">Col</option>
               ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}${sheetHeaders[c]?' ('+sheetHeaders[c]+')':''}</option>`).join('')}
@@ -345,71 +362,150 @@
     }
 
     function renderRules() {
-      const names = keywords.map(k=>k.nom).filter(n=>n);
-      document.getElementById('rules-list').innerHTML = rules.map((r,i) => `
-        <div class="rule-card">
-          <select class="rule-select" onchange="rules[${i}].sources[0]=this.value;render()">
-            <option value="">...</option>
-            ${names.map(n=>`<option value="${n}" ${r.sources[0]===n?'selected':''}>${n}</option>`).join('')}
-          </select>
-          <span class="rule-op">+</span>
-          <select class="rule-select" onchange="rules[${i}].sources[1]=this.value;render()">
-            <option value="">...</option>
-            ${names.map(n=>`<option value="${n}" ${r.sources[1]===n?'selected':''}>${n}</option>`).join('')}
-          </select>
-          <span class="rule-arrow">→</span>
-          <select class="rule-select" onchange="rules[${i}].target=this.value;render()">
-            <option value="">...</option>
-            ${names.map(n=>`<option value="${n}" ${r.target===n?'selected':''}>${n}</option>`).join('')}
-          </select>
-          <button class="kw-del" onclick="rules.splice(${i},1);render()">x</button>
-        </div>
-      `).join('');
+      const names = keywords.map(k => k.nom).filter(n => n);
+
+      document.getElementById('rules-list').innerHTML = rules.map((r, i) => {
+        const termsHtml = r.terms.map((t, j) => {
+          const opHtml = j > 0 ? `
+            <select class="rule-op-select" onchange="updRuleTerm(${i},${j},'op',this.value)">
+              <option value="+" ${t.op === '+' ? 'selected' : ''}>+</option>
+              <option value="-" ${t.op === '-' ? 'selected' : ''}>−</option>
+            </select>
+          ` : '';
+
+          return `
+            ${opHtml}
+            <select class="rule-select" onchange="updRuleTerm(${i},${j},'name',this.value)">
+              <option value="">...</option>
+              ${names.map(n => `<option value="${n}" ${t.name === n ? 'selected' : ''}>${n}</option>`).join('')}
+            </select>
+            ${r.terms.length > 1 ? `<button class="rule-del-term" onclick="delRuleTerm(${i},${j})">×</button>` : ''}
+          `;
+        }).join('');
+
+        return `
+          <div class="rule-card">
+            <div class="rule-terms">
+              ${termsHtml}
+              <button class="rule-add-term" onclick="addRuleTerm(${i})">+ terme</button>
+            </div>
+            <div class="rule-bottom">
+              <span class="rule-arrow">=</span>
+              <select class="rule-select" onchange="updRuleTarget(${i},this.value)">
+                <option value="">résultat</option>
+                ${names.map(n => `<option value="${n}" ${r.target === n ? 'selected' : ''}>${n}</option>`).join('')}
+              </select>
+              <button class="kw-del" onclick="delRule(${i})">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function addKw() { keywords.push({nom:'',colonne:'',noteColumn:'',aliases:[]}); render(); }
-    function updKw(i,f,v) {
-      if(f==='nom') { keywords[i].nom=v.toUpperCase(); keywords[i].aliases=[v.toLowerCase()]; }
-      else keywords[i][f]=v;
+    // Keywords
+    function addKw() { keywords.push({ nom: '', colonne: '', noteColumn: '', aliases: [] }); render(); }
+    function updKw(i, f, v) {
+      if (f === 'nom') { keywords[i].nom = v.toUpperCase(); keywords[i].aliases = [v.toLowerCase()]; }
+      else keywords[i][f] = v;
       render();
     }
-    function delKw(i) { keywords.splice(i,1); render(); }
-    function addRule() { rules.push({sources:['',''],target:''}); render(); }
+    function delKw(i) { keywords.splice(i, 1); render(); }
+
+    // Rules
+    function addRule() { rules.push({ terms: [{ name: '', op: '+' }], target: '' }); render(); }
+    function delRule(i) { rules.splice(i, 1); render(); }
+    function updRuleTerm(ri, ti, field, value) { rules[ri].terms[ti][field] = value; render(); }
+    function updRuleTarget(ri, value) { rules[ri].target = value; render(); }
+    function addRuleTerm(ri) { rules[ri].terms.push({ name: '', op: '+' }); render(); }
+    function delRuleTerm(ri, ti) {
+      if (rules[ri].terms.length > 1) {
+        rules[ri].terms.splice(ti, 1);
+        // S'assurer que le premier terme est toujours '+'
+        if (rules[ri].terms.length > 0) rules[ri].terms[0].op = '+';
+        render();
+      }
+    }
 
     function updatePreview() {
       const txt = document.getElementById('test-input').value.trim();
-      const tgEl = document.getElementById('preview-tg');
-      const shEl = document.getElementById('preview-sheet');
+      const parsedEl = document.getElementById('preview-parsed');
+      const resultEl = document.getElementById('preview-result');
+      const detailEl = document.getElementById('preview-rules-detail');
+      const calcEl = document.getElementById('preview-calc');
 
       if (!txt) {
-        tgEl.innerHTML = '<span class="empty-state">...</span>';
-        shEl.innerHTML = '<span class="empty-state">...</span>';
+        parsedEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
+        resultEl.innerHTML = '<span class="empty-state">Après règles...</span>';
+        detailEl.style.display = 'none';
         return;
       }
 
-      tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
-
+      // 1. Parser les valeurs
       const parsed = {};
       for (const k of keywords) {
         if (!k.nom) continue;
         const re = new RegExp(`\\b${k.nom.toLowerCase()}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
         const m = txt.toLowerCase().match(re);
-        if (m) parsed[k.nom] = parseFloat(m[1].replace(',','.'));
+        if (m) parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
       }
 
+      // Afficher valeurs parsées
+      const parsedRows = Object.entries(parsed).map(([k, v]) =>
+        `<div class="sheet-row"><span class="sheet-col">${k}:</span><span class="sheet-val">${v}</span></div>`
+      );
+      parsedEl.innerHTML = parsedRows.length ? parsedRows.join('') : '<span class="empty-state">Aucun mot-clé détecté</span>';
+
+      // 2. Appliquer les règles
+      const result = { ...parsed };
+      const calcDetails = [];
+
       for (const r of rules) {
-        if (r.sources[0] && r.sources[1] && r.target) {
-          const v1 = parsed[r.sources[0]] || 0;
-          const v2 = parsed[r.sources[1]] || 0;
-          if (v1 > 0 || v2 > 0) {
-            parsed[r.target] = (parsed[r.target] || 0) + v1 + v2;
+        if (!r.target || !r.terms.some(t => t.name)) continue;
+
+        let calcValue = 0;
+        let calcStr = '';
+        let hasValue = false;
+
+        for (let i = 0; i < r.terms.length; i++) {
+          const t = r.terms[i];
+          if (!t.name) continue;
+
+          const val = parsed[t.name] || 0;
+          if (val > 0) hasValue = true;
+
+          if (i === 0) {
+            calcValue = val;
+            calcStr = `${t.name}(${val})`;
+          } else {
+            if (t.op === '-') {
+              calcValue -= val;
+              calcStr += ` − ${t.name}(${val})`;
+            } else {
+              calcValue += val;
+              calcStr += ` + ${t.name}(${val})`;
+            }
           }
+        }
+
+        if (hasValue && r.target) {
+          result[r.target] = calcValue;
+          calcDetails.push(`${calcStr} = <span class="preview-calc-result">${r.target}: ${calcValue}</span>`);
         }
       }
 
-      const rows = keywords.filter(k => k.nom && k.colonne && parsed[k.nom] > 0)
-        .map(k => `<div class="sheet-row"><span class="sheet-col">${k.nom}:</span><span class="sheet-val">${parsed[k.nom].toFixed(0)}E</span></div>`);
-      shEl.innerHTML = rows.length ? rows.join('') : '<span class="empty-state">-</span>';
+      // Afficher résultat après règles
+      const resultRows = Object.entries(result).map(([k, v]) =>
+        `<div class="sheet-row"><span class="sheet-col">${k}:</span><span class="sheet-val">${v}€</span></div>`
+      );
+      resultEl.innerHTML = resultRows.length ? resultRows.join('') : '<span class="empty-state">-</span>';
+
+      // Afficher détail des calculs
+      if (calcDetails.length > 0) {
+        detailEl.style.display = 'block';
+        calcEl.innerHTML = calcDetails.join('<br>');
+      } else {
+        detailEl.style.display = 'none';
+      }
     }
 
     function escapeHtml(text) {
@@ -427,7 +523,7 @@
       if (!session) { btn.disabled = false; btn.textContent = 'Sauvegarder'; return; }
 
       const validKw = keywords.filter(k => k.nom.trim());
-      const validRules = rules.filter(r => r.sources[0] && r.sources[1] && r.target);
+      const validRules = rules.filter(r => r.terms.some(t => t.name) && r.target);
 
       const newCfg = {
         ...(config?.excel_config || {}),
@@ -438,8 +534,7 @@
           aliases: k.aliases.length ? k.aliases : [k.nom.toLowerCase()]
         })),
         regles_calcul: validRules.map(r => ({
-          sources: r.sources,
-          operation: 'add',
+          terms: r.terms.filter(t => t.name),
           target: r.target
         }))
       };
@@ -453,13 +548,13 @@
       btn.textContent = 'Sauvegarder';
 
       if (error) { toast('Erreur: ' + error.message, true); return; }
-      toast('Sauvegarde OK');
+      toast('Config sauvegardée !');
     }
 
-    function toast(msg, err=false) {
+    function toast(msg, err = false) {
       const t = document.getElementById('toast');
       t.textContent = msg;
-      t.className = 'toast show' + (err?' error':'');
+      t.className = 'toast show' + (err ? ' error' : '');
       setTimeout(() => t.className = 'toast', 2500);
     }
 
@@ -496,8 +591,8 @@
       const month = document.getElementById('export-month').value;
       const format = document.getElementById('export-format').value;
       const year = new Date().getFullYear();
-      const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-      const sheetName = monthNames[parseInt(month)-1] + ' ' + year;
+      const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      const sheetName = monthNames[parseInt(month) - 1] + ' ' + year;
 
       toast('Export en cours...');
 
@@ -516,14 +611,12 @@
           const csv = rows.map(r => r.join(';')).join('\n');
           downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
         } else {
-          // Pour XLSX, on utilise SheetJS si disponible
           if (typeof XLSX !== 'undefined') {
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(rows);
             XLSX.utils.book_append_sheet(wb, ws, sheetName);
             XLSX.writeFile(wb, `compta_${sheetName}.xlsx`);
           } else {
-            // Fallback CSV
             const csv = rows.map(r => r.join(';')).join('\n');
             downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
           }
