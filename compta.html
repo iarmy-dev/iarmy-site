@@ -3488,8 +3488,8 @@
           rule.operations = rule.sources.slice(1).map(function() { return '+'; });
         }
 
-        // Ligne GLASS: [A] + [B] - [C] → [D]
-        html += '<div class="glass-row" style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); flex-wrap: wrap;">';
+        // Ligne GLASS: [A] + [B] - [C] → [D] [+]
+        html += '<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap;">';
 
         // Sources avec opérations entre elles
         rule.sources.forEach(function(src, srcIdx) {
@@ -3497,14 +3497,14 @@
           if (srcIdx > 0) {
             var opIdx = srcIdx - 1;
             var currentOp = rule.operations[opIdx] || '+';
-            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 50px; background: rgba(255,107,53,0.2); border: 2px solid rgba(255,107,53,0.5); border-radius: 6px; padding: 6px 4px; color: #FF6B35; font-size: 16px; font-weight: 700; text-align: center;">';
-            html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>PLUS</option>';
-            html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>MOINS</option>';
+            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 36px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 6px 2px; color: #FF8B5E; font-size: 18px; font-weight: 600; text-align: center; cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none;">';
+            html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>+</option>';
+            html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>−</option>';
             html += '</select>';
           }
 
           // Select pour la source
-          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="width: 65px; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 7px 8px; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; text-align: center;">';
+          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="min-width: 55px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px; font-weight: 500; cursor: pointer;">';
           keywords.forEach(function(kw) {
             var selected = kw === src ? 'selected' : '';
             html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
@@ -3513,39 +3513,36 @@
 
           // Bouton supprimer la source (si plus de 2 sources)
           if (rule.sources.length > 2) {
-            html += '<button onclick="removeRuleSource(' + index + ', ' + srcIdx + ')" style="width: 18px; height: 18px; background: rgba(239,68,68,0.1); border: none; border-radius: 4px; color: rgba(239,68,68,0.5); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;" title="Supprimer">×</button>';
+            html += '<button onclick="removeRuleSource(' + index + ', ' + srcIdx + ')" style="width: 16px; height: 16px; background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 12px; padding: 0;" title="Supprimer">×</button>';
           }
         });
 
-        // Flèche
-        html += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; margin: 0 4px;">→</span>';
+        // Bouton ajouter terme (petit, inline)
+        html += '<button onclick="addRuleSource(' + index + ')" style="width: 24px; height: 24px; background: rgba(255,107,53,0.1); border: 1px dashed rgba(255,107,53,0.3); border-radius: 4px; color: #FF8B5E; cursor: pointer; font-size: 14px; font-weight: 500;" title="Ajouter un terme">+</button>';
 
-        // Target avec option "nouvelle colonne"
-        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="width: 75px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 7px 6px; color: #4ade80; font-size: 12px; font-weight: 600; text-align: center;">';
-        // Option pour créer une nouvelle colonne
+        // Flèche
+        html += '<span style="color: rgba(255,255,255,0.3); font-size: 14px; margin: 0 2px;">=</span>';
+
+        // Target
+        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="min-width: 60px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 6px; padding: 6px 8px; color: #4ade80; font-size: 12px; font-weight: 500; cursor: pointer;">';
         if (rule.createTarget) {
-          html += '<option value="__NEW__" selected>✨ ' + rule.target + '</option>';
+          html += '<option value="__NEW__" selected>' + rule.target + '</option>';
         }
         keywords.forEach(function(kw) {
           var selected = (!rule.createTarget && kw === rule.target) ? 'selected' : '';
           html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
         });
-        html += '<option value="__NEW__"' + (rule.createTarget ? ' selected' : '') + '>+ Créer</option>';
+        html += '<option value="__NEW__">+ Nouveau</option>';
         html += '</select>';
 
         // Input pour nom de nouvelle colonne (si createTarget)
         if (rule.createTarget) {
-          html += '<input type="text" value="' + rule.target + '" onchange="updateNewTargetName(' + index + ', this.value)" placeholder="Nom" style="width: 60px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 6px 8px; color: #4ade80; font-size: 11px; font-weight: 600; text-transform: uppercase;">';
+          html += '<input type="text" value="' + rule.target + '" onchange="updateNewTargetName(' + index + ', this.value)" placeholder="Nom" style="width: 55px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 5px; padding: 5px 6px; color: #4ade80; font-size: 11px; text-transform: uppercase;">';
         }
 
         // Supprimer la règle
-        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\'">×</button>';
+        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; padding: 4px;" title="Supprimer la règle">×</button>';
 
-        html += '</div>';
-
-        // Bouton ajouter terme - GROS ET VISIBLE
-        html += '<div style="margin: 8px 0; padding: 8px; background: #FF6B35; border-radius: 8px; text-align: center;">';
-        html += '<button onclick="addRuleSource(' + index + ')" style="padding: 10px 20px; background: white; border: none; border-radius: 6px; color: #FF6B35; cursor: pointer; font-size: 14px; font-weight: bold;">➕ AJOUTER UN TERME (CB, ESP, TR...)</button>';
         html += '</div>';
       });
 
