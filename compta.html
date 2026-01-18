@@ -1373,6 +1373,7 @@
 
     function updateGoogleSheetsButton() {
       const btn = document.getElementById('btn-google-sheets');
+      if (!btn) return; // Éviter erreur si bouton pas encore dans le DOM
       if (hasGoogleSheetsAccess) { btn.classList.add('connected'); btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg><span>Choisir mon fichier</span>'; }
       else if (userProvider === 'google') { btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#0f9d58"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg><span>Autoriser l\'accès à Google Sheets</span>'; }
       else { btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.1 16.2 18.7 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.1 2 9.3 6.2 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.3-2 14.1-5.3l-6.5-5.5C29.5 37 26.9 38 24 38c-6.1 0-11.2-3.9-13.1-9.3l-6.6 5.1C7.3 41.4 15.1 46 24 46z"/><path fill="#EA4335" d="M46.5 20H24v8.5h11.8c-.8 2.4-2.3 4.5-4.3 6l6.5 5.5C41.8 36.5 46 30.9 46 24c0-1.3-.1-2.6-.5-4z"/></svg><span>Se connecter avec Google</span>'; }
@@ -1729,7 +1730,7 @@
       closeSheetsOverlay();
 
       var { data: { session } } = await supabaseClient.auth.getSession();
-      var sheetToUse = { id: sheet.id, name: sheet.name };
+      var sheetToUse = { id: sheet.id, name: sheet.name, webViewLink: sheet.webViewLink };
 
       // Check if it's an Excel file that needs conversion
       var isExcel = sheet.fileType === 'excel-xlsx' || sheet.fileType === 'excel-xls';
@@ -1756,8 +1757,8 @@
           if (!convertResult.success) throw new Error(convertResult.error || 'Conversion échouée');
 
           // Use the converted Google Sheet
-          sheetToUse = { id: convertResult.sheet.id, name: convertResult.sheet.name };
-          console.log('[COMPTA] ✅ Conversion réussie:', sheetToUse.name);
+          sheetToUse = { id: convertResult.sheet.id, name: convertResult.sheet.name, webViewLink: convertResult.sheet.webViewLink };
+          console.log('[COMPTA] ✅ Conversion réussie:', sheetToUse.name, sheetToUse.webViewLink);
 
           hideLoader();
 
@@ -1765,7 +1766,7 @@
           if (convertResult.verification && !convertResult.verification.success) {
             // Show warning modal
             console.log('[COMPTA] ⚠️ Différences détectées:', convertResult.verification.differences);
-            pendingConvertedSheet = sheetToUse;
+            pendingConvertedSheet = { ...sheetToUse, webViewLink: convertResult.sheet.webViewLink };
             pendingCompareUrls = {
               original: convertResult.sheet.originalWebViewLink,
               converted: convertResult.sheet.webViewLink
