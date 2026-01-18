@@ -602,29 +602,42 @@
       XLSX.writeFile(wb, filename + '.xlsx');
     }
 
-    async function resetConfig() {
-      if (!confirm('Supprimer ta config actuelle et créer un nouveau fichier iArmy ?')) return;
+    function resetConfig() {
+      // Afficher modal de confirmation
+      const modal = document.createElement('div');
+      modal.id = 'reset-modal';
+      modal.innerHTML = `
+        <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;">
+            <div style="font-size: 32px; margin-bottom: 12px;">🔄</div>
+            <div style="font-size: 16px; font-weight: 600; color: white; margin-bottom: 8px;">Nouveau fichier ?</div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">Ta config actuelle sera supprimée et tu pourras créer un nouveau fichier iArmy.</div>
+            <div style="display: flex; gap: 10px;">
+              <button onclick="document.getElementById('reset-modal').remove()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer;">Annuler</button>
+              <button onclick="doResetConfig()" style="flex: 1; padding: 12px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; color: #f87171; font-size: 13px; font-weight: 600; cursor: pointer;">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    async function doResetConfig() {
+      const modal = document.getElementById('reset-modal');
+      if (modal) modal.remove();
 
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-          alert('Session expirée');
-          return;
-        }
+        if (!session) return;
 
-        // Supprimer la config
-        const { error } = await supabaseClient
+        await supabaseClient
           .from('user_configs')
           .delete()
           .eq('user_id', session.user.id);
 
-        if (error) throw error;
-
-        alert('Config supprimée ! Tu vas être redirigé pour créer un nouveau fichier.');
         window.location.href = 'compta.html';
       } catch (err) {
         console.error('Reset error:', err);
-        alert('Erreur: ' + err.message);
       }
     }
 
