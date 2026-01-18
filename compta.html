@@ -3479,7 +3479,7 @@
       noRulesMsg.style.display = 'none';
 
       // Obtenir la liste des mots-clés disponibles
-      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+      var keywords = getAvailableKeywords();
 
       var html = '';
       customRules.forEach(function(rule, index) {
@@ -3552,9 +3552,26 @@
       container.innerHTML = html;
     }
 
+    // Fonction helper pour récupérer les mots-clés disponibles
+    function getAvailableKeywords() {
+      // Essayer d'abord sheetEditorColumns (tableau visible)
+      if (sheetEditorColumns && sheetEditorColumns.length > 0) {
+        return sheetEditorColumns
+          .filter(function(c) { return c.name !== 'Date' && c.name !== 'Notes'; })
+          .map(function(c) { return c.name.toUpperCase(); });
+      }
+      // Sinon configEditorData
+      if (configEditorData && configEditorData.length > 0) {
+        return configEditorData
+          .map(function(c) { return c.keyword.toUpperCase(); })
+          .filter(function(k) { return k; });
+      }
+      return [];
+    }
+
     function addCustomRule() {
-      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
-      console.log('[RULES] addCustomRule - configEditorData:', configEditorData.length, 'keywords:', keywords);
+      var keywords = getAvailableKeywords();
+      console.log('[RULES] addCustomRule - keywords:', keywords);
 
       if (keywords.length < 2) {
         showToast("Configure d'abord tes mots-clés (CB, ESP, TR...)");
@@ -3606,7 +3623,7 @@
     }
 
     function addRuleSource(ruleIndex) {
-      var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
+      var keywords = getAvailableKeywords();
       if (keywords.length > 0) {
         customRules[ruleIndex].sources.push(keywords[0]);
         customRules[ruleIndex].operations.push('+');
