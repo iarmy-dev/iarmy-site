@@ -2672,8 +2672,25 @@
     function sheetFinishEdit(index, newName) {
       var col = sheetEditorColumns[index];
       if (newName && newName.trim() && newName.trim() !== col.name) {
-        col.name = newName.trim();
-        col.aliases = [newName.trim().toLowerCase()];
+        var trimmed = newName.trim();
+
+        // Validation : interdire les caractères spéciaux
+        var invalidChars = /[+\-=*\/\\|<>!@#$%^&(){}[\]:;"'?,]/;
+        if (invalidChars.test(trimmed)) {
+          alert('❌ Nom invalide\n\nLes caractères spéciaux ne sont pas autorisés : + - = * / etc.\n\nUtilise uniquement des lettres et chiffres.');
+          renderSheetEditor();
+          return;
+        }
+
+        // Validation : minimum 2 caractères
+        if (trimmed.length < 2) {
+          alert('❌ Nom trop court\n\nLe nom doit faire au moins 2 caractères.');
+          renderSheetEditor();
+          return;
+        }
+
+        col.name = trimmed;
+        col.aliases = [trimmed.toLowerCase()];
         hasUnsavedChanges = true;
       }
       renderSheetEditor();
