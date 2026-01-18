@@ -1151,7 +1151,7 @@
               <span style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.3);">optionnel</span>
             </summary>
             <div style="padding: 0 16px 16px 16px;">
-              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: Si tu tapes "total", ça additionne CB + ESP</p>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: ESP − DEP → ESP (soustrait les dépenses des espèces)</p>
               <div id="rules-editor-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
                 <!-- Règles générées par JS -->
               </div>
@@ -2787,13 +2787,18 @@
         });
       });
 
-      // Appliquer les règles
+      // Appliquer les règles (+ ou -)
       sheetEditorRules.forEach(function(rule) {
         if (rule.src1 && rule.src2 && rule.target) {
           var v1 = parsed[rule.src1] || 0;
           var v2 = parsed[rule.src2] || 0;
           if (v1 > 0 || v2 > 0) {
-            parsed[rule.target] = (parsed[rule.target] || 0) + v1 + v2;
+            var op = rule.op || '+';
+            if (op === '-') {
+              parsed[rule.target] = (parsed[rule.target] || 0) + v1 - v2;
+            } else {
+              parsed[rule.target] = (parsed[rule.target] || 0) + v1 + v2;
+            }
           }
         }
       });
@@ -2877,7 +2882,7 @@
     }
 
     function addEditorRule() {
-      sheetEditorRules.push({ src1: '', src2: '', target: '' });
+      sheetEditorRules.push({ src1: '', op: '+', src2: '', target: '' });
       renderEditorRules();
     }
 
@@ -2889,9 +2894,16 @@
       var opts = '<option value="">...</option>' + cols.map(function(c) { return '<option value="' + c.name + '">' + c.name + '</option>'; }).join('');
 
       container.innerHTML = sheetEditorRules.map(function(rule, i) {
+        // Assurer que op existe (compatibilité anciennes règles)
+        if (!rule.op) rule.op = '+';
+        var opSelect = '<select onchange="sheetEditorRules[' + i + '].op=this.value;updateTelegramPreview()" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 4px 8px; color: #FF8B5E; font-size: 14px; font-weight: 600; width: 40px; text-align: center;">' +
+          '<option value="+"' + (rule.op === '+' ? ' selected' : '') + '>+</option>' +
+          '<option value="-"' + (rule.op === '-' ? ' selected' : '') + '>−</option>' +
+          '</select>';
+
         return '<div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">' +
           '<select onchange="sheetEditorRules[' + i + '].src1=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
-          '<span style="color: #FF8B5E;">+</span>' +
+          opSelect +
           '<select onchange="sheetEditorRules[' + i + '].src2=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
           '<span style="color: rgba(255,255,255,0.4);">→</span>' +
           '<select onchange="sheetEditorRules[' + i + '].target=this.value;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
