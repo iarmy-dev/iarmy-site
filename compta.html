@@ -1199,15 +1199,15 @@
                 <label style="font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px;">Taux à calculer :</label>
                 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                   <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-5-5" value="5.5" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                    <input type="checkbox" id="tva-5-5" value="5.5" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
                     5,5%
                   </label>
                   <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-10" value="10" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                    <input type="checkbox" id="tva-10" value="10" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
                     10%
                   </label>
                   <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-20" value="20" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                    <input type="checkbox" id="tva-20" value="20" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
                     20%
                   </label>
                 </div>
@@ -2600,6 +2600,9 @@
       var tbody = document.getElementById('sheet-editor-body');
       if (!headersRow || !tbody) return;
 
+      // Récupérer les taux TVA sélectionnés
+      var selectedTvaRates = getSelectedTvaRates();
+
       // Générer les headers
       var headersHtml = '';
       sheetEditorColumns.forEach(function(col, i) {
@@ -2614,6 +2617,12 @@
           '<span class="col-name" onclick="sheetStartEdit(' + i + ')">' + col.name + '</span>' +
           (!isFixed ? '<span class="col-delete" onclick="event.stopPropagation();sheetRemoveCol(' + i + ')">×</span>' : '') +
           '</th>';
+      });
+      // Colonne TOTAL (toujours visible)
+      headersHtml += '<th class="sheet-col" style="background: rgba(255,107,53,0.15); font-weight: 600;">TOTAL</th>';
+      // Colonnes TVA (si sélectionnées)
+      selectedTvaRates.forEach(function(rate) {
+        headersHtml += '<th class="sheet-col" style="background: rgba(255,200,100,0.15); font-size: 11px;">TVA ' + rate.toString().replace('.', ',') + '%</th>';
       });
       // Bouton ajouter
       headersHtml += '<th class="sheet-col-add"><span onclick="sheetAddCol()">+</span></th>';
@@ -2633,6 +2642,12 @@
             val = (d < 10 ? '0' : '') + d + '/' + (month < 10 ? '0' : '') + month;
           }
           rowsHtml += '<td class="sheet-cell" ' + (isFirstRow ? 'data-col="' + col.name + '"' : '') + '>' + val + '</td>';
+        });
+        // Cellule TOTAL
+        rowsHtml += '<td class="sheet-cell" style="font-weight: 600; color: #FF8B5E;" ' + (isFirstRow ? 'data-col="TOTAL"' : '') + '></td>';
+        // Cellules TVA
+        selectedTvaRates.forEach(function(rate) {
+          rowsHtml += '<td class="sheet-cell" style="color: rgba(255,180,80,0.8); font-size: 11px;" ' + (isFirstRow ? 'data-col="TVA' + rate + '"' : '') + '></td>';
         });
         rowsHtml += '<td></td></tr>';
       }
@@ -2825,6 +2840,40 @@
           }
         }
       });
+
+      // Calculer et afficher TOTAL
+      var total = 0;
+      sheetEditorColumns.forEach(function(col) {
+        if (col.name !== 'Date' && col.name !== 'Notes' && parsed[col.name]) {
+          total += parsed[col.name];
+        }
+      });
+      var totalCell = document.querySelector('#sheet-preview-row td[data-col="TOTAL"]');
+      if (totalCell) {
+        if (total > 0) {
+          totalCell.textContent = total.toFixed(2) + ' €';
+          totalCell.classList.add('value-pop');
+          setTimeout(function() { totalCell.classList.remove('value-pop'); }, 300);
+        } else {
+          totalCell.textContent = '';
+        }
+      }
+
+      // Calculer et afficher TVA
+      var selectedTvaRates = getSelectedTvaRates();
+      selectedTvaRates.forEach(function(rate) {
+        var tvaCell = document.querySelector('#sheet-preview-row td[data-col="TVA' + rate + '"]');
+        if (tvaCell) {
+          if (total > 0) {
+            var tva = total / (1 + rate/100) * (rate/100);
+            tvaCell.textContent = tva.toFixed(2) + ' €';
+            tvaCell.classList.add('value-pop');
+            setTimeout(function() { tvaCell.classList.remove('value-pop'); }, 300);
+          } else {
+            tvaCell.textContent = '';
+          }
+        }
+      });
     }
 
     function addEditorRule() {
@@ -2891,6 +2940,13 @@
           opt.style.background = 'rgba(255,255,255,0.04)';
         }
       });
+
+      // Mettre à jour la prévisualisation
+      renderSheetEditor();
+    }
+
+    function onTvaCheckboxChange() {
+      renderSheetEditor();
     }
 
     function getSelectedTvaRates() {
