@@ -620,21 +620,22 @@
         display: none !important;
       }
 
-      /* Réduire le padding du main content */
+      /* Réduire le padding du main content - 0 pour edge-to-edge */
       .main-content {
-        padding: 8px !important;
+        padding: 0 !important;
       }
 
       /* Container principal full width */
       #config-editor-main {
-        padding: 0 !important;
+        padding: 0 8px !important;
       }
 
-      /* Cards full width */
+      /* Cards full width - pas de border-radius pour edge-to-edge */
       #config-editor-main .glass-card {
-        margin: 0 0 8px 0 !important;
-        border-radius: 10px !important;
+        margin: 0 -8px 8px -8px !important;
+        border-radius: 0 !important;
         border: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
       }
 
       /* Header Excel ultra compact */
@@ -1159,50 +1160,20 @@
               <span style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.3);">optionnel</span>
             </summary>
             <div style="padding: 0 16px 16px 16px;">
-              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ajoute des colonnes TVA automatiques à ton fichier</p>
-
-              <!-- Sélecteur d'activité -->
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px;">Ton activité :</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                  <label class="tva-activity-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="radio" name="tva-activity" value="restaurant" onchange="updateTvaRates()" style="accent-color: #FF6B35;">
-                    Restaurant
-                  </label>
-                  <label class="tva-activity-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="radio" name="tva-activity" value="bar" onchange="updateTvaRates()" style="accent-color: #FF6B35;">
-                    Bar
-                  </label>
-                  <label class="tva-activity-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="radio" name="tva-activity" value="epicerie" onchange="updateTvaRates()" style="accent-color: #FF6B35;">
-                    Épicerie
-                  </label>
-                  <label class="tva-activity-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="radio" name="tva-activity" value="autre" onchange="updateTvaRates()" style="accent-color: #FF6B35;">
-                    Autre commerce
-                  </label>
-                </div>
-                <p style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 6px;">Pas de TVA ? Laisse vide, c'est optionnel.</p>
-              </div>
-
-              <!-- Taux TVA -->
-              <div id="tva-rates-container" style="display: none;">
-                <label style="font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px;">Colonnes TVA à ajouter :</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                  <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-5-5" value="5.5" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
-                    5,5%
-                  </label>
-                  <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-10" value="10" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
-                    10%
-                  </label>
-                  <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
-                    <input type="checkbox" id="tva-20" value="20" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
-                    20%
-                  </label>
-                </div>
-                <p id="tva-info" style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 10px; font-style: italic;"></p>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ajoute des colonnes TVA à ton fichier</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
+                  <input type="checkbox" id="tva-5-5" value="5.5" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                  5,5%
+                </label>
+                <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
+                  <input type="checkbox" id="tva-10" value="10" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                  10%
+                </label>
+                <label class="tva-rate-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s;">
+                  <input type="checkbox" id="tva-20" value="20" onchange="onTvaCheckboxChange()" style="accent-color: #FF6B35; width: 16px; height: 16px;">
+                  20%
+                </label>
               </div>
             </div>
           </details>
@@ -2905,51 +2876,8 @@
     }
 
     // ========== TVA ==========
-    var tvaConfig = {
-      restaurant: { rates: [5.5, 10], info: '10% repas sur place · 5,5% vente à emporter' },
-      bar: { rates: [10, 20], info: '10% boissons sans alcool · 20% alcool' },
-      epicerie: { rates: [5.5, 10, 20], info: '5,5% produits alimentaires · 20% alcool' },
-      autre: { rates: [5.5, 10, 20], info: 'Coche les taux qui correspondent à ton activité' }
-    };
-
-    function updateTvaRates() {
-      var activity = document.querySelector('input[name="tva-activity"]:checked');
-      var container = document.getElementById('tva-rates-container');
-      var info = document.getElementById('tva-info');
-
-      if (!activity) {
-        container.style.display = 'none';
-        return;
-      }
-
-      container.style.display = 'block';
-      var config = tvaConfig[activity.value];
-
-      // Cocher les taux recommandés pour cette activité
-      document.getElementById('tva-5-5').checked = config.rates.includes(5.5);
-      document.getElementById('tva-10').checked = config.rates.includes(10);
-      document.getElementById('tva-20').checked = config.rates.includes(20);
-
-      // Afficher l'info
-      info.textContent = config.info;
-
-      // Highlight les options sélectionnées
-      document.querySelectorAll('.tva-activity-option').forEach(function(opt) {
-        var input = opt.querySelector('input');
-        if (input.checked) {
-          opt.style.borderColor = 'rgba(255,107,53,0.4)';
-          opt.style.background = 'rgba(255,107,53,0.1)';
-        } else {
-          opt.style.borderColor = 'rgba(255,255,255,0.1)';
-          opt.style.background = 'rgba(255,255,255,0.04)';
-        }
-      });
-
-      // Mettre à jour la prévisualisation
-      renderSheetEditor();
-    }
-
     function onTvaCheckboxChange() {
+      // Met à jour la preview quand on coche/décoche une TVA
       renderSheetEditor();
     }
 
