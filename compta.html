@@ -1144,7 +1144,7 @@
             .tg-bot.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: rgba(255,255,255,0.8); }
           </style>
 
-          <!-- RÈGLES (accordion) -->
+          <!-- RÈGLES AVANCÉES (multi-termes) -->
           <details class="glass-card" style="padding: 0; margin-bottom: 24px;">
             <summary style="padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;"><path d="M9 18l6-6-6-6"/></svg>
@@ -1152,11 +1152,14 @@
               <span style="margin-left: auto; font-size: 11px; color: rgba(255,255,255,0.3);">optionnel</span>
             </summary>
             <div style="padding: 0 16px 16px 16px;">
-              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Ex: ESP − DEP → ESP (soustrait les dépenses des espèces)</p>
-              <div id="rules-editor-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-                <!-- Règles générées par JS -->
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Crée des calculs automatiques : CB + ESP + TR → TOTAL</p>
+              <div id="no-rules-message" style="padding: 12px; text-align: center; color: rgba(255,255,255,0.3); font-size: 11px;">
+                Aucune règle configurée
               </div>
-              <button onclick="addEditorRule()" style="padding: 8px 14px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: #FF8B5E; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.2)'" onmouseout="this.style.background='rgba(255,107,53,0.1)'">
+              <div id="custom-rules-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;">
+                <!-- Règles générées par renderCustomRules() -->
+              </div>
+              <button onclick="addCustomRule()" style="padding: 8px 14px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; color: #FF8B5E; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.2)'" onmouseout="this.style.background='rgba(255,107,53,0.1)'">
                 + Ajouter une règle
               </button>
             </div>
