@@ -7,6 +7,10 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Export libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
@@ -80,6 +84,22 @@
 
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: #FF8B5E; }
+
+    /* Export columns checkboxes */
+    .export-col-check { display: flex; align-items: center; gap: 5px; padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; font-size: 11px; transition: all 0.2s; }
+    .export-col-check:hover { background: rgba(255,255,255,0.08); }
+    .export-col-check.checked { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.3); }
+    .export-col-check input { accent-color: #FF6B35; width: 14px; height: 14px; }
+
+    /* Select styling */
+    select option { background: #1a1a1a; color: white; }
+
+    /* Export button states */
+    #export-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,53,0.3); }
+    #export-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    #export-btn.loading { pointer-events: none; }
+    #export-btn.loading span:first-child { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -152,6 +172,63 @@
       </div>
     </div>
     </div>
+
+    <!-- Export Comptable -->
+    <div class="main-card" id="export-section" style="margin-top: 16px; display: none;">
+      <div class="section-title" style="margin-bottom: 16px;">📥 Export Comptable</div>
+
+      <!-- Période + Format -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label style="font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">Période</label>
+          <select id="export-month" style="width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 13px; cursor: pointer;">
+            <option value="01">Janvier</option>
+            <option value="02">Février</option>
+            <option value="03">Mars</option>
+            <option value="04">Avril</option>
+            <option value="05">Mai</option>
+            <option value="06">Juin</option>
+            <option value="07">Juillet</option>
+            <option value="08">Août</option>
+            <option value="09">Septembre</option>
+            <option value="10">Octobre</option>
+            <option value="11">Novembre</option>
+            <option value="12">Décembre</option>
+          </select>
+        </div>
+        <div style="flex: 1;">
+          <label style="font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-bottom: 4px;">Format</label>
+          <select id="export-format" style="width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 13px; cursor: pointer;">
+            <option value="excel">📊 Excel</option>
+            <option value="pdf">📄 PDF</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Colonnes à inclure -->
+      <div style="margin-bottom: 16px;">
+        <label style="font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-bottom: 8px;">Colonnes à inclure</label>
+        <div id="export-columns" style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <!-- Généré par JS -->
+        </div>
+      </div>
+
+      <!-- En-tête personnalisé (accordéon) -->
+      <details style="margin-bottom: 16px;">
+        <summary style="font-size: 11px; color: rgba(255,255,255,0.5); cursor: pointer; padding: 8px 0;">⚙️ En-tête personnalisé (optionnel)</summary>
+        <div style="padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <input type="text" id="export-header-name" placeholder="Nom du restaurant" style="padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 12px;">
+          <input type="text" id="export-header-address" placeholder="Adresse (optionnel)" style="padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 12px;">
+          <input type="text" id="export-header-siret" placeholder="SIRET (optionnel)" style="padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 12px;">
+        </div>
+      </details>
+
+      <!-- Bouton Export -->
+      <button id="export-btn" onclick="generateExport()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 12px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>📥</span> Générer l'export
+      </button>
+      <p style="font-size: 9px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 8px;">Le fichier original reste intact dans Google Sheets</p>
+    </div>
   </div>
 
   <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
@@ -196,6 +273,10 @@
       await loadModuleData(user.id);
     }
 
+    // Variables globales pour l'export
+    let userConfig = null;
+    let userSheetId = null;
+
     async function loadModuleData(userId) {
       try {
         const { data: config } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
@@ -213,6 +294,13 @@
           document.getElementById('sheet-conn').classList.add('active');
           document.getElementById('sheet-conn').style.cursor = 'pointer';
           document.getElementById('sheet-conn').onclick = () => window.open('https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit', '_blank');
+
+          // Stocker la config pour l'export
+          userConfig = config.excel_config;
+          userSheetId = config.sheet_id;
+
+          // Afficher la section export et charger les colonnes
+          initExportSection(config.excel_config);
         }
 
         if (!config?.sheet_id && !telegramLink?.telegram_user_id) {
@@ -220,6 +308,288 @@
           document.getElementById('compta-badge').className = 'module-badge inactive';
         }
       } catch (err) { console.log('No config'); }
+    }
+
+    // ========== EXPORT COMPTABLE ==========
+
+    function initExportSection(config) {
+      // Afficher la section
+      document.getElementById('export-section').style.display = 'block';
+
+      // Sélectionner le mois en cours par défaut
+      const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+      document.getElementById('export-month').value = currentMonth;
+
+      // Générer les checkboxes de colonnes
+      const columnsContainer = document.getElementById('export-columns');
+      const columns = config?.colonnes || ['Date', 'CB', 'ESP', 'TR', 'DEP', 'RAZ', 'Notes', 'TOTAL'];
+
+      // Colonnes toujours incluses par défaut (données comptables)
+      const defaultChecked = ['Date', 'CB', 'ESP', 'TR', 'TOTAL', 'TVA'];
+
+      columnsContainer.innerHTML = columns.map(col => {
+        const isChecked = defaultChecked.some(d => col.toUpperCase().includes(d.toUpperCase()));
+        const isNotes = col.toLowerCase() === 'notes';
+        return `
+          <label class="export-col-check ${isChecked ? 'checked' : ''}" onclick="toggleExportCol(this)">
+            <input type="checkbox" value="${col}" ${isChecked ? 'checked' : ''}>
+            ${col}${isNotes ? ' <span style="font-size:9px;color:rgba(255,255,255,0.3)">(interne)</span>' : ''}
+          </label>
+        `;
+      }).join('');
+
+      // Ajouter TVA si présent dans la config
+      const tvaRates = config?.tva_rates || [];
+      tvaRates.forEach(rate => {
+        const colName = 'TVA ' + rate + '%';
+        columnsContainer.innerHTML += `
+          <label class="export-col-check checked" onclick="toggleExportCol(this)">
+            <input type="checkbox" value="${colName}" checked>
+            ${colName}
+          </label>
+        `;
+      });
+    }
+
+    function toggleExportCol(label) {
+      const checkbox = label.querySelector('input');
+      checkbox.checked = !checkbox.checked;
+      label.classList.toggle('checked', checkbox.checked);
+    }
+
+    async function generateExport() {
+      const btn = document.getElementById('export-btn');
+      const originalHtml = btn.innerHTML;
+
+      try {
+        // Loading state
+        btn.innerHTML = '<span>⏳</span> Génération...';
+        btn.classList.add('loading');
+
+        // Récupérer les paramètres
+        const month = document.getElementById('export-month').value;
+        const format = document.getElementById('export-format').value;
+        const monthNames = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        const monthName = monthNames[parseInt(month)];
+
+        // Colonnes sélectionnées
+        const selectedCols = Array.from(document.querySelectorAll('#export-columns input:checked')).map(cb => cb.value);
+
+        if (selectedCols.length === 0) {
+          alert('Sélectionne au moins une colonne');
+          return;
+        }
+
+        // En-tête personnalisé
+        const headerName = document.getElementById('export-header-name').value.trim();
+        const headerAddress = document.getElementById('export-header-address').value.trim();
+        const headerSiret = document.getElementById('export-header-siret').value.trim();
+
+        // Appeler l'Edge Function pour récupérer les données
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        const response = await fetch(SUPABASE_URL + '/functions/v1/export-sheet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({
+            sheet_id: userSheetId,
+            month: monthName.toUpperCase(),
+            columns: selectedCols
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la récupération des données');
+        }
+
+        const { data: sheetData, error } = await response.json();
+        if (error) throw new Error(error);
+
+        // Générer le fichier
+        const year = new Date().getFullYear();
+        const filename = `Compta_${monthName}_${year}`;
+
+        if (format === 'pdf') {
+          generatePDF(sheetData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
+        } else {
+          generateExcel(sheetData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
+        }
+
+        btn.innerHTML = '<span>✓</span> Export généré !';
+        setTimeout(() => { btn.innerHTML = originalHtml; btn.classList.remove('loading'); }, 2000);
+
+      } catch (err) {
+        console.error('Export error:', err);
+
+        // Fallback: générer avec des données de démo
+        if (confirm('L\'export automatique n\'est pas encore disponible.\n\nVoulez-vous générer un fichier de démonstration ?')) {
+          generateDemoExport();
+        }
+
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('loading');
+      }
+    }
+
+    function generateDemoExport() {
+      const month = document.getElementById('export-month').value;
+      const format = document.getElementById('export-format').value;
+      const monthNames = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+      const monthName = monthNames[parseInt(month)];
+      const year = new Date().getFullYear();
+
+      const selectedCols = Array.from(document.querySelectorAll('#export-columns input:checked')).map(cb => cb.value);
+      const headerName = document.getElementById('export-header-name').value.trim() || 'Restaurant Demo';
+      const headerAddress = document.getElementById('export-header-address').value.trim();
+      const headerSiret = document.getElementById('export-header-siret').value.trim();
+
+      // Données de démo
+      const demoData = [];
+      const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const row = {};
+        selectedCols.forEach(col => {
+          if (col === 'Date') {
+            row[col] = String(d).padStart(2, '0') + '/' + month;
+          } else if (col === 'Notes') {
+            row[col] = d % 7 === 0 ? 'FERMÉ' : '';
+          } else if (col.includes('TVA')) {
+            const rate = parseFloat(col.replace('TVA ', '').replace('%', ''));
+            const total = row['TOTAL'] || 0;
+            row[col] = total > 0 ? (total / (1 + rate/100) * (rate/100)).toFixed(2) : '';
+          } else if (col === 'TOTAL') {
+            const cb = row['CB'] || 0;
+            const esp = row['ESP'] || 0;
+            const tr = row['TR'] || 0;
+            row[col] = d % 7 === 0 ? '' : (cb + esp + tr).toFixed(2);
+          } else {
+            row[col] = d % 7 === 0 ? '' : (Math.random() * 400 + 100).toFixed(2);
+          }
+        });
+        demoData.push(row);
+      }
+
+      const filename = `Compta_${monthName}_${year}_DEMO`;
+
+      if (format === 'pdf') {
+        generatePDF(demoData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
+      } else {
+        generateExcel(demoData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
+      }
+    }
+
+    function generatePDF(data, columns, monthName, year, filename, header) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // En-tête
+      let yPos = 15;
+      if (header.name) {
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text(header.name, 14, yPos);
+        yPos += 7;
+      }
+      if (header.address) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(header.address, 14, yPos);
+        yPos += 5;
+      }
+      if (header.siret) {
+        doc.setFontSize(9);
+        doc.text('SIRET: ' + header.siret, 14, yPos);
+        yPos += 5;
+      }
+
+      // Titre
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Comptabilité ' + monthName + ' ' + year, 14, yPos + 8);
+
+      // Tableau
+      const tableData = data.map(row => columns.map(col => row[col] || ''));
+
+      // Totaux
+      const totals = columns.map(col => {
+        if (col === 'Date') return 'TOTAL';
+        if (col === 'Notes') return '';
+        const sum = data.reduce((acc, row) => acc + (parseFloat(row[col]) || 0), 0);
+        return sum > 0 ? sum.toFixed(2) + ' €' : '';
+      });
+      tableData.push(totals);
+
+      doc.autoTable({
+        head: [columns],
+        body: tableData,
+        startY: yPos + 15,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [31, 111, 66], textColor: 255 },
+        footStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [250, 250, 250] }
+      });
+
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text('Généré par iArmy - ' + new Date().toLocaleDateString('fr-FR'), 14, doc.internal.pageSize.height - 10);
+        doc.text('Page ' + i + '/' + pageCount, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 10);
+      }
+
+      doc.save(filename + '.pdf');
+    }
+
+    function generateExcel(data, columns, monthName, year, filename, header) {
+      // Créer le workbook
+      const wb = XLSX.utils.book_new();
+
+      // Préparer les données avec en-tête
+      const wsData = [];
+
+      if (header.name) wsData.push([header.name]);
+      if (header.address) wsData.push([header.address]);
+      if (header.siret) wsData.push(['SIRET: ' + header.siret]);
+      if (header.name || header.address || header.siret) wsData.push([]); // Ligne vide
+
+      wsData.push(['Comptabilité ' + monthName + ' ' + year]);
+      wsData.push([]); // Ligne vide
+
+      // Headers
+      wsData.push(columns);
+
+      // Data rows
+      data.forEach(row => {
+        wsData.push(columns.map(col => {
+          const val = row[col];
+          if (col === 'Date' || col === 'Notes') return val || '';
+          return val ? parseFloat(val) : '';
+        }));
+      });
+
+      // Totaux
+      const totals = columns.map(col => {
+        if (col === 'Date') return 'TOTAL';
+        if (col === 'Notes') return '';
+        const sum = data.reduce((acc, row) => acc + (parseFloat(row[col]) || 0), 0);
+        return sum > 0 ? sum : '';
+      });
+      wsData.push(totals);
+
+      // Créer la feuille
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      // Largeur des colonnes
+      ws['!cols'] = columns.map(() => ({ wch: 12 }));
+
+      XLSX.utils.book_append_sheet(wb, ws, monthName);
+      XLSX.writeFile(wb, filename + '.xlsx');
     }
 
     async function signOut() {
