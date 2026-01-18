@@ -45,14 +45,27 @@
     .preview-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 14px; color: white; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
     .preview-input:focus { outline: none; border-color: #FF6B35; }
     .preview-input::placeholder { color: rgba(255,255,255,0.3); }
-    .preview-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .preview-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; }
-    .preview-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .tg-bubble { background: #2AABEE; padding: 8px 12px; border-radius: 12px 12px 12px 4px; font-size: 14px; display: inline-block; }
-    .sheet-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-    .sheet-col { font-size: 12px; font-weight: 700; color: #4ade80; }
-    .sheet-val { color: white; font-weight: 600; font-size: 14px; }
-    .empty-state { color: rgba(255,255,255,0.25); font-size: 13px; }
+    .preview-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
+    .preview-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; min-height: 80px; }
+    .preview-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .preview-label-icon { font-size: 12px; }
+    .tg-bubble { background: #2AABEE; padding: 10px 14px; border-radius: 14px 14px 14px 4px; font-size: 13px; display: inline-block; max-width: 100%; word-break: break-word; }
+    .empty-state { color: rgba(255,255,255,0.25); font-size: 12px; }
+
+    /* Mini Excel preview */
+    .mini-excel { background: #1a472a; border-radius: 6px; overflow: hidden; font-size: 11px; }
+    .mini-excel-header { display: flex; background: #0f9d58; }
+    .mini-excel-header span { flex: 1; padding: 4px 6px; text-align: center; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.2); font-size: 10px; }
+    .mini-excel-header span:last-child { border-right: none; }
+    .mini-excel-row { display: flex; background: white; }
+    .mini-excel-row span { flex: 1; padding: 5px 6px; text-align: center; color: #333; border-right: 1px solid #e0e0e0; font-size: 11px; }
+    .mini-excel-row span:last-child { border-right: none; }
+    .mini-excel-row span.calculated { background: #e8f5e9; color: #2e7d32; font-weight: 600; }
+    .mini-excel-row span.empty { color: #bbb; }
+
+    /* Rules detail */
+    .preview-rules { margin-top: 10px; padding: 8px 10px; background: rgba(255,107,53,0.08); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.6); }
+    .preview-rules strong { color: #FF8B5E; }
 
     /* Section */
     .section { margin-bottom: 24px; }
@@ -153,17 +166,15 @@
       <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100 tr 50" oninput="updatePreview()">
       <div class="preview-row">
         <div class="preview-box">
-          <div class="preview-label">Parsé</div>
-          <div id="preview-parsed"><span class="empty-state">Tape un message...</span></div>
+          <div class="preview-label"><span class="preview-label-icon">💬</span> Telegram</div>
+          <div id="preview-tg"><span class="empty-state">Tape un message...</span></div>
         </div>
         <div class="preview-box">
-          <div class="preview-label">Résultat</div>
-          <div id="preview-result"><span class="empty-state">Après règles...</span></div>
+          <div class="preview-label"><span class="preview-label-icon">📊</span> Google Sheets</div>
+          <div id="preview-sheet"><span class="empty-state">Preview Excel...</span></div>
         </div>
       </div>
-      <div class="preview-result" id="preview-rules-detail" style="display: none;">
-        <div class="preview-calc" id="preview-calc"></div>
-      </div>
+      <div class="preview-rules" id="preview-rules" style="display: none;"></div>
     </div>
 
     <!-- Keywords -->
@@ -340,6 +351,7 @@
     function renderKw() {
       document.getElementById('kw-grid').innerHTML = keywords.map((k, i) => {
         const incomplete = k.nom && !k.colonne;
+        const colHeader = k.colonne && sheetHeaders[k.colonne] ? sheetHeaders[k.colonne] : null;
         return `
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
           <div class="kw-top">
@@ -349,14 +361,15 @@
           <div class="kw-bottom">
             <span class="kw-arrow">→</span>
             <select class="kw-col-select ${!k.colonne?'empty':''}" onchange="updKw(${i},'colonne',this.value)">
-              <option value="">Col</option>
-              ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}${sheetHeaders[c]?' ('+sheetHeaders[c]+')':''}</option>`).join('')}
+              <option value="">Colonne</option>
+              ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}${sheetHeaders[c]?' · '+sheetHeaders[c]:''}</option>`).join('')}
             </select>
             <select class="kw-note-select ${k.noteColumn?'active':''}" onchange="updKw(${i},'noteColumn',this.value)">
               <option value="">Note</option>
               ${cols.map(c=>`<option value="${c}" ${k.noteColumn===c?'selected':''}>${c}</option>`).join('')}
             </select>
           </div>
+          ${colHeader ? `<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:6px;">Excel: "${colHeader}"</div>` : ''}
         </div>
       `}).join('');
     }
@@ -428,19 +441,21 @@
 
     function updatePreview() {
       const txt = document.getElementById('test-input').value.trim();
-      const parsedEl = document.getElementById('preview-parsed');
-      const resultEl = document.getElementById('preview-result');
-      const detailEl = document.getElementById('preview-rules-detail');
-      const calcEl = document.getElementById('preview-calc');
+      const tgEl = document.getElementById('preview-tg');
+      const sheetEl = document.getElementById('preview-sheet');
+      const rulesEl = document.getElementById('preview-rules');
 
       if (!txt) {
-        parsedEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
-        resultEl.innerHTML = '<span class="empty-state">Après règles...</span>';
-        detailEl.style.display = 'none';
+        tgEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
+        sheetEl.innerHTML = '<span class="empty-state">Preview Excel...</span>';
+        rulesEl.style.display = 'none';
         return;
       }
 
-      // 1. Parser les valeurs
+      // 1. Afficher bulle Telegram
+      tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
+
+      // 2. Parser les valeurs
       const parsed = {};
       for (const k of keywords) {
         if (!k.nom) continue;
@@ -449,15 +464,10 @@
         if (m) parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
       }
 
-      // Afficher valeurs parsées
-      const parsedRows = Object.entries(parsed).map(([k, v]) =>
-        `<div class="sheet-row"><span class="sheet-col">${k}:</span><span class="sheet-val">${v}</span></div>`
-      );
-      parsedEl.innerHTML = parsedRows.length ? parsedRows.join('') : '<span class="empty-state">Aucun mot-clé détecté</span>';
-
-      // 2. Appliquer les règles
+      // 3. Appliquer les règles
       const result = { ...parsed };
       const calcDetails = [];
+      const calculatedFields = new Set();
 
       for (const r of rules) {
         if (!r.target || !r.terms.some(t => t.name)) continue;
@@ -475,36 +485,62 @@
 
           if (i === 0) {
             calcValue = val;
-            calcStr = `${t.name}(${val})`;
+            calcStr = t.name;
           } else {
             if (t.op === '-') {
               calcValue -= val;
-              calcStr += ` − ${t.name}(${val})`;
+              calcStr += ` − ${t.name}`;
             } else {
               calcValue += val;
-              calcStr += ` + ${t.name}(${val})`;
+              calcStr += ` + ${t.name}`;
             }
           }
         }
 
         if (hasValue && r.target) {
           result[r.target] = calcValue;
-          calcDetails.push(`${calcStr} = <span class="preview-calc-result">${r.target}: ${calcValue}</span>`);
+          calculatedFields.add(r.target);
+          calcDetails.push(`<strong>${calcStr} = ${r.target}</strong> (${calcValue}€)`);
         }
       }
 
-      // Afficher résultat après règles
-      const resultRows = Object.entries(result).map(([k, v]) =>
-        `<div class="sheet-row"><span class="sheet-col">${k}:</span><span class="sheet-val">${v}€</span></div>`
-      );
-      resultEl.innerHTML = resultRows.length ? resultRows.join('') : '<span class="empty-state">-</span>';
+      // 4. Construire le mini Excel
+      const activeKeywords = keywords.filter(k => k.nom && k.colonne);
 
-      // Afficher détail des calculs
-      if (calcDetails.length > 0) {
-        detailEl.style.display = 'block';
-        calcEl.innerHTML = calcDetails.join('<br>');
+      if (activeKeywords.length === 0) {
+        sheetEl.innerHTML = '<span class="empty-state">Configure tes mots-clés</span>';
       } else {
-        detailEl.style.display = 'none';
+        // Header avec colonnes
+        const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
+
+        // Row avec valeurs
+        const valueCells = activeKeywords.map(k => {
+          const val = result[k.nom];
+          const isCalculated = calculatedFields.has(k.nom);
+          if (val !== undefined && val !== null) {
+            return `<span class="${isCalculated ? 'calculated' : ''}">${val}</span>`;
+          }
+          return `<span class="empty">-</span>`;
+        }).join('');
+
+        // Labels sous les colonnes
+        const labelCells = activeKeywords.map(k => `<span style="background:#f5f5f5;color:#666;font-size:9px;">${k.nom}</span>`).join('');
+
+        sheetEl.innerHTML = `
+          <div class="mini-excel">
+            <div class="mini-excel-header">${headerCells}</div>
+            <div class="mini-excel-row">${valueCells}</div>
+            <div class="mini-excel-row" style="border-top:1px solid #e0e0e0;">${labelCells}</div>
+          </div>
+        `;
+      }
+
+      // 5. Afficher les règles appliquées
+      if (calcDetails.length > 0) {
+        rulesEl.style.display = 'block';
+        rulesEl.innerHTML = '📐 ' + calcDetails.join(' · ');
+      } else {
+        rulesEl.style.display = 'none';
       }
     }
 
