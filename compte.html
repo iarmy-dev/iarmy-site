@@ -241,13 +241,9 @@
           // Stocker la config pour l'export
           userConfig = config.excel_config;
           userSheetId = config.sheet_id;
-
-          // Afficher la section export et charger les colonnes
-          initExportSection(config.excel_config);
-        }
-
-        if (!config?.sheet_id && !telegramLink?.telegram_user_id) {
-          document.getElementById('compta-badge').textContent = 'Config';
+        } else {
+          // Pas de config = module non configuré
+          document.getElementById('compta-badge').textContent = 'À configurer';
           document.getElementById('compta-badge').className = 'module-badge inactive';
         }
       } catch (err) { console.log('No config'); }
