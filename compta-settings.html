@@ -185,6 +185,29 @@
     </div>
 
     <button class="btn-save" id="save-btn" onclick="saveConfig()">Sauvegarder</button>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 8px; margin-top: 12px;">
+      <button onclick="resetConfig()" style="flex: 1; padding: 10px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.15); border-radius: 8px; color: #f87171; font-size: 11px; cursor: pointer;">🔄 Nouveau fichier</button>
+    </div>
+
+    <!-- Export Comptable -->
+    <div class="section" id="export-section" style="margin-top: 20px; display: none;">
+      <div class="section-title" style="margin-bottom: 10px;">Export Comptable</div>
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <select id="export-month" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 11px;">
+          <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
+          <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
+          <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
+          <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+        </select>
+        <select id="export-format" style="flex: 1; padding: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; font-size: 11px;">
+          <option value="csv">CSV</option>
+          <option value="xlsx">Excel</option>
+        </select>
+      </div>
+      <button onclick="exportData()" style="width: 100%; padding: 10px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.25); border-radius: 8px; color: #FF8B5E; font-size: 11px; font-weight: 600; cursor: pointer;">📥 Exporter</button>
+    </div>
   </div>
 
   <footer style="padding: 24px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 24px;">
@@ -229,6 +252,13 @@
 
     async function loadConfig(userId) {
       const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
+
+      // Si pas de config, rediriger vers la création
+      if (!cfg) {
+        window.location.href = 'compta.html';
+        return;
+      }
+
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
       config = cfg;
@@ -259,6 +289,10 @@
       if (cfg?.sheet_id) {
         sheetEl.innerHTML = `<a href="https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit" target="_blank">Ouvrir</a>`;
         sheetEl.classList.remove('pending');
+        // Afficher section export
+        document.getElementById('export-section').style.display = 'block';
+        // Sélectionner le mois en cours
+        document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
       }
       if (tg?.telegram_user_id) {
         tgEl.textContent = 'Connecte';
@@ -427,6 +461,85 @@
       t.textContent = msg;
       t.className = 'toast show' + (err?' error':'');
       setTimeout(() => t.className = 'toast', 2500);
+    }
+
+    function resetConfig() {
+      const modal = document.createElement('div');
+      modal.id = 'reset-modal';
+      modal.innerHTML = `
+        <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;">
+            <div style="font-size: 32px; margin-bottom: 12px;">🔄</div>
+            <div style="font-size: 16px; font-weight: 600; color: white; margin-bottom: 8px;">Nouveau fichier ?</div>
+            <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">Ta config actuelle sera supprimée et tu pourras créer un nouveau fichier iArmy.</div>
+            <div style="display: flex; gap: 10px;">
+              <button onclick="document.getElementById('reset-modal').remove()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer;">Annuler</button>
+              <button onclick="doResetConfig()" style="flex: 1; padding: 12px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; color: #f87171; font-size: 13px; font-weight: 600; cursor: pointer;">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    async function doResetConfig() {
+      document.getElementById('reset-modal')?.remove();
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+      await supabaseClient.from('user_configs').delete().eq('user_id', session.user.id);
+      window.location.href = 'compta.html';
+    }
+
+    async function exportData() {
+      if (!config?.sheet_id) { toast('Aucun fichier configuré', true); return; }
+
+      const month = document.getElementById('export-month').value;
+      const format = document.getElementById('export-format').value;
+      const year = new Date().getFullYear();
+      const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const sheetName = monthNames[parseInt(month)-1] + ' ' + year;
+
+      toast('Export en cours...');
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const res = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+          body: JSON.stringify({ sheetId: config.sheet_id, sheetName: sheetName })
+        });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.error);
+
+        const rows = result.data;
+        if (format === 'csv') {
+          const csv = rows.map(r => r.join(';')).join('\n');
+          downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
+        } else {
+          // Pour XLSX, on utilise SheetJS si disponible
+          if (typeof XLSX !== 'undefined') {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, `compta_${sheetName}.xlsx`);
+          } else {
+            // Fallback CSV
+            const csv = rows.map(r => r.join(';')).join('\n');
+            downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
+          }
+        }
+        toast('Export terminé !');
+      } catch (err) {
+        toast('Erreur: ' + err.message, true);
+      }
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
     }
 
     document.addEventListener('DOMContentLoaded', init);
