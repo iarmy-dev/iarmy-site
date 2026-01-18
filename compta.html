@@ -3513,9 +3513,6 @@
           }
         });
 
-        // Bouton ajouter source (TRÈS visible avec texte)
-        html += '<button onclick="addRuleSource(' + index + ')" style="padding: 8px 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: bold; white-space: nowrap; box-shadow: 0 2px 8px rgba(255,107,53,0.4);">+ terme</button>';
-
         // Flèche
         html += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; margin: 0 4px;">→</span>';
 
@@ -3540,6 +3537,11 @@
         // Supprimer la règle
         html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\'">×</button>';
 
+        html += '</div>';
+
+        // Bouton ajouter terme EN DESSOUS de la règle (bien visible)
+        html += '<div style="margin-top: 6px; margin-left: 10px;">';
+        html += '<button onclick="addRuleSource(' + index + ')" style="padding: 6px 14px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 12px; font-weight: 600; box-shadow: 0 2px 6px rgba(255,107,53,0.3);">＋ Ajouter un terme</button>';
         html += '</div>';
       });
 
