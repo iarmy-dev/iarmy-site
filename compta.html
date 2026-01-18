@@ -3084,7 +3084,12 @@
       customRules = [];
       if (pendingConfig && pendingConfig.regles_calcul) {
         customRules = pendingConfig.regles_calcul.map(function(r) {
-          return { sources: r.sources || [], operation: r.operation || 'add', target: r.target || '' };
+          return {
+            sources: r.sources || [],
+            operations: r.operations || (r.sources || []).slice(1).map(function() { return '+'; }),
+            target: r.target || '',
+            createTarget: r.createTarget || false
+          };
         });
       }
 
@@ -3308,11 +3313,25 @@
         // Container pour la ligne + note optionnelle
         var rowHtml = '<div class="keyword-row-container" style="display: flex; flex-direction: column; gap: 6px;">';
 
-        // Ligne principale GLASS: [KEYWORD] → [Column]
-        rowHtml += '<div class="glass-row" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\'">';
+        // Ligne principale GLASS: [↑↓] [KEYWORD] → [Column]
+        rowHtml += '<div class="glass-row" style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\'">';
+
+        // Boutons réordonnement (↑↓)
+        rowHtml += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+        if (index > 0) {
+          rowHtml += '<button onclick="moveConfigRow(' + index + ', -1)" style="width: 20px; height: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; padding: 0;" onmouseover="this.style.color=\'#FF8B5E\';this.style.borderColor=\'rgba(255,107,53,0.3)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.4)\';this.style.borderColor=\'rgba(255,255,255,0.1)\'">↑</button>';
+        } else {
+          rowHtml += '<div style="width: 20px; height: 16px;"></div>';
+        }
+        if (index < configEditorData.length - 1) {
+          rowHtml += '<button onclick="moveConfigRow(' + index + ', 1)" style="width: 20px; height: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; padding: 0;" onmouseover="this.style.color=\'#FF8B5E\';this.style.borderColor=\'rgba(255,107,53,0.3)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.4)\';this.style.borderColor=\'rgba(255,255,255,0.1)\'">↓</button>';
+        } else {
+          rowHtml += '<div style="width: 20px; height: 16px;"></div>';
+        }
+        rowHtml += '</div>';
 
         // Input mot-clé (glass orange)
-        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 72px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 10px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; box-shadow: 0 2px 6px rgba(255,107,53,0.15); transition: all 0.2s;" placeholder="...">';
+        rowHtml += '<input type="text" value="' + row.keyword + '" onchange="updateConfigKeyword(' + index + ', this.value); updatePreview();" style="width: 68px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; padding: 8px 8px; color: #FF8B5E; font-size: 13px; font-weight: 700; text-align: center; text-transform: uppercase; box-shadow: 0 2px 6px rgba(255,107,53,0.15); transition: all 0.2s;" placeholder="...">';
 
         // Flèche
         rowHtml += '<span style="color: rgba(255,255,255,0.35); font-size: 16px;">→</span>';
@@ -3440,7 +3459,8 @@
     }
 
     // ========== RÈGLES PERSONNALISÉES ==========
-    var customRules = []; // Array de { sources: ['DEP', 'ESP'], operation: 'add', target: 'ESP' }
+    // Format: { sources: ['CB', 'ESP'], operations: ['+'], target: 'RAZ', createTarget: false }
+    var customRules = [];
 
     function renderCustomRules() {
       var container = document.getElementById('custom-rules-container');
@@ -3459,38 +3479,66 @@
 
       var html = '';
       customRules.forEach(function(rule, index) {
-        // Ligne GLASS: [A] + [B] → [C]
-        html += '<div class="glass-row" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.2)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\';this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.15)\'">';
+        // Normaliser le format (compatibilité anciennes règles)
+        if (!rule.operations) {
+          rule.operations = rule.sources.slice(1).map(function() { return '+'; });
+        }
 
-        // Sources (les colonnes à additionner)
+        // Ligne GLASS: [A] + [B] - [C] → [D]
+        html += '<div class="glass-row" style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05); flex-wrap: wrap;">';
+
+        // Sources avec opérations entre elles
         rule.sources.forEach(function(src, srcIdx) {
+          // Opération avant la source (sauf pour la première)
           if (srcIdx > 0) {
-            html += '<span style="color: rgba(255,255,255,0.4); font-size: 14px; font-weight: 500; text-shadow: 0 0 8px rgba(255,255,255,0.1);">+</span>';
+            var opIdx = srcIdx - 1;
+            var currentOp = rule.operations[opIdx] || '+';
+            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 36px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 5px 2px; color: #FF8B5E; font-size: 14px; font-weight: 700; text-align: center;">';
+            html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>+</option>';
+            html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>−</option>';
+            html += '</select>';
           }
-          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="width: 65px; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 7px 8px; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; text-align: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
+
+          // Select pour la source
+          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="width: 65px; background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 7px 8px; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; text-align: center;">';
           keywords.forEach(function(kw) {
             var selected = kw === src ? 'selected' : '';
             html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
           });
           html += '</select>';
+
+          // Bouton supprimer la source (si plus de 2 sources)
+          if (rule.sources.length > 2) {
+            html += '<button onclick="removeRuleSource(' + index + ', ' + srcIdx + ')" style="width: 18px; height: 18px; background: rgba(239,68,68,0.1); border: none; border-radius: 4px; color: rgba(239,68,68,0.5); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;" title="Supprimer">×</button>';
+          }
         });
 
-        // Bouton ajouter source (glass)
-        html += '<button onclick="addRuleSource(' + index + ')" style="width: 22px; height: 22px; background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); border-radius: 6px; color: rgba(255,107,53,0.6); cursor: pointer; font-size: 13px; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background=\'rgba(255,107,53,0.2)\';this.style.color=\'#FF6B35\';this.style.boxShadow=\'0 2px 8px rgba(255,107,53,0.2)\'" onmouseout="this.style.background=\'rgba(255,107,53,0.08)\';this.style.color=\'rgba(255,107,53,0.6)\';this.style.boxShadow=\'none\'" title="Ajouter">+</button>';
+        // Bouton ajouter source
+        html += '<button onclick="addRuleSource(' + index + ')" style="width: 22px; height: 22px; background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); border-radius: 6px; color: rgba(255,107,53,0.6); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;" title="Ajouter terme">+</button>';
 
-        // Flèche avec glow
-        html += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; margin: 0 4px; text-shadow: 0 0 10px rgba(255,255,255,0.1);">→</span>';
+        // Flèche
+        html += '<span style="color: rgba(255,255,255,0.35); font-size: 16px; margin: 0 4px;">→</span>';
 
-        // Target (green glass)
-        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="width: 65px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 7px 8px; color: #4ade80; font-size: 12px; font-weight: 600; text-align: center; box-shadow: 0 2px 6px rgba(34,197,94,0.1), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.2s;">';
+        // Target avec option "nouvelle colonne"
+        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="width: 75px; background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.08)); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 7px 6px; color: #4ade80; font-size: 12px; font-weight: 600; text-align: center;">';
+        // Option pour créer une nouvelle colonne
+        if (rule.createTarget) {
+          html += '<option value="__NEW__" selected>✨ ' + rule.target + '</option>';
+        }
         keywords.forEach(function(kw) {
-          var selected = kw === rule.target ? 'selected' : '';
+          var selected = (!rule.createTarget && kw === rule.target) ? 'selected' : '';
           html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
         });
+        html += '<option value="__NEW__"' + (rule.createTarget ? ' selected' : '') + '>+ Créer</option>';
         html += '</select>';
 
-        // Supprimer (glass hover)
-        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; transition: all 0.25s ease; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\';this.style.borderColor=\'rgba(239,68,68,0.3)\';this.style.boxShadow=\'0 2px 8px rgba(239,68,68,0.2)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\';this.style.borderColor=\'transparent\';this.style.boxShadow=\'none\'">×</button>';
+        // Input pour nom de nouvelle colonne (si createTarget)
+        if (rule.createTarget) {
+          html += '<input type="text" value="' + rule.target + '" onchange="updateNewTargetName(' + index + ', this.value)" placeholder="Nom" style="width: 60px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; padding: 6px 8px; color: #4ade80; font-size: 11px; font-weight: 600; text-transform: uppercase;">';
+        }
+
+        // Supprimer la règle
+        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; width: 26px; height: 26px; background: rgba(255,255,255,0.03); border: 1px solid transparent; color: rgba(255,255,255,0.25); cursor: pointer; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color=\'#f87171\';this.style.background=\'rgba(239,68,68,0.15)\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\';this.style.background=\'rgba(255,255,255,0.03)\'">×</button>';
 
         html += '</div>';
       });
@@ -3499,7 +3547,6 @@
     }
 
     function addCustomRule() {
-      // Obtenir les 2 premiers mots-clés disponibles
       var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
       if (keywords.length < 2) {
         alert('Tu dois avoir au moins 2 mots-clés configurés pour créer une règle.');
@@ -3508,8 +3555,9 @@
 
       customRules.push({
         sources: [keywords[0], keywords[1]],
-        operation: 'add',
-        target: keywords[1]
+        operations: ['+'],
+        target: keywords[1],
+        createTarget: false
       });
 
       renderCustomRules();
@@ -3525,8 +3573,27 @@
       renderCustomRules();
     }
 
+    function updateRuleOperation(ruleIndex, opIndex, value) {
+      customRules[ruleIndex].operations[opIndex] = value;
+      renderCustomRules();
+    }
+
     function updateRuleTarget(ruleIndex, value) {
-      customRules[ruleIndex].target = value;
+      if (value === '__NEW__') {
+        // Activer le mode création
+        customRules[ruleIndex].createTarget = true;
+        if (!customRules[ruleIndex].target || customRules[ruleIndex].target === '__NEW__') {
+          customRules[ruleIndex].target = 'NOUVEAU';
+        }
+      } else {
+        customRules[ruleIndex].target = value;
+        customRules[ruleIndex].createTarget = false;
+      }
+      renderCustomRules();
+    }
+
+    function updateNewTargetName(ruleIndex, value) {
+      customRules[ruleIndex].target = value.toUpperCase().trim() || 'NOUVEAU';
       renderCustomRules();
     }
 
@@ -3534,6 +3601,17 @@
       var keywords = configEditorData.map(function(c) { return c.keyword.toUpperCase(); }).filter(function(k) { return k; });
       if (keywords.length > 0) {
         customRules[ruleIndex].sources.push(keywords[0]);
+        customRules[ruleIndex].operations.push('+');
+        renderCustomRules();
+      }
+    }
+
+    function removeRuleSource(ruleIndex, sourceIndex) {
+      if (customRules[ruleIndex].sources.length > 2) {
+        customRules[ruleIndex].sources.splice(sourceIndex, 1);
+        // Supprimer aussi l'opération correspondante
+        var opIdx = sourceIndex > 0 ? sourceIndex - 1 : 0;
+        customRules[ruleIndex].operations.splice(opIdx, 1);
         renderCustomRules();
       }
     }
@@ -3559,6 +3637,19 @@
       renderConfigEditorRows();
       renderCustomRules();
       // Reconstruire le tableau Excel
+      buildExcelPreview();
+    }
+
+    function moveConfigRow(index, direction) {
+      var newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= configEditorData.length) return;
+
+      // Swap les éléments
+      var temp = configEditorData[index];
+      configEditorData[index] = configEditorData[newIndex];
+      configEditorData[newIndex] = temp;
+
+      renderConfigEditorRows();
       buildExcelPreview();
     }
 
@@ -3609,13 +3700,51 @@
       // Mettre à jour pendingConfig
       pendingConfig.colonnes_a_remplir = newColonnes;
 
-      // Sauvegarder les règles personnalisées
+      // Sauvegarder les règles personnalisées et créer les nouvelles colonnes si nécessaire
       if (customRules.length > 0) {
+        // Trouver la prochaine colonne disponible pour les nouvelles colonnes
+        var usedColumns = new Set(newColonnes.map(function(c) { return c.colonne; }));
+        var allCols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        var nextColIdx = 0;
+        function getNextFreeColumn() {
+          while (nextColIdx < allCols.length && usedColumns.has(allCols[nextColIdx])) {
+            nextColIdx++;
+          }
+          if (nextColIdx < allCols.length) {
+            usedColumns.add(allCols[nextColIdx]);
+            return allCols[nextColIdx++];
+          }
+          return 'Z'; // fallback
+        }
+
+        // Traiter les règles avec createTarget
+        customRules.forEach(function(rule) {
+          if (rule.createTarget && rule.target) {
+            // Vérifier si la colonne n'existe pas déjà
+            var exists = newColonnes.some(function(c) { return c.nom === rule.target; });
+            if (!exists) {
+              // Ajouter la nouvelle colonne à colonnes_a_remplir
+              newColonnes.push({
+                nom: rule.target,
+                colonne: getNextFreeColumn(),
+                aliases: [rule.target.toLowerCase()],
+                isCalculated: true // Marqueur pour indiquer que c'est une colonne calculée
+              });
+              console.log('[CONFIG EDITOR] Nouvelle colonne créée par règle:', rule.target);
+            }
+          }
+        });
+
+        // Mettre à jour pendingConfig avec les nouvelles colonnes
+        pendingConfig.colonnes_a_remplir = newColonnes;
+
+        // Sauvegarder les règles avec le format complet
         pendingConfig.regles_calcul = customRules.map(function(rule) {
           return {
             sources: rule.sources,
-            operation: rule.operation,
-            target: rule.target
+            operations: rule.operations || rule.sources.slice(1).map(function() { return '+'; }),
+            target: rule.target,
+            createTarget: rule.createTarget || false
           };
         });
       } else {
@@ -4827,9 +4956,10 @@
         // Charger les règles personnalisées
         customRules = (pendingConfig.regles_calcul || []).map(function(rule) {
           return {
-            sources: rule.sources,
-            operation: rule.operation,
-            target: rule.target
+            sources: rule.sources || [],
+            operations: rule.operations || (rule.sources || []).slice(1).map(function() { return '+'; }),
+            target: rule.target || '',
+            createTarget: rule.createTarget || false
           };
         });
 
