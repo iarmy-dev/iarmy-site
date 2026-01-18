@@ -3494,9 +3494,9 @@
           if (srcIdx > 0) {
             var opIdx = srcIdx - 1;
             var currentOp = rule.operations[opIdx] || '+';
-            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 36px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 5px 2px; color: #FF8B5E; font-size: 14px; font-weight: 700; text-align: center;">';
-            html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>+</option>';
-            html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>−</option>';
+            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 50px; background: rgba(255,107,53,0.2); border: 2px solid rgba(255,107,53,0.5); border-radius: 6px; padding: 6px 4px; color: #FF6B35; font-size: 16px; font-weight: 700; text-align: center;">';
+            html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>PLUS</option>';
+            html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>MOINS</option>';
             html += '</select>';
           }
 
