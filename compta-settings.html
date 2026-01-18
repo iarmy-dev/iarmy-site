@@ -614,13 +614,36 @@
       // 1. Afficher bulle Telegram
       tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
 
-      // 2. Parser les valeurs
+      // 2. Parser les valeurs (cherche nom + aliases)
       const parsed = {};
       for (const k of keywords) {
         if (!k.nom) continue;
-        const re = new RegExp(`\\b${k.nom.toLowerCase()}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
-        const m = txt.toLowerCase().match(re);
-        if (m) parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
+        // Construire liste de tous les termes à chercher (nom + aliases)
+        const termsToSearch = [k.nom.toLowerCase()];
+        if (k.aliases && k.aliases.length) {
+          k.aliases.forEach(a => { if (a) termsToSearch.push(a.toLowerCase()); });
+        }
+        // Aliases courants pour les termes comptables
+        const commonAliases = {
+          'dep': ['dépense', 'dépenses', 'depense', 'depenses', 'dép'],
+          'esp': ['espèces', 'especes', 'espèce', 'espece', 'cash', 'liquide'],
+          'cb': ['carte', 'cartes', 'bancaire', 'tpe', 'visa'],
+          'tr': ['ticket', 'tickets', 'resto', 'restaurant', 'titres'],
+          'raz': ['recette', 'recettes', 'total', 'ca', 'z']
+        };
+        const base = k.nom.toLowerCase();
+        if (commonAliases[base]) {
+          commonAliases[base].forEach(a => termsToSearch.push(a));
+        }
+        // Chercher chaque terme
+        for (const term of termsToSearch) {
+          const re = new RegExp(`\\b${term}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
+          const m = txt.toLowerCase().match(re);
+          if (m) {
+            parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
+            break;
+          }
+        }
       }
 
       // 3. Appliquer les règles
