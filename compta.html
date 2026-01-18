@@ -2731,6 +2731,10 @@
         }
       });
 
+      // Trouver la colonne Notes (avant-dernière colonne)
+      var notesIndex = sheetEditorColumns.findIndex(function(c) { return c.name === 'Notes'; });
+      var colonneNotes = notesIndex >= 0 ? colLetters[notesIndex] : null;
+
       var configToSave = {
         user_id: currentUser.id,
         sheet_id: excelData.sheetId,
@@ -2739,6 +2743,7 @@
           ligne_entetes: 1,
           premiere_ligne_donnees: 2,
           colonne_date: 'A',
+          colonne_notes: colonneNotes,
           format_date: 'DD/MM/YYYY',
           colonnes_a_remplir: colonnesARemplir,
           regles: sheetEditorRules.filter(function(r) { return r.src1 && r.src2 && r.target; })
