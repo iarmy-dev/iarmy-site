@@ -593,128 +593,118 @@
     }
 
     /* ============================================= */
-    /* MOBILE - HEADER & NAV COMPACT                */
+    /* MOBILE - ÉTAPE 3 ULTRA COMPACT               */
     /* ============================================= */
     @media (max-width: 768px) {
-      /* Header nav plus compact */
-      nav .glass {
-        padding: 8px 12px !important;
+      /* Mobile progress bar plus compact */
+      .mobile-progress {
+        padding: 8px 16px !important;
       }
-      nav .flex.items-center.gap-3 {
-        gap: 8px !important;
+      .mobile-step-label {
+        display: none !important;
       }
-      /* Ajuster espacement entre logo et boutons */
-      nav > .glass > div {
-        width: 100%;
+      .mobile-progress-steps {
+        margin-bottom: 0 !important;
       }
-    }
 
-    /* ============================================= */
-    /* MOBILE - TABLEAU EXCEL RESPONSIVE            */
-    /* ============================================= */
-    @media (max-width: 768px) {
-      /* Container scroll horizontal */
+      /* Titre plus compact */
+      #step-config .text-center.mb-8 {
+        margin-bottom: 8px !important;
+      }
+      #step-config .text-center.mb-8 h1 {
+        font-size: 18px !important;
+        margin-bottom: 0 !important;
+      }
+      #step-config .text-center.mb-8 p,
+      #step-config .text-center.mb-8 .mb-2 {
+        display: none !important;
+      }
+
+      /* Réduire le padding du main content */
+      .main-content {
+        padding: 8px !important;
+      }
+
+      /* Container principal full width */
+      #config-editor-main {
+        padding: 0 !important;
+      }
+
+      /* Cards full width */
       #config-editor-main .glass-card {
-        margin: 0 -8px 16px -8px;
-        border-radius: 16px;
-        border-left: none;
-        border-right: none;
+        margin: 0 0 8px 0 !important;
+        border-radius: 10px !important;
+        border: none !important;
       }
 
-      /* Wrapper scroll pour le tableau */
+      /* Header Excel ultra compact */
+      #config-editor-main .glass-card > div:first-child {
+        padding: 6px 10px !important;
+      }
+      #sheet-editor-name {
+        font-size: 11px !important;
+      }
+      #open-sheet-link {
+        font-size: 9px !important;
+      }
+
+      /* Tableau scroll + compact */
       #config-editor-main .glass-card > div:nth-child(2) {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
       }
-
-      /* Tableau minimum width pour scroll */
       #sheet-editor-table {
-        min-width: 500px;
-        font-size: 12px !important;
+        min-width: 400px;
+        font-size: 10px !important;
       }
-
-      /* Colonnes plus compactes */
       .sheet-col {
-        padding: 8px 10px !important;
-        font-size: 11px !important;
-        white-space: nowrap;
+        padding: 5px 6px !important;
+        font-size: 9px !important;
       }
-
-      /* Cellules plus petites */
       .sheet-cell {
-        padding: 6px 10px !important;
-        font-size: 11px !important;
-        white-space: nowrap;
+        padding: 3px 6px !important;
+        font-size: 9px !important;
+      }
+      /* Masquer les lignes 3+ sur mobile (garder seulement 2) */
+      #sheet-editor-body tr:nth-child(n+3) {
+        display: none;
+      }
+      /* Pas de fade gradient sur mobile */
+      #config-editor-main .glass-card > div:nth-child(2) > div[style*="gradient"] {
+        display: none !important;
       }
 
-      /* Header du tableau */
-      #config-editor-main .glass-card > div:first-child {
-        padding: 10px 12px !important;
-        font-size: 13px !important;
+      /* Preview Telegram compact */
+      #telegram-chat-area {
+        height: 60px !important;
+        padding: 6px !important;
       }
-      #sheet-editor-name {
-        font-size: 13px !important;
-      }
-
-      /* Bouton + colonne */
-      .sheet-col-add span {
-        padding: 2px 8px !important;
-        font-size: 12px !important;
-      }
-
-      /* Indicateur scroll horizontal */
-      #config-editor-main .glass-card::after {
-        content: '← glisse →';
-        display: block;
-        text-align: center;
-        font-size: 10px;
-        color: rgba(255,255,255,0.3);
-        padding: 4px 0 8px;
-        background: linear-gradient(to top, rgba(3,3,3,0.8), transparent);
-      }
-    }
-
-    /* ============================================= */
-    /* MOBILE - PREVIEW TELEGRAM RESPONSIVE         */
-    /* ============================================= */
-    @media (max-width: 768px) {
-      /* Container conversation */
-      #tg-preview-area {
-        min-height: 100px !important;
-        max-height: 120px !important;
-        font-size: 13px !important;
-      }
-
-      /* Bulles plus compactes */
       .tg-bubble {
-        padding: 8px 12px !important;
-        font-size: 13px !important;
-        max-width: 90% !important;
+        padding: 4px 8px !important;
+        font-size: 10px !important;
       }
-
-      /* Input */
-      #tg-input {
-        font-size: 14px !important;
-        padding: 10px 12px !important;
-      }
-
-      /* Header Telegram */
-      #config-editor-main > div:nth-child(2) > div:first-child {
-        padding: 8px 12px !important;
-      }
-    }
-
-    /* ============================================= */
-    /* MOBILE - RÈGLES AVANCÉES                     */
-    /* ============================================= */
-    @media (max-width: 768px) {
-      details.glass-card {
-        margin: 0 -8px 16px -8px !important;
-        border-radius: 16px !important;
-      }
-      details summary {
+      #telegram-test-input {
+        font-size: 15px !important;
         padding: 12px 16px !important;
+      }
+
+      /* Accordéons compacts */
+      details.glass-card {
+        margin: 0 0 8px 0 !important;
+      }
+      details.glass-card summary {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+      }
+
+      /* Bouton Continuer sticky en bas */
+      #config-editor-main > button.btn-glow {
+        position: sticky;
+        bottom: 8px;
+        z-index: 100;
+        padding: 14px !important;
         font-size: 14px !important;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
       }
     }
   </style>
