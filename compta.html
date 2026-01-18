@@ -591,6 +591,132 @@
       .glass { padding-top: calc(12px + env(safe-area-inset-top)) !important; }
       .toast { bottom: calc(20px + env(safe-area-inset-bottom)); }
     }
+
+    /* ============================================= */
+    /* MOBILE - HEADER & NAV COMPACT                */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      /* Header nav plus compact */
+      nav .glass {
+        padding: 8px 12px !important;
+      }
+      nav .flex.items-center.gap-3 {
+        gap: 8px !important;
+      }
+      /* Ajuster espacement entre logo et boutons */
+      nav > .glass > div {
+        width: 100%;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE - TABLEAU EXCEL RESPONSIVE            */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      /* Container scroll horizontal */
+      #config-editor-main .glass-card {
+        margin: 0 -8px 16px -8px;
+        border-radius: 16px;
+        border-left: none;
+        border-right: none;
+      }
+
+      /* Wrapper scroll pour le tableau */
+      #config-editor-main .glass-card > div:nth-child(2) {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Tableau minimum width pour scroll */
+      #sheet-editor-table {
+        min-width: 500px;
+        font-size: 12px !important;
+      }
+
+      /* Colonnes plus compactes */
+      .sheet-col {
+        padding: 8px 10px !important;
+        font-size: 11px !important;
+        white-space: nowrap;
+      }
+
+      /* Cellules plus petites */
+      .sheet-cell {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        white-space: nowrap;
+      }
+
+      /* Header du tableau */
+      #config-editor-main .glass-card > div:first-child {
+        padding: 10px 12px !important;
+        font-size: 13px !important;
+      }
+      #sheet-editor-name {
+        font-size: 13px !important;
+      }
+
+      /* Bouton + colonne */
+      .sheet-col-add span {
+        padding: 2px 8px !important;
+        font-size: 12px !important;
+      }
+
+      /* Indicateur scroll horizontal */
+      #config-editor-main .glass-card::after {
+        content: '← glisse →';
+        display: block;
+        text-align: center;
+        font-size: 10px;
+        color: rgba(255,255,255,0.3);
+        padding: 4px 0 8px;
+        background: linear-gradient(to top, rgba(3,3,3,0.8), transparent);
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE - PREVIEW TELEGRAM RESPONSIVE         */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      /* Container conversation */
+      #tg-preview-area {
+        min-height: 100px !important;
+        max-height: 120px !important;
+        font-size: 13px !important;
+      }
+
+      /* Bulles plus compactes */
+      .tg-bubble {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+        max-width: 90% !important;
+      }
+
+      /* Input */
+      #tg-input {
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+      }
+
+      /* Header Telegram */
+      #config-editor-main > div:nth-child(2) > div:first-child {
+        padding: 8px 12px !important;
+      }
+    }
+
+    /* ============================================= */
+    /* MOBILE - RÈGLES AVANCÉES                     */
+    /* ============================================= */
+    @media (max-width: 768px) {
+      details.glass-card {
+        margin: 0 -8px 16px -8px !important;
+        border-radius: 16px !important;
+      }
+      details summary {
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-animate">
