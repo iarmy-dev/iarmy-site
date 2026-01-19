@@ -53,15 +53,23 @@
     .empty-state { color: rgba(255,255,255,0.25); font-size: 12px; }
 
     /* Mini Excel preview */
-    .mini-excel { background: #1a472a; border-radius: 6px; overflow: hidden; font-size: 11px; }
+    .mini-excel-wrapper { position: relative; }
+    .mini-excel-container { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
+    .mini-excel-container::-webkit-scrollbar { display: none; }
+    .mini-excel { background: #1a472a; border-radius: 6px; overflow: hidden; font-size: 11px; display: inline-flex; flex-direction: column; min-width: 100%; }
     .mini-excel-header { display: flex; background: #0f9d58; }
-    .mini-excel-header span { flex: 1; padding: 4px 6px; text-align: center; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.2); font-size: 10px; }
+    .mini-excel-header span { min-width: 42px; padding: 4px 6px; text-align: center; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.2); font-size: 10px; white-space: nowrap; }
     .mini-excel-header span:last-child { border-right: none; }
     .mini-excel-row { display: flex; background: white; }
-    .mini-excel-row span { flex: 1; padding: 5px 6px; text-align: center; color: #333; border-right: 1px solid #e0e0e0; font-size: 11px; }
+    .mini-excel-row span { min-width: 42px; padding: 5px 6px; text-align: center; color: #333; border-right: 1px solid #e0e0e0; font-size: 11px; white-space: nowrap; }
     .mini-excel-row span:last-child { border-right: none; }
     .mini-excel-row span.calculated { background: #e8f5e9; color: #2e7d32; font-weight: 600; }
     .mini-excel-row span.empty { color: #bbb; }
+    .excel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; color: white; font-size: 12px; cursor: pointer; z-index: 5; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
+    .excel-nav:hover { background: rgba(0,0,0,0.7); }
+    .excel-nav.left { left: -8px; }
+    .excel-nav.right { right: -8px; }
+    .mini-excel-wrapper:hover .excel-nav.visible { opacity: 1; }
 
     /* Rules detail */
     .preview-rules { margin-top: 10px; padding: 8px 10px; background: rgba(255,107,53,0.08); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.6); }
@@ -630,49 +638,57 @@
       const sheetEl = document.getElementById('preview-sheet');
       const rulesEl = document.getElementById('preview-rules');
 
+      // 1. Afficher bulle Telegram (vide ou avec message)
       if (!txt) {
         tgEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
-        sheetEl.innerHTML = '<span class="empty-state">Preview Excel...</span>';
+      } else {
+        tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
+      }
+
+      // 2. Vérifier si on a des mots-clés configurés
+      const activeKeywords = keywords.filter(k => k.nom && k.colonne);
+
+      if (activeKeywords.length === 0) {
+        sheetEl.innerHTML = '<span class="empty-state">Configure tes mots-clés</span>';
         rulesEl.style.display = 'none';
         return;
       }
 
-      // 1. Afficher bulle Telegram
-      tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
-
-      // 2. Parser les valeurs (cherche nom + aliases)
+      // 3. Parser les valeurs (si texte présent)
       const parsed = {};
-      for (const k of keywords) {
-        if (!k.nom) continue;
-        // Construire liste de tous les termes à chercher (nom + aliases)
-        const termsToSearch = [k.nom.toLowerCase()];
-        if (k.aliases && k.aliases.length) {
-          k.aliases.forEach(a => { if (a) termsToSearch.push(a.toLowerCase()); });
-        }
-        // Aliases courants pour les termes comptables
-        const commonAliases = {
-          'dep': ['dépense', 'dépenses', 'depense', 'depenses', 'dép'],
-          'esp': ['espèces', 'especes', 'espèce', 'espece', 'cash', 'liquide'],
-          'cb': ['carte', 'cartes', 'bancaire', 'tpe', 'visa'],
-          'tr': ['ticket', 'tickets', 'resto', 'restaurant', 'titres'],
-          'raz': ['recette', 'recettes', 'total', 'ca', 'z']
-        };
-        const base = k.nom.toLowerCase();
-        if (commonAliases[base]) {
-          commonAliases[base].forEach(a => termsToSearch.push(a));
-        }
-        // Chercher chaque terme
-        for (const term of termsToSearch) {
-          const re = new RegExp(`\\b${term}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
-          const m = txt.toLowerCase().match(re);
-          if (m) {
-            parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
-            break;
+      if (txt) {
+        for (const k of keywords) {
+          if (!k.nom) continue;
+          // Construire liste de tous les termes à chercher (nom + aliases)
+          const termsToSearch = [k.nom.toLowerCase()];
+          if (k.aliases && k.aliases.length) {
+            k.aliases.forEach(a => { if (a) termsToSearch.push(a.toLowerCase()); });
+          }
+          // Aliases courants pour les termes comptables
+          const commonAliases = {
+            'dep': ['dépense', 'dépenses', 'depense', 'depenses', 'dép'],
+            'esp': ['espèces', 'especes', 'espèce', 'espece', 'cash', 'liquide'],
+            'cb': ['carte', 'cartes', 'bancaire', 'tpe', 'visa'],
+            'tr': ['ticket', 'tickets', 'resto', 'restaurant', 'titres'],
+            'raz': ['recette', 'recettes', 'total', 'ca', 'z']
+          };
+          const base = k.nom.toLowerCase();
+          if (commonAliases[base]) {
+            commonAliases[base].forEach(a => termsToSearch.push(a));
+          }
+          // Chercher chaque terme
+          for (const term of termsToSearch) {
+            const re = new RegExp(`\\b${term}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
+            const m = txt.toLowerCase().match(re);
+            if (m) {
+              parsed[k.nom] = parseFloat(m[1].replace(',', '.'));
+              break;
+            }
           }
         }
       }
 
-      // 3. Appliquer les règles
+      // 4. Appliquer les règles
       const result = { ...parsed };
       const calcDetails = [];
       const calculatedFields = new Set();
@@ -712,41 +728,65 @@
         }
       }
 
-      // 4. Construire le mini Excel
-      const activeKeywords = keywords.filter(k => k.nom && k.colonne);
-
-      if (activeKeywords.length === 0) {
-        sheetEl.innerHTML = '<span class="empty-state">Configure tes mots-clés</span>';
-      } else {
-        // Header avec colonnes
-        const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
-
-        // Row avec valeurs
-        const valueCells = activeKeywords.map(k => {
-          const val = result[k.nom];
-          const isCalculated = calculatedFields.has(k.nom);
-          if (val !== undefined && val !== null && val !== 0) {
-            return `<span class="${isCalculated ? 'calculated' : ''}">${val}${isCalculated ? ' 📐' : ''}</span>`;
-          }
-          return `<span class="empty">-</span>`;
-        }).join('');
-
-        // Labels sous les colonnes (avec indicateur formule)
-        const labelCells = activeKeywords.map(k => {
-          const isCalculated = calculatedFields.has(k.nom);
-          return `<span style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${k.nom}${isCalculated ? ' ƒ' : ''}</span>`;
-        }).join('');
-
-        sheetEl.innerHTML = `
-          <div class="mini-excel">
-            <div class="mini-excel-header">${headerCells}</div>
-            <div class="mini-excel-row">${valueCells}</div>
-            <div class="mini-excel-row" style="border-top:1px solid #e0e0e0;">${labelCells}</div>
-          </div>
-        `;
+      // 5. Calculer TOTAL (somme de toutes les colonnes)
+      let total = 0;
+      for (const k of activeKeywords) {
+        const val = result[k.nom] || 0;
+        if (val > 0) {
+          total += val;
+        }
       }
 
-      // 5. Afficher les règles appliquées
+      // TVA à 10% (restauration)
+      const tva = total > 0 ? Math.round(total * 0.1 * 100) / 100 : 0;
+
+      // 6. Construire le mini Excel avec TOTAL et TVA
+      // Header avec colonnes + TOTAL + TVA
+      const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('') +
+        '<span style="background:#1565c0;">TOT</span>' +
+        '<span style="background:#7b1fa2;">TVA</span>';
+
+      // Row avec valeurs
+      const valueCells = activeKeywords.map(k => {
+        const val = result[k.nom];
+        const isCalculated = calculatedFields.has(k.nom);
+        if (val !== undefined && val !== null && val !== 0) {
+          return `<span class="${isCalculated ? 'calculated' : ''}">${val}${isCalculated ? ' 📐' : ''}</span>`;
+        }
+        return `<span class="empty">-</span>`;
+      }).join('') +
+        `<span style="background:#e3f2fd;color:#1565c0;font-weight:600;">${total > 0 ? total : '-'}</span>` +
+        `<span style="background:#f3e5f5;color:#7b1fa2;font-weight:600;">${tva > 0 ? tva : '-'}</span>`;
+
+      // Labels sous les colonnes (avec indicateur formule)
+      const labelCells = activeKeywords.map(k => {
+        const isCalculated = calculatedFields.has(k.nom);
+        return `<span style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${k.nom}${isCalculated ? ' ƒ' : ''}</span>`;
+      }).join('') +
+        '<span style="background:#e3f2fd;color:#1565c0;font-size:9px;">TOTAL ƒ</span>' +
+        '<span style="background:#f3e5f5;color:#7b1fa2;font-size:9px;">TVA ƒ</span>';
+
+      // Calculer si on a besoin des flèches (plus de 6 colonnes)
+      const needsNav = activeKeywords.length > 4;
+
+      sheetEl.innerHTML = `
+        <div class="mini-excel-wrapper">
+          ${needsNav ? '<button class="excel-nav left" onclick="scrollExcel(-1)">‹</button>' : ''}
+          <div class="mini-excel-container" id="excel-container">
+            <div class="mini-excel">
+              <div class="mini-excel-header">${headerCells}</div>
+              <div class="mini-excel-row">${valueCells}</div>
+              <div class="mini-excel-row" style="border-top:1px solid #e0e0e0;">${labelCells}</div>
+            </div>
+          </div>
+          ${needsNav ? '<button class="excel-nav right" onclick="scrollExcel(1)">›</button>' : ''}
+        </div>
+      `;
+
+      // Vérifier si scroll nécessaire et afficher les flèches
+      setTimeout(() => updateExcelNavVisibility(), 50);
+
+      // 7. Afficher les règles appliquées
       if (calcDetails.length > 0) {
         rulesEl.style.display = 'block';
         rulesEl.innerHTML = '📐 ' + calcDetails.join(' · ');
@@ -759,6 +799,44 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    // Scroll du mini Excel
+    function scrollExcel(direction) {
+      const container = document.getElementById('excel-container');
+      if (!container) return;
+      const scrollAmount = 120;
+      container.scrollLeft += direction * scrollAmount;
+      setTimeout(() => updateExcelNavVisibility(), 100);
+    }
+
+    function updateExcelNavVisibility() {
+      const container = document.getElementById('excel-container');
+      if (!container) return;
+      const leftBtn = document.querySelector('.excel-nav.left');
+      const rightBtn = document.querySelector('.excel-nav.right');
+
+      const canScroll = container.scrollWidth > container.clientWidth + 5;
+      const atStart = container.scrollLeft < 5;
+      const atEnd = container.scrollLeft >= container.scrollWidth - container.clientWidth - 5;
+
+      // Flèche gauche : visible si pas au début
+      if (leftBtn) {
+        if (canScroll && !atStart) {
+          leftBtn.classList.add('visible');
+        } else {
+          leftBtn.classList.remove('visible');
+        }
+      }
+
+      // Flèche droite : visible si pas à la fin et scroll possible
+      if (rightBtn) {
+        if (canScroll && !atEnd) {
+          rightBtn.classList.add('visible');
+        } else {
+          rightBtn.classList.remove('visible');
+        }
+      }
     }
 
     async function saveConfig(silent = false) {
