@@ -576,7 +576,27 @@
         keywords[i].nom = v;
         keywords[i].aliases = [v.toLowerCase()];
       }
-      else keywords[i][f] = v;
+      else if (f === 'colonne') {
+        // Avertir si on change une colonne déjà configurée (données existantes)
+        const oldCol = keywords[i].colonne;
+        if (oldCol && oldCol !== v && v) {
+          const confirmed = confirm(
+            `⚠️ Attention !\n\n` +
+            `Tu changes la colonne de "${keywords[i].nom}" de ${oldCol} vers ${v}.\n\n` +
+            `Si tu as déjà des données en colonne ${oldCol}, elles ne seront plus utilisées.\n\n` +
+            `Pour un fichier propre, utilise "Nouveau fichier" en bas de page.\n\n` +
+            `Continuer quand même ?`
+          );
+          if (!confirmed) {
+            render();
+            return;
+          }
+        }
+        keywords[i].colonne = v;
+      }
+      else {
+        keywords[i][f] = v;
+      }
       render();
       scheduleAutoSave();
     }
