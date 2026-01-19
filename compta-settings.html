@@ -695,11 +695,9 @@
       const yearSelect = document.getElementById('export-year');
       const currentYear = new Date().getFullYear();
 
-      // Années: année actuelle + année précédente
-      yearSelect.innerHTML = `
-        <option value="${currentYear}">${currentYear}</option>
-        <option value="${currentYear - 1}">${currentYear - 1}</option>
-      `;
+      // Pour l'instant, juste l'année en cours
+      // TODO: ajouter années précédentes si l'user a des données
+      yearSelect.innerHTML = `<option value="${currentYear}">${currentYear}</option>`;
 
       updateMonthOptions();
     }
