@@ -135,11 +135,6 @@
     .toggle-active { background: #22C55E !important; }
     .toggle-dot-active { transform: translateX(20px); background: white !important; }
 
-    /* Auto-save indicator */
-    .auto-save-indicator { position: fixed; top: 80px; right: 20px; padding: 8px 14px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; color: #4ade80; font-size: 12px; font-weight: 500; opacity: 0; transform: translateY(-10px); transition: all 0.3s; z-index: 100; display: flex; align-items: center; gap: 6px; }
-    .auto-save-indicator.show { opacity: 1; transform: translateY(0); }
-    .auto-save-indicator.saving { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.25); color: #FF8B5E; }
-
     /* Toast */
     .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 12px 24px; background: #22C55E; border-radius: 12px; color: white; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 1000; }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -169,8 +164,15 @@
 
   <div class="page-container">
     <div class="page-header">
-      <div class="page-title">Compta Express</div>
-      <div class="page-subtitle">Configure ton robot</div>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div class="page-title">Compta Express</div>
+          <div class="page-subtitle">Configure ton robot</div>
+        </div>
+        <button id="save-btn" onclick="saveConfig()" disabled style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.3); font-size: 14px; font-weight: 600; cursor: not-allowed; transition: all 0.2s;">
+          💾 Sauvegarder
+        </button>
+      </div>
     </div>
 
     <!-- Preview -->
@@ -318,7 +320,6 @@
   </footer>
 
   <div class="toast" id="toast"></div>
-  <div class="auto-save-indicator" id="auto-save-indicator">✓ Sauvegardé</div>
 
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
@@ -327,7 +328,7 @@
 
     let config = null, keywords = [], rules = [], sheetHeaders = {}, exportSettings = {};
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    let autoSaveTimeout = null;
+    let hasUnsavedChanges = false;
 
     // Nouveau format règles: { terms: [{name, op}], target }
     // op: '+' ou '-' (premier terme toujours '+')
@@ -594,7 +595,7 @@
       }
       keywords.push({ nom: '', colonne: nextCol, noteColumn: '', aliases: [] });
       render();
-      scheduleAutoSave();
+      markAsModified();
     }
     function updKw(i, f, v) {
       if (f === 'nom') {
@@ -625,36 +626,35 @@
         keywords[i][f] = v;
       }
       render();
-      scheduleAutoSave();
+      markAsModified();
     }
-    function delKw(i) { keywords.splice(i, 1); render(); scheduleAutoSave(); }
+    function delKw(i) { keywords.splice(i, 1); render(); markAsModified(); }
 
     // Rules
-    function addRule() { rules.push({ terms: [{ name: '', op: '+' }], target: '' }); render(); scheduleAutoSave(); }
-    function delRule(i) { rules.splice(i, 1); render(); scheduleAutoSave(); }
-    function updRuleTerm(ri, ti, field, value) { rules[ri].terms[ti][field] = value; render(); scheduleAutoSave(); }
-    function updRuleTarget(ri, value) { rules[ri].target = value; render(); scheduleAutoSave(); }
-    function addRuleTerm(ri) { rules[ri].terms.push({ name: '', op: '+' }); render(); scheduleAutoSave(); }
+    function addRule() { rules.push({ terms: [{ name: '', op: '+' }], target: '' }); render(); markAsModified(); }
+    function delRule(i) { rules.splice(i, 1); render(); markAsModified(); }
+    function updRuleTerm(ri, ti, field, value) { rules[ri].terms[ti][field] = value; render(); markAsModified(); }
+    function updRuleTarget(ri, value) { rules[ri].target = value; render(); markAsModified(); }
+    function addRuleTerm(ri) { rules[ri].terms.push({ name: '', op: '+' }); render(); markAsModified(); }
     function delRuleTerm(ri, ti) {
       if (rules[ri].terms.length > 1) {
         rules[ri].terms.splice(ti, 1);
         // S'assurer que le premier terme est toujours '+'
         if (rules[ri].terms.length > 0) rules[ri].terms[0].op = '+';
         render();
-        scheduleAutoSave();
+        markAsModified();
       }
     }
 
-    // Auto-save avec debounce
-    function scheduleAutoSave() {
-      if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
-      const indicator = document.getElementById('auto-save-indicator');
-      indicator.textContent = '⏳ En cours...';
-      indicator.classList.add('show', 'saving');
-
-      autoSaveTimeout = setTimeout(async () => {
-        await saveConfig(true);
-      }, 1500);
+    // Marquer comme modifié (active le bouton Sauvegarder)
+    function markAsModified() {
+      hasUnsavedChanges = true;
+      const btn = document.getElementById('save-btn');
+      btn.disabled = false;
+      btn.style.background = 'rgba(255,107,53,0.2)';
+      btn.style.borderColor = 'rgba(255,107,53,0.4)';
+      btn.style.color = '#FF8B5E';
+      btn.style.cursor = 'pointer';
     }
 
     // Toggle envoi automatique
@@ -703,7 +703,7 @@
         reminder_enabled: document.getElementById('reminder-toggle').checked,
         reminder_days: document.getElementById('reminder-days').value
       };
-      scheduleAutoSave();
+      markAsModified();
     }
 
     function updatePreview() {
@@ -926,12 +926,15 @@
       }
     }
 
-    async function saveConfig(silent = false) {
-      const indicator = document.getElementById('auto-save-indicator');
+    async function saveConfig() {
+      const btn = document.getElementById('save-btn');
+      btn.textContent = '⏳ Sauvegarde...';
+      btn.disabled = true;
 
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        if (!silent) toast('Session expirée', true);
+        toast('Session expirée', true);
+        resetSaveBtn();
         return;
       }
 
@@ -959,20 +962,48 @@
       }).eq('user_id', session.user.id);
 
       if (error) {
-        if (!silent) toast('Erreur: ' + error.message, true);
-        indicator.textContent = '✗ Erreur';
-        indicator.classList.remove('saving');
-        setTimeout(() => indicator.classList.remove('show'), 2000);
+        toast('Erreur: ' + error.message, true);
+        resetSaveBtn();
         return;
       }
 
       // Mise à jour du config local
       if (config) config.excel_config = newCfg;
+      hasUnsavedChanges = false;
 
-      // Afficher confirmation
-      indicator.textContent = '✓ Sauvegardé';
-      indicator.classList.remove('saving');
-      setTimeout(() => indicator.classList.remove('show'), 2000);
+      // Succès
+      btn.textContent = '✓ Sauvegardé';
+      btn.style.background = 'rgba(34,197,94,0.2)';
+      btn.style.borderColor = 'rgba(34,197,94,0.4)';
+      btn.style.color = '#4ade80';
+
+      setTimeout(() => {
+        btn.textContent = '💾 Sauvegarder';
+        btn.style.background = 'rgba(255,255,255,0.1)';
+        btn.style.borderColor = 'rgba(255,255,255,0.1)';
+        btn.style.color = 'rgba(255,255,255,0.3)';
+        btn.style.cursor = 'not-allowed';
+      }, 2000);
+
+      toast('Configuration sauvegardée !');
+    }
+
+    function resetSaveBtn() {
+      const btn = document.getElementById('save-btn');
+      btn.textContent = '💾 Sauvegarder';
+      if (hasUnsavedChanges) {
+        btn.disabled = false;
+        btn.style.background = 'rgba(255,107,53,0.2)';
+        btn.style.borderColor = 'rgba(255,107,53,0.4)';
+        btn.style.color = '#FF8B5E';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.background = 'rgba(255,255,255,0.1)';
+        btn.style.borderColor = 'rgba(255,255,255,0.1)';
+        btn.style.color = 'rgba(255,255,255,0.3)';
+        btn.style.cursor = 'not-allowed';
+      }
     }
 
     function toast(msg, err = false) {
