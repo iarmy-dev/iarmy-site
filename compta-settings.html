@@ -197,7 +197,10 @@
         <span class="section-count" id="kw-count">0</span>
       </div>
       <div class="kw-grid" id="kw-grid"></div>
-      <button class="btn-add" onclick="addKw()">+ Ajouter</button>
+      <button class="btn-add" onclick="showAddKwWarning()">+ Ajouter un mot-clé</button>
+      <div id="add-kw-hint" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; color: rgba(255,255,255,0.6);">
+        💡 <strong>Avant d'ajouter</strong> : crée d'abord la colonne dans ton <a href="#" id="hint-sheet-link" target="_blank" style="color: #4ade80;">Google Sheet</a>, puis reviens ici pour la linker.
+      </div>
     </div>
 
     <!-- Rules -->
@@ -552,6 +555,30 @@
     }
 
     // Keywords
+    let addKwWarningShown = false;
+
+    function showAddKwWarning() {
+      const hint = document.getElementById('add-kw-hint');
+      const hintLink = document.getElementById('hint-sheet-link');
+
+      if (!addKwWarningShown) {
+        // Premier clic : afficher le hint
+        hint.style.display = 'block';
+        if (config?.sheet_id) {
+          hintLink.href = `https://docs.google.com/spreadsheets/d/${config.sheet_id}/edit`;
+        }
+        addKwWarningShown = true;
+        // Changer le texte du bouton
+        document.querySelector('.btn-add').textContent = '+ J\'ai créé ma colonne, ajouter';
+      } else {
+        // Deuxième clic : ajouter le mot-clé
+        addKw();
+        hint.style.display = 'none';
+        addKwWarningShown = false;
+        document.querySelector('.btn-add').textContent = '+ Ajouter un mot-clé';
+      }
+    }
+
     function addKw() {
       // Trouver la prochaine colonne libre :
       // - Pas déjà utilisée par un mot-clé
