@@ -1452,12 +1452,17 @@
       toast('Chargement de la prévisualisation...');
 
       try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        // Refresh session to get fresh token
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.refreshSession();
 
-        if (!session?.access_token) {
+        if (sessionError || !session?.access_token) {
+          console.error('Session error:', sessionError);
           toast('Session expirée, reconnecte-toi', true);
+          setTimeout(() => location.href = 'index.html', 1500);
           return;
         }
+
+        console.log('Session OK, token length:', session.access_token.length);
 
         console.log('Calling generate-pdf with:', { sheetId: config.sheet_id, sheetName });
 
