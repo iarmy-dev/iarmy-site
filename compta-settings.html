@@ -71,6 +71,15 @@
     .excel-nav.right { right: -6px; }
     .excel-nav:not(.visible) { display: none; }
 
+    /* Save button pulse animation */
+    @keyframes pulse-save {
+      0%, 100% { box-shadow: 0 2px 12px rgba(255,107,53,0.2); }
+      50% { box-shadow: 0 2px 20px rgba(255,107,53,0.5); }
+    }
+    .save-btn-pulse {
+      animation: pulse-save 2s ease-in-out infinite;
+    }
+
     /* Rules detail */
     .preview-rules { margin-top: 10px; padding: 8px 10px; background: rgba(255,107,53,0.08); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.6); }
     .preview-rules strong { color: #FF8B5E; }
@@ -83,40 +92,194 @@
     .section-badge { font-size: 10px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; color: rgba(255,255,255,0.4); margin-left: 6px; }
 
     /* Keywords grid - 2 colonnes */
-    .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .kw-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; position: relative; transition: all 0.2s; }
-    .kw-card:hover { border-color: rgba(255,255,255,0.12); }
-    .kw-card.incomplete { border-color: rgba(239,68,68,0.3); }
-    .kw-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .kw-name-input { background: none; border: none; color: white; font-weight: 700; font-size: 16px; width: 60px; font-family: inherit; }
+    .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kw-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .kw-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #FF6B35, #FF8B5E);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .kw-card:hover {
+      border-color: rgba(255,107,53,0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,53,0.1);
+    }
+    .kw-card:hover::before { opacity: 1; }
+    .kw-card.incomplete { border-color: rgba(239,68,68,0.4); }
+    .kw-card.incomplete::before { background: linear-gradient(90deg, #ef4444, #f87171); opacity: 1; }
+
+    .kw-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .kw-name-input {
+      background: none;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      width: 80px;
+      font-family: inherit;
+      letter-spacing: -0.5px;
+    }
     .kw-name-input:focus { outline: none; }
-    .kw-name-input::placeholder { color: rgba(255,255,255,0.25); }
-    .kw-del { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
-    .kw-del:hover { color: #ef4444; }
-    .kw-bottom { display: flex; align-items: center; gap: 6px; }
-    .kw-arrow { color: rgba(255,255,255,0.2); font-size: 12px; }
-    .kw-col-select { background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.25); border-radius: 6px; padding: 6px 10px; color: #FF8B5E; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; }
-    .kw-col-select:focus { outline: none; }
-    .kw-col-select.empty { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); color: rgba(255,255,255,0.3); }
-    .kw-note-select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 6px 8px; color: rgba(255,255,255,0.35); font-size: 12px; font-family: inherit; cursor: pointer; }
-    .kw-note-select.active { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #4ade80; }
+    .kw-name-input::placeholder { color: rgba(255,255,255,0.2); }
+    .kw-del {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.15);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+      transition: all 0.2s;
+      border-radius: 6px;
+    }
+    .kw-del:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+    .kw-mapping { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .kw-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .kw-chip-col {
+      background: linear-gradient(135deg, rgba(255,107,53,0.2) 0%, rgba(255,107,53,0.1) 100%);
+      border: 1px solid rgba(255,107,53,0.3);
+      color: #FF8B5E;
+    }
+    .kw-chip-col:hover { background: rgba(255,107,53,0.25); }
+    .kw-chip-col.empty {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.4);
+    }
+    .kw-chip select {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+      cursor: pointer;
+      padding-right: 4px;
+    }
+    .kw-chip select:focus { outline: none; }
+    .kw-chip-icon { font-size: 10px; opacity: 0.7; }
+
+    .kw-footer { margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.25); }
 
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
 
     /* Rules */
-    .rule-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-    .rule-terms { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-    .rule-select { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: white; font-size: 13px; font-family: inherit; cursor: pointer; }
-    .rule-select:focus { outline: none; border-color: #FF6B35; }
-    .rule-op-select { background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 6px 8px; color: #FF8B5E; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; width: 44px; text-align: center; }
+    .rule-card {
+      background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rule-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 16px 16px 0 0;
+    }
+    .rule-card:hover {
+      border-color: rgba(139,92,246,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.12);
+    }
+    .rule-card:hover::before { opacity: 1; }
+    .rule-terms { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .rule-select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: white;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rule-select:hover { border-color: rgba(139,92,246,0.4); }
+    .rule-select:focus { outline: none; border-color: #8B5CF6; }
+    .rule-op-select {
+      background: linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.15) 100%);
+      border: 1px solid rgba(139,92,246,0.4);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #A78BFA;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      width: 44px;
+      text-align: center;
+    }
     .rule-op-select:focus { outline: none; }
-    .rule-bottom { display: flex; align-items: center; gap: 8px; }
-    .rule-arrow { color: rgba(255,255,255,0.25); font-size: 12px; }
-    .rule-add-term { background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; color: rgba(255,255,255,0.4); font-size: 11px; cursor: pointer; }
-    .rule-add-term:hover { border-color: #FF6B35; color: #FF8B5E; }
-    .rule-del-term { background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 11px; padding: 2px 4px; }
-    .rule-del-term:hover { color: #ef4444; }
+    .rule-bottom { display: flex; align-items: center; gap: 10px; }
+    .rule-arrow { color: #A78BFA; font-size: 14px; font-weight: 600; }
+    .rule-add-term {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: rgba(255,255,255,0.4);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rule-add-term:hover { border-color: #8B5CF6; color: #A78BFA; }
+    .rule-del-term {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.2);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .rule-del-term:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+    .rule-del-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.15);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+      transition: all 0.2s;
+      border-radius: 6px;
+      margin-left: auto;
+    }
+    .rule-del-btn:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
 
     /* Preview amélioré */
     .preview-result { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -235,30 +398,12 @@
         <div class="section-title">Export Comptable</div>
       </div>
 
-      <!-- Export manuel -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 10px;">Export manuel</div>
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-          <select id="export-month" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;">
-            <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
-            <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
-            <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
-            <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
-          </select>
-          <select id="export-format" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;">
-            <option value="csv">CSV</option>
-            <option value="xlsx">Excel</option>
-          </select>
-        </div>
-        <button onclick="exportData()" style="width: 100%; padding: 12px; background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.2); border-radius: 10px; color: #FF8B5E; font-size: 13px; font-weight: 600; cursor: pointer;">📥 Exporter maintenant</button>
-      </div>
-
-      <!-- Envoi automatique -->
+      <!-- Alerte fin de mois -->
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
           <div>
-            <div style="font-size: 13px; font-weight: 500;">📧 Envoi à la comptable</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">L'export est envoyé automatiquement par email</div>
+            <div style="font-size: 13px; font-weight: 500;">📊 Alerte fin de mois</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Reçois le PDF sur Telegram pour vérifier et envoyer</div>
           </div>
           <label style="position: relative; width: 44px; height: 24px;">
             <input type="checkbox" id="auto-export-toggle" onchange="toggleAutoExport()" style="opacity: 0; width: 0; height: 0;">
@@ -267,27 +412,37 @@
           </label>
         </div>
         <div id="auto-export-settings" style="display: none;">
-          <input type="email" id="export-email" placeholder="Email comptable" style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px; margin-bottom: 8px;" onchange="saveAutoExportSettings()">
-          <div style="display: flex; gap: 8px;">
+          <!-- Email comptable -->
+          <input type="email" id="export-email" placeholder="Email de ta comptable" style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px; margin-bottom: 8px;" onchange="saveAutoExportSettings()">
+
+          <!-- Jour d'alerte + Format -->
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <select id="auto-export-day" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;" onchange="saveAutoExportSettings()">
               <option value="last">Dernier jour du mois</option>
               <option value="1">1er du mois suivant</option>
               <option value="5">5 du mois suivant</option>
             </select>
             <select id="auto-export-format" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;" onchange="saveAutoExportSettings()">
-              <option value="csv">CSV</option>
+              <option value="pdf">PDF</option>
               <option value="xlsx">Excel</option>
             </select>
           </div>
+
+          <!-- Colonnes à exporter -->
+          <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Colonnes à inclure dans l'export :</div>
+          <div id="export-columns-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+            <!-- Généré dynamiquement -->
+          </div>
+          <div style="font-size: 10px; color: rgba(255,255,255,0.3); font-style: italic;">Décoche les colonnes que tu ne veux pas envoyer à ta comptable</div>
         </div>
       </div>
 
       <!-- Rappel -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <div style="font-size: 13px; font-weight: 500;">🔔 Rappel d'export</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Te rappelle de vérifier tes données avant clôture</div>
+            <div style="font-size: 13px; font-weight: 500;">🔔 Rappel avant clôture</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Vérifie tes données avant la fin du mois</div>
           </div>
           <label style="position: relative; width: 44px; height: 24px;">
             <input type="checkbox" id="reminder-toggle" onchange="toggleReminder()" style="opacity: 0; width: 0; height: 0;">
@@ -302,6 +457,24 @@
             <option value="7">7 jours avant</option>
           </select>
         </div>
+      </div>
+
+      <!-- Export manuel -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 10px;">Export manuel</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <select id="export-month" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;">
+            <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
+            <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
+            <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
+            <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+          </select>
+          <select id="export-format-manual" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;">
+            <option value="pdf">PDF</option>
+            <option value="xlsx">Excel</option>
+          </select>
+        </div>
+        <button onclick="exportDataManual()" style="width: 100%; padding: 12px; background: rgba(255,107,53,0.12); border: 1px solid rgba(255,107,53,0.2); border-radius: 10px; color: #FF8B5E; font-size: 13px; font-weight: 600; cursor: pointer;">📥 Télécharger</button>
       </div>
     </div>
 
@@ -447,6 +620,46 @@
       if (exportSettings.reminder_days) {
         document.getElementById('reminder-days').value = exportSettings.reminder_days;
       }
+
+      // Générer les checkboxes des colonnes
+      renderExportColumns();
+    }
+
+    function renderExportColumns() {
+      const container = document.getElementById('export-columns-list');
+      if (!container) return;
+
+      // Colonnes de base toujours présentes
+      const baseColumns = [
+        { id: 'date', nom: 'Date', checked: true }
+      ];
+
+      // Colonnes des mots-clés configurés
+      const kwColumns = keywords.filter(k => k.nom && k.colonne).map(k => ({
+        id: k.nom.toLowerCase(),
+        nom: k.nom,
+        checked: exportSettings.export_columns ? exportSettings.export_columns.includes(k.nom) : true
+      }));
+
+      // Colonnes calculées
+      const calcColumns = [
+        { id: 'total', nom: 'TOTAL', checked: exportSettings.export_columns ? exportSettings.export_columns.includes('TOTAL') : true },
+        { id: 'tva', nom: 'TVA', checked: exportSettings.export_columns ? exportSettings.export_columns.includes('TVA') : true }
+      ];
+
+      const allColumns = [...baseColumns, ...kwColumns, ...calcColumns];
+
+      // Si pas de settings sauvegardés, tout coché par défaut
+      if (!exportSettings.export_columns) {
+        allColumns.forEach(c => c.checked = true);
+      }
+
+      container.innerHTML = allColumns.map(col => `
+        <label style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; cursor: pointer; font-size: 12px;">
+          <input type="checkbox" class="export-col-checkbox" data-col="${col.nom}" ${col.checked ? 'checked' : ''} onchange="saveAutoExportSettings()" style="accent-color: #FF6B35;">
+          <span>${col.nom}</span>
+        </label>
+      `).join('');
     }
 
     function render() {
@@ -493,24 +706,23 @@
       document.getElementById('kw-grid').innerHTML = keywords.map((k, i) => {
         const incomplete = k.nom && !k.colonne;
         const colHeader = k.colonne && sheetHeaders[k.colonne] ? sheetHeaders[k.colonne] : null;
+
         return `
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
-          <div class="kw-top">
-            <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" oninput="this.value=this.value.substring(0,20)" maxlength="20" placeholder="CB">
-            <button class="kw-del" onclick="delKw(${i})">×</button>
+          <div class="kw-header">
+            <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" oninput="this.value=this.value.substring(0,20)" maxlength="20" placeholder="NOM">
+            <button class="kw-del" onclick="delKw(${i})" title="Supprimer">×</button>
           </div>
-          <div class="kw-bottom">
-            <span class="kw-arrow">→</span>
-            <select class="kw-col-select ${!k.colonne?'empty':''}" onchange="updKw(${i},'colonne',this.value)">
-              <option value="">Colonne</option>
-              ${cols.map(c=>`<option value="${c}" ${k.colonne===c?'selected':''}>${c}${sheetHeaders[c]?' · '+sheetHeaders[c]:''}</option>`).join('')}
-            </select>
-            <select class="kw-note-select ${k.noteColumn?'active':''}" onchange="updKw(${i},'noteColumn',this.value)">
-              <option value="">Note</option>
-              ${cols.map(c=>`<option value="${c}" ${k.noteColumn===c?'selected':''}>${c}</option>`).join('')}
-            </select>
+          <div class="kw-mapping">
+            <div class="kw-chip kw-chip-col ${!k.colonne ? 'empty' : ''}">
+              <span class="kw-chip-icon">→</span>
+              <select onchange="updKw(${i},'colonne',this.value)">
+                <option value="">Colonne</option>
+                ${cols.map(c => `<option value="${c}" ${k.colonne === c ? 'selected' : ''}>${c}${sheetHeaders[c] ? ' · ' + sheetHeaders[c] : ''}</option>`).join('')}
+              </select>
+            </div>
           </div>
-          ${colHeader ? `<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:6px;">Excel: "${colHeader}"</div>` : ''}
+          ${colHeader ? `<div class="kw-footer">Colonne "${colHeader}"</div>` : ''}
         </div>
       `}).join('');
     }
@@ -541,15 +753,15 @@
           <div class="rule-card">
             <div class="rule-terms">
               ${termsHtml}
-              <button class="rule-add-term" onclick="addRuleTerm(${i})">+ terme</button>
+              <button class="rule-add-term" onclick="addRuleTerm(${i})">+</button>
             </div>
             <div class="rule-bottom">
               <span class="rule-arrow">=</span>
               <select class="rule-select" onchange="updRuleTarget(${i},this.value)">
-                <option value="">résultat</option>
+                <option value="">cible</option>
                 ${names.map(n => `<option value="${n}" ${r.target === n ? 'selected' : ''}>${n}</option>`).join('')}
               </select>
-              <button class="kw-del" onclick="delRule(${i})">×</button>
+              <button class="rule-del-btn" onclick="delRule(${i})" title="Supprimer">×</button>
             </div>
           </div>
         `;
@@ -651,7 +863,7 @@
       }
     }
 
-    // Marquer comme modifié (active le bouton Sauvegarder)
+    // Marquer comme modifié (active le bouton Sauvegarder avec animation pulse)
     function markAsModified() {
       hasUnsavedChanges = true;
       const btn = document.getElementById('save-btn');
@@ -660,8 +872,17 @@
       btn.style.borderColor = 'rgba(255,107,53,0.4)';
       btn.style.color = '#FF8B5E';
       btn.style.cursor = 'pointer';
-      btn.style.boxShadow = '0 2px 12px rgba(255,107,53,0.2)';
+      btn.classList.add('save-btn-pulse');
     }
+
+    // Alerte si on quitte la page avec des modifications non sauvegardées
+    window.onbeforeunload = function(e) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
 
     // Toggle envoi automatique
     function toggleAutoExport() {
@@ -701,11 +922,18 @@
 
     // Sauvegarder les settings d'export
     async function saveAutoExportSettings() {
+      // Collecter les colonnes cochées
+      const checkedCols = [];
+      document.querySelectorAll('.export-col-checkbox:checked').forEach(cb => {
+        checkedCols.push(cb.dataset.col);
+      });
+
       exportSettings = {
         auto_export_enabled: document.getElementById('auto-export-toggle').checked,
         export_email: document.getElementById('export-email').value,
         auto_export_day: document.getElementById('auto-export-day').value,
         auto_export_format: document.getElementById('auto-export-format').value,
+        export_columns: checkedCols,
         reminder_enabled: document.getElementById('reminder-toggle').checked,
         reminder_days: document.getElementById('reminder-days').value
       };
@@ -977,7 +1205,8 @@
       if (config) config.excel_config = newCfg;
       hasUnsavedChanges = false;
 
-      // Succès
+      // Succès - arrêter l'animation pulse
+      btn.classList.remove('save-btn-pulse');
       btn.textContent = '✓ Sauvegardé';
       btn.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.15) 100%)';
       btn.style.borderColor = 'rgba(34,197,94,0.4)';
@@ -1005,7 +1234,7 @@
         btn.style.borderColor = 'rgba(255,107,53,0.4)';
         btn.style.color = '#FF8B5E';
         btn.style.cursor = 'pointer';
-        btn.style.boxShadow = '0 2px 12px rgba(255,107,53,0.2)';
+        btn.classList.add('save-btn-pulse');
       } else {
         btn.disabled = true;
         btn.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)';
@@ -1013,6 +1242,7 @@
         btn.style.color = 'rgba(255,255,255,0.35)';
         btn.style.cursor = 'not-allowed';
         btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        btn.classList.remove('save-btn-pulse');
       }
     }
 
@@ -1050,11 +1280,11 @@
       window.location.href = 'compta.html';
     }
 
-    async function exportData() {
+    async function exportDataManual() {
       if (!config?.sheet_id) { toast('Aucun fichier configuré', true); return; }
 
       const month = document.getElementById('export-month').value;
-      const format = document.getElementById('export-format').value;
+      const format = document.getElementById('export-format-manual').value;
       const year = new Date().getFullYear();
       const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
       const sheetName = monthNames[parseInt(month) - 1] + ' ' + year;
@@ -1069,27 +1299,71 @@
           body: JSON.stringify({ sheetId: config.sheet_id, sheetName: sheetName })
         });
         const result = await res.json();
-        if (!result.success) throw new Error(result.error);
+        if (!result.success) throw new Error(result.error || 'Erreur lors de la lecture');
 
         const rows = result.data;
-        if (format === 'csv') {
-          const csv = rows.map(r => r.join(';')).join('\n');
-          downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
-        } else {
-          if (typeof XLSX !== 'undefined') {
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-            XLSX.writeFile(wb, `compta_${sheetName}.xlsx`);
-          } else {
-            const csv = rows.map(r => r.join(';')).join('\n');
-            downloadFile(csv, `compta_${sheetName}.csv`, 'text/csv');
-          }
+        if (!rows || rows.length === 0) {
+          toast('Aucune donnée pour ce mois', true);
+          return;
         }
+
+        const filename = `compta_${sheetName.replace(' ', '_')}`;
+
+        if (format === 'xlsx') {
+          // Charger SheetJS si pas déjà chargé
+          if (typeof XLSX === 'undefined') {
+            toast('Chargement de la librairie Excel...');
+            await loadScript('https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js');
+          }
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.aoa_to_sheet(rows);
+          XLSX.utils.book_append_sheet(wb, ws, sheetName);
+          XLSX.writeFile(wb, `${filename}.xlsx`);
+        } else if (format === 'pdf') {
+          // Pour le PDF, on appelle une Edge Function qui génère le PDF
+          toast('Génération du PDF...');
+          const pdfRes = await fetch(SUPABASE_URL + '/functions/v1/generate-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+            body: JSON.stringify({
+              sheetId: config.sheet_id,
+              sheetName: sheetName,
+              title: `Compta - ${sheetName}`
+            })
+          });
+
+          if (!pdfRes.ok) {
+            // Fallback: télécharger en CSV si l'Edge Function n'existe pas encore
+            const csv = rows.map(r => r.join(';')).join('\n');
+            downloadFile(csv, `${filename}.csv`, 'text/csv');
+            toast('PDF non disponible, export CSV effectué');
+            return;
+          }
+
+          const blob = await pdfRes.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${filename}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+
         toast('Export terminé !');
       } catch (err) {
+        console.error('Export error:', err);
         toast('Erreur: ' + err.message, true);
       }
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
     }
 
     function downloadFile(content, filename, type) {
