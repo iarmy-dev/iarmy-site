@@ -580,7 +580,7 @@
     async function loadConfig(userId) {
       const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config, created_at').eq('user_id', userId).single();
 
-      if (!cfg) { window.location.href = '../../inscription/'; return; }
+      if (!cfg) { window.location.href = './setup/'; return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
@@ -1526,7 +1526,7 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) return;
       await supabaseClient.from('user_configs').delete().eq('user_id', session.user.id);
-      window.location.href = '../../inscription/';
+      window.location.href = './setup/';
     }
 
     async function exportDataManual() {

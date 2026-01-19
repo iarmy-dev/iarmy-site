@@ -366,7 +366,7 @@
         }
       } catch (e) { console.log('[INDEX] Profil déjà existant'); }
       
-      setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
+      setTimeout(() => { window.location.href = 'modules/compta/setup/'; }, 2000);
       return true;
     }
 
@@ -429,7 +429,7 @@
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-          window.location.href = 'inscription/';
+          window.location.href = 'modules/compta/setup/';
         } else {
           openModal('login');
         }
@@ -491,7 +491,7 @@
         closeModal();
         showLoggedInNav(data.user);
         showWelcome(data.user?.user_metadata?.name?.split(' ')[0] || 'toi');
-        setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
+        setTimeout(() => { window.location.href = 'modules/compta/setup/'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect' : error.message;
         err.classList.add('show');
@@ -517,7 +517,7 @@
         if (error) throw error;
         closeModal();
         showWelcome(name.split(' ')[0]);
-        setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
+        setTimeout(() => { window.location.href = 'modules/compta/setup/'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
         err.classList.add('show');

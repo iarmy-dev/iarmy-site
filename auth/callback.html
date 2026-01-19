@@ -87,7 +87,7 @@
             // Créer profil si nécessaire
             await createProfileIfNeeded(session.user);
 
-            setTimeout(() => { window.location.href = '../inscription/'; }, 1500);
+            setTimeout(() => { window.location.href = '../modules/compta/setup/'; }, 1500);
             return;
           }
 
@@ -133,7 +133,7 @@
         await createProfileIfNeeded(user);
 
         // Redirection vers la page compta
-        setTimeout(() => { window.location.href = '../inscription/'; }, 1500);
+        setTimeout(() => { window.location.href = '../modules/compta/setup/'; }, 1500);
 
       } catch (err) {
         console.error('[CALLBACK] ❌ Erreur inattendue:', err);
