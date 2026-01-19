@@ -522,6 +522,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let config = null, keywords = [], rules = [], sheetHeaders = {}, exportSettings = {};
+    let userEmail = '';
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let hasUnsavedChanges = false;
 
@@ -533,6 +534,7 @@
       if (!session) { location.href = 'index.html'; return; }
 
       const user = session.user;
+      userEmail = user.email || '';
       const userName = user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0] || 'User';
       const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${userName}&background=FF6B35&color=fff`;
 
@@ -689,6 +691,7 @@
     function updateEmailPreview() {
       const emailInput = document.getElementById('export-email');
       const previewTo = document.getElementById('preview-to');
+      const previewCc = document.getElementById('preview-cc');
       const previewTable = document.getElementById('preview-table');
 
       if (!previewTo || !previewTable) return;
@@ -696,6 +699,11 @@
       // Update recipient
       const email = emailInput?.value || '';
       previewTo.textContent = email || 'comptable@...';
+
+      // Update CC with user's email
+      if (previewCc) {
+        previewCc.textContent = userEmail || 'ton email';
+      }
 
       // Get checked columns
       const checkedCols = [];
