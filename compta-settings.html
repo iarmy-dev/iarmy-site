@@ -683,7 +683,7 @@
             if (m) {
               let val = parseFloat(m[1].replace(',', '.'));
               // Limite max 999 999€ pour éviter les erreurs de saisie
-              if (val > 999999) val = 999999;
+              if (val > 10000) val = 10000;
               parsed[k.nom] = val;
               break;
             }
@@ -806,8 +806,8 @@
 
     function formatNumber(n) {
       if (n === undefined || n === null || n === 0) return '-';
-      // Limiter à 999999 et formater sans notation scientifique
-      if (n > 999999) n = 999999;
+      // Limiter à 10000 et formater sans notation scientifique
+      if (n > 10000) n = 10000;
       // Arrondir à 2 décimales si nécessaire
       if (n % 1 !== 0) n = Math.round(n * 100) / 100;
       return n.toLocaleString('fr-FR');
