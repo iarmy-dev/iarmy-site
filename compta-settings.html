@@ -485,7 +485,7 @@
         return `
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
           <div class="kw-top">
-            <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" placeholder="CB">
+            <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" oninput="this.value=this.value.substring(0,20)" maxlength="20" placeholder="CB">
             <button class="kw-del" onclick="delKw(${i})">×</button>
           </div>
           <div class="kw-bottom">
@@ -548,7 +548,12 @@
     // Keywords
     function addKw() { keywords.push({ nom: '', colonne: '', noteColumn: '', aliases: [] }); render(); scheduleAutoSave(); }
     function updKw(i, f, v) {
-      if (f === 'nom') { keywords[i].nom = v.toUpperCase(); keywords[i].aliases = [v.toLowerCase()]; }
+      if (f === 'nom') {
+        // Limite à 20 caractères max
+        v = v.substring(0, 20).toUpperCase();
+        keywords[i].nom = v;
+        keywords[i].aliases = [v.toLowerCase()];
+      }
       else keywords[i][f] = v;
       render();
       scheduleAutoSave();
@@ -761,10 +766,11 @@
         `<span style="background:#e3f2fd;color:#1565c0;font-weight:600;">${formatNumber(total)}</span>` +
         `<span style="background:#f3e5f5;color:#7b1fa2;font-weight:600;">${formatNumber(tva)}</span>`;
 
-      // Labels sous les colonnes (avec indicateur formule)
+      // Labels sous les colonnes (avec indicateur formule, tronqué à 8 chars)
       const labelCells = activeKeywords.map(k => {
         const isCalculated = calculatedFields.has(k.nom);
-        return `<span style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${k.nom}${isCalculated ? ' ƒ' : ''}</span>`;
+        const displayName = k.nom.length > 8 ? k.nom.substring(0, 7) + '…' : k.nom;
+        return `<span title="${k.nom}" style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${displayName}${isCalculated ? ' ƒ' : ''}</span>`;
       }).join('') +
         '<span style="background:#e3f2fd;color:#1565c0;font-size:9px;">TOTAL ƒ</span>' +
         '<span style="background:#f3e5f5;color:#7b1fa2;font-size:9px;">TVA ƒ</span>';
