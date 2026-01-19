@@ -566,13 +566,14 @@
     }
 
     async function loadConfig(userId) {
-      const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
+      const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config, created_at').eq('user_id', userId).single();
 
       if (!cfg) { window.location.href = 'compta.html'; return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
       config = cfg;
+      config.createdYear = cfg.created_at ? new Date(cfg.created_at).getFullYear() : new Date().getFullYear();
 
       if (cfg?.excel_config?.colonnes_detectees) {
         cfg.excel_config.colonnes_detectees.forEach(c => {
@@ -717,14 +718,12 @@
     function initExportSelects() {
       const yearSelect = document.getElementById('export-year');
       const currentYear = new Date().getFullYear();
+      const createdYear = config?.createdYear || currentYear;
 
-      // Juste l'année en cours (iArmy a démarré en 2026)
-      // Les années précédentes seront ajoutées automatiquement quand l'user en aura
-      let yearsHtml = `<option value="${currentYear}">${currentYear}</option>`;
-
-      // Ajouter l'année précédente seulement si on est en 2027+
-      if (currentYear > 2026) {
-        yearsHtml += `<option value="${currentYear - 1}">${currentYear - 1}</option>`;
+      // Générer les années disponibles (de l'année en cours jusqu'à l'année de création)
+      let yearsHtml = '';
+      for (let y = currentYear; y >= createdYear; y--) {
+        yearsHtml += `<option value="${y}">${y}</option>`;
       }
 
       yearSelect.innerHTML = yearsHtml;
@@ -732,7 +731,7 @@
       updateMonthOptions();
       updateYearExportButton();
 
-      // Mettre à jour le bouton quand on change d'année
+      // Mettre à jour quand on change d'année
       yearSelect.addEventListener('change', () => {
         updateMonthOptions();
         updateYearExportButton();
