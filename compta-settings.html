@@ -53,23 +53,23 @@
     .empty-state { color: rgba(255,255,255,0.25); font-size: 12px; }
 
     /* Mini Excel preview */
-    .mini-excel-wrapper { position: relative; }
-    .mini-excel-container { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
+    .mini-excel-wrapper { position: relative; padding: 0 20px; }
+    .mini-excel-container { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; border-radius: 6px; }
     .mini-excel-container::-webkit-scrollbar { display: none; }
     .mini-excel { background: #1a472a; border-radius: 6px; overflow: hidden; font-size: 11px; display: inline-flex; flex-direction: column; min-width: 100%; }
     .mini-excel-header { display: flex; background: #0f9d58; }
-    .mini-excel-header span { min-width: 42px; padding: 4px 6px; text-align: center; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.2); font-size: 10px; white-space: nowrap; }
+    .mini-excel-header span { min-width: 40px; max-width: 50px; padding: 4px 5px; text-align: center; font-weight: 600; color: white; border-right: 1px solid rgba(255,255,255,0.2); font-size: 10px; white-space: nowrap; overflow: hidden; }
     .mini-excel-header span:last-child { border-right: none; }
     .mini-excel-row { display: flex; background: white; }
-    .mini-excel-row span { min-width: 42px; max-width: 70px; padding: 5px 6px; text-align: center; color: #333; border-right: 1px solid #e0e0e0; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-excel-row span { min-width: 40px; max-width: 50px; padding: 4px 5px; text-align: center; color: #333; border-right: 1px solid #e0e0e0; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mini-excel-row span:last-child { border-right: none; }
     .mini-excel-row span.calculated { background: #e8f5e9; color: #2e7d32; font-weight: 600; }
     .mini-excel-row span.empty { color: #bbb; }
-    .excel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; color: white; font-size: 12px; cursor: pointer; z-index: 5; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
-    .excel-nav:hover { background: rgba(0,0,0,0.7); }
-    .excel-nav.left { left: -8px; }
-    .excel-nav.right { right: -8px; }
-    .mini-excel-wrapper:hover .excel-nav.visible { opacity: 1; }
+    .excel-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: white; font-size: 14px; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .excel-nav:hover { background: rgba(255,255,255,0.2); }
+    .excel-nav.left { left: -6px; }
+    .excel-nav.right { right: -6px; }
+    .excel-nav:not(.visible) { display: none; }
 
     /* Rules detail */
     .preview-rules { margin-top: 10px; padding: 8px 10px; background: rgba(255,107,53,0.08); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.6); }
