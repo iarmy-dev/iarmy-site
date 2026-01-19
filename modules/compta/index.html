@@ -578,12 +578,19 @@
     }
 
     async function loadConfig(userId) {
-      const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config, created_at').eq('user_id', userId).single();
+      const { data: moduleConfig } = await supabaseClient.from('module_configs').select('sheet_id, config, created_at').eq('user_id', userId).eq('module_name', 'compta').single();
 
-      if (!cfg) { window.location.href = './setup/'; return; }
+      if (!moduleConfig) { window.location.href = './setup/'; return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
+      // Mapper pour compatibilité avec l'ancien format
+      const cfg = {
+        user_id: userId,
+        sheet_id: moduleConfig.sheet_id,
+        excel_config: moduleConfig.config,
+        created_at: moduleConfig.created_at
+      };
       config = cfg;
       config.createdYear = cfg.created_at ? new Date(cfg.created_at).getFullYear() : new Date().getFullYear();
 
@@ -1439,10 +1446,10 @@
         export_settings: exportSettings
       };
 
-      const { error } = await supabaseClient.from('user_configs').update({
-        excel_config: newCfg,
+      const { error } = await supabaseClient.from('module_configs').update({
+        config: newCfg,
         updated_at: new Date().toISOString()
-      }).eq('user_id', session.user.id);
+      }).eq('user_id', session.user.id).eq('module_name', 'compta');
 
       if (error) {
         toast('Erreur: ' + error.message, true);
@@ -1525,7 +1532,7 @@
       document.getElementById('reset-modal')?.remove();
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) return;
-      await supabaseClient.from('user_configs').delete().eq('user_id', session.user.id);
+      await supabaseClient.from('module_configs').delete().eq('user_id', session.user.id).eq('module_name', 'compta');
       window.location.href = './setup/';
     }
 

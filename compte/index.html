@@ -305,7 +305,7 @@
     async function loadModuleData(userId) {
       currentUserId = userId;
       try {
-        const { data: config } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
+        const { data: config } = await supabaseClient.from('module_configs').select('sheet_id, config').eq('user_id', userId).eq('module_name', 'compta').single();
         const { data: telegramLink } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
         const hasTelegram = !!telegramLink?.telegram_user_id;
@@ -320,7 +320,7 @@
         }
 
         // Load notification settings
-        currentExcelConfig = config?.excel_config || {};
+        currentExcelConfig = config?.config || {};
         const exportSettings = currentExcelConfig.export_settings || {};
 
         const weeklyCheckbox = document.getElementById('notif-weekly');
@@ -399,9 +399,10 @@
 
       try {
         await supabaseClient
-          .from('user_configs')
-          .update({ excel_config: updatedConfig })
-          .eq('user_id', currentUserId);
+          .from('module_configs')
+          .update({ config: updatedConfig })
+          .eq('user_id', currentUserId)
+          .eq('module_name', 'compta');
 
         currentExcelConfig = updatedConfig;
         console.log('Notification settings saved');

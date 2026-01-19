@@ -68,6 +68,7 @@ iArmy
 ### Supabase
 - **Project ID** : byqfnpdcnifauhwgetcq
 - **URL** : https://byqfnpdcnifauhwgetcq.supabase.co
+- **Service Role Key** : sb_secret_bdFt6k2fcrGn5S5GXvt3qA_hgDUPU4q
 
 ### GitHub Repos
 - **Site** : https://github.com/iarmy-dev/iarmy-site

@@ -2125,14 +2125,15 @@
         // 1. Mettre à jour google_credentials avec le sheet sélectionné
         await supabaseClient.from('google_credentials').update({ sheet_id: sheetToUse.id, sheet_name: sheetToUse.name }).eq('user_id', freshSession.user.id);
 
-        // 2. Créer/mettre à jour user_configs avec le sheet_id
-        await supabaseClient.from('user_configs').upsert({
+        // 2. Créer/mettre à jour module_configs avec le sheet_id
+        await supabaseClient.from('module_configs').upsert({
           user_id: freshSession.user.id,
+          module_name: 'compta',
           sheet_id: sheetToUse.id,
-          excel_config: {},
-          is_active: true
-        }, { onConflict: 'user_id' });
-        console.log('[COMPTA] ✅ user_configs initialisé avec sheet_id:', sheetToUse.id);
+          config: {},
+          is_enabled: true
+        }, { onConflict: 'user_id,module_name' });
+        console.log('[COMPTA] ✅ module_configs initialisé avec sheet_id:', sheetToUse.id);
 
         // 3. Stocker les infos du sheet
         excelData = { fileName: sheetToUse.name, sheetId: sheetToUse.id, sheetName: sheetToUse.name, webViewLink: sheetToUse.webViewLink };
@@ -3138,8 +3139,9 @@
 
       var configToSave = {
         user_id: currentUser.id,
+        module_name: 'compta',
         sheet_id: excelData.sheetId,
-        excel_config: {
+        config: {
           onglet: 'Janvier ' + currentYear,
           ligne_entetes: 1,
           premiere_ligne_donnees: 2,
@@ -3149,13 +3151,13 @@
           colonnes_a_remplir: colonnesARemplir,
           regles: sheetEditorRules.filter(function(r) { return r.src1 && r.src2 && r.target; })
         },
-        is_active: true
+        is_enabled: true
       };
 
       console.log('[SHEET EDITOR] Saving config:', configToSave);
 
       // Sauvegarder la config
-      var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
+      var { error: saveError } = await supabaseClient.from('module_configs').upsert(configToSave, { onConflict: 'user_id,module_name' });
       if (saveError) {
         console.error('[SHEET EDITOR] Save error:', saveError);
         return;
@@ -3953,14 +3955,15 @@
 
         var configToSave = {
           user_id: session.user.id,
+          module_name: 'compta',
           sheet_id: excelData?.sheetId || null,
-          excel_config: pendingConfig,
-          is_active: true  // IMPORTANT: Le bot filtre sur is_active=true
+          config: pendingConfig,
+          is_enabled: true  // IMPORTANT: Le bot filtre sur is_enabled=true
         };
 
         var result = await supabaseClient
-          .from('user_configs')
-          .upsert(configToSave, { onConflict: 'user_id' });
+          .from('module_configs')
+          .upsert(configToSave, { onConflict: 'user_id,module_name' });
 
         if (result.error) throw result.error;
 
@@ -4257,12 +4260,13 @@
       // Save config
       var configToSave = {
         user_id: currentUser.id,
-        excel_config: pendingConfig,
+        module_name: 'compta',
+        config: pendingConfig,
         sheet_id: excelData?.sheetId || null,
-        is_active: true
+        is_enabled: true
       };
-      console.log('[COMPTA] 💾 Sauvegarde user_configs:', configToSave);
-      var { error: saveError } = await supabaseClient.from('user_configs').upsert(configToSave, { onConflict: 'user_id' });
+      console.log('[COMPTA] 💾 Sauvegarde module_configs:', configToSave);
+      var { error: saveError } = await supabaseClient.from('module_configs').upsert(configToSave, { onConflict: 'user_id,module_name' });
       if (saveError) {
         console.error('[COMPTA] ❌ Erreur sauvegarde:', saveError);
         alert('Erreur lors de la sauvegarde. Réessaie ?');
@@ -5106,11 +5110,15 @@
         if (!session) return;
 
         // Charger la config existante
-        var { data: config } = await supabaseClient
-          .from('user_configs')
-          .select('sheet_id, excel_config')
+        var { data: moduleConfig } = await supabaseClient
+          .from('module_configs')
+          .select('sheet_id, config')
           .eq('user_id', session.user.id)
+          .eq('module_name', 'compta')
           .single();
+
+        // Mapper pour compatibilité
+        var config = moduleConfig ? { sheet_id: moduleConfig.sheet_id, excel_config: moduleConfig.config } : null;
 
         if (!config || !config.excel_config) {
           showToast('Aucune configuration trouvée');
