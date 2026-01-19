@@ -140,6 +140,125 @@
     .analyse-step.active .analyse-step-text { color: rgba(255, 255, 255, 0.9); font-weight: 500; }
     .analyse-step.done .analyse-step-text { color: rgba(255, 255, 255, 0.5); }
     .loader-progress-bar { height: 100%; background: linear-gradient(90deg, #FF6B35, #FF8F6B); border-radius: 2px; transition: width 0.5s ease; width: 0%; }
+
+    /* ============================================= */
+    /* RULE CARDS - Glass Style                     */
+    /* ============================================= */
+    .rule-card {
+      background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rule-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 16px 16px 0 0;
+    }
+    .rule-card:hover {
+      border-color: rgba(139,92,246,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(139,92,246,0.12);
+    }
+    .rule-card:hover::before { opacity: 1; }
+    .rule-terms { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rule-select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: white;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rule-select:hover { border-color: rgba(139,92,246,0.4); }
+    .rule-select:focus { outline: none; border-color: #8B5CF6; }
+    .rule-op-select {
+      background: linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.15) 100%);
+      border: 1px solid rgba(139,92,246,0.4);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #A78BFA;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      width: 44px;
+      text-align: center;
+    }
+    .rule-op-select:focus { outline: none; }
+    .rule-arrow { color: #A78BFA; font-size: 14px; font-weight: 600; }
+    .rule-target {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #4ade80;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rule-target:hover { border-color: rgba(34,197,94,0.5); }
+    .rule-target:focus { outline: none; border-color: #22c55e; }
+    .rule-add-term {
+      background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: rgba(255,255,255,0.4);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rule-add-term:hover { border-color: #8B5CF6; color: #A78BFA; }
+    .rule-del-term {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.2);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .rule-del-term:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+    .rule-del-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.15);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+      transition: all 0.2s;
+      border-radius: 6px;
+      margin-left: auto;
+    }
+    .rule-del-btn:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+    .rule-new-target-input {
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #4ade80;
+      font-size: 12px;
+      font-family: inherit;
+      width: 70px;
+      text-transform: uppercase;
+    }
+    .rule-new-target-input:focus { outline: none; border-color: #22c55e; }
+
     /* Modal overlay - ne couvre PAS le header/sidebar */
     .sheets-overlay { position: fixed; top: 70px; left: 280px; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .sheets-overlay.active { opacity: 1; pointer-events: all; }
@@ -2920,19 +3039,19 @@
       container.innerHTML = sheetEditorRules.map(function(rule, i) {
         // Assurer que op existe (compatibilité anciennes règles)
         if (!rule.op) rule.op = '+';
-        var opSelect = '<select onchange="sheetEditorRules[' + i + '].op=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 4px 8px; color: #FF8B5E; font-size: 14px; font-weight: 600; width: 40px; text-align: center;">' +
+        var opSelect = '<select class="rule-op-select" onchange="sheetEditorRules[' + i + '].op=this.value;hasUnsavedChanges=true;updateTelegramPreview()">' +
           '<option value="+"' + (rule.op === '+' ? ' selected' : '') + '>+</option>' +
           '<option value="-"' + (rule.op === '-' ? ' selected' : '') + '>−</option>' +
           '</select>';
 
-        return '<div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">' +
-          '<select onchange="sheetEditorRules[' + i + '].src1=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
+        return '<div class="rule-card"><div class="rule-terms">' +
+          '<select class="rule-select" onchange="sheetEditorRules[' + i + '].src1=this.value;hasUnsavedChanges=true;updateTelegramPreview()">' + opts.replace('value="' + rule.src1 + '"', 'value="' + rule.src1 + '" selected') + '</select>' +
           opSelect +
-          '<select onchange="sheetEditorRules[' + i + '].src2=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
-          '<span style="color: rgba(255,255,255,0.4);">→</span>' +
-          '<select onchange="sheetEditorRules[' + i + '].target=this.value;hasUnsavedChanges=true;updateTelegramPreview()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px;">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
-          '<button onclick="sheetEditorRules.splice(' + i + ',1);hasUnsavedChanges=true;renderEditorRules()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;">×</button>' +
-          '</div>';
+          '<select class="rule-select" onchange="sheetEditorRules[' + i + '].src2=this.value;hasUnsavedChanges=true;updateTelegramPreview()">' + opts.replace('value="' + rule.src2 + '"', 'value="' + rule.src2 + '" selected') + '</select>' +
+          '<span class="rule-arrow">=</span>' +
+          '<select class="rule-target" onchange="sheetEditorRules[' + i + '].target=this.value;hasUnsavedChanges=true;updateTelegramPreview()">' + opts.replace('value="' + rule.target + '"', 'value="' + rule.target + '" selected') + '</select>' +
+          '<button class="rule-del-btn" onclick="sheetEditorRules.splice(' + i + ',1);hasUnsavedChanges=true;renderEditorRules()">×</button>' +
+          '</div></div>';
       }).join('');
     }
 
@@ -3527,8 +3646,9 @@
           rule.operations = rule.sources.slice(1).map(function() { return '+'; });
         }
 
-        // Ligne GLASS: [A] + [B] - [C] → [D] [+]
-        html += '<div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap;">';
+        // Rule card with purple gradient glass style
+        html += '<div class="rule-card">';
+        html += '<div class="rule-terms">';
 
         // Sources avec opérations entre elles
         rule.sources.forEach(function(src, srcIdx) {
@@ -3536,14 +3656,14 @@
           if (srcIdx > 0) {
             var opIdx = srcIdx - 1;
             var currentOp = rule.operations[opIdx] || '+';
-            html += '<select onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)" style="width: 36px; background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); border-radius: 6px; padding: 6px 2px; color: #FF8B5E; font-size: 18px; font-weight: 600; text-align: center; cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none;">';
+            html += '<select class="rule-op-select" onchange="updateRuleOperation(' + index + ', ' + opIdx + ', this.value)">';
             html += '<option value="+"' + (currentOp === '+' ? ' selected' : '') + '>+</option>';
             html += '<option value="-"' + (currentOp === '-' ? ' selected' : '') + '>−</option>';
             html += '</select>';
           }
 
           // Select pour la source
-          html += '<select onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)" style="min-width: 55px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: white; font-size: 12px; font-weight: 500; cursor: pointer;">';
+          html += '<select class="rule-select" onchange="updateRuleSource(' + index + ', ' + srcIdx + ', this.value)">';
           keywords.forEach(function(kw) {
             var selected = kw === src ? 'selected' : '';
             html += '<option value="' + kw + '" ' + selected + '>' + kw + '</option>';
@@ -3552,18 +3672,18 @@
 
           // Bouton supprimer la source (si plus de 2 sources)
           if (rule.sources.length > 2) {
-            html += '<button onclick="removeRuleSource(' + index + ', ' + srcIdx + ')" style="width: 16px; height: 16px; background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 12px; padding: 0;" title="Supprimer">×</button>';
+            html += '<button class="rule-del-term" onclick="removeRuleSource(' + index + ', ' + srcIdx + ')" title="Supprimer">×</button>';
           }
         });
 
-        // Bouton ajouter terme (petit, inline)
-        html += '<button onclick="addRuleSource(' + index + ')" style="width: 24px; height: 24px; background: rgba(255,107,53,0.1); border: 1px dashed rgba(255,107,53,0.3); border-radius: 4px; color: #FF8B5E; cursor: pointer; font-size: 14px; font-weight: 500;" title="Ajouter un terme">+</button>';
+        // Bouton ajouter terme
+        html += '<button class="rule-add-term" onclick="addRuleSource(' + index + ')" title="Ajouter un terme">+ terme</button>';
 
         // Flèche
-        html += '<span style="color: rgba(255,255,255,0.3); font-size: 14px; margin: 0 2px;">=</span>';
+        html += '<span class="rule-arrow">=</span>';
 
         // Target
-        html += '<select onchange="updateRuleTarget(' + index + ', this.value)" style="min-width: 60px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); border-radius: 6px; padding: 6px 8px; color: #4ade80; font-size: 12px; font-weight: 500; cursor: pointer;">';
+        html += '<select class="rule-target" onchange="updateRuleTarget(' + index + ', this.value)">';
         if (rule.createTarget) {
           html += '<option value="__NEW__" selected>' + rule.target + '</option>';
         }
@@ -3576,13 +3696,14 @@
 
         // Input pour nom de nouvelle colonne (si createTarget)
         if (rule.createTarget) {
-          html += '<input type="text" value="' + rule.target + '" onchange="updateNewTargetName(' + index + ', this.value)" placeholder="Nom" style="width: 55px; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 5px; padding: 5px 6px; color: #4ade80; font-size: 11px; text-transform: uppercase;">';
+          html += '<input type="text" class="rule-new-target-input" value="' + rule.target + '" onchange="updateNewTargetName(' + index + ', this.value)" placeholder="Nom">';
         }
 
         // Supprimer la règle
-        html += '<button onclick="removeCustomRule(' + index + ')" style="margin-left: auto; background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 16px; padding: 4px;" title="Supprimer la règle">×</button>';
+        html += '<button class="rule-del-btn" onclick="removeCustomRule(' + index + ')" title="Supprimer la règle">×</button>';
 
-        html += '</div>';
+        html += '</div>'; // rule-terms
+        html += '</div>'; // rule-card
       });
 
       container.innerHTML = html;
