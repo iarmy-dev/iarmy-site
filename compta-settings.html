@@ -476,25 +476,32 @@
         </div>
       </div>
 
-      <!-- Export manuel -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
-        <div style="font-size: 13px; font-weight: 600; color: white; margin-bottom: 4px;">📥 Export manuel</div>
-        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">Prévisualise ou télécharge les données d'un mois</div>
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-          <select id="export-month" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
-            <!-- Généré dynamiquement par JS -->
-          </select>
-          <select id="export-year" style="width: 90px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="updateMonthOptions()">
-            <!-- Généré dynamiquement par JS -->
-          </select>
-          <select id="export-format-manual" style="width: 80px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
-            <option value="pdf">PDF</option>
-            <option value="xlsx">Excel</option>
-          </select>
+      <!-- Export manuel (accordéon) -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden;">
+        <div onclick="toggleExportManual()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-size: 13px; font-weight: 600; color: white;">📥 Export manuel</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Télécharge les données d'un mois</div>
+          </div>
+          <span id="export-manual-arrow" style="color: rgba(255,255,255,0.4); transition: transform 0.2s;">▼</span>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="previewExport()" style="flex: 1; padding: 10px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 500; cursor: pointer;">👁 Prévisualiser</button>
-          <button onclick="exportDataManual()" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(255,107,53,0.2) 0%, rgba(255,107,53,0.1) 100%); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF8B5E; font-size: 12px; font-weight: 600; cursor: pointer;">📥 Télécharger</button>
+        <div id="export-manual-content" style="display: none; padding: 0 14px 14px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div style="display: flex; gap: 8px; margin: 12px 0 10px;">
+            <select id="export-month" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
+              <!-- Généré dynamiquement par JS -->
+            </select>
+            <select id="export-year" style="width: 90px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="updateMonthOptions()">
+              <!-- Généré dynamiquement par JS -->
+            </select>
+            <select id="export-format-manual" style="width: 80px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
+              <option value="pdf">PDF</option>
+              <option value="xlsx">Excel</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="previewExport()" style="flex: 1; padding: 10px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 500; cursor: pointer;">👁 Prévisualiser</button>
+            <button onclick="exportDataManual()" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(255,107,53,0.2) 0%, rgba(255,107,53,0.1) 100%); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF8B5E; font-size: 12px; font-weight: 600; cursor: pointer;">📥 Télécharger</button>
+          </div>
         </div>
       </div>
     </div>
@@ -689,6 +696,15 @@
 
       // Update preview after rendering
       updateEmailPreview();
+    }
+
+    function toggleExportManual() {
+      const content = document.getElementById('export-manual-content');
+      const arrow = document.getElementById('export-manual-arrow');
+      const isOpen = content.style.display !== 'none';
+
+      content.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
     }
 
     function initExportSelects() {
