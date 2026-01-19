@@ -1408,6 +1408,7 @@
       const year = document.getElementById('export-year').value;
       const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
       const sheetName = monthNames[parseInt(month) - 1] + ' ' + year;
+      const filename = `compta_${sheetName.replace(' ', '_')}`;
 
       toast('Export en cours...');
 
@@ -1418,23 +1419,22 @@
           return;
         }
 
-        const res = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
-          body: JSON.stringify({ sheetId: config.sheet_id, sheetName: sheetName })
-        });
-        const result = await res.json();
-        if (!result.success) throw new Error(result.error || 'Erreur lors de la lecture');
-
-        const rows = result.data;
-        if (!rows || rows.length === 0) {
-          toast('Aucune donnée pour ce mois', true);
-          return;
-        }
-
-        const filename = `compta_${sheetName.replace(' ', '_')}`;
-
         if (format === 'xlsx') {
+          // Pour Excel, on lit les données puis on génère le fichier
+          const res = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+            body: JSON.stringify({ sheetId: config.sheet_id, sheetName: sheetName })
+          });
+          const result = await res.json();
+          if (!result.success) throw new Error(result.error || 'Erreur lors de la lecture');
+
+          const rows = result.data;
+          if (!rows || rows.length === 0) {
+            toast('Aucune donnée pour ce mois', true);
+            return;
+          }
+
           // Charger SheetJS si pas déjà chargé
           if (typeof XLSX === 'undefined') {
             toast('Chargement de la librairie Excel...');
@@ -1444,9 +1444,9 @@
           const ws = XLSX.utils.aoa_to_sheet(rows);
           XLSX.utils.book_append_sheet(wb, ws, sheetName);
           XLSX.writeFile(wb, `${filename}.xlsx`);
+
         } else if (format === 'pdf') {
-          // Pour le PDF, on appelle une Edge Function qui génère le PDF
-          toast('Génération du PDF...');
+          // Pour PDF, on utilise directement generate-pdf (export natif Google)
           const pdfRes = await fetch(SUPABASE_URL + '/functions/v1/generate-pdf', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
@@ -1458,11 +1458,9 @@
           });
 
           if (!pdfRes.ok) {
-            // Fallback: télécharger en CSV si l'Edge Function n'existe pas encore
-            const csv = rows.map(r => r.join(';')).join('\n');
-            downloadFile(csv, `${filename}.csv`, 'text/csv');
-            toast('PDF non disponible, export CSV effectué');
-            return;
+            const errText = await pdfRes.text();
+            console.error('PDF error:', errText);
+            throw new Error('Impossible de générer le PDF');
           }
 
           const blob = await pdfRes.blob();
