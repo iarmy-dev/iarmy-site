@@ -498,10 +498,14 @@
               <option value="xlsx">Excel</option>
             </select>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
             <button onclick="previewExport()" style="flex: 1; padding: 10px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.8); font-size: 12px; font-weight: 500; cursor: pointer;">👁 Prévisualiser</button>
             <button onclick="exportDataManual()" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(255,107,53,0.2) 0%, rgba(255,107,53,0.1) 100%); border: 1px solid rgba(255,107,53,0.3); border-radius: 8px; color: #FF8B5E; font-size: 12px; font-weight: 600; cursor: pointer;">📥 Télécharger</button>
           </div>
+          <!-- Export année complète -->
+          <button id="export-year-btn" onclick="exportFullYear()" disabled style="width: 100%; padding: 10px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 500; cursor: not-allowed; transition: all 0.2s;">
+            📅 Année complète <span id="export-year-status">(disponible en décembre)</span>
+          </button>
         </div>
       </div>
     </div>
@@ -710,12 +714,88 @@
     function initExportSelects() {
       const yearSelect = document.getElementById('export-year');
       const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth(); // 0-indexed (11 = décembre)
 
       // Pour l'instant, juste l'année en cours
-      // TODO: ajouter années précédentes si l'user a des données
       yearSelect.innerHTML = `<option value="${currentYear}">${currentYear}</option>`;
 
       updateMonthOptions();
+
+      // Activer le bouton "Année complète" en décembre
+      const yearBtn = document.getElementById('export-year-btn');
+      const yearStatus = document.getElementById('export-year-status');
+
+      if (currentMonth === 11) { // Décembre
+        yearBtn.disabled = false;
+        yearBtn.style.background = 'rgba(74, 222, 128, 0.1)';
+        yearBtn.style.borderColor = 'rgba(74, 222, 128, 0.2)';
+        yearBtn.style.color = '#4ade80';
+        yearBtn.style.cursor = 'pointer';
+        yearStatus.textContent = '';
+      } else {
+        const monthsLeft = 11 - currentMonth;
+        yearStatus.textContent = `(dans ${monthsLeft} mois)`;
+      }
+    }
+
+    async function exportFullYear() {
+      if (!config?.sheet_id) { toast('Aucun fichier configuré', true); return; }
+
+      const year = document.getElementById('export-year').value;
+      toast('Export de l\'année en cours...');
+
+      try {
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.refreshSession();
+        if (sessionError || !session?.access_token) {
+          toast('Session expirée, reconnecte-toi', true);
+          return;
+        }
+
+        // Charger SheetJS
+        if (typeof XLSX === 'undefined') {
+          toast('Chargement...');
+          await loadScript('https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js');
+        }
+
+        const wb = XLSX.utils.book_new();
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        let hasData = false;
+
+        // Récupérer chaque mois
+        for (let i = 0; i < 12; i++) {
+          const sheetName = `${monthNames[i]} ${year}`;
+          toast(`Lecture ${monthNames[i]}...`);
+
+          try {
+            const res = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+              body: JSON.stringify({ sheetId: config.sheet_id, sheetName: sheetName })
+            });
+            const result = await res.json();
+
+            if (result.success && result.data?.length > 0) {
+              const ws = XLSX.utils.aoa_to_sheet(result.data);
+              XLSX.utils.book_append_sheet(wb, ws, monthNames[i]);
+              hasData = true;
+            }
+          } catch (e) {
+            console.log(`Pas de données pour ${sheetName}`);
+          }
+        }
+
+        if (!hasData) {
+          toast('Aucune donnée pour cette année', true);
+          return;
+        }
+
+        XLSX.writeFile(wb, `compta_${year}_complet.xlsx`);
+        toast('Export année terminé !');
+
+      } catch (err) {
+        console.error('Export year error:', err);
+        toast('Erreur: ' + err.message, true);
+      }
     }
 
     function updateMonthOptions() {
