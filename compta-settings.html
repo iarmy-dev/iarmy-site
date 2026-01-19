@@ -483,6 +483,38 @@
         </div>
       </div>
 
+      <!-- Notifications Telegram -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
+        <div style="font-size: 13px; font-weight: 600; color: white; margin-bottom: 12px;">📱 Notifications Telegram</div>
+
+        <!-- Récap mensuel -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+          <div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.9);">Récap mensuel</div>
+            <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Résumé + comparatif mois précédent</div>
+          </div>
+          <input type="checkbox" id="notif-monthly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+        </label>
+
+        <!-- Récap hebdo -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+          <div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.9);">Récap hebdo</div>
+            <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Résumé de la semaine chaque lundi</div>
+          </div>
+          <input type="checkbox" id="notif-weekly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+        </label>
+
+        <!-- Record battu -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer;">
+          <div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.9);">Alerte record</div>
+            <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Notification si meilleure journée du mois</div>
+          </div>
+          <input type="checkbox" id="notif-record-alert" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+        </label>
+      </div>
+
       <!-- Export manuel (accordéon) -->
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden;">
         <div onclick="toggleExportManual()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
@@ -665,6 +697,11 @@
       if (exportSettings.reminder_days) {
         document.getElementById('reminder-days').value = exportSettings.reminder_days;
       }
+
+      // Notifications Telegram
+      document.getElementById('notif-monthly-recap').checked = exportSettings.notif_monthly_recap || false;
+      document.getElementById('notif-weekly-recap').checked = exportSettings.notif_weekly_recap || false;
+      document.getElementById('notif-record-alert').checked = exportSettings.notif_record_alert || false;
 
       // Générer les checkboxes des colonnes
       renderExportColumns();
@@ -1188,9 +1225,16 @@
         export_columns: checkedCols,
         require_telegram_confirm: true,
         reminder_enabled: document.getElementById('reminder-toggle').checked,
-        reminder_days: document.getElementById('reminder-days').value
+        reminder_days: document.getElementById('reminder-days').value,
+        notif_monthly_recap: document.getElementById('notif-monthly-recap').checked,
+        notif_weekly_recap: document.getElementById('notif-weekly-recap').checked,
+        notif_record_alert: document.getElementById('notif-record-alert').checked
       };
       markAsModified();
+    }
+
+    function saveNotificationSettings() {
+      saveAutoExportSettings();
     }
 
     function updatePreview() {
