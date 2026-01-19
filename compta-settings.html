@@ -717,18 +717,40 @@
     function initExportSelects() {
       const yearSelect = document.getElementById('export-year');
       const currentYear = new Date().getFullYear();
-      const currentMonth = new Date().getMonth(); // 0-indexed (11 = décembre)
 
-      // Pour l'instant, juste l'année en cours
-      yearSelect.innerHTML = `<option value="${currentYear}">${currentYear}</option>`;
+      // Juste l'année en cours (iArmy a démarré en 2026)
+      // Les années précédentes seront ajoutées automatiquement quand l'user en aura
+      let yearsHtml = `<option value="${currentYear}">${currentYear}</option>`;
+
+      // Ajouter l'année précédente seulement si on est en 2027+
+      if (currentYear > 2026) {
+        yearsHtml += `<option value="${currentYear - 1}">${currentYear - 1}</option>`;
+      }
+
+      yearSelect.innerHTML = yearsHtml;
 
       updateMonthOptions();
+      updateYearExportButton();
 
-      // Activer le bouton "Année complète" en décembre
+      // Mettre à jour le bouton quand on change d'année
+      yearSelect.addEventListener('change', () => {
+        updateMonthOptions();
+        updateYearExportButton();
+      });
+    }
+
+    function updateYearExportButton() {
+      const selectedYear = parseInt(document.getElementById('export-year').value);
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth(); // 0-indexed
+
       const yearBtn = document.getElementById('export-year-btn');
       const yearStatus = document.getElementById('export-year-status');
 
-      if (currentMonth === 11) { // Décembre
+      // Actif si : année passée OU décembre de l'année en cours
+      const isEnabled = (selectedYear < currentYear) || (selectedYear === currentYear && currentMonth === 11);
+
+      if (isEnabled) {
         yearBtn.disabled = false;
         yearBtn.style.background = 'rgba(74, 222, 128, 0.1)';
         yearBtn.style.borderColor = 'rgba(74, 222, 128, 0.2)';
@@ -736,6 +758,11 @@
         yearBtn.style.cursor = 'pointer';
         yearStatus.textContent = '';
       } else {
+        yearBtn.disabled = true;
+        yearBtn.style.background = 'rgba(255,255,255,0.02)';
+        yearBtn.style.borderColor = 'rgba(255,255,255,0.05)';
+        yearBtn.style.color = 'rgba(255,255,255,0.3)';
+        yearBtn.style.cursor = 'not-allowed';
         const monthsLeft = 11 - currentMonth;
         yearStatus.textContent = `(dans ${monthsLeft} mois)`;
       }
