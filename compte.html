@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Compte - iArmy</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
-  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Export libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,26 +29,21 @@
     .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; color: rgba(255,255,255,0.3); transition: all 0.2s; display: flex; align-items: center; border-radius: 6px; }
     .btn-logout:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
 
-    .page-container { max-width: 640px; margin: 0 auto; padding: 90px 20px 30px; position: relative; z-index: 10; text-align: center; }
+    .page-container { max-width: 640px; margin: 0 auto; padding: 90px 20px 30px; position: relative; z-index: 10; }
 
-    /* Glass card */
-    .main-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 28px 24px; }
+    .main-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 28px 24px; text-align: center; }
 
-    /* Profile - centré */
     .profile-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .profile-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,107,53,0.4); margin-bottom: 14px; }
     .profile-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
     .profile-email { font-size: 14px; color: rgba(255,255,255,0.5); }
 
-    /* Section */
     .section-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Modules Grid */
-    .modules-grid { display: flex; gap: 16px; margin-bottom: 28px; justify-content: center; }
+    .modules-grid { display: flex; gap: 16px; margin-bottom: 28px; justify-content: center; flex-wrap: wrap; }
     .module-card { width: 140px; height: 140px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; padding: 16px; }
     .module-card:hover { transform: translateY(-4px); border-color: rgba(255,107,53,0.5); box-shadow: 0 12px 30px rgba(255,107,53,0.2); }
 
-    /* Animation logos dans module */
     .module-anim { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .module-anim svg { width: 32px; height: 32px; }
     .logo-tg { animation: pulseTg 2s ease-in-out infinite; }
@@ -69,11 +59,9 @@
     .module-badge { font-size: 11px; padding: 4px 12px; background: rgba(34,197,94,0.15); color: #4ade80; border-radius: 12px; font-weight: 600; }
     .module-badge.inactive { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
 
-    /* Coming soon */
     .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); opacity: 0.4; pointer-events: none; }
     .module-card.soon .module-anim { opacity: 0.3; }
 
-    /* Infos row - chips centrés */
     .info-row { display: flex; gap: 12px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
     .info-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 10px 18px; display: flex; align-items: center; gap: 8px; }
     .info-box.active { border-color: rgba(34,197,94,0.25); }
@@ -82,95 +70,97 @@
     .info-status { font-size: 13px; color: #4ade80; font-weight: 600; }
     .info-status.pending { color: rgba(255,255,255,0.3); }
 
+    /* Section Facturation */
+    .billing-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-top: 20px; }
+    .billing-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .billing-icon { font-size: 20px; }
+    .billing-title { font-size: 14px; font-weight: 600; }
+    .billing-badge { font-size: 10px; padding: 3px 8px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); border-radius: 8px; margin-left: auto; }
+    .billing-desc { font-size: 12px; color: rgba(255,255,255,0.4); }
+
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: #FF8B5E; }
-
-    /* Export columns checkboxes */
-    .export-col-check { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
-    .export-col-check:hover { background: rgba(255,255,255,0.08); }
-    .export-col-check.checked { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.3); }
-    .export-col-check input { accent-color: #FF6B35; width: 14px; height: 14px; }
-
-    /* Select styling */
-    select option { background: #1a1a1a; color: white; }
-
-    /* Export button states */
-    #export-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,53,0.3); }
-    #export-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    #export-btn.loading { pointer-events: none; }
-    #export-btn.loading span:first-child { animation: spin 1s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-gradient-animate">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <nav class="glass fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
+  <nav class="glass" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
+    <div style="max-width: 640px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+      <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;">
         <div class="logo-i">i</div>
-        <span class="font-semibold text-lg">iArmy</span>
+        <span style="font-weight: 600; font-size: 18px;">iArmy</span>
       </a>
-      <div id="auth-buttons" class="flex items-center gap-3"></div>
+      <div id="auth-buttons"></div>
     </div>
   </nav>
 
   <div class="page-container">
     <div class="main-card">
-      <!-- Profile centré -->
+      <!-- Profile -->
       <div class="profile-box">
-      <img id="profile-avatar" class="profile-avatar" src="" alt="">
-      <div class="profile-name" id="profile-name">-</div>
-      <div class="profile-email" id="profile-email">-</div>
-    </div>
+        <img id="profile-avatar" class="profile-avatar" src="" alt="">
+        <div class="profile-name" id="profile-name">-</div>
+        <div class="profile-email" id="profile-email">-</div>
+      </div>
 
-    <!-- Modules -->
-    <div class="section-title">Modules</div>
-    <div class="modules-grid">
-      <a href="compta-settings.html" class="module-card">
-        <div class="module-anim">
-          <div class="logo-tg">
-            <svg viewBox="0 0 240 240"><defs><linearGradient id="tg" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d2e4ef" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138c.897.306 1.377 1.152 1.377 1.152.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18z"/></svg>
+      <!-- Modules -->
+      <div class="section-title">Modules</div>
+      <div class="modules-grid">
+        <a href="compta-settings.html" class="module-card">
+          <div class="module-anim">
+            <div class="logo-tg">
+              <svg viewBox="0 0 240 240"><defs><linearGradient id="tg" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d2e4ef" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138c.897.306 1.377 1.152 1.377 1.152.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18z"/></svg>
+            </div>
+            <div class="pulse-dot"></div>
+            <div class="pulse-dot"></div>
+            <div class="pulse-dot"></div>
+            <div class="logo-sheet">
+              <svg viewBox="0 0 56 56"><defs><linearGradient id="sh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#0a7e3e"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sh)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/></svg>
+            </div>
           </div>
-          <div class="pulse-dot"></div>
-          <div class="pulse-dot"></div>
-          <div class="pulse-dot"></div>
-          <div class="logo-sheet">
-            <svg viewBox="0 0 56 56"><defs><linearGradient id="sh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#0a7e3e"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sh)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/></svg>
+          <div class="module-name">Compta Express</div>
+          <span class="module-badge" id="compta-badge">Actif</span>
+        </a>
+        <div class="module-card soon">
+          <div class="module-anim">
+            <div style="font-size: 32px;">👥</div>
           </div>
+          <div class="module-name">Personnel</div>
+          <span class="module-badge inactive">Bientôt</span>
         </div>
-        <div class="module-name">Compta Express</div>
-        <span class="module-badge" id="compta-badge">Actif</span>
-      </a>
-      <div class="module-card soon">
-        <div class="module-anim">
-          <div style="font-size: 32px;">👥</div>
-        </div>
-        <div class="module-name">Personnel</div>
-        <span class="module-badge inactive">Bientôt</span>
       </div>
-    </div>
 
-    <!-- Connexions - chips inline -->
-    <div class="section-title">Connexions</div>
-    <div class="info-row">
-      <div class="info-box active">
-        <span class="info-icon">🔗</span>
-        <span class="info-label">Google</span>
-        <span class="info-status">✓</span>
+      <!-- Connexions -->
+      <div class="section-title">Connexions</div>
+      <div class="info-row">
+        <div class="info-box active">
+          <span class="info-icon">🔗</span>
+          <span class="info-label">Google</span>
+          <span class="info-status">✓</span>
+        </div>
+        <div class="info-box" id="telegram-conn">
+          <span class="info-icon">📱</span>
+          <span class="info-label">Telegram</span>
+          <span class="info-status pending" id="telegram-status">-</span>
+        </div>
+        <div class="info-box" id="sheet-conn">
+          <span class="info-icon">📊</span>
+          <span class="info-label">Sheets</span>
+          <span class="info-status pending" id="sheet-status">-</span>
+        </div>
       </div>
-      <div class="info-box" id="telegram-conn">
-        <span class="info-icon">📱</span>
-        <span class="info-label">Telegram</span>
-        <span class="info-status pending" id="telegram-status">-</span>
+
+      <!-- Facturation -->
+      <div class="billing-card">
+        <div class="billing-header">
+          <span class="billing-icon">💳</span>
+          <span class="billing-title">Facturation</span>
+          <span class="billing-badge">Bientôt</span>
+        </div>
+        <div class="billing-desc">Gère tes abonnements et factures ici</div>
       </div>
-      <div class="info-box" id="sheet-conn">
-        <span class="info-icon">📊</span>
-        <span class="info-label">Sheets</span>
-        <span class="info-status pending" id="sheet-status">-</span>
-      </div>
-    </div>
     </div>
   </div>
 
@@ -216,13 +206,9 @@
       await loadModuleData(user.id);
     }
 
-    // Variables globales pour l'export
-    let userConfig = null;
-    let userSheetId = null;
-
     async function loadModuleData(userId) {
       try {
-        const { data: config } = await supabaseClient.from('user_configs').select('sheet_id, excel_config').eq('user_id', userId).single();
+        const { data: config } = await supabaseClient.from('user_configs').select('sheet_id').eq('user_id', userId).single();
         const { data: telegramLink } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
         if (telegramLink?.telegram_user_id) {
@@ -237,337 +223,11 @@
           document.getElementById('sheet-conn').classList.add('active');
           document.getElementById('sheet-conn').style.cursor = 'pointer';
           document.getElementById('sheet-conn').onclick = () => window.open('https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit', '_blank');
-
-          // Stocker la config pour l'export
-          userConfig = config.excel_config;
-          userSheetId = config.sheet_id;
         } else {
-          // Pas de config = module non configuré
           document.getElementById('compta-badge').textContent = 'À configurer';
           document.getElementById('compta-badge').className = 'module-badge inactive';
         }
       } catch (err) { console.log('No config'); }
-    }
-
-    // ========== EXPORT COMPTABLE ==========
-
-    function initExportSection(config) {
-      // Afficher la section
-      document.getElementById('export-section').style.display = 'block';
-
-      // Sélectionner le mois en cours par défaut
-      const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
-      document.getElementById('export-month').value = currentMonth;
-
-      // Générer les checkboxes de colonnes
-      const columnsContainer = document.getElementById('export-columns');
-      const columns = config?.colonnes || ['Date', 'CB', 'ESP', 'TR', 'DEP', 'RAZ', 'Notes', 'TOTAL'];
-
-      // Colonnes toujours incluses par défaut (données comptables)
-      const defaultChecked = ['Date', 'CB', 'ESP', 'TR', 'TOTAL', 'TVA'];
-
-      columnsContainer.innerHTML = columns.map(col => {
-        const isChecked = defaultChecked.some(d => col.toUpperCase().includes(d.toUpperCase()));
-        const isNotes = col.toLowerCase() === 'notes';
-        return `
-          <label class="export-col-check ${isChecked ? 'checked' : ''}" onclick="toggleExportCol(this)">
-            <input type="checkbox" value="${col}" ${isChecked ? 'checked' : ''}>
-            ${col}${isNotes ? ' <span style="font-size:9px;color:rgba(255,255,255,0.3)">(interne)</span>' : ''}
-          </label>
-        `;
-      }).join('');
-
-      // Ajouter TVA si présent dans la config
-      const tvaRates = config?.tva_rates || [];
-      tvaRates.forEach(rate => {
-        const colName = 'TVA ' + rate + '%';
-        columnsContainer.innerHTML += `
-          <label class="export-col-check checked" onclick="toggleExportCol(this)">
-            <input type="checkbox" value="${colName}" checked>
-            ${colName}
-          </label>
-        `;
-      });
-    }
-
-    function toggleExportCol(label) {
-      const checkbox = label.querySelector('input');
-      checkbox.checked = !checkbox.checked;
-      label.classList.toggle('checked', checkbox.checked);
-    }
-
-    async function generateExport() {
-      const btn = document.getElementById('export-btn');
-      const originalHtml = btn.innerHTML;
-
-      try {
-        // Loading state
-        btn.innerHTML = '<span>⏳</span> Génération...';
-        btn.classList.add('loading');
-
-        // Récupérer les paramètres
-        const month = document.getElementById('export-month').value;
-        const format = document.getElementById('export-format').value;
-        const monthNames = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-        const monthName = monthNames[parseInt(month)];
-
-        // Colonnes sélectionnées
-        const selectedCols = Array.from(document.querySelectorAll('#export-columns input:checked')).map(cb => cb.value);
-
-        if (selectedCols.length === 0) {
-          alert('Sélectionne au moins une colonne');
-          return;
-        }
-
-        // En-tête personnalisé
-        const headerName = document.getElementById('export-header-name').value.trim();
-        const headerAddress = document.getElementById('export-header-address').value.trim();
-        const headerSiret = document.getElementById('export-header-siret').value.trim();
-
-        // Appeler l'Edge Function pour récupérer les données
-        const { data: { session } } = await supabaseClient.auth.getSession();
-
-        const response = await fetch(SUPABASE_URL + '/functions/v1/export-sheet', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + session.access_token
-          },
-          body: JSON.stringify({
-            sheet_id: userSheetId,
-            month: monthName.toUpperCase(),
-            columns: selectedCols
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des données');
-        }
-
-        const { data: sheetData, error } = await response.json();
-        if (error) throw new Error(error);
-
-        // Générer le fichier
-        const year = new Date().getFullYear();
-        const filename = `Compta_${monthName}_${year}`;
-
-        if (format === 'pdf') {
-          generatePDF(sheetData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
-        } else {
-          generateExcel(sheetData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
-        }
-
-        btn.innerHTML = '<span>✓</span> Export généré !';
-        setTimeout(() => { btn.innerHTML = originalHtml; btn.classList.remove('loading'); }, 2000);
-
-      } catch (err) {
-        console.error('Export error:', err);
-
-        // Fallback: générer avec des données de démo
-        if (confirm('L\'export automatique n\'est pas encore disponible.\n\nVoulez-vous générer un fichier de démonstration ?')) {
-          generateDemoExport();
-        }
-
-        btn.innerHTML = originalHtml;
-        btn.classList.remove('loading');
-      }
-    }
-
-    function generateDemoExport() {
-      const month = document.getElementById('export-month').value;
-      const format = document.getElementById('export-format').value;
-      const monthNames = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-      const monthName = monthNames[parseInt(month)];
-      const year = new Date().getFullYear();
-
-      const selectedCols = Array.from(document.querySelectorAll('#export-columns input:checked')).map(cb => cb.value);
-      const headerName = document.getElementById('export-header-name').value.trim() || 'Restaurant Demo';
-      const headerAddress = document.getElementById('export-header-address').value.trim();
-      const headerSiret = document.getElementById('export-header-siret').value.trim();
-
-      // Données de démo
-      const demoData = [];
-      const daysInMonth = new Date(year, parseInt(month), 0).getDate();
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const row = {};
-        selectedCols.forEach(col => {
-          if (col === 'Date') {
-            row[col] = String(d).padStart(2, '0') + '/' + month;
-          } else if (col === 'Notes') {
-            row[col] = d % 7 === 0 ? 'FERMÉ' : '';
-          } else if (col.includes('TVA')) {
-            const rate = parseFloat(col.replace('TVA ', '').replace('%', ''));
-            const total = row['TOTAL'] || 0;
-            row[col] = total > 0 ? (total / (1 + rate/100) * (rate/100)).toFixed(2) : '';
-          } else if (col === 'TOTAL') {
-            const cb = row['CB'] || 0;
-            const esp = row['ESP'] || 0;
-            const tr = row['TR'] || 0;
-            row[col] = d % 7 === 0 ? '' : (cb + esp + tr).toFixed(2);
-          } else {
-            row[col] = d % 7 === 0 ? '' : (Math.random() * 400 + 100).toFixed(2);
-          }
-        });
-        demoData.push(row);
-      }
-
-      const filename = `Compta_${monthName}_${year}_DEMO`;
-
-      if (format === 'pdf') {
-        generatePDF(demoData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
-      } else {
-        generateExcel(demoData, selectedCols, monthName, year, filename, { name: headerName, address: headerAddress, siret: headerSiret });
-      }
-    }
-
-    function generatePDF(data, columns, monthName, year, filename, header) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      // En-tête
-      let yPos = 15;
-      if (header.name) {
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text(header.name, 14, yPos);
-        yPos += 7;
-      }
-      if (header.address) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(header.address, 14, yPos);
-        yPos += 5;
-      }
-      if (header.siret) {
-        doc.setFontSize(9);
-        doc.text('SIRET: ' + header.siret, 14, yPos);
-        yPos += 5;
-      }
-
-      // Titre
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Comptabilité ' + monthName + ' ' + year, 14, yPos + 8);
-
-      // Tableau
-      const tableData = data.map(row => columns.map(col => row[col] || ''));
-
-      // Totaux
-      const totals = columns.map(col => {
-        if (col === 'Date') return 'TOTAL';
-        if (col === 'Notes') return '';
-        const sum = data.reduce((acc, row) => acc + (parseFloat(row[col]) || 0), 0);
-        return sum > 0 ? sum.toFixed(2) + ' €' : '';
-      });
-      tableData.push(totals);
-
-      doc.autoTable({
-        head: [columns],
-        body: tableData,
-        startY: yPos + 15,
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [31, 111, 66], textColor: 255 },
-        footStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [250, 250, 250] }
-      });
-
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text('Généré par iArmy - ' + new Date().toLocaleDateString('fr-FR'), 14, doc.internal.pageSize.height - 10);
-        doc.text('Page ' + i + '/' + pageCount, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 10);
-      }
-
-      doc.save(filename + '.pdf');
-    }
-
-    function generateExcel(data, columns, monthName, year, filename, header) {
-      // Créer le workbook
-      const wb = XLSX.utils.book_new();
-
-      // Préparer les données avec en-tête
-      const wsData = [];
-
-      if (header.name) wsData.push([header.name]);
-      if (header.address) wsData.push([header.address]);
-      if (header.siret) wsData.push(['SIRET: ' + header.siret]);
-      if (header.name || header.address || header.siret) wsData.push([]); // Ligne vide
-
-      wsData.push(['Comptabilité ' + monthName + ' ' + year]);
-      wsData.push([]); // Ligne vide
-
-      // Headers
-      wsData.push(columns);
-
-      // Data rows
-      data.forEach(row => {
-        wsData.push(columns.map(col => {
-          const val = row[col];
-          if (col === 'Date' || col === 'Notes') return val || '';
-          return val ? parseFloat(val) : '';
-        }));
-      });
-
-      // Totaux
-      const totals = columns.map(col => {
-        if (col === 'Date') return 'TOTAL';
-        if (col === 'Notes') return '';
-        const sum = data.reduce((acc, row) => acc + (parseFloat(row[col]) || 0), 0);
-        return sum > 0 ? sum : '';
-      });
-      wsData.push(totals);
-
-      // Créer la feuille
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-      // Largeur des colonnes
-      ws['!cols'] = columns.map(() => ({ wch: 12 }));
-
-      XLSX.utils.book_append_sheet(wb, ws, monthName);
-      XLSX.writeFile(wb, filename + '.xlsx');
-    }
-
-    function resetConfig() {
-      // Afficher modal de confirmation
-      const modal = document.createElement('div');
-      modal.id = 'reset-modal';
-      modal.innerHTML = `
-        <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;">
-            <div style="font-size: 32px; margin-bottom: 12px;">🔄</div>
-            <div style="font-size: 16px; font-weight: 600; color: white; margin-bottom: 8px;">Nouveau fichier ?</div>
-            <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">Ta config actuelle sera supprimée et tu pourras créer un nouveau fichier iArmy.</div>
-            <div style="display: flex; gap: 10px;">
-              <button onclick="document.getElementById('reset-modal').remove()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer;">Annuler</button>
-              <button onclick="doResetConfig()" style="flex: 1; padding: 12px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; color: #f87171; font-size: 13px; font-weight: 600; cursor: pointer;">Supprimer</button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    async function doResetConfig() {
-      const modal = document.getElementById('reset-modal');
-      if (modal) modal.remove();
-
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-
-        await supabaseClient
-          .from('user_configs')
-          .delete()
-          .eq('user_id', session.user.id);
-
-        window.location.href = 'compta.html';
-      } catch (err) {
-        console.error('Reset error:', err);
-      }
     }
 
     async function signOut() {
