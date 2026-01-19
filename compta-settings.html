@@ -482,10 +482,10 @@
         <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px;">Prévisualise ou télécharge les données d'un mois</div>
         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
           <select id="export-month" style="flex: 1; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
-            <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
-            <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
-            <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
-            <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
+            <!-- Généré dynamiquement par JS -->
+          </select>
+          <select id="export-year" style="width: 90px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="updateMonthOptions()">
+            <!-- Généré dynamiquement par JS -->
           </select>
           <select id="export-format-manual" style="width: 80px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;">
             <option value="pdf">PDF</option>
@@ -646,6 +646,9 @@
 
       // Générer les checkboxes des colonnes
       renderExportColumns();
+
+      // Initialiser les sélecteurs mois/année
+      initExportSelects();
     }
 
     function renderExportColumns() {
@@ -686,6 +689,40 @@
 
       // Update preview after rendering
       updateEmailPreview();
+    }
+
+    function initExportSelects() {
+      const yearSelect = document.getElementById('export-year');
+      const currentYear = new Date().getFullYear();
+
+      // Années: année actuelle + année précédente
+      yearSelect.innerHTML = `
+        <option value="${currentYear}">${currentYear}</option>
+        <option value="${currentYear - 1}">${currentYear - 1}</option>
+      `;
+
+      updateMonthOptions();
+    }
+
+    function updateMonthOptions() {
+      const monthSelect = document.getElementById('export-month');
+      const yearSelect = document.getElementById('export-year');
+      const selectedYear = parseInt(yearSelect.value);
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth(); // 0-indexed
+
+      const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+      let options = '';
+      const maxMonth = (selectedYear === currentYear) ? currentMonth : 11;
+
+      for (let i = maxMonth; i >= 0; i--) {
+        const value = String(i + 1).padStart(2, '0');
+        const selected = (i === maxMonth) ? 'selected' : '';
+        options += `<option value="${value}" ${selected}>${monthNames[i]}</option>`;
+      }
+
+      monthSelect.innerHTML = options;
     }
 
     function updateEmailPreview() {
@@ -1370,7 +1407,7 @@
 
       const month = document.getElementById('export-month').value;
       const format = document.getElementById('export-format-manual').value;
-      const year = new Date().getFullYear();
+      const year = document.getElementById('export-year').value;
       const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
       const sheetName = monthNames[parseInt(month) - 1] + ' ' + year;
 
@@ -1450,7 +1487,7 @@
       if (!config?.sheet_id) { toast('Aucun fichier configuré', true); return; }
 
       const month = document.getElementById('export-month').value;
-      const year = new Date().getFullYear();
+      const year = document.getElementById('export-year').value;
       const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
       const sheetName = monthNames[parseInt(month) - 1] + ' ' + year;
 
