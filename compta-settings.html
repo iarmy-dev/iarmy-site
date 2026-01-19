@@ -436,6 +436,14 @@
               <!-- Généré dynamiquement -->
             </div>
           </div>
+          <!-- Confirmation Telegram -->
+          <label style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; cursor: pointer; margin-bottom: 10px;">
+            <input type="checkbox" id="require-telegram-confirm" checked onchange="saveAutoExportSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+            <div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">📱 Confirmation Telegram</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Prévisualise et valide avant envoi</div>
+            </div>
+          </label>
           <!-- Preview email -->
           <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
             <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Aperçu du mail</div>
@@ -646,6 +654,14 @@
       }
       if (exportSettings.auto_export_format) {
         document.getElementById('auto-export-format').value = exportSettings.auto_export_format;
+      }
+
+      // Confirmation Telegram (coché par défaut si pas défini)
+      const confirmCheckbox = document.getElementById('require-telegram-confirm');
+      if (exportSettings.require_telegram_confirm === false) {
+        confirmCheckbox.checked = false;
+      } else {
+        confirmCheckbox.checked = true; // Par défaut activé
       }
 
       // Rappel
@@ -1179,6 +1195,7 @@
         auto_export_day: document.getElementById('auto-export-day').value,
         auto_export_format: document.getElementById('auto-export-format').value,
         export_columns: checkedCols,
+        require_telegram_confirm: document.getElementById('require-telegram-confirm').checked,
         reminder_enabled: document.getElementById('reminder-toggle').checked,
         reminder_days: document.getElementById('reminder-days').value
       };
