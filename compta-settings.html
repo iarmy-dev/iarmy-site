@@ -725,14 +725,17 @@
         const valueCells = activeKeywords.map(k => {
           const val = result[k.nom];
           const isCalculated = calculatedFields.has(k.nom);
-          if (val !== undefined && val !== null) {
-            return `<span class="${isCalculated ? 'calculated' : ''}">${val}</span>`;
+          if (val !== undefined && val !== null && val !== 0) {
+            return `<span class="${isCalculated ? 'calculated' : ''}">${val}${isCalculated ? ' 📐' : ''}</span>`;
           }
           return `<span class="empty">-</span>`;
         }).join('');
 
-        // Labels sous les colonnes
-        const labelCells = activeKeywords.map(k => `<span style="background:#f5f5f5;color:#666;font-size:9px;">${k.nom}</span>`).join('');
+        // Labels sous les colonnes (avec indicateur formule)
+        const labelCells = activeKeywords.map(k => {
+          const isCalculated = calculatedFields.has(k.nom);
+          return `<span style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${k.nom}${isCalculated ? ' ƒ' : ''}</span>`;
+        }).join('');
 
         sheetEl.innerHTML = `
           <div class="mini-excel">
