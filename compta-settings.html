@@ -200,7 +200,8 @@
       </div>
       <div class="kw-grid" id="kw-grid"></div>
       <button class="btn-add" onclick="showAddKwWarning()">+ Ajouter un mot-clé</button>
-      <div id="add-kw-hint" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; color: rgba(255,255,255,0.6);">
+      <div id="add-kw-hint" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; color: rgba(255,255,255,0.6); position: relative;">
+        <button onclick="closeAddKwHint()" style="position: absolute; top: 6px; right: 8px; background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 14px; padding: 0; line-height: 1;">×</button>
         💡 <strong>Avant d'ajouter</strong> : crée d'abord la colonne dans ton <a href="#" id="hint-sheet-link" target="_blank" style="color: #4ade80;">Google Sheet</a>, puis reviens ici pour la linker.
       </div>
     </div>
@@ -574,10 +575,14 @@
       } else {
         // Deuxième clic : ajouter le mot-clé
         addKw();
-        hint.style.display = 'none';
-        addKwWarningShown = false;
-        document.querySelector('.btn-add').textContent = '+ Ajouter un mot-clé';
+        closeAddKwHint();
       }
+    }
+
+    function closeAddKwHint() {
+      document.getElementById('add-kw-hint').style.display = 'none';
+      addKwWarningShown = false;
+      document.querySelector('.btn-add').textContent = '+ Ajouter un mot-clé';
     }
 
     function addKw() {
