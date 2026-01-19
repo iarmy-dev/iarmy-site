@@ -169,8 +169,8 @@
           <div class="page-title">Compta Express</div>
           <div class="page-subtitle">Configure ton robot</div>
         </div>
-        <button id="save-btn" onclick="saveConfig()" disabled style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.3); font-size: 14px; font-weight: 600; cursor: not-allowed; transition: all 0.2s;">
-          💾 Sauvegarder
+        <button id="save-btn" onclick="saveConfig()" disabled style="padding: 12px 24px; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.35); font-size: 13px; font-weight: 600; cursor: not-allowed; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+          Sauvegarder
         </button>
       </div>
     </div>
@@ -189,7 +189,7 @@
         </div>
       </div>
       <div class="preview-rules" id="preview-rules" style="display: none;"></div>
-      <a id="sheet-link" href="#" target="_blank" style="display: none; margin-top: 12px; padding: 10px 16px; background: rgba(15,157,88,0.1); border: 1px solid rgba(15,157,88,0.2); border-radius: 10px; color: #4ade80; font-size: 13px; text-decoration: none; text-align: center;">📊 Ouvrir mon Google Sheet</a>
+      <a id="sheet-link" href="#" target="_blank" style="display: none; margin-top: 12px; padding: 12px 20px; background: linear-gradient(135deg, rgba(15,157,88,0.15) 0%, rgba(15,157,88,0.08) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(15,157,88,0.2); border-radius: 12px; color: #4ade80; font-size: 13px; font-weight: 500; text-decoration: none; text-align: center; box-shadow: 0 2px 8px rgba(15,157,88,0.1); transition: all 0.3s;">↗ Ouvrir Google Sheet</a>
     </div>
 
     <!-- Keywords -->
@@ -651,10 +651,11 @@
       hasUnsavedChanges = true;
       const btn = document.getElementById('save-btn');
       btn.disabled = false;
-      btn.style.background = 'rgba(255,107,53,0.2)';
+      btn.style.background = 'linear-gradient(135deg, rgba(255,107,53,0.25) 0%, rgba(255,107,53,0.15) 100%)';
       btn.style.borderColor = 'rgba(255,107,53,0.4)';
       btn.style.color = '#FF8B5E';
       btn.style.cursor = 'pointer';
+      btn.style.boxShadow = '0 2px 12px rgba(255,107,53,0.2)';
     }
 
     // Toggle envoi automatique
@@ -973,16 +974,18 @@
 
       // Succès
       btn.textContent = '✓ Sauvegardé';
-      btn.style.background = 'rgba(34,197,94,0.2)';
+      btn.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.15) 100%)';
       btn.style.borderColor = 'rgba(34,197,94,0.4)';
       btn.style.color = '#4ade80';
+      btn.style.boxShadow = '0 2px 12px rgba(34,197,94,0.2)';
 
       setTimeout(() => {
-        btn.textContent = '💾 Sauvegarder';
-        btn.style.background = 'rgba(255,255,255,0.1)';
-        btn.style.borderColor = 'rgba(255,255,255,0.1)';
-        btn.style.color = 'rgba(255,255,255,0.3)';
+        btn.textContent = 'Sauvegarder';
+        btn.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        btn.style.color = 'rgba(255,255,255,0.35)';
         btn.style.cursor = 'not-allowed';
+        btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
       }, 2000);
 
       toast('Configuration sauvegardée !');
@@ -990,19 +993,21 @@
 
     function resetSaveBtn() {
       const btn = document.getElementById('save-btn');
-      btn.textContent = '💾 Sauvegarder';
+      btn.textContent = 'Sauvegarder';
       if (hasUnsavedChanges) {
         btn.disabled = false;
-        btn.style.background = 'rgba(255,107,53,0.2)';
+        btn.style.background = 'linear-gradient(135deg, rgba(255,107,53,0.25) 0%, rgba(255,107,53,0.15) 100%)';
         btn.style.borderColor = 'rgba(255,107,53,0.4)';
         btn.style.color = '#FF8B5E';
         btn.style.cursor = 'pointer';
+        btn.style.boxShadow = '0 2px 12px rgba(255,107,53,0.2)';
       } else {
         btn.disabled = true;
-        btn.style.background = 'rgba(255,255,255,0.1)';
-        btn.style.borderColor = 'rgba(255,255,255,0.1)';
-        btn.style.color = 'rgba(255,255,255,0.3)';
+        btn.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        btn.style.color = 'rgba(255,255,255,0.35)';
         btn.style.cursor = 'not-allowed';
+        btn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
       }
     }
 
