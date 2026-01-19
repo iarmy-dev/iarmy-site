@@ -1377,7 +1377,12 @@
       toast('Export en cours...');
 
       try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.refreshSession();
+        if (sessionError || !session?.access_token) {
+          toast('Session expirée, reconnecte-toi', true);
+          return;
+        }
+
         const res = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
