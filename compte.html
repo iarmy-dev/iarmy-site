@@ -99,6 +99,14 @@
     .toggle input:checked + .toggle-slider { background: rgba(255,107,53,0.6); }
     .toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: #FF6B35; }
     .toggle input:disabled + .toggle-slider { opacity: 0.4; cursor: not-allowed; }
+
+    /* Objective input */
+    .objective-input-row { padding: 12px 18px; background: rgba(255,107,53,0.05); border-top: 1px solid rgba(255,255,255,0.04); }
+    .objective-input-wrapper { display: flex; align-items: center; gap: 8px; max-width: 160px; margin-left: auto; }
+    .objective-input-wrapper input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: white; font-size: 14px; text-align: right; width: 100px; }
+    .objective-input-wrapper input:focus { outline: none; border-color: rgba(255,107,53,0.5); }
+    .objective-input-wrapper input::placeholder { color: rgba(255,255,255,0.3); }
+    .objective-currency { color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 500; }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -200,6 +208,38 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
+        <div class="notif-row">
+          <div class="notif-info">
+            <span class="notif-icon">🏆</span>
+            <div>
+              <div class="notif-label">Records</div>
+              <div class="notif-desc">Quand tu bats un record</div>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notif-records">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="notif-row objective-row">
+          <div class="notif-info">
+            <span class="notif-icon">🎯</span>
+            <div>
+              <div class="notif-label">Objectif mensuel</div>
+              <div class="notif-desc">Alerte quand atteint</div>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="notif-objective">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="objective-input-row" id="objective-input-row" style="display: none;">
+          <div class="objective-input-wrapper">
+            <input type="number" id="monthly-objective" placeholder="10000" min="0" step="100">
+            <span class="objective-currency">€</span>
+          </div>
+        </div>
         <div class="notif-note" id="notif-note" style="display: none;">
           <span>📱</span> Connecte Telegram pour recevoir les récaps
         </div>
@@ -289,14 +329,37 @@
         weeklyCheckbox.checked = exportSettings.notif_weekly_recap === true;
         monthlyCheckbox.checked = exportSettings.notif_monthly_recap === true;
 
+        // Records & Objective
+        const recordsCheckbox = document.getElementById('notif-records');
+        const objectiveCheckbox = document.getElementById('notif-objective');
+        const objectiveInput = document.getElementById('monthly-objective');
+        const objectiveInputRow = document.getElementById('objective-input-row');
+
+        recordsCheckbox.checked = exportSettings.notif_records === true;
+        objectiveCheckbox.checked = exportSettings.notif_objective === true;
+        objectiveInput.value = exportSettings.monthly_objective || '';
+
+        // Show/hide objective input
+        objectiveInputRow.style.display = objectiveCheckbox.checked ? 'block' : 'none';
+
         // Disable toggles if no Telegram
         if (!hasTelegram) {
           weeklyCheckbox.disabled = true;
           monthlyCheckbox.disabled = true;
+          recordsCheckbox.disabled = true;
+          objectiveCheckbox.disabled = true;
+          objectiveInput.disabled = true;
         } else {
           // Add change listeners
           weeklyCheckbox.addEventListener('change', () => saveNotifSettings());
           monthlyCheckbox.addEventListener('change', () => saveNotifSettings());
+          recordsCheckbox.addEventListener('change', () => saveNotifSettings());
+          objectiveCheckbox.addEventListener('change', () => {
+            objectiveInputRow.style.display = objectiveCheckbox.checked ? 'block' : 'none';
+            saveNotifSettings();
+          });
+          objectiveInput.addEventListener('change', () => saveNotifSettings());
+          objectiveInput.addEventListener('blur', () => saveNotifSettings());
         }
 
         if (config?.sheet_id) {
@@ -317,6 +380,9 @@
 
       const weeklyChecked = document.getElementById('notif-weekly').checked;
       const monthlyChecked = document.getElementById('notif-monthly').checked;
+      const recordsChecked = document.getElementById('notif-records').checked;
+      const objectiveChecked = document.getElementById('notif-objective').checked;
+      const monthlyObjective = parseInt(document.getElementById('monthly-objective').value) || 0;
 
       // Update the excel_config with new settings
       const updatedConfig = {
@@ -324,7 +390,10 @@
         export_settings: {
           ...(currentExcelConfig.export_settings || {}),
           notif_weekly_recap: weeklyChecked,
-          notif_monthly_recap: monthlyChecked
+          notif_monthly_recap: monthlyChecked,
+          notif_records: recordsChecked,
+          notif_objective: objectiveChecked,
+          monthly_objective: monthlyObjective
         }
       };
 
