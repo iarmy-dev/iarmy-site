@@ -1454,9 +1454,20 @@
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
 
+        if (!session?.access_token) {
+          toast('Session expirée, reconnecte-toi', true);
+          return;
+        }
+
+        console.log('Calling generate-pdf with:', { sheetId: config.sheet_id, sheetName });
+
         const pdfRes = await fetch(SUPABASE_URL + '/functions/v1/generate-pdf', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': SUPABASE_ANON_KEY },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
           body: JSON.stringify({
             sheetId: config.sheet_id,
             sheetName: sheetName,
@@ -1464,9 +1475,17 @@
           })
         });
 
+        console.log('Response status:', pdfRes.status);
+
         if (!pdfRes.ok) {
-          const err = await pdfRes.json();
-          throw new Error(err.error || 'Impossible de générer le PDF');
+          const errText = await pdfRes.text();
+          console.error('PDF error response:', errText);
+          try {
+            const err = JSON.parse(errText);
+            throw new Error(err.error || 'Impossible de générer le PDF');
+          } catch {
+            throw new Error(errText || 'Impossible de générer le PDF');
+          }
         }
 
         const blob = await pdfRes.blob();
