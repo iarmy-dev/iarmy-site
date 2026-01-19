@@ -175,7 +175,10 @@
 
     <!-- Preview -->
     <div class="preview-card">
-      <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100 tr 50" oninput="updatePreview()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100 tr 50" oninput="updatePreview()" style="margin-bottom: 0; flex: 1;">
+        <a id="sheet-link" href="#" target="_blank" style="display: none; margin-left: 10px; padding: 8px 12px; background: rgba(15,157,88,0.15); border: 1px solid rgba(15,157,88,0.3); border-radius: 8px; color: #0f9d58; font-size: 12px; text-decoration: none; white-space: nowrap;">📊 Ouvrir Sheet</a>
+      </div>
       <div class="preview-row">
         <div class="preview-box">
           <div class="preview-label"><span class="preview-label-icon">💬</span> Telegram</div>
@@ -393,10 +396,15 @@
       const tgEl = document.getElementById('info-tg');
 
       if (cfg?.sheet_id) {
-        sheetEl.innerHTML = `<a href="https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit" target="_blank">Ouvrir</a>`;
+        const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
+        sheetEl.innerHTML = `<a href="${sheetUrl}" target="_blank">Ouvrir</a>`;
         sheetEl.classList.remove('pending');
         document.getElementById('export-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
+        // Afficher le lien rapide près du preview
+        const sheetLink = document.getElementById('sheet-link');
+        sheetLink.href = sheetUrl;
+        sheetLink.style.display = 'inline-flex';
       }
       if (tg?.telegram_user_id) {
         tgEl.textContent = 'Connecté';
@@ -546,7 +554,20 @@
     }
 
     // Keywords
-    function addKw() { keywords.push({ nom: '', colonne: '', noteColumn: '', aliases: [] }); render(); scheduleAutoSave(); }
+    function addKw() {
+      // Trouver la prochaine colonne libre (après celles déjà utilisées)
+      const usedCols = keywords.map(k => k.colonne).filter(c => c);
+      let nextCol = '';
+      for (const col of cols) {
+        if (!usedCols.includes(col) && col !== 'A') { // A souvent réservé pour Date
+          nextCol = col;
+          break;
+        }
+      }
+      keywords.push({ nom: '', colonne: nextCol, noteColumn: '', aliases: [] });
+      render();
+      scheduleAutoSave();
+    }
     function updKw(i, f, v) {
       if (f === 'nom') {
         // Limite à 20 caractères max
