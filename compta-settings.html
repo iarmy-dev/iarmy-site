@@ -38,7 +38,7 @@
     /* Header page */
     .page-header { text-align: center; margin-bottom: 24px; }
     .page-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-    .page-subtitle { font-size: 14px; color: rgba(255,255,255,0.5); }
+    .page-subtitle { font-size: 14px; color: rgba(255,255,255,0.7); }
 
     /* Preview Card */
     .preview-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
@@ -47,7 +47,7 @@
     .preview-input::placeholder { color: rgba(255,255,255,0.3); }
     .preview-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
     .preview-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; min-height: 80px; }
-    .preview-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .preview-label { font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .preview-label-icon { font-size: 12px; }
     .tg-bubble { background: #2AABEE; padding: 10px 14px; border-radius: 14px 14px 14px 4px; font-size: 13px; display: inline-block; max-width: 100%; word-break: break-word; }
     .empty-state { color: rgba(255,255,255,0.25); font-size: 12px; }
@@ -87,9 +87,9 @@
     /* Section */
     .section { margin-bottom: 24px; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .section-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; }
-    .section-count { font-size: 12px; color: rgba(255,255,255,0.3); }
-    .section-badge { font-size: 10px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; color: rgba(255,255,255,0.4); margin-left: 6px; }
+    .section-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-count { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .section-badge { font-size: 10px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; color: rgba(255,255,255,0.6); margin-left: 6px; }
 
     /* Keywords grid - 2 colonnes */
     .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -287,8 +287,8 @@
     .preview-calc-result { color: #4ade80; font-weight: 600; }
 
     /* Connexions */
-    .conn-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; }
-    .conn-label { font-size: 14px; }
+    .conn-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; }
+    .conn-label { font-size: 14px; color: rgba(255,255,255,0.9); }
     .conn-status { font-size: 13px; color: #4ade80; font-weight: 500; }
     .conn-status a { color: inherit; text-decoration: none; }
     .conn-status a:hover { text-decoration: underline; }
@@ -408,7 +408,7 @@
         <!-- Export auto -->
         <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <div style="font-size: 12px; font-weight: 500;">📧 Auto</div>
+            <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.9);">📧 Auto</div>
             <label style="position: relative; width: 36px; height: 20px;">
               <input type="checkbox" id="auto-export-toggle" onchange="toggleAutoExport()" style="opacity: 0; width: 0; height: 0;">
               <span style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border-radius: 10px; transition: 0.3s;"></span>
@@ -430,7 +430,7 @@
         <!-- Rappel -->
         <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-            <div style="font-size: 12px; font-weight: 500;">🔔 Rappel</div>
+            <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.9);">🔔 Rappel</div>
             <label style="position: relative; width: 36px; height: 20px;">
               <input type="checkbox" id="reminder-toggle" onchange="toggleReminder()" style="opacity: 0; width: 0; height: 0;">
               <span style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border-radius: 10px; transition: 0.3s;"></span>
@@ -448,7 +448,7 @@
       </div>
 
       <!-- Colonnes à exporter -->
-      <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Colonnes à exporter :</div>
+      <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 6px;">Colonnes à exporter :</div>
       <div id="export-columns-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
         <!-- Généré dynamiquement -->
       </div>
