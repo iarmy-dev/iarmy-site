@@ -555,11 +555,14 @@
 
     // Keywords
     function addKw() {
-      // Trouver la prochaine colonne libre (après celles déjà utilisées)
+      // Trouver la prochaine colonne libre :
+      // - Pas déjà utilisée par un mot-clé
+      // - Pas déjà occupée dans le Sheet (sheetHeaders)
       const usedCols = keywords.map(k => k.colonne).filter(c => c);
+      const sheetCols = Object.keys(sheetHeaders); // Colonnes qui ont déjà un header dans le Sheet
       let nextCol = '';
       for (const col of cols) {
-        if (!usedCols.includes(col) && col !== 'A') { // A souvent réservé pour Date
+        if (!usedCols.includes(col) && !sheetCols.includes(col) && col !== 'A') {
           nextCol = col;
           break;
         }
