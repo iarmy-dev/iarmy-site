@@ -439,18 +439,28 @@
     }
 
     function updatePlaceholder() {
-      // Générer un placeholder basé sur les mots-clés de l'utilisateur
+      // Générer un exemple basé sur les mots-clés de l'utilisateur et pré-remplir le preview
       const validKw = keywords.filter(k => k.nom && k.colonne);
+      const input = document.getElementById('test-input');
+
       if (validKw.length === 0) {
-        document.getElementById('test-input').placeholder = 'Teste: cb 200 esp 100';
+        input.placeholder = 'Teste: cb 200 esp 100';
         return;
       }
-      // Créer un exemple avec des montants aléatoires
-      const amounts = [50, 100, 150, 200, 250, 80, 120];
-      const example = validKw.slice(0, 4).map((k, i) =>
+
+      // Créer un exemple avec des montants
+      const amounts = [50, 100, 150, 200, 80, 120];
+      const example = validKw.slice(0, 5).map((k, i) =>
         `${k.nom.toLowerCase()} ${amounts[i % amounts.length]}`
       ).join(' ');
-      document.getElementById('test-input').placeholder = `Teste: ${example}`;
+
+      input.placeholder = `Teste: ${example}`;
+
+      // Si le champ est vide, pré-remplir avec l'exemple pour montrer le preview
+      if (!input.value) {
+        input.value = example;
+        updatePreview();
+      }
     }
 
     function updateCounts() {
