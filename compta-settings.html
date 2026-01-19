@@ -461,28 +461,6 @@
         </div>
       </div>
 
-      <!-- Rappel -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <div style="font-size: 13px; font-weight: 600; color: white;">🔔 Rappel mensuel</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Notification pour vérifier tes données</div>
-          </div>
-          <label style="position: relative; width: 44px; height: 24px;">
-            <input type="checkbox" id="reminder-toggle" onchange="toggleReminder()" style="opacity: 0; width: 0; height: 0;">
-            <span style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border-radius: 12px; transition: 0.3s;"></span>
-            <span id="reminder-dot" style="position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s;"></span>
-          </label>
-        </div>
-        <div id="reminder-settings" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);">
-          <select id="reminder-days" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="saveAutoExportSettings()">
-            <option value="3">3 jours avant la fin du mois</option>
-            <option value="5">5 jours avant</option>
-            <option value="7">7 jours avant</option>
-          </select>
-        </div>
-      </div>
-
       <!-- Notifications Telegram (accordéon) -->
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden;">
         <div onclick="toggleNotifications()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
@@ -684,17 +662,6 @@
 
       // Confirmation Telegram toujours activée
       document.getElementById('require-telegram-confirm').value = 'true';
-
-      // Rappel
-      if (exportSettings.reminder_enabled) {
-        document.getElementById('reminder-toggle').checked = true;
-        document.getElementById('reminder-dot').classList.add('toggle-dot-active');
-        document.getElementById('reminder-dot').previousElementSibling.classList.add('toggle-active');
-        document.getElementById('reminder-settings').style.display = 'block';
-      }
-      if (exportSettings.reminder_days) {
-        document.getElementById('reminder-days').value = exportSettings.reminder_days;
-      }
 
       // Notifications Telegram
       document.getElementById('notif-monthly-recap').checked = exportSettings.notif_monthly_recap || false;
@@ -1197,24 +1164,6 @@
       saveAutoExportSettings();
     }
 
-    // Toggle rappel
-    function toggleReminder() {
-      const toggle = document.getElementById('reminder-toggle');
-      const dot = document.getElementById('reminder-dot');
-      const settings = document.getElementById('reminder-settings');
-
-      if (toggle.checked) {
-        dot.classList.add('toggle-dot-active');
-        dot.previousElementSibling.classList.add('toggle-active');
-        settings.style.display = 'block';
-      } else {
-        dot.classList.remove('toggle-dot-active');
-        dot.previousElementSibling.classList.remove('toggle-active');
-        settings.style.display = 'none';
-      }
-      saveAutoExportSettings();
-    }
-
     // Sauvegarder les settings d'export
     async function saveAutoExportSettings() {
       // Collecter les colonnes cochées
@@ -1230,8 +1179,6 @@
         auto_export_format: document.getElementById('auto-export-format').value,
         export_columns: checkedCols,
         require_telegram_confirm: true,
-        reminder_enabled: document.getElementById('reminder-toggle').checked,
-        reminder_days: document.getElementById('reminder-days').value,
         notif_monthly_recap: document.getElementById('notif-monthly-recap').checked,
         notif_weekly_recap: document.getElementById('notif-weekly-recap').checked
       };
