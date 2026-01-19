@@ -248,7 +248,7 @@
       <div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
         <div style="display:flex; align-items:center; gap:24px; font-size:14px;">
           <a href="index.html">Accueil</a>
-          <a href="compte.html">Mon compte</a>
+          <a href="compte/">Mon compte</a>
           <a href="mailto:contact@iarmy.fr">Contact</a>
         </div>
         <p style="color:rgba(255,255,255,0.3); font-size:13px;">© 2026 iArmy</p>
@@ -312,7 +312,7 @@
       const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
       authButtons.innerHTML = `
         <div class="nav-user-section">
-          <a href="compte.html" class="nav-profile">
+          <a href="compte/" class="nav-profile">
             <img src="${userAvatar}" class="nav-avatar" alt="Avatar">
             <span>${userName}</span>
           </a>
@@ -366,7 +366,7 @@
         }
       } catch (e) { console.log('[INDEX] Profil déjà existant'); }
       
-      setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
+      setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
       return true;
     }
 
@@ -429,7 +429,7 @@
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-          window.location.href = 'compta.html';
+          window.location.href = 'inscription/';
         } else {
           openModal('login');
         }
@@ -491,7 +491,7 @@
         closeModal();
         showLoggedInNav(data.user);
         showWelcome(data.user?.user_metadata?.name?.split(' ')[0] || 'toi');
-        setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect' : error.message;
         err.classList.add('show');
@@ -517,7 +517,7 @@
         if (error) throw error;
         closeModal();
         showWelcome(name.split(' ')[0]);
-        setTimeout(() => { window.location.href = 'compta.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'inscription/'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
         err.classList.add('show');

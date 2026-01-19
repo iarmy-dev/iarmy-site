@@ -317,7 +317,7 @@
 
   <nav class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-      <a href="compte.html" class="flex items-center gap-3">
+      <a href="../../compte/" class="flex items-center gap-3">
         <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
@@ -329,7 +329,7 @@
     <div class="page-header">
       <div style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <a href="compte.html" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.color='rgba(255,255,255,0.6)'">←</a>
+          <a href="../../compte/" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.color='rgba(255,255,255,0.6)'">←</a>
           <div>
             <div class="page-title">Compta Express</div>
             <div class="page-subtitle">Configure ton robot</div>
@@ -533,8 +533,8 @@
 
   <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
     <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
-      <a href="index.html">Accueil</a>
-      <a href="compte.html">Compte</a>
+      <a href="../../">Accueil</a>
+      <a href="../../compte/">Compte</a>
       <a href="mailto:contact@iarmy.fr">Contact</a>
     </div>
     <p style="color: rgba(255,255,255,0.25); font-size: 12px; text-align: center; margin-top: 12px;">© 2026 iArmy</p>
@@ -557,7 +557,7 @@
 
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { location.href = 'index.html'; return; }
+      if (!session) { location.href = '../../'; return; }
 
       const user = session.user;
       userEmail = user.email || '';
@@ -566,7 +566,7 @@
 
       document.getElementById('auth-section').innerHTML = `
         <div class="nav-user-section">
-          <a href="compte.html" class="nav-profile">
+          <a href="../../compte/" class="nav-profile">
             <img src="${userAvatar}" class="nav-avatar">
             <span>${userName}</span>
           </a>
@@ -580,7 +580,7 @@
     async function loadConfig(userId) {
       const { data: cfg } = await supabaseClient.from('user_configs').select('sheet_id, excel_config, created_at').eq('user_id', userId).single();
 
-      if (!cfg) { window.location.href = 'compta.html'; return; }
+      if (!cfg) { window.location.href = '../../inscription/'; return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
@@ -1526,7 +1526,7 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) return;
       await supabaseClient.from('user_configs').delete().eq('user_id', session.user.id);
-      window.location.href = 'compta.html';
+      window.location.href = '../../inscription/';
     }
 
     async function exportDataManual() {
@@ -1625,7 +1625,7 @@
         if (sessionError || !session?.access_token) {
           console.error('Session error:', sessionError);
           toast('Session expirée, reconnecte-toi', true);
-          setTimeout(() => location.href = 'index.html', 1500);
+          setTimeout(() => location.href = '../../', 1500);
           return;
         }
 

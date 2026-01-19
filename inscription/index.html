@@ -978,7 +978,7 @@
   </div>
   <nav class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3"><div class="logo-i">i</div><span class="font-semibold text-lg">iArmy</span></a>
+      <a href="../" class="flex items-center gap-3"><div class="logo-i">i</div><span class="font-semibold text-lg">iArmy</span></a>
       <div id="auth-buttons"></div>
     </div>
   </nav>
@@ -1009,7 +1009,7 @@
       </div>
     </aside>
     <main class="main-content">
-      <a href="index.html" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
+      <a href="../" class="close-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></a>
       <!-- ÉTAPE 1a: Autoriser Google Sheets (si pas encore fait) -->
       <div class="step-content active" id="step-auth">
         <div class="mb-2"><span class="text-white/30 text-sm">Etape 1/4</span></div>
@@ -1349,7 +1349,7 @@
           <div class="check-icon mx-auto"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
           <h3 class="text-2xl font-bold mb-2">Telegram connecté ! 🎉</h3>
           <p class="text-white/50 mb-6">Tu peux maintenant utiliser ton robot</p>
-          <a href="compte.html" class="btn-glow">Aller à mon espace</a>
+          <a href="../compte/" class="btn-glow">Aller à mon espace</a>
         </div>
       </div>
     </main>
@@ -1616,7 +1616,7 @@
     async function initComptaPage() {
       console.log('[COMPTA] Init');
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
+      if (!session) { window.location.href = '../'; return; }
       currentUser = session.user;
       userProvider = session.user.app_metadata?.provider || 'email';
       console.log('[COMPTA] Connecte:', currentUser.email);
@@ -2286,10 +2286,10 @@
 
     async function updateNavBar() {
       var authButtons = document.getElementById('auth-buttons');
-      if (!currentUser) { authButtons.innerHTML = '<a href="index.html">Retour</a>'; return; }
+      if (!currentUser) { authButtons.innerHTML = '<a href="../">Retour</a>'; return; }
       var userName = currentUser.user_metadata?.full_name?.split(' ')[0] || currentUser.user_metadata?.name?.split(' ')[0] || currentUser.email?.split('@')[0] || 'User';
       var userAvatar = currentUser.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=' + userName + '&background=FF6B35&color=fff';
-      authButtons.innerHTML = '<div style="display: flex; align-items: center; gap: 10px;"><a href="compte.html" id="user-profile-btn" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; text-decoration: none; color: white; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"><img src="' + userAvatar + '" style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,107,53,0.3); box-shadow: 0 0 12px rgba(255,107,53,0.2);"><span style="font-weight: 500; font-size: 14px;">' + userName + '</span></a><button onclick="signOut()" id="logout-btn" style="padding: 10px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease;" title="Déconnexion"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button></div>';
+      authButtons.innerHTML = '<div style="display: flex; align-items: center; gap: 10px;"><a href="../compte/" id="user-profile-btn" style="display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; text-decoration: none; color: white; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"><img src="' + userAvatar + '" style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,107,53,0.3); box-shadow: 0 0 12px rgba(255,107,53,0.2);"><span style="font-weight: 500; font-size: 14px;">' + userName + '</span></a><button onclick="signOut()" id="logout-btn" style="padding: 10px; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease;" title="Déconnexion"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button></div>';
       // Add hover effects
       var profileBtn = document.getElementById('user-profile-btn');
       var logoutBtn = document.getElementById('logout-btn');
@@ -2302,7 +2302,7 @@
         logoutBtn.onmouseout = function() { this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.06)'; this.style.color='rgba(255,255,255,0.4)'; this.style.boxShadow='none'; };
       }
     }
-    async function signOut() { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
+    async function signOut() { await supabaseClient.auth.signOut(); window.location.href = '../'; }
 
     function setupUploadZone() {
       var uploadZone = document.getElementById('upload-zone');
@@ -3970,7 +3970,7 @@
         // Si on est en mode édition, rester sur la page (ou retourner au profil)
         if (isEditMode) {
           setTimeout(function() {
-            window.location.href = 'compte.html';
+            window.location.href = '../compte/';
           }, 1000);
           return;
         }
@@ -5069,7 +5069,7 @@
           // User déjà connecté → redirection directe vers son espace
           showToast('Telegram déjà connecté ! Redirection...');
           setTimeout(function() {
-            window.location.href = 'compte.html';
+            window.location.href = '../compte/';
           }, 1500);
           return;
         } else {
@@ -5089,7 +5089,7 @@
         console.log('[COMPTA] 📝 Mode édition directe demandé');
         // Init minimal (juste session)
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = 'index.html'; return; }
+        if (!session) { window.location.href = '../'; return; }
         currentUser = session.user;
         await updateNavBar();
         await loadExistingConfigForEdit();

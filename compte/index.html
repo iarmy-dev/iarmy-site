@@ -115,7 +115,7 @@
 
   <nav class="glass" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
     <div style="max-width: 640px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
-      <a href="index.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;">
+      <a href="../" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;">
         <div class="logo-i">i</div>
         <span style="font-weight: 600; font-size: 18px;">iArmy</span>
       </a>
@@ -135,7 +135,7 @@
       <!-- Modules -->
       <div class="section-title">Modules</div>
       <div class="modules-grid">
-        <a href="compta-settings.html" class="module-card">
+        <a href="../modules/compta/" class="module-card">
           <div class="module-anim">
             <div class="logo-tg">
               <svg viewBox="0 0 240 240"><defs><linearGradient id="tg" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d2e4ef" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138c.897.306 1.377 1.152 1.377 1.152.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18z"/></svg>
@@ -259,7 +259,7 @@
 
   <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
     <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
-      <a href="index.html">Accueil</a>
+      <a href="../">Accueil</a>
       <a href="compte.html">Compte</a>
       <a href="mailto:contact@iarmy.fr">Contact</a>
     </div>
@@ -273,7 +273,7 @@
 
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
+      if (!session) { window.location.href = '../'; return; }
 
       const user = session.user;
       const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
@@ -412,7 +412,7 @@
 
     async function signOut() {
       await supabaseClient.auth.signOut();
-      window.location.href = 'index.html';
+      window.location.href = '../';
     }
 
     document.addEventListener('DOMContentLoaded', init);
