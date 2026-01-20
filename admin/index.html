@@ -312,24 +312,34 @@
 
     async function toggleTester(userId, moduleName, setTester) {
       try {
-        // Vérifier si subscription existe
-        const { data: existing } = await supabaseClient
+        // Vérifier si subscription existe (maybeSingle pour éviter erreur 406)
+        const { data: existing, error: selectError } = await supabaseClient
           .from('subscriptions')
           .select('id')
           .eq('user_id', userId)
           .eq('module_name', moduleName)
-          .single();
+          .maybeSingle();
+
+        if (selectError) {
+          console.error('Select error:', selectError);
+          throw selectError;
+        }
 
         if (existing) {
           // Update
-          await supabaseClient
+          const { error: updateError } = await supabaseClient
             .from('subscriptions')
             .update({ is_tester: setTester, status: setTester ? 'tester' : 'trialing' })
             .eq('user_id', userId)
             .eq('module_name', moduleName);
+
+          if (updateError) {
+            console.error('Update error:', updateError);
+            throw updateError;
+          }
         } else {
           // Insert
-          await supabaseClient
+          const { error: insertError } = await supabaseClient
             .from('subscriptions')
             .insert({
               user_id: userId,
@@ -338,13 +348,18 @@
               status: setTester ? 'tester' : 'trialing',
               trial_ends_at: setTester ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
             });
+
+          if (insertError) {
+            console.error('Insert error:', insertError);
+            throw insertError;
+          }
         }
 
         showToast(setTester ? 'Testeur ajouté !' : 'Testeur retiré');
         await loadDashboard();
       } catch (err) {
         console.error('Toggle tester error:', err);
-        showToast('Erreur: ' + err.message);
+        showToast('Erreur: ' + (err.message || err.details || 'Inconnue'));
       }
     }
 
