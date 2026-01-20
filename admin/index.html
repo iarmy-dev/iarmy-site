@@ -346,7 +346,7 @@
               module_name: moduleName,
               is_tester: setTester,
               status: setTester ? 'tester' : 'trialing',
-              trial_ends_at: setTester ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+              expires_at: setTester ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
             });
 
           if (insertError) {
