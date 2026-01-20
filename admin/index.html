@@ -357,22 +357,28 @@
     }
 
     function renderAnalyticsTab() {
+      // Init recentVisitors avec les visiteurs actuels
+      if (analyticsData.online) {
+        recentVisitors = new Set();
+        // On garde le count initial
+      }
+
       return `
         <div class="stats-grid">
           <div class="stat-card live">
-            <div class="stat-value">${analyticsData.online || 0}</div>
+            <div class="stat-value" id="live-count" style="transition: transform 0.3s;">${analyticsData.online || 0}</div>
             <div class="stat-label">En ligne maintenant</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">${analyticsData.todayVisits || 0}</div>
+            <div class="stat-value" id="today-count">${analyticsData.todayVisits || 0}</div>
             <div class="stat-label">Visites aujourd'hui</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">${analyticsData.todayUnique || 0}</div>
+            <div class="stat-value" id="unique-count">${analyticsData.todayUnique || 0}</div>
             <div class="stat-label">Visiteurs uniques</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">${analyticsData.weekVisits || 0}</div>
+            <div class="stat-value" id="week-count">${analyticsData.weekVisits || 0}</div>
             <div class="stat-label">Cette semaine</div>
           </div>
         </div>
@@ -551,6 +557,8 @@
 
     // Supabase Realtime - nouvelle visite en temps réel
     let realtimeChannel = null;
+    let liveCount = 0;
+    let recentVisitors = new Set();
 
     function setupRealtime() {
       if (realtimeChannel) return;
@@ -561,24 +569,76 @@
           { event: 'INSERT', schema: 'public', table: 'page_visits' },
           (payload) => {
             console.log('Nouvelle visite!', payload.new);
-            // Refresh analytics si on est sur l'onglet
+
+            // Ajouter le visiteur au set des récents
+            recentVisitors.add(payload.new.visitor_id);
+
+            // Update juste les chiffres si on est sur l'onglet analytics
             if (currentTab === 'analytics') {
-              loadAnalytics().then(() => {
-                document.getElementById('tab-content').innerHTML = renderAnalyticsTab();
-                // Flash effect
-                const liveCard = document.querySelector('.stat-card.live');
-                if (liveCard) {
-                  liveCard.style.transition = 'all 0.3s';
-                  liveCard.style.boxShadow = '0 0 20px rgba(74, 222, 128, 0.5)';
-                  setTimeout(() => {
-                    liveCard.style.boxShadow = 'none';
-                  }, 1000);
+              // Update le compteur "En ligne"
+              const liveEl = document.getElementById('live-count');
+              if (liveEl) {
+                const newCount = recentVisitors.size;
+                liveEl.textContent = newCount;
+                liveEl.style.transform = 'scale(1.2)';
+                setTimeout(() => { liveEl.style.transform = 'scale(1)'; }, 300);
+              }
+
+              // Update visites aujourd'hui
+              const todayEl = document.getElementById('today-count');
+              if (todayEl) {
+                todayEl.textContent = parseInt(todayEl.textContent) + 1;
+              }
+
+              // Update visiteurs uniques
+              const uniqueEl = document.getElementById('unique-count');
+              if (uniqueEl) {
+                uniqueEl.textContent = recentVisitors.size;
+              }
+
+              // Flash vert sur la carte live
+              const liveCard = document.querySelector('.stat-card.live');
+              if (liveCard) {
+                liveCard.style.boxShadow = '0 0 30px rgba(74, 222, 128, 0.6)';
+                setTimeout(() => { liveCard.style.boxShadow = 'none'; }, 1000);
+              }
+
+              // Ajouter la visite en haut de la liste
+              const visitsList = document.querySelector('.visits-list');
+              if (visitsList && payload.new.page_path) {
+                const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                const pageName = payload.new.page_path === '/' ? 'Accueil' : payload.new.page_path;
+                const newVisit = document.createElement('div');
+                newVisit.className = 'visit-item';
+                newVisit.style.background = 'rgba(74, 222, 128, 0.1)';
+                newVisit.innerHTML = `
+                  <div class="visit-dot online"></div>
+                  <div class="visit-page">${pageName}</div>
+                  <div class="visit-time">${time}</div>
+                `;
+                visitsList.insertBefore(newVisit, visitsList.firstChild);
+                setTimeout(() => { newVisit.style.background = 'transparent'; }, 2000);
+
+                // Limiter à 20 visites
+                while (visitsList.children.length > 20) {
+                  visitsList.removeChild(visitsList.lastChild);
                 }
-              });
+              }
             }
           }
         )
         .subscribe();
+
+      // Nettoyer les visiteurs "en ligne" après 5 minutes
+      setInterval(() => {
+        recentVisitors.clear();
+        loadAnalytics().then(() => {
+          if (currentTab === 'analytics') {
+            const liveEl = document.getElementById('live-count');
+            if (liveEl) liveEl.textContent = analyticsData.online || 0;
+          }
+        });
+      }, 5 * 60 * 1000);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
