@@ -614,7 +614,7 @@
       try {
         const { data: sub } = await supabaseClient
           .from('subscriptions')
-          .select('status, is_tester, trial_ends_at, current_period_end')
+          .select('status, is_tester, expires_at')
           .eq('user_id', userId)
           .eq('module_name', moduleName)
           .single();
@@ -629,13 +629,13 @@
 
         // En essai et pas expiré
         if (sub.status === 'trialing') {
-          if (!sub.trial_ends_at) return true;
-          return new Date(sub.trial_ends_at) > new Date();
+          if (!sub.expires_at) return true;
+          return new Date(sub.expires_at) > new Date();
         }
 
         // Annulé mais période pas finie
-        if (sub.status === 'canceled' && sub.current_period_end) {
-          return new Date(sub.current_period_end) > new Date();
+        if (sub.status === 'canceled' && sub.expires_at) {
+          return new Date(sub.expires_at) > new Date();
         }
 
         return false;
