@@ -488,6 +488,30 @@
             </div>
             <input type="checkbox" id="notif-monthly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
           </label>
+
+          <!-- Records -->
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+            <div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">🏆 Records</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Notification quand tu bats un record</div>
+            </div>
+            <input type="checkbox" id="notif-records" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+          </label>
+
+          <!-- Objectif mensuel -->
+          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+            <div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">🎯 Objectif mensuel</div>
+              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Alerte quand tu atteins ton objectif</div>
+            </div>
+            <input type="checkbox" id="notif-objective" onchange="toggleObjectiveInput(); saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
+          </label>
+          <div id="objective-input-row" style="display: none; padding: 8px 0 4px; border-top: 1px solid rgba(255,255,255,0.04);">
+            <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
+              <input type="number" id="monthly-objective" placeholder="10000" min="0" step="100" onchange="saveNotificationSettings()" style="width: 100px; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 13px; text-align: right;">
+              <span style="color: rgba(255,255,255,0.5); font-size: 13px;">€</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -673,6 +697,12 @@
       // Notifications Telegram
       document.getElementById('notif-monthly-recap').checked = exportSettings.notif_monthly_recap || false;
       document.getElementById('notif-weekly-recap').checked = exportSettings.notif_weekly_recap || false;
+      document.getElementById('notif-records').checked = exportSettings.notif_records || false;
+      document.getElementById('notif-objective').checked = exportSettings.notif_objective || false;
+      document.getElementById('monthly-objective').value = exportSettings.monthly_objective || '';
+      if (exportSettings.notif_objective) {
+        document.getElementById('objective-input-row').style.display = 'block';
+      }
 
       // Générer les checkboxes des colonnes
       renderExportColumns();
@@ -1187,13 +1217,21 @@
         export_columns: checkedCols,
         require_telegram_confirm: true,
         notif_monthly_recap: document.getElementById('notif-monthly-recap').checked,
-        notif_weekly_recap: document.getElementById('notif-weekly-recap').checked
+        notif_weekly_recap: document.getElementById('notif-weekly-recap').checked,
+        notif_records: document.getElementById('notif-records').checked,
+        notif_objective: document.getElementById('notif-objective').checked,
+        monthly_objective: parseInt(document.getElementById('monthly-objective').value) || 0
       };
       markAsModified();
     }
 
     function saveNotificationSettings() {
       saveAutoExportSettings();
+    }
+
+    function toggleObjectiveInput() {
+      const checked = document.getElementById('notif-objective').checked;
+      document.getElementById('objective-input-row').style.display = checked ? 'block' : 'none';
     }
 
     function updatePreview() {
