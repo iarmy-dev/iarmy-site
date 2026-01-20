@@ -66,6 +66,12 @@
     .btn-view { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
     .btn-view:hover { background: rgba(255,255,255,0.1); }
 
+    /* Tester row highlight */
+    .row-tester { background: rgba(168,85,247,0.08) !important; }
+    .row-tester td { border-bottom-color: rgba(168,85,247,0.2) !important; }
+    .avatar-tester { border-color: #a855f7 !important; box-shadow: 0 0 12px rgba(168,85,247,0.4); }
+    .tester-badge { background: linear-gradient(135deg, #a855f7, #c084fc); color: white; font-size: 9px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600; vertical-align: middle; }
+
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal-box { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px; max-width: 500px; width: 100%; }
@@ -268,14 +274,15 @@
 
         const displayName = u.full_name || u.email?.split('@')[0] || 'Utilisateur';
         const avatarUrl = u.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=FF6B35&color=fff&size=36`;
+        const testerBadge = hasTester ? '<span class="tester-badge">★ TESTEUR</span>' : '';
 
         return `
-          <tr>
+          <tr class="${hasTester ? 'row-tester' : ''}">
             <td>
               <div class="user-cell">
-                <img src="${avatarUrl}" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=U&background=333&color=fff&size=36'">
+                <img src="${avatarUrl}" class="user-avatar ${hasTester ? 'avatar-tester' : ''}" onerror="this.src='https://ui-avatars.com/api/?name=U&background=333&color=fff&size=36'">
                 <div class="user-info">
-                  <div class="user-name">${displayName}</div>
+                  <div class="user-name">${displayName} ${testerBadge}</div>
                   <div class="user-email">${u.email || u.user_id.substring(0, 12) + '...'}</div>
                 </div>
               </div>
@@ -285,7 +292,7 @@
             <td>${u.telegram ? '✅' : '❌'}</td>
             <td class="actions-cell">
               <button class="btn-action btn-tester ${hasTester ? 'active' : ''}" onclick="toggleTester('${u.user_id}', 'compta', ${!hasTester})">
-                ${hasTester ? '★ Testeur' : '☆ Testeur'}
+                ${hasTester ? '✓ Retirer' : '+ Testeur'}
               </button>
             </td>
           </tr>
