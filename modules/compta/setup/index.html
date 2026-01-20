@@ -5086,6 +5086,75 @@
         console.error('[TELEGRAM] ❌ telegram-connected NOT FOUND!');
       }
     }
+    async function waitForSubscriptionAfterPayment() {
+      console.log('[PAYMENT] Waiting for subscription after payment...');
+
+      // Afficher l'étape 4 avec un message d'attente
+      document.querySelectorAll('.step-content').forEach(function(el) { el.classList.remove('active'); });
+      document.getElementById('global-loader')?.classList.remove('active');
+      document.getElementById('welcome-overlay')?.classList.remove('active');
+
+      var telegramStep = document.getElementById('step-telegram');
+      if (telegramStep) {
+        telegramStep.classList.add('active');
+        telegramStep.style.display = 'block';
+      }
+      updateSidebarStep(4);
+
+      // Masquer les sections Telegram et afficher un loader temporaire
+      document.getElementById('telegram-payment').style.display = 'none';
+      document.getElementById('telegram-initial').style.display = 'none';
+      document.getElementById('step4-subtitle').textContent = 'Activation de ton compte...';
+
+      // Créer un loader temporaire
+      var loadingDiv = document.createElement('div');
+      loadingDiv.id = 'payment-processing';
+      loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;"><div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#FF6B35;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div><p style="color:rgba(255,255,255,0.6);">Activation en cours...</p></div>';
+      document.querySelector('#step-telegram .glass-card')?.appendChild(loadingDiv);
+
+      // Polling: vérifier toutes les 1.5 secondes pendant 30 secondes max
+      var maxAttempts = 20;
+      var attempt = 0;
+      var subscriptionFound = false;
+
+      while (attempt < maxAttempts && !subscriptionFound) {
+        attempt++;
+        console.log('[PAYMENT] Checking subscription, attempt', attempt);
+
+        var { data: subscription } = await supabaseClient
+          .from('subscriptions')
+          .select('status, is_tester')
+          .eq('user_id', currentUser.id)
+          .eq('module_name', 'compta')
+          .maybeSingle();
+
+        if (subscription && (subscription.status === 'active' || subscription.status === 'trialing')) {
+          subscriptionFound = true;
+          console.log('[PAYMENT] Subscription found!', subscription);
+          break;
+        }
+
+        // Attendre 1.5 secondes avant le prochain essai
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+
+      // Supprimer le loader
+      document.getElementById('payment-processing')?.remove();
+
+      if (subscriptionFound) {
+        // Afficher le bouton Telegram
+        document.getElementById('step4-subtitle').textContent = 'Connecte ton robot Telegram';
+        document.getElementById('telegram-initial').style.display = 'block';
+        showToast('Compte activé ! 🎉');
+      } else {
+        // Timeout - afficher quand même Telegram (webhook peut être lent)
+        console.log('[PAYMENT] Subscription not found after timeout, showing Telegram anyway');
+        document.getElementById('step4-subtitle').textContent = 'Connecte ton robot Telegram';
+        document.getElementById('telegram-initial').style.display = 'block';
+        showToast('Compte en cours d\'activation, tu peux continuer');
+      }
+    }
+
     async function checkExistingTelegramConnection() {
       console.log('[TELEGRAM] checkExistingTelegramConnection called, currentUser:', currentUser?.id);
       if (!currentUser) {
@@ -5187,7 +5256,9 @@
         if (!session) { window.location.href = '../../../'; return; }
         currentUser = session.user;
         await updateNavBar();
-        goToStep(4);
+
+        // Attendre que le webhook Stripe crée la subscription (polling avec timeout)
+        await waitForSubscriptionAfterPayment();
         return;
       } else if (urlParams.get('payment') === 'canceled') {
         showToast('Paiement annulé');
