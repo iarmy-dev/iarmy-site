@@ -2014,6 +2014,10 @@
       console.log('[COMPTA] 📄 Sheet sélectionné:', sheet.name, 'fileType:', sheet.fileType);
       closeSheetsOverlay();
 
+      // Aller à l'étape 3 et afficher le loading
+      goToStep(3);
+      initStep3Loading(sheet.name, ['Connexion au fichier', 'Lecture des données', 'Analyse de la structure', 'Configuration automatique']);
+
       var { data: { session } } = await supabaseClient.auth.getSession();
       var sheetToUse = { id: sheet.id, name: sheet.name, webViewLink: sheet.webViewLink };
 
