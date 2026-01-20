@@ -5233,9 +5233,36 @@
     async function initStripePayment() {
       var btn = document.getElementById('btn-start-trial');
       btn.disabled = true;
-      btn.textContent = 'Chargement...';
+      btn.textContent = 'Vérification...';
 
       try {
+        // D'abord re-vérifier si l'utilisateur est devenu testeur entre-temps
+        var { data: subscription } = await supabaseClient
+          .from('subscriptions')
+          .select('status, is_tester')
+          .eq('user_id', currentUser.id)
+          .eq('module_name', 'compta')
+          .maybeSingle();
+
+        var hasAccess = subscription && (
+          subscription.is_tester ||
+          subscription.status === 'active' ||
+          subscription.status === 'trialing' ||
+          subscription.status === 'tester'
+        );
+
+        if (hasAccess) {
+          // L'utilisateur a maintenant accès ! Afficher Telegram directement
+          console.log('[STRIPE] User now has access, skipping payment');
+          showToast('Accès activé ! 🎉');
+          document.getElementById('telegram-payment').style.display = 'none';
+          document.getElementById('telegram-initial').style.display = 'block';
+          document.getElementById('step4-subtitle').textContent = 'Connecte ton robot Telegram';
+          return;
+        }
+
+        btn.textContent = 'Chargement...';
+
         // Créer la subscription et obtenir le client_secret
         var response = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
           method: 'POST',

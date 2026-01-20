@@ -704,7 +704,10 @@
         // Ancien format avec sources array
         if (r.sources && Array.isArray(r.sources)) {
           return {
-            terms: r.sources.map((s, idx) => ({ name: s, op: '+' })),
+            terms: r.sources.map((s, idx) => ({
+              name: s,
+              op: r.operations && r.operations[idx] ? r.operations[idx] : '+'
+            })),
             target: r.target || ''
           };
         }
@@ -1108,7 +1111,7 @@
               <option value="">...</option>
               ${names.map(n => `<option value="${n}" ${t.name === n ? 'selected' : ''}>${n}</option>`).join('')}
             </select>
-            ${r.terms.length > 1 ? `<button class="rule-del-term" onclick="delRuleTerm(${i},${j})">×</button>` : ''}
+            ${r.terms.length > 2 ? `<button class="rule-del-term" onclick="delRuleTerm(${i},${j})">×</button>` : ''}
           `;
         }).join('');
 
@@ -1211,13 +1214,13 @@
     function delKw(i) { keywords.splice(i, 1); render(); markAsModified(); }
 
     // Rules
-    function addRule() { rules.push({ terms: [{ name: '', op: '+' }], target: '' }); render(); markAsModified(); }
+    function addRule() { rules.push({ terms: [{ name: '', op: '+' }, { name: '', op: '+' }], target: '' }); render(); markAsModified(); }
     function delRule(i) { rules.splice(i, 1); render(); markAsModified(); }
     function updRuleTerm(ri, ti, field, value) { rules[ri].terms[ti][field] = value; render(); markAsModified(); }
     function updRuleTarget(ri, value) { rules[ri].target = value; render(); markAsModified(); }
     function addRuleTerm(ri) { rules[ri].terms.push({ name: '', op: '+' }); render(); markAsModified(); }
     function delRuleTerm(ri, ti) {
-      if (rules[ri].terms.length > 1) {
+      if (rules[ri].terms.length > 2) {
         rules[ri].terms.splice(ti, 1);
         // S'assurer que le premier terme est toujours '+'
         if (rules[ri].terms.length > 0) rules[ri].terms[0].op = '+';
