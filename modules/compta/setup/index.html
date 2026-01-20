@@ -5182,6 +5182,13 @@
       if (urlParams.get('payment') === 'success') {
         showToast('Paiement réussi ! 🎉');
         window.history.replaceState({}, '', window.location.pathname);
+        // Aller directement à l'étape Telegram après paiement
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = '../../../'; return; }
+        currentUser = session.user;
+        await updateNavBar();
+        goToStep(4);
+        return;
       } else if (urlParams.get('payment') === 'canceled') {
         showToast('Paiement annulé');
         window.history.replaceState({}, '', window.location.pathname);
