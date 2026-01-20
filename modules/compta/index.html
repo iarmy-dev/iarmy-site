@@ -599,8 +599,70 @@
         </div>
       `;
 
+      // Vérifier l'abonnement au module
+      const hasAccess = await checkModuleAccess(user.id, 'compta');
+      if (!hasAccess) {
+        showNoAccessScreen();
+        return;
+      }
+
       await loadConfig(session.user.id);
       document.getElementById('loading').style.display = 'none';
+    }
+
+    async function checkModuleAccess(userId, moduleName) {
+      try {
+        const { data: sub } = await supabaseClient
+          .from('subscriptions')
+          .select('status, is_tester, trial_ends_at, current_period_end')
+          .eq('user_id', userId)
+          .eq('module_name', moduleName)
+          .single();
+
+        if (!sub) return false;
+
+        // Testeur = toujours accès
+        if (sub.is_tester) return true;
+
+        // Status actif
+        if (sub.status === 'active' || sub.status === 'tester') return true;
+
+        // En essai et pas expiré
+        if (sub.status === 'trialing') {
+          if (!sub.trial_ends_at) return true;
+          return new Date(sub.trial_ends_at) > new Date();
+        }
+
+        // Annulé mais période pas finie
+        if (sub.status === 'canceled' && sub.current_period_end) {
+          return new Date(sub.current_period_end) > new Date();
+        }
+
+        return false;
+      } catch (e) {
+        console.log('No subscription found, checking if table exists...');
+        // Si la table n'existe pas encore, on laisse passer (pour la transition)
+        return true;
+      }
+    }
+
+    function showNoAccessScreen() {
+      document.getElementById('loading').style.display = 'none';
+      document.querySelector('.page-container').innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+          <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">Abonnement requis</h2>
+          <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Pour accéder au module Compta Express, tu dois avoir un abonnement actif ou être en période d'essai.
+          </p>
+          <a href="../../compte/" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 12px; color: white; font-weight: 600; text-decoration: none; transition: all 0.3s;">
+            Voir les abonnements
+          </a>
+          <p style="margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.4);">
+            Un problème ? <a href="mailto:support@iarmy.fr" style="color: #FF6B35;">Contacte-nous</a>
+          </p>
+        </div>
+      `;
     }
 
     async function loadConfig(userId) {

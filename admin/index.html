@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: white; min-height: 100vh; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+    /* Header */
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+    .header h1 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .header h1 span { color: #FF6B35; }
+    .admin-badge { background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
+    .stat-value { font-size: 32px; font-weight: 700; color: #FF6B35; }
+    .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    /* Search */
+    .search-bar { margin-bottom: 20px; }
+    .search-input { width: 100%; max-width: 400px; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; font-size: 14px; }
+    .search-input:focus { outline: none; border-color: #FF6B35; }
+    .search-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    /* Table */
+    .users-table { width: 100%; border-collapse: collapse; }
+    .users-table th { text-align: left; padding: 12px 16px; background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .users-table td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    .users-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* User cell */
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+    .user-info { }
+    .user-name { font-weight: 500; font-size: 14px; }
+    .user-email { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+    /* Badges */
+    .module-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .module-badge { font-size: 11px; padding: 4px 10px; border-radius: 6px; font-weight: 500; }
+    .module-badge.active { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .module-badge.trialing { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .module-badge.tester { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .module-badge.canceled { background: rgba(239,68,68,0.15); color: #f87171; }
+    .module-badge.none { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
+
+    /* Date */
+    .date-cell { font-size: 13px; color: rgba(255,255,255,0.6); }
+    .date-cell small { display: block; font-size: 11px; color: rgba(255,255,255,0.3); }
+
+    /* Actions */
+    .actions-cell { display: flex; gap: 8px; }
+    .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-tester { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .btn-tester:hover { background: rgba(168,85,247,0.3); }
+    .btn-tester.active { background: #a855f7; color: white; }
+    .btn-view { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
+    .btn-view:hover { background: rgba(255,255,255,0.1); }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-box { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px; max-width: 500px; width: 100%; }
+    .modal-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+    .form-select { width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; }
+    .form-select option { background: #1a1a1a; }
+
+    .btn-save { width: 100%; padding: 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; }
+    .btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,107,53,0.3); }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 20px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; font-size: 14px; z-index: 200; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(34,197,94,0.3); }
+
+    /* Loading */
+    .loading { text-align: center; padding: 60px; color: rgba(255,255,255,0.5); }
+
+    /* No access */
+    .no-access { text-align: center; padding: 100px 20px; }
+    .no-access h2 { font-size: 24px; margin-bottom: 12px; }
+    .no-access p { color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="content">
+      <div class="loading">Chargement...</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Liste des admins autorisés (vérification côté client + côté serveur via RLS)
+    const ADMIN_EMAILS = ['ludovikh@gmail.com'];
+
+    let allUsers = [];
+    let currentUser = null;
+
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = '../';
+        return;
+      }
+
+      currentUser = session.user;
+
+      // Vérifier si admin
+      if (!ADMIN_EMAILS.includes(currentUser.email)) {
+        showNoAccess();
+        return;
+      }
+
+      await loadDashboard();
+    }
+
+    function showNoAccess() {
+      document.getElementById('content').innerHTML = `
+        <div class="no-access">
+          <h2>Accès refusé</h2>
+          <p>Tu n'as pas les droits d'accès à l'admin.</p>
+          <a href="../" style="color: #FF6B35; margin-top: 20px; display: inline-block;">Retour à l'accueil</a>
+        </div>
+      `;
+    }
+
+    async function loadDashboard() {
+      // Charger les users depuis auth.users via une vue ou directement
+      // Note: On ne peut pas accéder à auth.users directement, donc on utilise les tables publiques
+      const { data: configs } = await supabaseClient.from('module_configs').select('user_id, module_name, created_at');
+      const { data: subscriptions } = await supabaseClient.from('subscriptions').select('*');
+      const { data: telegramLinks } = await supabaseClient.from('telegram_links').select('user_id, telegram_user_id');
+
+      // Grouper par user_id
+      const usersMap = new Map();
+
+      // Ajouter les configs
+      (configs || []).forEach(c => {
+        if (!usersMap.has(c.user_id)) {
+          usersMap.set(c.user_id, { user_id: c.user_id, modules: [], subscriptions: [], telegram: false, created_at: c.created_at });
+        }
+        usersMap.get(c.user_id).modules.push(c.module_name);
+      });
+
+      // Ajouter les subscriptions
+      (subscriptions || []).forEach(s => {
+        if (!usersMap.has(s.user_id)) {
+          usersMap.set(s.user_id, { user_id: s.user_id, modules: [], subscriptions: [], telegram: false, created_at: s.created_at });
+        }
+        usersMap.get(s.user_id).subscriptions.push(s);
+      });
+
+      // Ajouter telegram
+      (telegramLinks || []).forEach(t => {
+        if (usersMap.has(t.user_id)) {
+          usersMap.get(t.user_id).telegram = true;
+        }
+      });
+
+      allUsers = Array.from(usersMap.values());
+
+      // Stats
+      const totalUsers = allUsers.length;
+      const testers = allUsers.filter(u => u.subscriptions.some(s => s.is_tester)).length;
+      const withTelegram = allUsers.filter(u => u.telegram).length;
+      const activeModules = allUsers.reduce((acc, u) => acc + u.modules.length, 0);
+
+      renderDashboard({ totalUsers, testers, withTelegram, activeModules });
+    }
+
+    function renderDashboard(stats) {
+      document.getElementById('content').innerHTML = `
+        <header class="header">
+          <h1><span>iArmy</span> Admin <span class="admin-badge">ADMIN</span></h1>
+          <a href="../compte/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14px;">← Retour au compte</a>
+        </header>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${stats.totalUsers}</div>
+            <div class="stat-label">Utilisateurs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.testers}</div>
+            <div class="stat-label">Testeurs gratuits</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.withTelegram}</div>
+            <div class="stat-label">Telegram connecté</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.activeModules}</div>
+            <div class="stat-label">Modules configurés</div>
+          </div>
+        </div>
+
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="Rechercher par email ou ID..." onkeyup="filterUsers(this.value)">
+        </div>
+
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Modules</th>
+              <th>Abonnements</th>
+              <th>Telegram</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            ${renderUsersRows(allUsers)}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderUsersRows(users) {
+      if (users.length === 0) {
+        return '<tr><td colspan="5" style="text-align: center; color: rgba(255,255,255,0.4); padding: 40px;">Aucun utilisateur</td></tr>';
+      }
+
+      return users.map(u => {
+        const hasTester = u.subscriptions.some(s => s.is_tester);
+        const subBadges = u.subscriptions.map(s => {
+          let cls = 'none';
+          if (s.is_tester) cls = 'tester';
+          else if (s.status === 'active') cls = 'active';
+          else if (s.status === 'trialing') cls = 'trialing';
+          else if (s.status === 'canceled') cls = 'canceled';
+          return `<span class="module-badge ${cls}">${s.module_name}: ${s.is_tester ? 'Testeur' : s.status}</span>`;
+        }).join('') || '<span class="module-badge none">Aucun</span>';
+
+        const moduleBadges = u.modules.map(m => `<span class="module-badge active">${m}</span>`).join('') || '<span class="module-badge none">-</span>';
+
+        return `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-info">
+                  <div class="user-name">${u.user_id.substring(0, 8)}...</div>
+                  <div class="user-email">ID: ${u.user_id}</div>
+                </div>
+              </div>
+            </td>
+            <td><div class="module-badges">${moduleBadges}</div></td>
+            <td><div class="module-badges">${subBadges}</div></td>
+            <td>${u.telegram ? '✅' : '❌'}</td>
+            <td class="actions-cell">
+              <button class="btn-action btn-tester ${hasTester ? 'active' : ''}" onclick="toggleTester('${u.user_id}', 'compta', ${!hasTester})">
+                ${hasTester ? '★ Testeur' : '☆ Testeur'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterUsers(query) {
+      const filtered = allUsers.filter(u =>
+        u.user_id.toLowerCase().includes(query.toLowerCase())
+      );
+      document.getElementById('users-tbody').innerHTML = renderUsersRows(filtered);
+    }
+
+    async function toggleTester(userId, moduleName, setTester) {
+      try {
+        // Vérifier si subscription existe
+        const { data: existing } = await supabaseClient
+          .from('subscriptions')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('module_name', moduleName)
+          .single();
+
+        if (existing) {
+          // Update
+          await supabaseClient
+            .from('subscriptions')
+            .update({ is_tester: setTester, status: setTester ? 'tester' : 'trialing' })
+            .eq('user_id', userId)
+            .eq('module_name', moduleName);
+        } else {
+          // Insert
+          await supabaseClient
+            .from('subscriptions')
+            .insert({
+              user_id: userId,
+              module_name: moduleName,
+              is_tester: setTester,
+              status: setTester ? 'tester' : 'trialing',
+              trial_ends_at: setTester ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            });
+        }
+
+        showToast(setTester ? 'Testeur ajouté !' : 'Testeur retiré');
+        await loadDashboard();
+      } catch (err) {
+        console.error('Toggle tester error:', err);
+        showToast('Erreur: ' + err.message);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show', 'success');
+      setTimeout(() => toast.classList.remove('show', 'success'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
