@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Politique de Confidentialite - iArmy</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,6 +21,15 @@
     .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
     .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
+
+    .nav-user-section { display: flex; align-items: center; gap: 12px; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
+    .nav-profile:hover { background: rgba(255,255,255,0.08); }
+    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+    .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; color: rgba(255,255,255,0.3); transition: all 0.2s; display: flex; align-items: center; border-radius: 6px; }
+    .btn-logout:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .btn-login { padding: 10px 20px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
 
     .page-container { max-width: 800px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; }
 
@@ -56,6 +66,7 @@
         <div class="logo-i">i</div>
         <span style="font-weight: 600; font-size: 18px;">iArmy</span>
       </a>
+      <div id="auth-buttons"></div>
     </div>
   </nav>
 
@@ -65,84 +76,71 @@
       <p class="subtitle">Derniere mise a jour : Janvier 2025</p>
 
       <h2>1. Introduction</h2>
-      <p>iArmy ("nous", "notre", "nos") s'engage a proteger la vie privee de ses utilisateurs. Cette politique de confidentialite explique comment nous collectons, utilisons et protegeons vos donnees personnelles lorsque vous utilisez notre service.</p>
-
-      <h2>2. Donnees collectees</h2>
-      <p>Nous collectons les donnees suivantes :</p>
-      <ul>
-        <li><strong>Donnees d'identification</strong> : nom, adresse email (via Google OAuth)</li>
-        <li><strong>Donnees de connexion</strong> : identifiant Telegram, tokens d'acces Google Sheets</li>
-        <li><strong>Donnees metier</strong> : donnees de caisse que vous envoyez via Telegram (CB, especes, tickets restaurant, etc.)</li>
-        <li><strong>Donnees techniques</strong> : logs de connexion, adresse IP</li>
-      </ul>
-
-      <h2>3. Utilisation des donnees</h2>
-      <p>Vos donnees sont utilisees exclusivement pour :</p>
-      <ul>
-        <li>Fournir le service iArmy (enregistrement de vos donnees de caisse dans Google Sheets)</li>
-        <li>Vous envoyer des notifications et recaps via Telegram</li>
-        <li>Ameliorer notre service</li>
-        <li>Vous contacter en cas de probleme technique</li>
-      </ul>
+      <p>iArmy ("nous", "notre") est un service d'automatisation qui fait le lien entre vos applications (Telegram, Google Sheets, etc.). Cette politique explique comment nous traitons vos donnees.</p>
 
       <div class="highlight">
-        <p><strong>Important :</strong> Nous n'utilisons jamais vos donnees a des fins publicitaires et ne les vendons jamais a des tiers.</p>
+        <p><strong>Principe cle :</strong> iArmy est un intermediaire. Nous transmettons vos donnees entre vos applications, nous ne les stockons pas de maniere permanente. Vos donnees restent dans VOS comptes (Google Drive, Telegram).</p>
       </div>
 
-      <h2>4. Stockage et securite</h2>
-      <p>Vos donnees sont stockees de maniere securisee :</p>
+      <h2>2. Ce que nous collectons</h2>
+      <p>Pour faire fonctionner le service, nous avons besoin de :</p>
       <ul>
-        <li><strong>Base de donnees</strong> : Supabase (heberge dans l'UE)</li>
-        <li><strong>Chiffrement</strong> : Les tokens Google sont chiffres avec AES-256-GCM</li>
-        <li><strong>Acces</strong> : Politique de moindre privilege (Row Level Security)</li>
-        <li><strong>Google Sheets</strong> : Vos donnees de caisse restent dans VOTRE Google Drive</li>
+        <li><strong>Identification</strong> : Votre email et nom (via Google OAuth)</li>
+        <li><strong>Tokens d'acces</strong> : Pour communiquer avec Google Sheets et Telegram en votre nom</li>
+        <li><strong>Configuration</strong> : Vos preferences de modules et notifications</li>
+      </ul>
+      <p>Les donnees que vous envoyez (chiffres, montants, etc.) transitent par nos serveurs mais sont directement ecrites dans votre Google Sheets. Nous ne les conservons pas.</p>
+
+      <h2>3. Ce que nous ne faisons PAS</h2>
+      <ul>
+        <li>Nous ne stockons pas vos donnees metier de maniere permanente</li>
+        <li>Nous ne vendons jamais vos donnees</li>
+        <li>Nous n'utilisons pas vos donnees a des fins publicitaires</li>
+        <li>Nous ne partageons pas vos donnees avec des tiers non essentiels</li>
       </ul>
 
-      <h2>5. Partage des donnees</h2>
-      <p>Nous ne partageons vos donnees qu'avec :</p>
+      <h2>4. Securite</h2>
       <ul>
-        <li><strong>Google</strong> : Pour l'authentification et l'acces a vos Google Sheets</li>
-        <li><strong>Telegram</strong> : Pour vous envoyer des messages via le bot</li>
-        <li><strong>Anthropic (Claude AI)</strong> : Pour analyser la structure de vos fichiers Excel (donnees anonymisees)</li>
+        <li><strong>Chiffrement</strong> : Les tokens d'acces sont chiffres (AES-256-GCM)</li>
+        <li><strong>Acces restreint</strong> : Chaque utilisateur n'accede qu'a ses propres donnees</li>
+        <li><strong>Hebergement UE</strong> : Nos serveurs sont dans l'Union Europeenne</li>
+      </ul>
+
+      <h2>5. Services tiers</h2>
+      <p>Pour fonctionner, iArmy communique avec :</p>
+      <ul>
+        <li><strong>Google</strong> : Authentification et acces a vos Google Sheets</li>
+        <li><strong>Telegram</strong> : Envoi et reception de messages via le bot</li>
+        <li><strong>Supabase</strong> : Base de donnees (hebergee dans l'UE)</li>
       </ul>
 
       <h2>6. Vos droits (RGPD)</h2>
-      <p>Conformement au RGPD, vous disposez des droits suivants :</p>
+      <p>Vous pouvez a tout moment :</p>
       <ul>
-        <li><strong>Droit d'acces</strong> : Demander une copie de vos donnees</li>
-        <li><strong>Droit de rectification</strong> : Corriger vos donnees</li>
-        <li><strong>Droit a l'effacement</strong> : Supprimer votre compte et toutes vos donnees</li>
-        <li><strong>Droit a la portabilite</strong> : Exporter vos donnees</li>
-        <li><strong>Droit d'opposition</strong> : Refuser certains traitements</li>
+        <li><strong>Acceder</strong> a vos donnees</li>
+        <li><strong>Rectifier</strong> vos informations</li>
+        <li><strong>Supprimer</strong> votre compte et toutes les donnees associees</li>
+        <li><strong>Exporter</strong> vos donnees</li>
       </ul>
-      <p>Pour exercer ces droits, contactez-nous a : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></p>
+      <p>Pour exercer ces droits : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></p>
 
-      <h2>7. Conservation des donnees</h2>
-      <p>Nous conservons vos donnees :</p>
+      <h2>7. Conservation</h2>
       <ul>
-        <li><strong>Donnees de compte</strong> : Tant que votre compte est actif</li>
-        <li><strong>Donnees de caisse</strong> : Stockees dans votre Google Sheets (vous en etes proprietaire)</li>
-        <li><strong>Logs</strong> : 90 jours maximum</li>
+        <li><strong>Donnees de compte</strong> : Conservees tant que le compte est actif</li>
+        <li><strong>Vos donnees metier</strong> : Stockees dans votre Google Sheets (vous en etes proprietaire)</li>
+        <li><strong>Logs techniques</strong> : 90 jours maximum</li>
       </ul>
-      <p>Apres suppression de votre compte, toutes vos donnees sont effacees sous 30 jours.</p>
+      <p>Apres suppression du compte, toutes vos donnees sont effacees sous 30 jours.</p>
 
-      <h2>8. Cookies</h2>
-      <p>Nous utilisons uniquement des cookies techniques essentiels pour :</p>
-      <ul>
-        <li>Maintenir votre session de connexion</li>
-        <li>Memoriser vos preferences</li>
-      </ul>
-      <p>Nous n'utilisons pas de cookies de tracking ou publicitaires.</p>
+      <h2>8. Avertissement</h2>
+      <p>iArmy est un outil d'automatisation et de transmission de donnees. Nous ne fournissons aucun conseil financier, comptable ou juridique. Pour toute question relative a votre comptabilite, consultez un professionnel agree.</p>
 
       <h2>9. Modifications</h2>
-      <p>Nous pouvons mettre a jour cette politique. En cas de changement significatif, nous vous en informerons par email ou via Telegram.</p>
+      <p>Cette politique peut etre mise a jour. En cas de changement important, nous vous informerons par email ou via Telegram.</p>
 
       <h2>10. Contact</h2>
-      <p>Pour toute question concernant cette politique :</p>
-      <ul>
-        <li>Email : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></li>
-        <li>Responsable : Ludovik (Luxembourg)</li>
-      </ul>
+      <p>Pour toute question : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></p>
+      <p>Responsable : Ludovic R. (Luxembourg)</p>
     </div>
   </div>
 
@@ -155,5 +153,37 @@
     </div>
     <p style="color: rgba(255,255,255,0.25); font-size: 12px; text-align: center; margin-top: 12px;">© 2025 iArmy</p>
   </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (session) {
+        const user = session.user;
+        const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
+        const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+        const firstName = userName.split(' ')[0];
+
+        document.getElementById('auth-buttons').innerHTML = `
+          <div class="nav-user-section">
+            <a href="../compte/" class="nav-profile">
+              <img src="${userAvatar}" class="nav-avatar">
+              <span>${firstName}</span>
+            </a>
+          </div>
+        `;
+      } else {
+        document.getElementById('auth-buttons').innerHTML = `
+          <a href="../" class="btn-login">Connexion</a>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
