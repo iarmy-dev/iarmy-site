@@ -87,7 +87,7 @@ iArmy
 - **Publishable Key** : pk_test_51SnhCpQnTQdmBOkyvcPgFDg8LQbPZzwAdBv9X1LeLhy8WKtlAorKQeqdiZKC2l994bjKJXxndPYal8G6izNilG15002j0OaFcP
 - **Secret Key** : (dans Supabase secrets)
 - **Price IDs** :
-  - Compta : price_1Snh0QnTQdmBOkyLm53KqpHt (39€/mois)
+  - Compta : price_1SnhI0QnTQdmBOkyLm53KqqH (39€/mois)
 - **Webhook URL** : https://byqfnpdcnifauhwgetcq.supabase.co/functions/v1/stripe-webhook
 
 ---
