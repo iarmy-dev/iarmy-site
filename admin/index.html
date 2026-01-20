@@ -143,8 +143,8 @@
     }
 
     async function loadDashboard() {
-      // Charger les users depuis auth.users via une vue ou directement
-      // Note: On ne peut pas accéder à auth.users directement, donc on utilise les tables publiques
+      // Charger les users depuis la vue admin
+      const { data: usersList } = await supabaseClient.from('admin_users_list').select('*');
       const { data: configs } = await supabaseClient.from('module_configs').select('user_id, module_name, created_at');
       const { data: subscriptions } = await supabaseClient.from('subscriptions').select('*');
       const { data: telegramLinks } = await supabaseClient.from('telegram_links').select('user_id, telegram_user_id');
@@ -152,10 +152,25 @@
       // Grouper par user_id
       const usersMap = new Map();
 
+      // Ajouter les users depuis la vue (avec email et nom)
+      (usersList || []).forEach(u => {
+        usersMap.set(u.user_id, {
+          user_id: u.user_id,
+          email: u.email,
+          full_name: u.full_name,
+          avatar_url: u.avatar_url,
+          modules: [],
+          subscriptions: [],
+          telegram: false,
+          created_at: u.created_at,
+          last_sign_in_at: u.last_sign_in_at
+        });
+      });
+
       // Ajouter les configs
       (configs || []).forEach(c => {
         if (!usersMap.has(c.user_id)) {
-          usersMap.set(c.user_id, { user_id: c.user_id, modules: [], subscriptions: [], telegram: false, created_at: c.created_at });
+          usersMap.set(c.user_id, { user_id: c.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: c.created_at });
         }
         usersMap.get(c.user_id).modules.push(c.module_name);
       });
@@ -163,7 +178,7 @@
       // Ajouter les subscriptions
       (subscriptions || []).forEach(s => {
         if (!usersMap.has(s.user_id)) {
-          usersMap.set(s.user_id, { user_id: s.user_id, modules: [], subscriptions: [], telegram: false, created_at: s.created_at });
+          usersMap.set(s.user_id, { user_id: s.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: s.created_at });
         }
         usersMap.get(s.user_id).subscriptions.push(s);
       });
@@ -251,13 +266,17 @@
 
         const moduleBadges = u.modules.map(m => `<span class="module-badge active">${m}</span>`).join('') || '<span class="module-badge none">-</span>';
 
+        const displayName = u.full_name || u.email?.split('@')[0] || 'Utilisateur';
+        const avatarUrl = u.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=FF6B35&color=fff&size=36`;
+
         return `
           <tr>
             <td>
               <div class="user-cell">
+                <img src="${avatarUrl}" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=U&background=333&color=fff&size=36'">
                 <div class="user-info">
-                  <div class="user-name">${u.user_id.substring(0, 8)}...</div>
-                  <div class="user-email">ID: ${u.user_id}</div>
+                  <div class="user-name">${displayName}</div>
+                  <div class="user-email">${u.email || u.user_id.substring(0, 12) + '...'}</div>
                 </div>
               </div>
             </td>
@@ -275,8 +294,11 @@
     }
 
     function filterUsers(query) {
+      const q = query.toLowerCase();
       const filtered = allUsers.filter(u =>
-        u.user_id.toLowerCase().includes(query.toLowerCase())
+        u.user_id.toLowerCase().includes(q) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.full_name && u.full_name.toLowerCase().includes(q))
       );
       document.getElementById('users-tbody').innerHTML = renderUsersRows(filtered);
     }
