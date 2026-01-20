@@ -76,6 +76,10 @@
     .btn-tester.active { background: #a855f7; color: white; }
     .btn-view { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
     .btn-view:hover { background: rgba(255,255,255,0.1); }
+    .btn-reset { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .btn-reset:hover { background: rgba(251,191,36,0.3); }
+    .btn-delete { background: rgba(239,68,68,0.15); color: #f87171; }
+    .btn-delete:hover { background: rgba(239,68,68,0.3); }
 
     /* Tester row highlight */
     .row-tester { background: rgba(168,85,247,0.08) !important; }
@@ -473,6 +477,12 @@
               <button class="btn-action btn-tester ${hasTester ? 'active' : ''}" onclick="toggleTester('${u.user_id}', 'compta', ${!hasTester})">
                 ${hasTester ? 'Retirer' : '+ Testeur'}
               </button>
+              <button class="btn-action btn-reset" onclick="resetUserData('${u.user_id}', '${u.email || 'cet utilisateur'}')" title="Effacer les données">
+                Reset
+              </button>
+              <button class="btn-action btn-delete" onclick="deleteUser('${u.user_id}', '${u.email || 'cet utilisateur'}')" title="Supprimer le compte">
+                ✕
+              </button>
             </td>
           </tr>
         `;
@@ -536,6 +546,61 @@
       } catch (err) {
         console.error('Toggle tester error:', err);
         showToast('Erreur: ' + (err.message || err.details || 'Inconnue'));
+      }
+    }
+
+    async function resetUserData(userId, userEmail) {
+      if (!confirm(`Effacer toutes les données de ${userEmail} ?\n\nCela supprimera :\n- Configurations modules\n- Abonnements\n- Connexion Telegram\n- Tokens Google\n\nLe compte sera conservé.`)) {
+        return;
+      }
+
+      try {
+        // Supprimer dans toutes les tables
+        await supabaseClient.from('subscriptions').delete().eq('user_id', userId);
+        await supabaseClient.from('module_configs').delete().eq('user_id', userId);
+        await supabaseClient.from('telegram_links').delete().eq('user_id', userId);
+        await supabaseClient.from('google_tokens').delete().eq('user_id', userId);
+
+        showToast('Données effacées pour ' + userEmail);
+        await loadDashboard();
+      } catch (err) {
+        console.error('Reset error:', err);
+        showToast('Erreur: ' + (err.message || 'Inconnue'));
+      }
+    }
+
+    async function deleteUser(userId, userEmail) {
+      if (!confirm(`SUPPRIMER DÉFINITIVEMENT le compte de ${userEmail} ?\n\nCette action est IRRÉVERSIBLE.\nL'utilisateur devra se réinscrire.`)) {
+        return;
+      }
+
+      try {
+        // D'abord supprimer les données
+        await supabaseClient.from('subscriptions').delete().eq('user_id', userId);
+        await supabaseClient.from('module_configs').delete().eq('user_id', userId);
+        await supabaseClient.from('telegram_links').delete().eq('user_id', userId);
+        await supabaseClient.from('google_tokens').delete().eq('user_id', userId);
+
+        // Appeler l'Edge Function pour supprimer le compte auth
+        const response = await fetch(SUPABASE_URL + '/functions/v1/admin-delete-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (await supabaseClient.auth.getSession()).data.session?.access_token
+          },
+          body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Erreur suppression');
+        }
+
+        showToast('Compte supprimé : ' + userEmail);
+        await loadDashboard();
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast('Erreur: ' + (err.message || 'Inconnue'));
       }
     }
 
