@@ -68,7 +68,8 @@ iArmy
 ### Supabase
 - **Project ID** : byqfnpdcnifauhwgetcq
 - **URL** : https://byqfnpdcnifauhwgetcq.supabase.co
-- **Service Role Key** : sb_secret_bdFt6k2fcrGn5S5GXvt3qA_hgDUPU4q
+- **Anon Key** : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo
+- **Service Role Key** : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Nzg4NjUxMiwiZXhwIjoyMDgzNDYyNTEyfQ.Un7hRX9mamigIl2hTlSztYWzaV4UaINu0wYkk0zqcuM
 
 ### GitHub Repos
 - **Site** : https://github.com/iarmy-dev/iarmy-site
