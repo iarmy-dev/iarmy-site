@@ -540,16 +540,51 @@
       setTimeout(() => toast.classList.remove('show', 'success'), 3000);
     }
 
-    // Auto-refresh analytics toutes les 30 secondes si sur l'onglet analytics
+    // Auto-refresh analytics toutes les 10 secondes si sur l'onglet analytics
     setInterval(() => {
       if (currentTab === 'analytics') {
         loadAnalytics().then(() => {
           document.getElementById('tab-content').innerHTML = renderAnalyticsTab();
         });
       }
-    }, 30000);
+    }, 10000);
 
-    document.addEventListener('DOMContentLoaded', init);
+    // Supabase Realtime - nouvelle visite en temps réel
+    let realtimeChannel = null;
+
+    function setupRealtime() {
+      if (realtimeChannel) return;
+
+      realtimeChannel = supabaseClient
+        .channel('page_visits_changes')
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'page_visits' },
+          (payload) => {
+            console.log('Nouvelle visite!', payload.new);
+            // Refresh analytics si on est sur l'onglet
+            if (currentTab === 'analytics') {
+              loadAnalytics().then(() => {
+                document.getElementById('tab-content').innerHTML = renderAnalyticsTab();
+                // Flash effect
+                const liveCard = document.querySelector('.stat-card.live');
+                if (liveCard) {
+                  liveCard.style.transition = 'all 0.3s';
+                  liveCard.style.boxShadow = '0 0 20px rgba(74, 222, 128, 0.5)';
+                  setTimeout(() => {
+                    liveCard.style.boxShadow = 'none';
+                  }, 1000);
+                }
+              });
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      setupRealtime();
+    });
   </script>
 </body>
 </html>
