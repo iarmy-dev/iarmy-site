@@ -695,7 +695,8 @@
           return {
             terms: r.sources.map((s, idx) => ({
               name: s,
-              op: r.operations && r.operations[idx] ? r.operations[idx] : '+'
+              // operations[0] = entre source[0] et source[1], donc décalage de 1
+              op: idx === 0 ? '+' : (r.operations && r.operations[idx - 1] ? r.operations[idx - 1] : '+')
             })),
             target: r.target || ''
           };
