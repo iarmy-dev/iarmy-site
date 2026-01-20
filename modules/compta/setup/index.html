@@ -1323,9 +1323,32 @@
         <div class="text-center mb-8">
           <div class="check-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></div>
           <h1 class="text-3xl font-bold mb-2">Presque fini ! 🎉</h1>
-          <p class="text-white/40">Connecte ton robot Telegram</p>
+          <p class="text-white/40" id="step4-subtitle">Connecte ton robot Telegram</p>
         </div>
-        <div id="telegram-initial" class="glass-card p-8 max-w-lg mx-auto text-center">
+        <!-- Section Paiement (avant Telegram) -->
+        <div id="telegram-payment" class="glass-card p-8 max-w-lg mx-auto text-center" style="display: none;">
+          <div class="mb-6">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center text-4xl mb-4">💎</div>
+            <h3 class="text-xl font-semibold mb-2">Active ton abonnement</h3>
+            <p class="text-white/50 mb-4">Pour accéder au robot Telegram, active ton essai gratuit</p>
+          </div>
+          <div style="background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="color: rgba(255,255,255,0.7);">Compta Express</span>
+              <span style="font-weight: 600; color: #FF6B35;">39€/mois</span>
+            </div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.5);">
+              ✓ 7 jours d'essai gratuit<br>
+              ✓ Annulable à tout moment<br>
+              ✓ Prélèvement après l'essai
+            </div>
+          </div>
+          <button id="btn-start-trial" onclick="startCheckoutFromSetup()" style="width: 100%; padding: 16px 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; color: white; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
+            Commencer l'essai gratuit
+          </button>
+          <p class="text-xs text-white/30 mt-4">🔒 Paiement sécurisé par Stripe</p>
+        </div>
+        <div id="telegram-initial" class="glass-card p-8 max-w-lg mx-auto text-center" style="display: none;">
           <div class="mb-6">
             <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-4xl mb-4">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="#0088cc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
@@ -5070,6 +5093,33 @@
         return;
       }
       try {
+        // D'abord vérifier l'abonnement
+        var { data: subscription } = await supabaseClient
+          .from('subscriptions')
+          .select('status, is_tester, trial_ends_at')
+          .eq('user_id', currentUser.id)
+          .eq('module_name', 'compta')
+          .maybeSingle();
+
+        console.log('[TELEGRAM] Subscription:', subscription);
+
+        var hasAccess = subscription && (
+          subscription.is_tester ||
+          subscription.status === 'active' ||
+          subscription.status === 'trialing' ||
+          subscription.status === 'tester'
+        );
+
+        if (!hasAccess) {
+          // Pas d'abonnement → afficher le paiement
+          console.log('[TELEGRAM] No subscription, showing payment');
+          document.getElementById('step4-subtitle').textContent = 'Active ton essai gratuit';
+          document.getElementById('telegram-payment').style.display = 'block';
+          document.getElementById('telegram-initial').style.display = 'none';
+          return;
+        }
+
+        // A un abonnement → vérifier si déjà connecté à Telegram
         var { data, error } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', currentUser.id).maybeSingle();
         console.log('[TELEGRAM] Query result - data:', data, 'error:', error);
         if (data?.telegram_user_id) {
@@ -5081,16 +5131,61 @@
           }, 1500);
           return;
         } else {
-          console.log('[TELEGRAM] No existing connection, telegram-initial should be visible');
+          console.log('[TELEGRAM] Has subscription, showing Telegram connect');
+          document.getElementById('step4-subtitle').textContent = 'Connecte ton robot Telegram';
+          document.getElementById('telegram-payment').style.display = 'none';
+          document.getElementById('telegram-initial').style.display = 'block';
         }
       } catch (err) {
         console.error('[TELEGRAM] Error checking connection:', err);
       }
     }
 
+    async function startCheckoutFromSetup() {
+      var btn = document.getElementById('btn-start-trial');
+      btn.disabled = true;
+      btn.textContent = 'Redirection...';
+
+      try {
+        var response = await fetch(SUPABASE_URL + '/functions/v1/stripe-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            userEmail: currentUser.email,
+            moduleName: 'compta',
+            successUrl: window.location.origin + '/modules/compta/setup/?payment=success',
+            cancelUrl: window.location.origin + '/modules/compta/setup/?payment=canceled'
+          })
+        });
+
+        var data = await response.json();
+        if (data.error) throw new Error(data.error);
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error('No checkout URL');
+        }
+      } catch (err) {
+        console.error('Checkout error:', err);
+        showToast('Erreur: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Commencer l\'essai gratuit';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async function() {
       console.log('[COMPTA] 📱 Page chargée');
       var urlParams = new URLSearchParams(window.location.search);
+
+      // Check payment success/canceled
+      if (urlParams.get('payment') === 'success') {
+        showToast('Paiement réussi ! 🎉');
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (urlParams.get('payment') === 'canceled') {
+        showToast('Paiement annulé');
+        window.history.replaceState({}, '', window.location.pathname);
+      }
 
       // Si ?edit=true, charger directement l'éditeur (skip le flow normal)
       if (urlParams.get('edit') === 'true') {
