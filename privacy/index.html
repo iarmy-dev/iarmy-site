@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politique de Confidentialite - iArmy</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
+    .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.15; }
+    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.12; animation-delay: -7s; }
+    @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
+
+    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
+
+    .page-container { max-width: 800px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; }
+
+    .content-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px; }
+
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; }
+
+    h2 { font-size: 18px; font-weight: 600; margin-top: 32px; margin-bottom: 16px; color: #FF8B5E; }
+    h2:first-of-type { margin-top: 0; }
+
+    p, li { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+
+    ul { padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 8px; }
+
+    a { color: #FF6B35; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .highlight { background: rgba(255,107,53,0.1); border-left: 3px solid #FF6B35; padding: 16px 20px; border-radius: 0 12px 12px 0; margin: 20px 0; }
+    .highlight p { margin-bottom: 0; }
+
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: #FF8B5E; }
+  </style>
+</head>
+<body class="bg-gradient-animate">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="glass" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
+    <div style="max-width: 800px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+      <a href="../" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;">
+        <div class="logo-i">i</div>
+        <span style="font-weight: 600; font-size: 18px;">iArmy</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="page-container">
+    <div class="content-card">
+      <h1>Politique de Confidentialite</h1>
+      <p class="subtitle">Derniere mise a jour : Janvier 2025</p>
+
+      <h2>1. Introduction</h2>
+      <p>iArmy ("nous", "notre", "nos") s'engage a proteger la vie privee de ses utilisateurs. Cette politique de confidentialite explique comment nous collectons, utilisons et protegeons vos donnees personnelles lorsque vous utilisez notre service.</p>
+
+      <h2>2. Donnees collectees</h2>
+      <p>Nous collectons les donnees suivantes :</p>
+      <ul>
+        <li><strong>Donnees d'identification</strong> : nom, adresse email (via Google OAuth)</li>
+        <li><strong>Donnees de connexion</strong> : identifiant Telegram, tokens d'acces Google Sheets</li>
+        <li><strong>Donnees metier</strong> : donnees de caisse que vous envoyez via Telegram (CB, especes, tickets restaurant, etc.)</li>
+        <li><strong>Donnees techniques</strong> : logs de connexion, adresse IP</li>
+      </ul>
+
+      <h2>3. Utilisation des donnees</h2>
+      <p>Vos donnees sont utilisees exclusivement pour :</p>
+      <ul>
+        <li>Fournir le service iArmy (enregistrement de vos donnees de caisse dans Google Sheets)</li>
+        <li>Vous envoyer des notifications et recaps via Telegram</li>
+        <li>Ameliorer notre service</li>
+        <li>Vous contacter en cas de probleme technique</li>
+      </ul>
+
+      <div class="highlight">
+        <p><strong>Important :</strong> Nous n'utilisons jamais vos donnees a des fins publicitaires et ne les vendons jamais a des tiers.</p>
+      </div>
+
+      <h2>4. Stockage et securite</h2>
+      <p>Vos donnees sont stockees de maniere securisee :</p>
+      <ul>
+        <li><strong>Base de donnees</strong> : Supabase (heberge dans l'UE)</li>
+        <li><strong>Chiffrement</strong> : Les tokens Google sont chiffres avec AES-256-GCM</li>
+        <li><strong>Acces</strong> : Politique de moindre privilege (Row Level Security)</li>
+        <li><strong>Google Sheets</strong> : Vos donnees de caisse restent dans VOTRE Google Drive</li>
+      </ul>
+
+      <h2>5. Partage des donnees</h2>
+      <p>Nous ne partageons vos donnees qu'avec :</p>
+      <ul>
+        <li><strong>Google</strong> : Pour l'authentification et l'acces a vos Google Sheets</li>
+        <li><strong>Telegram</strong> : Pour vous envoyer des messages via le bot</li>
+        <li><strong>Anthropic (Claude AI)</strong> : Pour analyser la structure de vos fichiers Excel (donnees anonymisees)</li>
+      </ul>
+
+      <h2>6. Vos droits (RGPD)</h2>
+      <p>Conformement au RGPD, vous disposez des droits suivants :</p>
+      <ul>
+        <li><strong>Droit d'acces</strong> : Demander une copie de vos donnees</li>
+        <li><strong>Droit de rectification</strong> : Corriger vos donnees</li>
+        <li><strong>Droit a l'effacement</strong> : Supprimer votre compte et toutes vos donnees</li>
+        <li><strong>Droit a la portabilite</strong> : Exporter vos donnees</li>
+        <li><strong>Droit d'opposition</strong> : Refuser certains traitements</li>
+      </ul>
+      <p>Pour exercer ces droits, contactez-nous a : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></p>
+
+      <h2>7. Conservation des donnees</h2>
+      <p>Nous conservons vos donnees :</p>
+      <ul>
+        <li><strong>Donnees de compte</strong> : Tant que votre compte est actif</li>
+        <li><strong>Donnees de caisse</strong> : Stockees dans votre Google Sheets (vous en etes proprietaire)</li>
+        <li><strong>Logs</strong> : 90 jours maximum</li>
+      </ul>
+      <p>Apres suppression de votre compte, toutes vos donnees sont effacees sous 30 jours.</p>
+
+      <h2>8. Cookies</h2>
+      <p>Nous utilisons uniquement des cookies techniques essentiels pour :</p>
+      <ul>
+        <li>Maintenir votre session de connexion</li>
+        <li>Memoriser vos preferences</li>
+      </ul>
+      <p>Nous n'utilisons pas de cookies de tracking ou publicitaires.</p>
+
+      <h2>9. Modifications</h2>
+      <p>Nous pouvons mettre a jour cette politique. En cas de changement significatif, nous vous en informerons par email ou via Telegram.</p>
+
+      <h2>10. Contact</h2>
+      <p>Pour toute question concernant cette politique :</p>
+      <ul>
+        <li>Email : <a href="mailto:support@iarmy.fr">support@iarmy.fr</a></li>
+        <li>Responsable : Ludovik (Luxembourg)</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
+    <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
+      <a href="../">Accueil</a>
+      <a href="../compte/">Compte</a>
+      <a href="./">Confidentialite</a>
+      <a href="mailto:support@iarmy.fr">Contact</a>
+    </div>
+    <p style="color: rgba(255,255,255,0.25); font-size: 12px; text-align: center; margin-top: 12px;">© 2025 iArmy</p>
+  </footer>
+</body>
+</html>
