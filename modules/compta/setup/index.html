@@ -6695,6 +6695,8 @@
 
     function showAIConfigPreview(config) {
       console.log('[AI] Showing config preview:', config);
+      console.log('[AI] colonnes_a_remplir:', config.colonnes_a_remplir);
+      console.log('[AI] regles_calcul:', config.regles_calcul);
 
       var previewSection = document.getElementById('ai-config-preview');
       var columnsDiv = document.getElementById('ai-preview-columns');
@@ -6710,6 +6712,13 @@
           badge.textContent = col.nom;
           columnsDiv.appendChild(badge);
         });
+      } else {
+        // Debug: show that config is empty
+        var debugBadge = document.createElement('span');
+        debugBadge.style.cssText = 'display: inline-block; padding: 4px 10px; background: rgba(255, 107, 53, 0.15); border: 1px solid rgba(255, 107, 53, 0.3); border-radius: 6px; font-size: 12px; color: #ff6b35;';
+        debugBadge.textContent = '(aucune colonne detectee)';
+        columnsDiv.appendChild(debugBadge);
+        console.warn('[AI] No colonnes_a_remplir in config:', JSON.stringify(config));
       }
 
       // Show rules as compact badges with full formula
