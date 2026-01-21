@@ -178,6 +178,85 @@
 
     .kw-footer { margin-top: 10px; font-size: 10px; color: rgba(255,255,255,0.25); }
 
+    /* Aliases tags */
+    .kw-aliases { margin-top: 12px; }
+    .kw-aliases-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kw-aliases-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .alias-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 12px;
+      font-size: 11px;
+      color: #4ade80;
+      transition: all 0.2s;
+    }
+    .alias-tag:hover { background: rgba(34,197,94,0.25); }
+    .alias-tag-del {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      padding: 0 2px;
+      transition: color 0.2s;
+    }
+    .alias-tag-del:hover { color: #ef4444; }
+    .alias-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 12px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .alias-add:hover { border-color: #4ade80; color: #4ade80; }
+    .alias-input {
+      width: 60px;
+      padding: 4px 8px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 12px;
+      font-size: 11px;
+      color: white;
+      font-family: inherit;
+    }
+    .alias-input:focus { outline: none; border-color: #4ade80; }
+    .alias-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    /* Boutons ordre */
+    .kw-order-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .kw-order-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      width: 22px;
+      height: 18px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.4);
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .kw-order-btn:hover { background: rgba(255,107,53,0.2); color: #FF8B5E; border-color: rgba(255,107,53,0.3); }
+    .kw-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    .kw-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
+
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
 
@@ -1063,11 +1142,20 @@
         const incomplete = k.nom && !k.colonne;
         const colHeader = k.colonne && sheetHeaders[k.colonne] ? sheetHeaders[k.colonne] : null;
 
+        // Aliases (exclure le nom lui-même s'il est dans les aliases)
+        const aliases = (k.aliases || []).filter(a => a && a.toLowerCase() !== k.nom.toLowerCase());
+
         return `
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
           <div class="kw-header">
             <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" oninput="this.value=this.value.substring(0,20)" maxlength="20" placeholder="NOM">
-            <button class="kw-del" onclick="delKw(${i})" title="Supprimer">×</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="kw-order-btns">
+                <button class="kw-order-btn" onclick="moveKw(${i},-1)" ${i === 0 ? 'disabled' : ''} title="Monter">▲</button>
+                <button class="kw-order-btn" onclick="moveKw(${i},1)" ${i === keywords.length - 1 ? 'disabled' : ''} title="Descendre">▼</button>
+              </div>
+              <button class="kw-del" onclick="delKw(${i})" title="Supprimer">×</button>
+            </div>
           </div>
           <div class="kw-mapping">
             <div class="kw-chip kw-chip-col ${!k.colonne ? 'empty' : ''}">
@@ -1076,6 +1164,19 @@
                 <option value="">Colonne</option>
                 ${cols.map(c => `<option value="${c}" ${k.colonne === c ? 'selected' : ''}>${c}${sheetHeaders[c] ? ' · ' + sheetHeaders[c] : ''}</option>`).join('')}
               </select>
+            </div>
+          </div>
+          <div class="kw-aliases">
+            <div class="kw-aliases-label">Mots-clés</div>
+            <div class="kw-aliases-list">
+              ${aliases.map((a, j) => `
+                <span class="alias-tag">
+                  ${a}
+                  <button class="alias-tag-del" onclick="delAlias(${i},${j})" title="Supprimer">×</button>
+                </span>
+              `).join('')}
+              <button class="alias-add" onclick="showAliasInput(${i})" id="alias-add-${i}">+ Ajouter</button>
+              <input type="text" class="alias-input" id="alias-input-${i}" style="display:none" placeholder="ex: esp" onkeydown="if(event.key==='Enter'){addAlias(${i});}" onblur="addAlias(${i})">
             </div>
           </div>
           ${colHeader ? `<div class="kw-footer">Colonne "${colHeader}"</div>` : ''}
@@ -1202,6 +1303,52 @@
       markAsModified();
     }
     function delKw(i) { keywords.splice(i, 1); render(); markAsModified(); }
+
+    function moveKw(i, dir) {
+      const newIndex = i + dir;
+      if (newIndex < 0 || newIndex >= keywords.length) return;
+      const temp = keywords[i];
+      keywords[i] = keywords[newIndex];
+      keywords[newIndex] = temp;
+      render();
+      markAsModified();
+    }
+
+    // Aliases
+    function showAliasInput(i) {
+      document.getElementById('alias-add-' + i).style.display = 'none';
+      const input = document.getElementById('alias-input-' + i);
+      input.style.display = 'inline-block';
+      input.focus();
+    }
+
+    function addAlias(i) {
+      const input = document.getElementById('alias-input-' + i);
+      const value = input.value.trim().toLowerCase();
+      input.value = '';
+      input.style.display = 'none';
+      document.getElementById('alias-add-' + i).style.display = 'inline-flex';
+
+      if (value && value.length <= 20) {
+        if (!keywords[i].aliases) keywords[i].aliases = [];
+        // Ne pas ajouter si déjà présent ou si c'est le nom de la colonne
+        const existing = keywords[i].aliases.map(a => a.toLowerCase());
+        if (!existing.includes(value) && value !== keywords[i].nom.toLowerCase()) {
+          keywords[i].aliases.push(value);
+          render();
+          markAsModified();
+        }
+      }
+    }
+
+    function delAlias(i, j) {
+      // Filtrer les aliases qui ne sont pas le nom lui-même
+      const filteredAliases = (keywords[i].aliases || []).filter(a => a && a.toLowerCase() !== keywords[i].nom.toLowerCase());
+      filteredAliases.splice(j, 1);
+      keywords[i].aliases = filteredAliases;
+      render();
+      markAsModified();
+    }
 
     // Rules
     function addRule() { rules.push({ terms: [{ name: '', op: '+' }, { name: '', op: '+' }], target: '' }); render(); markAsModified(); }
