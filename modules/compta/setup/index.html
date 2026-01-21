@@ -2207,19 +2207,47 @@
         var readResult = await readResponse.json();
         if (!readResult.success) throw new Error(readResult.error || 'Lecture echouee');
 
-        // Extract headers from sheet
+        // Extract headers and formulas from sheet
         var sheetData = readResult.excelData;
+        var firstSheet = sheetData?.sheets?.[0];
+
         var headers = [];
-        if (sheetData?.sheets?.[0]?.detectedHeaders?.columns) {
-          headers = sheetData.sheets[0].detectedHeaders.columns.map(function(h) { return h.name; });
+        var headersWithLetters = [];
+        if (firstSheet?.detectedHeaders?.columns) {
+          firstSheet.detectedHeaders.columns.forEach(function(h) {
+            headers.push(h.name);
+            headersWithLetters.push(h.name + ' (col ' + h.letter + ')');
+          });
+        }
+
+        // Extract formulas
+        var formulas = [];
+        if (firstSheet?.formulas) {
+          var formulaEntries = Object.entries(firstSheet.formulas);
+          // Get unique formulas (by pattern, not cell ref)
+          var seenPatterns = {};
+          formulaEntries.forEach(function(entry) {
+            var cellRef = entry[0];
+            var formula = entry[1];
+            // Simplify formula pattern (replace row numbers with X)
+            var pattern = formula.replace(/\d+/g, 'X');
+            if (!seenPatterns[pattern]) {
+              seenPatterns[pattern] = true;
+              formulas.push(cellRef + ': ' + formula);
+            }
+          });
         }
 
         console.log('[AI-CHAT] Headers detected:', headers);
+        console.log('[AI-CHAT] Formulas found:', formulas.length);
 
-        // Step 2: Send to Claude for config
-        var userMessage = 'J\'ai selectionne mon Google Sheet "' + name + '".\n';
-        userMessage += 'Colonnes detectees: ' + headers.join(', ') + '\n';
-        userMessage += 'Propose-moi une configuration basee sur ces colonnes.';
+        // Step 2: Send detailed info to Claude for analysis
+        var userMessage = 'J\'ai selectionne mon fichier "' + name + '".\n\n';
+        userMessage += 'COLONNES DETECTEES:\n' + headersWithLetters.join(', ') + '\n\n';
+        if (formulas.length > 0) {
+          userMessage += 'FORMULES TROUVEES:\n' + formulas.slice(0, 8).join('\n') + '\n\n';
+        }
+        userMessage += 'Analyse mon fichier et dis-moi ce que tu comprends de ma compta. Quelles colonnes je remplis manuellement ? Lesquelles sont calculees ?';
 
         aiConversationHistory.push({ role: 'user', content: userMessage });
         var aiResponse = await callAIConfigAssistant(aiConversationHistory);
