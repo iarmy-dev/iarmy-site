@@ -265,53 +265,27 @@
     .recap-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
     .recap-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
 
-    .btn-add-kw {
-      width: 48px;
-      height: 48px;
+    .btn-add-kw, .btn-add-rule {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,107,53,0.05) 100%);
-      border: 1px solid rgba(255,107,53,0.2);
-      color: #FF6B35;
-      font-size: 24px;
+      background: transparent;
+      border: 1px dashed rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.2);
+      font-size: 18px;
       font-weight: 300;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 16px auto 0;
-    }
-    .btn-add-kw:hover {
-      transform: scale(1.1) rotate(90deg);
-      background: linear-gradient(135deg, rgba(255,107,53,0.3) 0%, rgba(255,107,53,0.15) 100%);
-      border-color: rgba(255,107,53,0.4);
-      box-shadow: 0 8px 24px rgba(255,107,53,0.25);
-    }
-    .btn-add-kw:active { transform: scale(0.95) rotate(90deg); }
-
-    .btn-add-rule {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.05) 100%);
-      border: 1px solid rgba(139,92,246,0.2);
-      color: #8B5CF6;
-      font-size: 20px;
-      font-weight: 300;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 12px auto 0;
     }
-    .btn-add-rule:hover {
-      transform: scale(1.1) rotate(90deg);
-      background: linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0.15) 100%);
-      border-color: rgba(139,92,246,0.4);
-      box-shadow: 0 8px 24px rgba(139,92,246,0.25);
+    .btn-add-kw:hover, .btn-add-rule:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.5);
+      transform: scale(1.05);
     }
-    .btn-add-rule:active { transform: scale(0.95) rotate(90deg); }
 
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
@@ -1305,16 +1279,12 @@
           hintLink.href = `https://docs.google.com/spreadsheets/d/${config.sheet_id}/edit`;
         }
         addKwWarningShown = true;
-        // Passer le bouton en vert (prêt)
-        btn.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(34,197,94,0.1) 100%)';
-        btn.style.borderColor = 'rgba(34,197,94,0.4)';
-        btn.style.color = '#4ade80';
+        btn.style.borderColor = 'rgba(74,222,128,0.4)';
+        btn.style.color = 'rgba(74,222,128,0.6)';
       } else {
         // Deuxième clic : ajouter le mot-clé
         addKw();
         closeAddKwHint();
-        // Reset le style du bouton
-        btn.style.background = '';
         btn.style.borderColor = '';
         btn.style.color = '';
       }
