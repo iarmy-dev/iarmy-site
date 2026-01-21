@@ -6397,34 +6397,59 @@
         // Create a Google Sheet with this config
         showLoader('Creation du Google Sheet...');
 
-        // Generate column headers from config
-        var headers = ['Date'];
-        aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
-          headers.push(col.nom);
-        });
-
-        // Create the sheet
-        var sheetName = 'Compta iArmy';
-        var createResponse = await createGoogleSheet(sheetName, headers);
-
-        if (!createResponse || !createResponse.spreadsheetId) {
-          throw new Error('Erreur creation Google Sheet');
+        // Get session
+        var session = await supabaseClient.auth.getSession();
+        if (!session.data.session) {
+          throw new Error('Non authentifie');
         }
 
-        console.log('[AI] Sheet created:', createResponse.spreadsheetId);
+        // Generate column names from config (without Date - Edge Function adds it)
+        var customColumns = [];
+        aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
+          customColumns.push(col.nom);
+        });
+
+        console.log('[AI] Creating sheet with columns:', customColumns);
+
+        // Call create-template-sheet Edge Function
+        var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.data.session.access_token
+          },
+          body: JSON.stringify({
+            templateType: 'compta-pro',
+            year: new Date().getFullYear(),
+            customColumns: customColumns
+          })
+        });
+
+        var result = await response.json();
+
+        if (!result.success || !result.sheet) {
+          throw new Error(result.error || 'Erreur creation Google Sheet');
+        }
+
+        console.log('[AI] Sheet created:', result.sheet.id);
 
         // Store in excelData for the flow
         excelData = {
-          sheetId: createResponse.spreadsheetId,
-          sheetName: sheetName,
+          sheetId: result.sheet.id,
+          sheetName: result.sheet.name,
           isGoogleSheet: true
         };
+
+        // Update google_credentials with the new sheet
+        await supabaseClient.from('google_credentials').update({
+          sheet_id: result.sheet.id,
+          sheet_name: result.sheet.name
+        }).eq('user_id', session.data.session.user.id);
 
         // Set pendingConfig
         pendingConfig = aiGeneratedConfig;
 
         // Add column letters if not present
-        var colLetter = 'A';
         pendingConfig.colonnes_a_remplir.forEach(function(col, i) {
           col.colonne = String.fromCharCode(66 + i); // B, C, D, etc. (A is Date)
         });
