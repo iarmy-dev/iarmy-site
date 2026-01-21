@@ -6298,7 +6298,7 @@
 
       try {
         // Create a Google Sheet with this config
-        showGlobalLoader('Creation du Google Sheet...');
+        showLoader('Creation du Google Sheet...');
 
         // Generate column headers from config
         var headers = ['Date'];
@@ -6337,7 +6337,7 @@
 
       } catch (error) {
         console.error('[AI] Error accepting config:', error);
-        hideGlobalLoader();
+        hideLoader();
         showToast('Erreur: ' + error.message);
       }
     }
