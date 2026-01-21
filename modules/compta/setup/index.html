@@ -6355,14 +6355,30 @@
           fileInfo += 'Formules: ' + formulas.slice(0, 5).join(', ');
         }
 
-        // Add to conversation
-        aiConversationHistory.push({ role: 'user', content: '[Fichier Excel uploade: ' + file.name + ']' });
-        aiConversationHistory.push({ role: 'assistant', content: fileInfo });
+        // Send file info to Claude for analysis
+        var userMessage = 'J\'ai uploade mon fichier Excel "' + file.name + '".\n';
+        userMessage += 'Colonnes detectees: ' + headers.join(', ') + '\n';
+        if (formulas.length > 0) {
+          userMessage += 'Formules trouvees: ' + formulas.slice(0, 5).join(', ');
+        }
+        userMessage += '\nPeux-tu me proposer une configuration basee sur ces colonnes ?';
+
+        aiConversationHistory.push({ role: 'user', content: userMessage });
+
+        // Call Claude to analyze and generate config
+        var aiResponse = await callAIConfigAssistant(aiConversationHistory);
 
         removeTypingIndicator(typingId);
 
-        // Add AI response
-        addChatMessage('J\'ai analyse ton fichier ! Je vois ' + headers.length + ' colonnes: ' + headers.slice(0, 5).join(', ') + (headers.length > 5 ? '...' : '') + '\n\nC\'est bien ca ? Tu veux que je cree ta config avec ces colonnes ?', 'ai');
+        // Add AI response to chat
+        addChatMessage(aiResponse.message, 'ai');
+        aiConversationHistory.push({ role: 'assistant', content: aiResponse.message });
+
+        // If config was generated, show preview
+        if (aiResponse.config) {
+          aiGeneratedConfig = aiResponse.config;
+          showAIConfigPreview(aiResponse.config);
+        }
 
       } catch (error) {
         console.error('[AI] File parse error:', error);
