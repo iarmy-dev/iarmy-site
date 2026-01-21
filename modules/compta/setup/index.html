@@ -6782,14 +6782,33 @@
       var progressId = showProgressIndicator();
 
       try {
-        // Parse Excel file
+        // Parse Excel file with ALL options to preserve formulas
         var arrayBuffer = await file.arrayBuffer();
-        var workbook = XLSX.read(arrayBuffer, { type: 'array', cellFormula: true });
+        var workbook = XLSX.read(arrayBuffer, {
+          type: 'array',
+          cellFormula: true,
+          cellNF: true,
+          cellStyles: true,
+          sheetStubs: true,
+          bookVBA: true
+        });
+        console.log('[AI DEBUG] XLSX version:', typeof XLSX.version !== 'undefined' ? XLSX.version : 'unknown');
 
         // Extract info from first sheet
         var sheetName = workbook.SheetNames[0];
         var sheet = workbook.Sheets[sheetName];
         var range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+
+        // DEBUG: Check specific cells that should have formulas
+        console.log('[AI DEBUG] Sheet:', sheetName, 'Range:', sheet['!ref']);
+        ['Q8', 'E8', 'F8', 'Q9'].forEach(function(ref) {
+          var cell = sheet[ref];
+          if (cell) {
+            console.log('[AI DEBUG] Cell ' + ref + ':', JSON.stringify(cell));
+          } else {
+            console.log('[AI DEBUG] Cell ' + ref + ': NOT FOUND');
+          }
+        });
 
         // Build a COMPLETE view of the file for Claude - global vision
         var tableRows = [];
