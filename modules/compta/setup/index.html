@@ -1392,7 +1392,7 @@
                   </svg>
                 </button>
                 <input type="file" id="ai-file-input" accept=".xlsx,.xls" style="display: none;" onchange="handleAIFileUpload(event)">
-                <textarea id="ai-chat-input" placeholder="Decris ton workflow ou ajoute un fichier..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px; resize: none; height: 52px; outline: none; font-family: inherit;" onkeydown="if(event.key === 'Enter' && !event.shiftKey && !isRecording) { event.preventDefault(); sendAIMessage(); }"></textarea>
+                <textarea id="ai-chat-input" placeholder="Decris ton workflow ou ajoute un fichier..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px; resize: none; height: 52px; outline: none; font-family: inherit;" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); if(isRecording) { stopAndSendVoice(); } else { sendAIMessage(); } }"></textarea>
                 <!-- Microphone button -->
                 <button onclick="toggleVoiceRecording()" id="ai-mic-btn" style="width: 44px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="if(!isRecording) this.style.background='rgba(255,255,255,0.05)'">
                   <svg id="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1403,7 +1403,7 @@
                   </svg>
                 </button>
                 <!-- Send button -->
-                <button onclick="if(!isRecording) sendAIMessage()" id="ai-send-btn" style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <button onclick="if(isRecording) { stopAndSendVoice(); } else { sendAIMessage(); }" id="ai-send-btn" style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
               </div>
@@ -5893,6 +5893,12 @@
     var audioChunks = [];
     var recordingStartTime = null;
 
+    function stopAndSendVoice() {
+      if (isRecording && mediaRecorder) {
+        mediaRecorder.stop();
+      }
+    }
+
     async function toggleVoiceRecording() {
       if (isRecording) {
         // Stop recording
@@ -5940,20 +5946,12 @@
     function updateMicButton(recording) {
       var btn = document.getElementById('ai-mic-btn');
       var hint = document.getElementById('ai-input-hint');
-      var sendBtn = document.getElementById('ai-send-btn');
-      var textarea = document.getElementById('ai-chat-input');
 
       if (recording) {
         btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
         btn.style.border = '1px solid #ef4444';
         btn.style.animation = 'pulse-recording 1.5s infinite';
-        hint.innerHTML = '<span style="color: #ef4444;">Enregistrement en cours... (clique pour envoyer)</span>';
-
-        // Disable send button and textarea during recording
-        sendBtn.style.opacity = '0.3';
-        sendBtn.style.pointerEvents = 'none';
-        textarea.disabled = true;
-        textarea.style.opacity = '0.5';
+        hint.innerHTML = '<span style="color: #ef4444;">Enregistrement... Appuie sur Envoyer ou Entree</span>';
 
         // Add pulse animation if not exists
         if (!document.getElementById('recording-animation-style')) {
@@ -5968,12 +5966,6 @@
         btn.style.animation = 'none';
         btn.style.boxShadow = 'none';
         hint.innerHTML = 'Tape un message ou envoie un vocal';
-
-        // Re-enable send button and textarea
-        sendBtn.style.opacity = '1';
-        sendBtn.style.pointerEvents = 'auto';
-        textarea.disabled = false;
-        textarea.style.opacity = '1';
       }
     }
 
