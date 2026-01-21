@@ -173,7 +173,7 @@
       // Utiliser l'Edge Function admin-data pour bypass RLS
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        showAccessDenied();
+        showNoAccess();
         return;
       }
 
@@ -190,7 +190,7 @@
         if (!response.ok) {
           const error = await response.json();
           console.error('Admin data error:', error);
-          showAccessDenied();
+          showNoAccess();
           return;
         }
 
@@ -235,7 +235,7 @@
         allUsers = Array.from(usersMap.values());
       } catch (error) {
         console.error('Error loading admin data:', error);
-        showAccessDenied();
+        showNoAccess();
         return;
       }
 
