@@ -2158,25 +2158,98 @@
     }
 
     // Handle sheet selection from chat
-    function selectSheetFromChat(id, name, fileType) {
-      console.log('[SHEETS-CHAT] Selected:', name);
-
-      // Add user selection message to chat
+    // AI Chat dedicated flow - stays entirely in chat
+    async function selectSheetFromChat(id, name, fileType) {
+      console.log('[AI-CHAT] Selected sheet:', name);
       var chatMessages = document.getElementById('ai-chat-messages');
-      var selectionHtml = `
+
+      // Show user selection
+      chatMessages.insertAdjacentHTML('beforeend', `
         <div style="display: flex; justify-content: flex-end;">
           <div style="background: rgba(15, 157, 88, 0.2); border: 1px solid rgba(15, 157, 88, 0.3); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#4ade80" stroke-width="2"/><path d="M9 3v18M3 9h18" stroke="#4ade80" stroke-width="1.5"/></svg>
             <span style="font-size: 13px; color: #4ade80;">${escapeHtml(name)}</span>
           </div>
         </div>
-      `;
-      chatMessages.insertAdjacentHTML('beforeend', selectionHtml);
+      `);
+
+      // Show analyzing message in chat
+      var analyzingId = 'analyzing-' + Date.now();
+      chatMessages.insertAdjacentHTML('beforeend', `
+        <div id="${analyzingId}" class="ai-message" style="display: flex; gap: 10px; align-items: flex-start;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2"/></svg>
+          </div>
+          <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 14px; height: 14px; border: 2px solid rgba(168, 85, 247, 0.3); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+              <span style="color: rgba(255,255,255,0.8); font-size: 13px;">Analyse de ton fichier en cours...</span>
+            </div>
+          </div>
+        </div>
+      `);
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // Call the existing selectSheet function
-      selectSheet({ id: id, name: name, fileType: fileType });
+      try {
+        var { data: { session } } = await supabaseClient.auth.getSession();
+
+        // Step 1: Read the Google Sheet
+        console.log('[AI-CHAT] Reading sheet...');
+        var readResponse = await fetch(SUPABASE_URL + '/functions/v1/read-google-sheet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ sheetId: id })
+        });
+        var readResult = await readResponse.json();
+        if (!readResult.success) throw new Error(readResult.error || 'Lecture echouee');
+
+        // Extract headers from sheet
+        var sheetData = readResult.excelData;
+        var headers = [];
+        if (sheetData?.sheets?.[0]?.detectedHeaders?.columns) {
+          headers = sheetData.sheets[0].detectedHeaders.columns.map(function(h) { return h.name; });
+        }
+
+        console.log('[AI-CHAT] Headers detected:', headers);
+
+        // Step 2: Send to Claude for config
+        var userMessage = 'J\'ai selectionne mon Google Sheet "' + name + '".\n';
+        userMessage += 'Colonnes detectees: ' + headers.join(', ') + '\n';
+        userMessage += 'Propose-moi une configuration basee sur ces colonnes.';
+
+        aiConversationHistory.push({ role: 'user', content: userMessage });
+        var aiResponse = await callAIConfigAssistant(aiConversationHistory);
+
+        // Remove analyzing message
+        var analyzingEl = document.getElementById(analyzingId);
+        if (analyzingEl) analyzingEl.remove();
+
+        // Show AI response
+        addChatMessage(aiResponse.message, 'ai');
+        aiConversationHistory.push({ role: 'assistant', content: aiResponse.message });
+
+        // Store sheet data for later
+        aiSelectedSheetData = { id: id, name: name, fileType: fileType, sheetData: sheetData };
+
+        // If config was generated, show preview
+        if (aiResponse.config) {
+          aiGeneratedConfig = aiResponse.config;
+          showAIConfigPreview(aiResponse.config);
+        }
+
+      } catch (error) {
+        console.error('[AI-CHAT] Error:', error);
+        var analyzingEl = document.getElementById(analyzingId);
+        if (analyzingEl) analyzingEl.remove();
+        addChatMessage('Desole, je n\'arrive pas a lire ce fichier. ' + error.message, 'ai');
+      }
     }
+
+    var aiSelectedSheetData = null;
 
     var allSheets = []; // Store all sheets for filtering
     var currentFilter = 'all';
@@ -6574,58 +6647,87 @@
       }
 
       console.log('[AI] Accepting config:', aiGeneratedConfig);
+      console.log('[AI] Selected sheet data:', aiSelectedSheetData);
 
       try {
-        // Create a Google Sheet with this config
-        showLoader('Creation du Google Sheet...');
-
-        // Get session
         var session = await supabaseClient.auth.getSession();
         if (!session.data.session) {
           throw new Error('Non authentifie');
         }
 
-        // Generate column names from config (without Date - Edge Function adds it)
-        var customColumns = [];
-        aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
-          customColumns.push(col.nom);
-        });
+        var sheetId, sheetName;
 
-        console.log('[AI] Creating sheet with columns:', customColumns);
+        // Check if user selected an existing sheet from chat
+        if (aiSelectedSheetData && aiSelectedSheetData.id) {
+          // Use the existing sheet
+          console.log('[AI] Using existing sheet:', aiSelectedSheetData.name);
+          sheetId = aiSelectedSheetData.id;
+          sheetName = aiSelectedSheetData.name;
 
-        // Call create-template-sheet Edge Function
-        var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + session.data.session.access_token
-          },
-          body: JSON.stringify({
-            templateType: 'compta-pro',
-            year: new Date().getFullYear(),
-            customColumns: customColumns
-          })
-        });
+          // Show nice transition in chat
+          var chatMessages = document.getElementById('ai-chat-messages');
+          chatMessages.insertAdjacentHTML('beforeend', `
+            <div class="ai-message" style="display: flex; gap: 10px; align-items: flex-start;">
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              </div>
+              <div style="flex: 1; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 10px; padding: 12px;">
+                <p style="color: #4ade80; font-size: 13px; font-weight: 500; margin: 0;">Configuration enregistree !</p>
+                <p style="color: rgba(255,255,255,0.6); font-size: 12px; margin: 4px 0 0 0;">Redirection vers Telegram...</p>
+              </div>
+            </div>
+          `);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        var result = await response.json();
+          // Wait a bit for user to see the message
+          await new Promise(function(r) { setTimeout(r, 1500); });
 
-        if (!result.success || !result.sheet) {
-          throw new Error(result.error || 'Erreur creation Google Sheet');
+        } else {
+          // No existing sheet - create a new one
+          showLoader('Creation du Google Sheet...');
+
+          var customColumns = [];
+          aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
+            customColumns.push(col.nom);
+          });
+
+          console.log('[AI] Creating sheet with columns:', customColumns);
+
+          var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.data.session.access_token
+            },
+            body: JSON.stringify({
+              templateType: 'compta-pro',
+              year: new Date().getFullYear(),
+              customColumns: customColumns
+            })
+          });
+
+          var result = await response.json();
+
+          if (!result.success || !result.sheet) {
+            throw new Error(result.error || 'Erreur creation Google Sheet');
+          }
+
+          console.log('[AI] Sheet created:', result.sheet.id);
+          sheetId = result.sheet.id;
+          sheetName = result.sheet.name;
         }
-
-        console.log('[AI] Sheet created:', result.sheet.id);
 
         // Store in excelData for the flow
         excelData = {
-          sheetId: result.sheet.id,
-          sheetName: result.sheet.name,
+          sheetId: sheetId,
+          sheetName: sheetName,
           isGoogleSheet: true
         };
 
-        // Update google_credentials with the new sheet
+        // Update google_credentials with the sheet
         await supabaseClient.from('google_credentials').update({
-          sheet_id: result.sheet.id,
-          sheet_name: result.sheet.name
+          sheet_id: sheetId,
+          sheet_name: sheetName
         }).eq('user_id', session.data.session.user.id);
 
         // Set pendingConfig
@@ -6636,7 +6738,10 @@
           col.colonne = String.fromCharCode(66 + i); // B, C, D, etc. (A is Date)
         });
 
-        // Save config
+        // Hide the AI chat section
+        document.getElementById('ai-conversation-section').style.display = 'none';
+
+        // Save config and go to final step
         await saveConfigAndContinue();
 
       } catch (error) {
