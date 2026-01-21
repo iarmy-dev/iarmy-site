@@ -4499,11 +4499,26 @@
     }
 
     async function saveConfigAndContinue() {
+      // Assurer que tous les champs nécessaires sont présents dans la config
+      var currentYear = new Date().getFullYear();
+      var currentMonth = new Date().toLocaleString('fr-FR', { month: 'long' });
+      currentMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
+
+      var fullConfig = {
+        colonne_date: pendingConfig?.colonne_date || 'A',
+        premiere_ligne_donnees: pendingConfig?.premiere_ligne_donnees || 2,
+        onglet: pendingConfig?.onglet || (currentMonth + ' ' + currentYear),
+        format_date: pendingConfig?.format_date || 'DD/MM/YYYY',
+        colonnes_a_remplir: pendingConfig?.colonnes_a_remplir || [],
+        colonnes_protegees: pendingConfig?.colonnes_protegees || [],
+        regles_calcul: pendingConfig?.regles_calcul || []
+      };
+
       // Save config
       var configToSave = {
         user_id: currentUser.id,
         module_name: 'compta',
-        config: pendingConfig,
+        config: fullConfig,
         sheet_id: excelData?.sheetId || null,
         is_enabled: true
       };

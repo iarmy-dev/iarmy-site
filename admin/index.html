@@ -170,49 +170,74 @@
     }
 
     async function loadDashboard() {
-      // Charger les users
-      const { data: usersList } = await supabaseClient.from('admin_users_list').select('*');
-      const { data: configs } = await supabaseClient.from('module_configs').select('user_id, module_name, created_at');
-      const { data: subscriptions } = await supabaseClient.from('subscriptions').select('*');
-      const { data: telegramLinks } = await supabaseClient.from('telegram_links').select('user_id, telegram_user_id');
+      // Utiliser l'Edge Function admin-data pour bypass RLS
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        showAccessDenied();
+        return;
+      }
 
-      const usersMap = new Map();
-
-      (usersList || []).forEach(u => {
-        usersMap.set(u.user_id, {
-          user_id: u.user_id,
-          email: u.email,
-          full_name: u.full_name,
-          avatar_url: u.avatar_url,
-          modules: [],
-          subscriptions: [],
-          telegram: false,
-          created_at: u.created_at,
-          last_sign_in_at: u.last_sign_in_at
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-data`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': SUPABASE_ANON_KEY
+          }
         });
-      });
 
-      (configs || []).forEach(c => {
-        if (!usersMap.has(c.user_id)) {
-          usersMap.set(c.user_id, { user_id: c.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: c.created_at });
+        if (!response.ok) {
+          const error = await response.json();
+          console.error('Admin data error:', error);
+          showAccessDenied();
+          return;
         }
-        usersMap.get(c.user_id).modules.push(c.module_name);
-      });
 
-      (subscriptions || []).forEach(s => {
-        if (!usersMap.has(s.user_id)) {
-          usersMap.set(s.user_id, { user_id: s.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: s.created_at });
-        }
-        usersMap.get(s.user_id).subscriptions.push(s);
-      });
+        const { users: usersList, configs, subscriptions, telegramLinks } = await response.json();
 
-      (telegramLinks || []).forEach(t => {
-        if (usersMap.has(t.user_id)) {
-          usersMap.get(t.user_id).telegram = true;
-        }
-      });
+        const usersMap = new Map();
 
-      allUsers = Array.from(usersMap.values());
+        (usersList || []).forEach(u => {
+          usersMap.set(u.user_id, {
+            user_id: u.user_id,
+            email: u.email,
+            full_name: u.full_name,
+            avatar_url: u.avatar_url,
+            modules: [],
+            subscriptions: [],
+            telegram: false,
+            created_at: u.created_at,
+            last_sign_in_at: u.last_sign_in_at
+          });
+        });
+
+        (configs || []).forEach(c => {
+          if (!usersMap.has(c.user_id)) {
+            usersMap.set(c.user_id, { user_id: c.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: c.created_at });
+          }
+          usersMap.get(c.user_id).modules.push(c.module_name);
+        });
+
+        (subscriptions || []).forEach(s => {
+          if (!usersMap.has(s.user_id)) {
+            usersMap.set(s.user_id, { user_id: s.user_id, email: null, full_name: null, modules: [], subscriptions: [], telegram: false, created_at: s.created_at });
+          }
+          usersMap.get(s.user_id).subscriptions.push(s);
+        });
+
+        (telegramLinks || []).forEach(t => {
+          if (usersMap.has(t.user_id)) {
+            usersMap.get(t.user_id).telegram = true;
+          }
+        });
+
+        allUsers = Array.from(usersMap.values());
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+        showAccessDenied();
+        return;
+      }
 
       // Charger analytics
       await loadAnalytics();
