@@ -1553,17 +1553,14 @@
     }
 
     function updatePreview() {
-      const txt = document.getElementById('test-input').value.trim();
       const tgEl = document.getElementById('preview-tg');
       const sheetEl = document.getElementById('preview-sheet');
       const rulesEl = document.getElementById('preview-rules');
 
-      // 1. Afficher bulle Telegram (vide ou avec message)
-      if (!txt) {
-        tgEl.innerHTML = '<span class="empty-state">Tape un message...</span>';
-      } else {
-        tgEl.innerHTML = `<div class="tg-bubble">${escapeHtml(txt)}</div>`;
-      }
+      // 1. Afficher exemple de message Telegram
+      const kwNames = keywords.filter(k => k.nom).map(k => k.nom.toLowerCase());
+      const exampleMsg = kwNames.length > 0 ? kwNames.slice(0, 3).join(' 100 ') + ' 100' : '';
+      tgEl.innerHTML = kwNames.length > 0 ? `<div class="tg-bubble">${exampleMsg}</div>` : '<span class="empty-state">Configure tes mots-clés</span>';
 
       // 2. Vérifier si on a des mots-clés configurés
       const activeKeywords = keywords.filter(k => k.nom && k.colonne);
@@ -1574,149 +1571,25 @@
         return;
       }
 
-      // 3. Parser les valeurs (si texte présent)
-      const parsed = {};
-      if (txt) {
-        for (const k of keywords) {
-          if (!k.nom) continue;
-          // Construire liste de tous les termes à chercher (nom + aliases)
-          const termsToSearch = [k.nom.toLowerCase()];
-          if (k.aliases && k.aliases.length) {
-            k.aliases.forEach(a => { if (a) termsToSearch.push(a.toLowerCase()); });
-          }
-          // Aliases courants pour les termes comptables
-          const commonAliases = {
-            'dep': ['dépense', 'dépenses', 'depense', 'depenses', 'dép'],
-            'esp': ['espèces', 'especes', 'espèce', 'espece', 'cash', 'liquide'],
-            'cb': ['carte', 'cartes', 'bancaire', 'tpe', 'visa'],
-            'tr': ['ticket', 'tickets', 'resto', 'restaurant', 'titres'],
-            'raz': ['recette', 'recettes', 'total', 'ca', 'z']
-          };
-          const base = k.nom.toLowerCase();
-          if (commonAliases[base]) {
-            commonAliases[base].forEach(a => termsToSearch.push(a));
-          }
-          // Chercher chaque terme
-          for (const term of termsToSearch) {
-            const re = new RegExp(`\\b${term}\\s*:?\\s*([0-9]+(?:[.,][0-9]+)?)`, 'i');
-            const m = txt.toLowerCase().match(re);
-            if (m) {
-              let val = parseFloat(m[1].replace(',', '.'));
-              // Limite max 999 999€ pour éviter les erreurs de saisie
-              if (val > 10000) val = 10000;
-              parsed[k.nom] = val;
-              break;
-            }
-          }
-        }
-      }
-
-      // 4. Appliquer les règles
-      const result = { ...parsed };
-      const calcDetails = [];
-      const calculatedFields = new Set();
-
-      for (const r of rules) {
-        if (!r.target || !r.terms.some(t => t.name)) continue;
-
-        let calcValue = 0;
-        let calcStr = '';
-        let hasValue = false;
-
-        for (let i = 0; i < r.terms.length; i++) {
-          const t = r.terms[i];
-          if (!t.name) continue;
-
-          const val = parsed[t.name] || 0;
-          if (val > 0) hasValue = true;
-
-          if (i === 0) {
-            calcValue = val;
-            calcStr = t.name;
-          } else {
-            if (t.op === '-') {
-              calcValue -= val;
-              calcStr += ` − ${t.name}`;
-            } else {
-              calcValue += val;
-              calcStr += ` + ${t.name}`;
-            }
-          }
-        }
-
-        if (hasValue && r.target) {
-          result[r.target] = calcValue;
-          calculatedFields.add(r.target);
-          calcDetails.push(`<strong>${calcStr} = ${r.target}</strong> (${calcValue}€)`);
-        }
-      }
-
-      // 5. Calculer TOTAL (somme de toutes les colonnes)
-      let total = 0;
-      for (const k of activeKeywords) {
-        const val = result[k.nom] || 0;
-        if (val > 0) {
-          total += val;
-        }
-      }
-
-      // TVA à 10% (restauration)
-      const tva = total > 0 ? Math.round(total * 0.1 * 100) / 100 : 0;
-
-      // 6. Construire le mini Excel avec TOTAL et TVA
-      // Header avec colonnes + TOTAL + TVA
-      const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('') +
-        '<span style="background:#1565c0;">TOT</span>' +
-        '<span style="background:#7b1fa2;">TVA</span>';
-
-      // Row avec valeurs
-      const valueCells = activeKeywords.map(k => {
-        const val = result[k.nom];
-        const isCalculated = calculatedFields.has(k.nom);
-        if (val !== undefined && val !== null && val !== 0) {
-          return `<span class="${isCalculated ? 'calculated' : ''}">${formatNumber(val)}${isCalculated ? ' 📐' : ''}</span>`;
-        }
-        return `<span class="empty">-</span>`;
-      }).join('') +
-        `<span style="background:#e3f2fd;color:#1565c0;font-weight:600;">${formatNumber(total)}</span>` +
-        `<span style="background:#f3e5f5;color:#7b1fa2;font-weight:600;">${formatNumber(tva)}</span>`;
-
-      // Labels sous les colonnes (avec indicateur formule, tronqué à 8 chars)
+      // 3. Construire le mini Excel (aperçu statique)
+      const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
       const labelCells = activeKeywords.map(k => {
-        const isCalculated = calculatedFields.has(k.nom);
         const displayName = k.nom.length > 8 ? k.nom.substring(0, 7) + '…' : k.nom;
-        return `<span title="${k.nom}" style="background:${isCalculated ? '#e8f5e9' : '#f5f5f5'};color:${isCalculated ? '#2e7d32' : '#666'};font-size:9px;">${displayName}${isCalculated ? ' ƒ' : ''}</span>`;
-      }).join('') +
-        '<span style="background:#e3f2fd;color:#1565c0;font-size:9px;">TOTAL ƒ</span>' +
-        '<span style="background:#f3e5f5;color:#7b1fa2;font-size:9px;">TVA ƒ</span>';
-
-      // Calculer si on a besoin des flèches (plus de 6 colonnes)
-      const needsNav = activeKeywords.length > 4;
+        return `<span title="${k.nom}" style="background:#f5f5f5;color:#666;font-size:9px;">${displayName}</span>`;
+      }).join('');
 
       sheetEl.innerHTML = `
         <div class="mini-excel-wrapper">
-          ${needsNav ? '<button class="excel-nav left" onclick="scrollExcel(-1)">‹</button>' : ''}
-          <div class="mini-excel-container" id="excel-container">
+          <div class="mini-excel-container">
             <div class="mini-excel">
               <div class="mini-excel-header">${headerCells}</div>
-              <div class="mini-excel-row">${valueCells}</div>
               <div class="mini-excel-row" style="border-top:1px solid #e0e0e0;">${labelCells}</div>
             </div>
           </div>
-          ${needsNav ? '<button class="excel-nav right" onclick="scrollExcel(1)">›</button>' : ''}
         </div>
       `;
 
-      // Vérifier si scroll nécessaire et afficher les flèches
-      setTimeout(() => updateExcelNavVisibility(), 50);
-
-      // 7. Afficher les règles appliquées
-      if (calcDetails.length > 0) {
-        rulesEl.style.display = 'block';
-        rulesEl.innerHTML = '📐 ' + calcDetails.join(' · ');
-      } else {
-        rulesEl.style.display = 'none';
-      }
+      rulesEl.style.display = 'none';
     }
 
     function escapeHtml(text) {
