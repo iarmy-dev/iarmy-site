@@ -171,8 +171,20 @@
 
     async function loadDashboard() {
       // Utiliser l'Edge Function admin-data pour bypass RLS
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
+      // Forcer un refresh du token pour éviter les JWT expirés
+      const { data: { session }, error: refreshError } = await supabaseClient.auth.refreshSession();
+      if (refreshError || !session) {
+        console.error('Session refresh error:', refreshError);
+        // Essayer avec getSession comme fallback
+        const { data: { session: fallbackSession } } = await supabaseClient.auth.getSession();
+        if (!fallbackSession) {
+          showNoAccess();
+          return;
+        }
+      }
+
+      const activeSession = session || (await supabaseClient.auth.getSession()).data.session;
+      if (!activeSession) {
         showNoAccess();
         return;
       }
@@ -182,7 +194,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${activeSession.access_token}`,
             'apikey': SUPABASE_ANON_KEY
           }
         });
