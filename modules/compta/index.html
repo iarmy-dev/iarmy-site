@@ -828,7 +828,15 @@
       // Ajouter mot-clé TOTAL automatiquement s'il n'existe pas (en dernier)
       const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
       if (!hasTotalColumn && keywords.length > 0) {
-        keywords.push({ nom: 'TOTAL', colonne: '', noteColumn: '', aliases: ['total'] });
+        // Chercher si une colonne du sheet s'appelle TOTAL
+        let totalCol = '';
+        for (const [col, name] of Object.entries(sheetHeaders)) {
+          if (name && name.toLowerCase() === 'total') {
+            totalCol = col;
+            break;
+          }
+        }
+        keywords.push({ nom: 'TOTAL', colonne: totalCol, noteColumn: '', aliases: ['total'] });
       }
 
       // S'assurer que TOTAL est en dernier
