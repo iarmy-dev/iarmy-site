@@ -143,19 +143,30 @@
     let analyticsData = {};
 
     async function init() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      console.log('[ADMIN] 🚀 Init...');
+
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+      console.log('[ADMIN] Session error:', sessionError);
+      console.log('[ADMIN] Session exists:', !!session);
+
       if (!session) {
+        console.log('[ADMIN] ❌ Pas de session, redirection...');
         window.location.href = '../';
         return;
       }
 
       currentUser = session.user;
+      console.log('[ADMIN] User email:', currentUser.email);
+      console.log('[ADMIN] ADMIN_EMAILS:', ADMIN_EMAILS);
+      console.log('[ADMIN] Email in list:', ADMIN_EMAILS.includes(currentUser.email));
 
       if (!ADMIN_EMAILS.includes(currentUser.email)) {
+        console.log('[ADMIN] ❌ Email pas dans la liste admin');
         showNoAccess();
         return;
       }
 
+      console.log('[ADMIN] ✅ Email OK, chargement dashboard...');
       await loadDashboard();
     }
 
@@ -170,14 +181,21 @@
     }
 
     async function loadDashboard() {
+      console.log('[ADMIN] 📊 loadDashboard...');
+
       // Utiliser l'Edge Function admin-data pour bypass RLS
       // Forcer un refresh du token pour éviter les JWT expirés
       const { data: { session }, error: refreshError } = await supabaseClient.auth.refreshSession();
+      console.log('[ADMIN] Refresh error:', refreshError);
+      console.log('[ADMIN] Session after refresh:', !!session);
+
       if (refreshError || !session) {
-        console.error('Session refresh error:', refreshError);
+        console.error('[ADMIN] Session refresh error:', refreshError);
         // Essayer avec getSession comme fallback
         const { data: { session: fallbackSession } } = await supabaseClient.auth.getSession();
+        console.log('[ADMIN] Fallback session:', !!fallbackSession);
         if (!fallbackSession) {
+          console.log('[ADMIN] ❌ Pas de session après fallback');
           showNoAccess();
           return;
         }
@@ -185,9 +203,12 @@
 
       const activeSession = session || (await supabaseClient.auth.getSession()).data.session;
       if (!activeSession) {
+        console.log('[ADMIN] ❌ Pas de activeSession');
         showNoAccess();
         return;
       }
+
+      console.log('[ADMIN] ✅ Session active, appel Edge Function...');
 
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-data`, {
@@ -199,9 +220,11 @@
           }
         });
 
+        console.log('[ADMIN] Edge Function response status:', response.status);
+
         if (!response.ok) {
           const error = await response.json();
-          console.error('Admin data error:', error);
+          console.error('[ADMIN] ❌ Admin data error:', error);
           showNoAccess();
           return;
         }
