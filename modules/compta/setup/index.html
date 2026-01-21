@@ -2936,6 +2936,32 @@
       }
     }
 
+    // Validation des conflits de colonnes/aliases
+    function checkColumnConflict(value, excludeIndex) {
+      var normalized = value.trim().toLowerCase();
+      if (!normalized) return null;
+
+      for (var j = 0; j < sheetEditorColumns.length; j++) {
+        if (j === excludeIndex) continue;
+        var col = sheetEditorColumns[j];
+
+        // Conflit avec un nom de colonne existant
+        if (col.name && col.name.toLowerCase() === normalized) {
+          return { type: 'column', name: col.name };
+        }
+
+        // Conflit avec un alias existant
+        if (col.aliases) {
+          for (var k = 0; k < col.aliases.length; k++) {
+            if (col.aliases[k].toLowerCase() === normalized) {
+              return { type: 'alias', name: col.name, alias: col.aliases[k] };
+            }
+          }
+        }
+      }
+      return null;
+    }
+
     function sheetFinishEdit(index, newName) {
       var col = sheetEditorColumns[index];
       if (newName && newName.trim() && newName.trim() !== col.name) {
@@ -2944,21 +2970,33 @@
         // Validation : interdire les caractères spéciaux
         var invalidChars = /[+\-=*\/\\|<>!@#$%^&(){}[\]:;"'?,]/;
         if (invalidChars.test(trimmed)) {
-          alert('❌ Nom invalide\n\nLes caractères spéciaux ne sont pas autorisés : + - = * / etc.\n\nUtilise uniquement des lettres et chiffres.');
+          showToast('❌ Caractères spéciaux non autorisés', 3000);
           renderSheetEditor();
           return;
         }
 
         // Validation : minimum 2 caractères
         if (trimmed.length < 2) {
-          alert('❌ Nom trop court\n\nLe nom doit faire au moins 2 caractères.');
+          showToast('❌ Nom trop court (min 2 caractères)', 3000);
           renderSheetEditor();
           return;
         }
 
         // Validation : maximum 20 caractères
         if (trimmed.length > 20) {
-          alert('❌ Nom trop long\n\nLe nom doit faire maximum 20 caractères.');
+          showToast('❌ Nom trop long (max 20 caractères)', 3000);
+          renderSheetEditor();
+          return;
+        }
+
+        // Validation : pas de conflit avec d'autres colonnes/aliases
+        var conflict = checkColumnConflict(trimmed, index);
+        if (conflict) {
+          if (conflict.type === 'column') {
+            showToast('❌ "' + trimmed + '" existe déjà', 3000);
+          } else {
+            showToast('❌ "' + trimmed + '" est déjà un alias de ' + conflict.name, 3000);
+          }
           renderSheetEditor();
           return;
         }
