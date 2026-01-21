@@ -6563,111 +6563,71 @@
         var sheet = workbook.Sheets[sheetName];
         var range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
 
-        // Find headers - prioritize accounting column names
-        var allHeaders = [];
+        // Build a COMPLETE view of the file for Claude - global vision
+        var tableRows = [];
         var formulas = [];
-        var formulasByCol = {};
+        var maxCol = Math.min(range.e.c, 25); // Max 25 columns for full view
+        var maxRows = Math.min(range.e.r, 25); // Max 25 rows for full view
 
-        // Priority keywords for accounting columns (HIGH priority)
-        var highPriorityKeywords = ['cb', 'esp', 'tr', 'total recette', 'total'];
-        // Medium priority
-        var mediumPriorityKeywords = ['recette', 'depense', 'ttc', 'ht', 'tva', 'ca', 'caisse', 'carte', 'ticket', 'cheque', 'virement'];
-        // Words to EXCLUDE (noise from display zones)
-        var excludeWords = ['ventilation', 'encaissement', 'mois de', 'ventes ttc', 'bleues', 'en especes'];
-
-        // First pass: collect all formulas to identify calculated columns
-        for (var col = range.s.c; col <= Math.min(range.e.c, 30); col++) {
-          var colLetter = XLSX.utils.encode_col(col);
-          formulasByCol[colLetter] = [];
-          for (var row = 0; row <= Math.min(20, range.e.r); row++) {
+        // First pass: identify header row (usually row 1 or 2)
+        var headerRow = -1;
+        for (var row = 0; row <= Math.min(5, range.e.r); row++) {
+          var textCells = 0;
+          for (var col = 0; col <= maxCol; col++) {
             var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-            if (cell && cell.f) {
-              formulasByCol[colLetter].push({ row: row + 1, formula: cell.f });
-            }
+            if (cell && cell.t === 's') textCells++;
+          }
+          if (textCells >= 3) {
+            headerRow = row;
+            break;
           }
         }
 
-        // Second pass: find headers
-        for (var col = range.s.c; col <= Math.min(range.e.c, 30); col++) {
-          var colLetter = XLSX.utils.encode_col(col);
-          for (var row = 0; row <= Math.min(10, range.e.r); row++) {
+        // Read ALL rows to understand structure
+        for (var row = 0; row <= maxRows; row++) {
+          var rowData = [];
+          var hasData = false;
+          for (var col = 0; col <= maxCol; col++) {
             var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-            if (cell && cell.v && typeof cell.v === 'string') {
-              var name = cell.v.trim();
-              var nameLower = name.toLowerCase();
+            var colLetter = XLSX.utils.encode_col(col);
+            if (cell) {
+              hasData = true;
+              var val = cell.v !== undefined ? String(cell.v).trim() : '';
+              // Truncate long values but keep useful info
+              if (val.length > 15) val = val.substring(0, 12) + '...';
 
-              // Skip noise
-              if (!name || name.length > 25 || /^\d+$/.test(name) || /^[A-Z]$/i.test(name)) continue;
-              if (excludeWords.some(function(w) { return nameLower.includes(w); })) continue;
-              if (allHeaders.some(function(h) { return h.name === name; })) continue;
-
-              // Calculate priority score
-              var score = 0;
-              if (highPriorityKeywords.some(function(kw) { return nameLower === kw || nameLower.replace(/\s+/g, ' ') === kw; })) score += 20;
-              else if (mediumPriorityKeywords.some(function(kw) { return nameLower.includes(kw); })) score += 10;
-              if (name.length >= 2 && name.length <= 15) score += 3;
-              if (/^[A-Z\s]+$/.test(name)) score += 2;
-
-              // Check if this column has formulas (calculated column)
-              var hasFormulas = formulasByCol[colLetter] && formulasByCol[colLetter].length > 3;
-
-              if (score > 0) {
-                allHeaders.push({
-                  name: name,
-                  score: score,
-                  col: colLetter,
-                  isCalculated: hasFormulas
-                });
+              if (cell.f) {
+                // Store ALL formulas - this is critical for understanding
+                formulas.push(colLetter + (row + 1) + ': =' + cell.f);
+                val = '[CALC]';
               }
+              if (val) rowData.push(colLetter + ':' + val);
             }
           }
-        }
-
-        // Collect unique formulas for context
-        for (var colLetter in formulasByCol) {
-          if (formulasByCol[colLetter].length > 0) {
-            var firstFormula = formulasByCol[colLetter][0];
-            formulas.push(colLetter + firstFormula.row + ': ' + firstFormula.formula);
+          if (hasData && rowData.length > 0) {
+            var rowLabel = row === headerRow ? 'HEADER' : 'Row ' + (row + 1);
+            tableRows.push(rowLabel + ': ' + rowData.join(' | '));
           }
         }
-
-        // Sort by priority score and take top results
-        allHeaders.sort(function(a, b) { return b.score - a.score; });
-        var headers = allHeaders.slice(0, 10);
 
         // Store for later use
         aiUploadedFileData = {
           fileName: file.name,
           sheetName: sheetName,
-          headers: headers.slice(0, 15),
-          formulas: formulas.slice(0, 10),
           file: file
         };
 
-        // Separate manual input columns from calculated columns
-        var manualCols = headers.filter(function(h) { return !h.isCalculated; });
-        var calcCols = headers.filter(function(h) { return h.isCalculated; });
-
-        // Build detailed message for Claude to analyze
-        var userMessage = 'J\'ai uploade mon fichier Excel "' + file.name + '".\n\n';
-
-        if (manualCols.length > 0) {
-          userMessage += 'COLONNES DE SAISIE (sans formules):\n';
-          userMessage += manualCols.map(function(h) { return '- ' + h.name + ' (colonne ' + h.col + ')'; }).join('\n');
-          userMessage += '\n\n';
-        }
-
-        if (calcCols.length > 0) {
-          userMessage += 'COLONNES CALCULEES (avec formules):\n';
-          userMessage += calcCols.map(function(h) { return '- ' + h.name + ' (colonne ' + h.col + ')'; }).join('\n');
-          userMessage += '\n\n';
-        }
+        // Build comprehensive message for Claude
+        var userMessage = 'Voici mon fichier Excel "' + file.name + '" (onglet: ' + sheetName + ').\n\n';
+        userMessage += '=== TABLEAU COMPLET ===\n';
+        userMessage += tableRows.join('\n');
+        userMessage += '\n\n';
 
         if (formulas.length > 0) {
-          userMessage += 'EXEMPLES DE FORMULES:\n' + formulas.slice(0, 8).join('\n') + '\n\n';
+          userMessage += '=== TOUTES LES FORMULES ===\n' + formulas.join('\n') + '\n\n';
         }
 
-        userMessage += 'Dis-moi ce que tu comprends de ma compta. Les colonnes de saisie sont celles ou je rentre mes donnees (CB, ESP, TR...). Les colonnes calculees se remplissent toutes seules.';
+        userMessage += 'Analyse ce fichier EN PROFONDEUR et explique-moi ce que tu comprends de ma compta.';
 
         aiConversationHistory.push({ role: 'user', content: userMessage });
 
