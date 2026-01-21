@@ -6494,12 +6494,17 @@
         })
       });
 
+      console.log('[AI] Response status:', response.status);
+      var responseText = await response.text();
+      console.log('[AI] Response body:', responseText);
+
       if (!response.ok) {
-        var errorData = await response.json().catch(function() { return {}; });
-        throw new Error(errorData.error || 'Erreur API');
+        var errorData = {};
+        try { errorData = JSON.parse(responseText); } catch(e) {}
+        throw new Error(errorData.error || 'Erreur API ' + response.status);
       }
 
-      return await response.json();
+      return JSON.parse(responseText);
     }
 
     function showAIConfigPreview(config) {
