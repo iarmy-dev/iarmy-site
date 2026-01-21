@@ -1388,13 +1388,23 @@
 
             <!-- Input Area -->
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 16px; background: rgba(0,0,0,0.2);">
-              <div style="display: flex; gap: 12px; align-items: flex-end;">
+              <div style="display: flex; gap: 10px; align-items: flex-end;">
                 <textarea id="ai-chat-input" placeholder="Decris ton workflow ici..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px; resize: none; height: 52px; outline: none; font-family: inherit;" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendAIMessage(); }"></textarea>
+                <!-- Microphone button -->
+                <button onclick="toggleVoiceRecording()" id="ai-mic-btn" style="width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="if(!isRecording) this.style.background='rgba(255,255,255,0.05)'">
+                  <svg id="mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </button>
+                <!-- Send button -->
                 <button onclick="sendAIMessage()" id="ai-send-btn" style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
               </div>
-              <p style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; text-align: center;">Appuie sur Entree pour envoyer</p>
+              <p id="ai-input-hint" style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; text-align: center;">Appuie sur Entree pour envoyer ou clique sur le micro</p>
             </div>
           </div>
 
@@ -5904,6 +5914,102 @@
     var aiConversationHistory = [];
     var aiGeneratedConfig = null;
     var isAIMode = false;
+
+    // Voice recording
+    var isRecording = false;
+    var recognition = null;
+
+    function initSpeechRecognition() {
+      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        console.log('[AI] Speech recognition not supported');
+        return null;
+      }
+
+      var rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'fr-FR';
+
+      rec.onstart = function() {
+        console.log('[AI] Voice recording started');
+        isRecording = true;
+        updateMicButton(true);
+      };
+
+      rec.onend = function() {
+        console.log('[AI] Voice recording ended');
+        isRecording = false;
+        updateMicButton(false);
+      };
+
+      rec.onerror = function(event) {
+        console.error('[AI] Speech recognition error:', event.error);
+        isRecording = false;
+        updateMicButton(false);
+        if (event.error === 'not-allowed') {
+          showToast('Autorise le micro dans ton navigateur');
+        }
+      };
+
+      rec.onresult = function(event) {
+        var transcript = '';
+        for (var i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        var input = document.getElementById('ai-chat-input');
+        input.value = transcript;
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+      };
+
+      return rec;
+    }
+
+    function toggleVoiceRecording() {
+      if (!recognition) {
+        recognition = initSpeechRecognition();
+        if (!recognition) {
+          showToast('Ton navigateur ne supporte pas la reconnaissance vocale');
+          return;
+        }
+      }
+
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        // Clear input before starting
+        document.getElementById('ai-chat-input').value = '';
+        recognition.start();
+      }
+    }
+
+    function updateMicButton(recording) {
+      var btn = document.getElementById('ai-mic-btn');
+      var hint = document.getElementById('ai-input-hint');
+
+      if (recording) {
+        btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        btn.style.border = '1px solid #ef4444';
+        btn.style.animation = 'pulse-recording 1.5s infinite';
+        hint.textContent = 'Parle... (clique pour arreter)';
+        hint.style.color = '#ef4444';
+
+        // Add pulse animation if not exists
+        if (!document.getElementById('recording-animation-style')) {
+          var style = document.createElement('style');
+          style.id = 'recording-animation-style';
+          style.textContent = '@keyframes pulse-recording { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }';
+          document.head.appendChild(style);
+        }
+      } else {
+        btn.style.background = 'rgba(255,255,255,0.05)';
+        btn.style.border = '1px solid rgba(255,255,255,0.15)';
+        btn.style.animation = 'none';
+        hint.textContent = 'Appuie sur Entree pour envoyer ou clique sur le micro';
+        hint.style.color = 'rgba(255,255,255,0.3)';
+      }
+    }
 
     function startAIConversation() {
       console.log('[AI] Starting AI conversation mode');
