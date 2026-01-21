@@ -452,9 +452,9 @@
         </div>
       </div>
       <div class="preview-rules" id="preview-rules" style="display: none;"></div>
-      <div id="preview-links" style="display: none; margin-top: 12px; gap: 8px; flex-wrap: wrap;">
-        <a id="sheet-link" href="#" target="_blank" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(15,157,88,0.15) 0%, rgba(15,157,88,0.08) 100%); border: 1px solid rgba(15,157,88,0.2); border-radius: 10px; color: #4ade80; font-size: 12px; font-weight: 500; text-decoration: none; text-align: center;">↗ Google Sheet</a>
-        <a id="tg-link" href="https://t.me/IArmyBOT" target="_blank" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(42,171,238,0.15) 0%, rgba(42,171,238,0.08) 100%); border: 1px solid rgba(42,171,238,0.2); border-radius: 10px; color: #2AABEE; font-size: 12px; font-weight: 500; text-decoration: none; text-align: center;">↗ Telegram Bot</a>
+      <div id="preview-links" style="display: none; margin-top: 10px; justify-content: center; gap: 16px;">
+        <a id="sheet-link" href="#" target="_blank" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;">↗ Sheet</a>
+        <a id="tg-link" href="https://t.me/IArmyBOT" target="_blank" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;">↗ Bot</a>
       </div>
     </div>
 
@@ -1550,8 +1550,10 @@
         return;
       }
 
-      // 3. Construire le mini Excel (aperçu statique)
+      // 3. Construire le mini Excel avec valeurs exemples
+      const amounts = [200, 150, 80, 50, 120, 90, 75];
       const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
+      const valueCells = activeKeywords.map((k, i) => `<span>${amounts[i % amounts.length]}</span>`).join('');
       const labelCells = activeKeywords.map(k => {
         const displayName = k.nom.length > 8 ? k.nom.substring(0, 7) + '…' : k.nom;
         return `<span title="${k.nom}" style="background:#f5f5f5;color:#666;font-size:9px;">${displayName}</span>`;
@@ -1562,6 +1564,7 @@
           <div class="mini-excel-container">
             <div class="mini-excel">
               <div class="mini-excel-header">${headerCells}</div>
+              <div class="mini-excel-row">${valueCells}</div>
               <div class="mini-excel-row" style="border-top:1px solid #e0e0e0;">${labelCells}</div>
             </div>
           </div>
