@@ -790,7 +790,8 @@
       }
 
       // Ajouter règle TOTAL par défaut si absente
-      const hasTotal = rules.some(r => r.target && r.target.toLowerCase() === 'total');
+      // Vérifie si une règle contient "total" dans son target (ex: "TOTAL", "TOTAL RECETTE", etc.)
+      const hasTotal = rules.some(r => r.target && r.target.toLowerCase().includes('total'));
       if (!hasTotal && keywords.length > 1) {
         const otherColumns = keywords.filter(k => k.nom && k.nom.toLowerCase() !== 'total');
         if (otherColumns.length > 0) {
