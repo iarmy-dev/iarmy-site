@@ -482,14 +482,22 @@
       <button class="btn-add-rule" onclick="addRule()" title="Ajouter une règle">+</button>
     </div>
 
-    <!-- Ordre du récap -->
+    <!-- Ordre du récap Telegram -->
     <div class="section">
       <div class="section-header" style="cursor: pointer;" onclick="toggleRecapOrder()">
-        <div class="section-title">Ordre du recap<span class="section-badge">optionnel</span></div>
+        <div class="section-title">📱 Récap Telegram<span class="section-badge">ordre</span></div>
         <span id="recap-toggle" style="font-size: 12px; color: rgba(255,255,255,0.4);">▼</span>
       </div>
       <div id="recap-order-panel" style="display: none;">
-        <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px;">Ordre d'affichage dans le récap Telegram</div>
+        <!-- Aperçu du récap -->
+        <div style="background: rgba(42,171,238,0.08); border: 1px solid rgba(42,171,238,0.2); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+          <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; text-transform: uppercase;">Aperçu du récap</div>
+          <div id="recap-preview" style="font-size: 12px; color: white; line-height: 1.6;">
+            <!-- Généré dynamiquement -->
+          </div>
+        </div>
+        <!-- Liste de réordonnancement -->
+        <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 8px;">Réorganise l'ordre d'affichage :</div>
         <div id="recap-order-list"></div>
       </div>
     </div>
@@ -1358,17 +1366,33 @@
 
     function renderRecapOrder() {
       const validKw = keywords.filter(k => k.nom);
-      document.getElementById('recap-order-list').innerHTML = validKw.length === 0
-        ? '<div style="font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 12px;">Ajoute des mots-clés d\'abord</div>'
-        : validKw.map((k, i) => `
-          <div class="recap-order-item">
-            <span class="recap-order-name">${k.nom}</span>
-            <div class="recap-order-btns">
-              <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},-1)" ${i === 0 ? 'disabled' : ''}>▲</button>
-              <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},1)" ${i === validKw.length - 1 ? 'disabled' : ''}>▼</button>
-            </div>
+      const recapPreview = document.getElementById('recap-preview');
+      const recapList = document.getElementById('recap-order-list');
+
+      if (validKw.length === 0) {
+        recapPreview.innerHTML = '<span style="color: rgba(255,255,255,0.3);">Configure tes mots-clés</span>';
+        recapList.innerHTML = '<div style="font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 12px;">Ajoute des mots-clés d\'abord</div>';
+        return;
+      }
+
+      // Générer l'aperçu du récap comme dans Telegram
+      const exampleValues = [200, 150, 100, 80, 60, 50];
+      const recapItems = validKw.map((k, i) => {
+        const val = exampleValues[i] || 50;
+        return `<strong>${k.nom}:</strong> ${val}€`;
+      });
+      recapPreview.innerHTML = `📊 ${recapItems.join(' • ')}<br><span style="color: #4ade80;">💰 <strong>TOTAL: ${recapItems.length > 0 ? '450€' : '0€'}</strong></span>`;
+
+      // Liste de réordonnancement
+      recapList.innerHTML = validKw.map((k, i) => `
+        <div class="recap-order-item">
+          <span class="recap-order-name">${k.nom}</span>
+          <div class="recap-order-btns">
+            <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},-1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+            <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},1)" ${i === validKw.length - 1 ? 'disabled' : ''}>▼</button>
           </div>
-        `).join('');
+        </div>
+      `).join('');
     }
 
     // Aliases
@@ -1547,25 +1571,64 @@
       }
 
       // Valeurs exemples cohérentes
-      const exampleValues = [200, 150, 100];
-      const examples = activeKeywords.slice(0, 3).map((k, i) => ({
-        nom: k.nom.toLowerCase(),
-        val: exampleValues[i] || 100
-      }));
+      const exampleValues = [200, 150, 100, 80, 60, 50];
+      const keywordValues = {};
+      activeKeywords.forEach((k, i) => {
+        keywordValues[k.nom] = exampleValues[i] || 50;
+      });
 
-      // Message Telegram
+      // Calculer les valeurs des règles
+      const calculatedValues = {};
+      rules.forEach(r => {
+        if (r.target && r.terms.some(t => t.name)) {
+          let result = 0;
+          r.terms.forEach(t => {
+            if (t.name && keywordValues[t.name] !== undefined) {
+              if (t.op === '-') {
+                result -= keywordValues[t.name];
+              } else {
+                result += keywordValues[t.name];
+              }
+            }
+          });
+          if (result !== 0) {
+            calculatedValues[r.target] = result;
+            keywordValues[r.target] = result; // Pour les règles chaînées
+          }
+        }
+      });
+
+      // Message Telegram (seulement les keywords saisis, pas les calculs)
+      const examples = activeKeywords.slice(0, 3).map(k => ({
+        nom: k.nom.toLowerCase(),
+        val: exampleValues[activeKeywords.indexOf(k)] || 50
+      }));
       const exampleMsg = examples.map(e => `${e.nom} ${e.val}`).join(' ');
       tgEl.innerHTML = `<div class="tg-bubble">${exampleMsg}</div>`;
 
-      // Excel avec les mêmes valeurs
-      const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
-      const valueCells = activeKeywords.map((k, i) => {
-        const val = i < examples.length ? examples[i].val : '-';
-        return `<span>${val}</span>`;
+      // Excel avec les mêmes valeurs + colonnes calculées
+      const allColumns = [...activeKeywords];
+
+      // Ajouter les colonnes calculées qui ont une valeur
+      Object.keys(calculatedValues).forEach(target => {
+        const kw = keywords.find(k => k.nom === target);
+        if (kw && kw.colonne && !allColumns.find(c => c.nom === target)) {
+          allColumns.push(kw);
+        }
+      });
+
+      const headerCells = allColumns.map(k => `<span>${k.colonne}</span>`).join('');
+      const valueCells = allColumns.map(k => {
+        const isCalculated = calculatedValues[k.nom] !== undefined;
+        const val = isCalculated ? calculatedValues[k.nom] : (keywordValues[k.nom] || '-');
+        const style = isCalculated ? 'class="calculated"' : '';
+        return `<span ${style}>${val}</span>`;
       }).join('');
-      const labelCells = activeKeywords.map(k => {
+      const labelCells = allColumns.map(k => {
         const displayName = k.nom.length > 8 ? k.nom.substring(0, 7) + '…' : k.nom;
-        return `<span title="${k.nom}" style="background:#f5f5f5;color:#666;font-size:9px;">${displayName}</span>`;
+        const isCalculated = calculatedValues[k.nom] !== undefined;
+        const bgColor = isCalculated ? '#e8f5e9' : '#f5f5f5';
+        return `<span title="${k.nom}" style="background:${bgColor};color:#666;font-size:9px;">${displayName}</span>`;
       }).join('');
 
       sheetEl.innerHTML = `
@@ -1580,7 +1643,20 @@
         </div>
       `;
 
-      rulesEl.style.display = 'none';
+      // Afficher le détail des règles si il y en a
+      const validRules = rules.filter(r => r.target && r.terms.some(t => t.name));
+      if (validRules.length > 0) {
+        rulesEl.style.display = 'block';
+        rulesEl.innerHTML = validRules.map(r => {
+          const formula = r.terms.filter(t => t.name).map((t, i) =>
+            (i > 0 ? ` ${t.op} ` : '') + t.name
+          ).join('');
+          const result = calculatedValues[r.target] || '?';
+          return `<strong>${r.target}</strong> = ${formula} → <span style="color:#4ade80">${result}</span>`;
+        }).join(' · ');
+      } else {
+        rulesEl.style.display = 'none';
+      }
     }
 
     function escapeHtml(text) {
