@@ -1255,10 +1255,49 @@
       render();
       markAsModified();
     }
+    // Validation des conflits de mots-clés/aliases
+    function checkKeywordConflict(value, excludeIndex = -1) {
+      const normalized = value.trim().toLowerCase();
+      if (!normalized) return null;
+
+      for (let j = 0; j < keywords.length; j++) {
+        if (j === excludeIndex) continue;
+        const kw = keywords[j];
+
+        // Conflit avec un nom de mot-clé existant
+        if (kw.nom && kw.nom.toLowerCase() === normalized) {
+          return { type: 'keyword', name: kw.nom };
+        }
+
+        // Conflit avec un alias existant
+        if (kw.aliases) {
+          for (const alias of kw.aliases) {
+            if (alias.toLowerCase() === normalized) {
+              return { type: 'alias', name: kw.nom, alias: alias };
+            }
+          }
+        }
+      }
+      return null;
+    }
+
     function updKw(i, f, v) {
       if (f === 'nom') {
         // Limite à 20 caractères max
         v = v.substring(0, 20).toUpperCase();
+
+        // Vérifier les conflits (sauf avec soi-même)
+        const conflict = checkKeywordConflict(v, i);
+        if (conflict) {
+          if (conflict.type === 'keyword') {
+            toast(`"${v}" existe déjà`, true);
+          } else {
+            toast(`"${v}" est déjà un alias de ${conflict.name}`, true);
+          }
+          render(); // Revenir à la valeur précédente
+          return;
+        }
+
         keywords[i].nom = v;
         keywords[i].aliases = [v.toLowerCase()];
       }
@@ -1305,13 +1344,33 @@
 
       if (value && value.length <= 20) {
         if (!keywords[i].aliases) keywords[i].aliases = [];
-        // Ne pas ajouter si déjà présent ou si c'est le nom de la colonne
-        const existing = keywords[i].aliases.map(a => a.toLowerCase());
-        if (!existing.includes(value) && value !== keywords[i].nom.toLowerCase()) {
-          keywords[i].aliases.push(value);
-          render();
-          markAsModified();
+
+        // Ne pas ajouter si c'est le nom de la colonne actuelle
+        if (value === keywords[i].nom.toLowerCase()) {
+          return;
         }
+
+        // Ne pas ajouter si déjà présent dans ce mot-clé
+        const existing = keywords[i].aliases.map(a => a.toLowerCase());
+        if (existing.includes(value)) {
+          toast(`"${value}" est déjà ajouté`, true);
+          return;
+        }
+
+        // Vérifier les conflits avec d'autres mots-clés
+        const conflict = checkKeywordConflict(value, i);
+        if (conflict) {
+          if (conflict.type === 'keyword') {
+            toast(`"${value}" est déjà le mot-clé ${conflict.name}`, true);
+          } else {
+            toast(`"${value}" est déjà un alias de ${conflict.name}`, true);
+          }
+          return;
+        }
+
+        keywords[i].aliases.push(value);
+        render();
+        markAsModified();
       }
     }
 
