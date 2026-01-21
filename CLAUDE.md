@@ -77,7 +77,7 @@ iArmy
 
 ### Bot Telegram
 - **Token** : 8366883614:AAG7NMGica82HgLUjuVJh3gOMMMI7Qq-7Ws
-- **Username** : @iarmy_bot
+- **Username** : @IArmyBOT
 
 ### Hébergement
 - **Site** : GitHub Pages (iarmy.fr)
