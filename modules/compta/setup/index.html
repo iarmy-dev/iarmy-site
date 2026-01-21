@@ -6566,43 +6566,74 @@
         // Find headers - prioritize accounting column names
         var allHeaders = [];
         var formulas = [];
+        var formulasByCol = {};
 
-        // Priority keywords for accounting columns
-        var priorityKeywords = ['cb', 'esp', 'tr', 'total', 'recette', 'depense', 'ttc', 'ht', 'tva', 'ca', 'caisse', 'carte', 'ticket', 'cheque', 'virement'];
-        // Words to EXCLUDE (noise)
-        var excludeWords = ['ventilation', 'encaissement', 'mois', 'date', 'jour', 'papa', 'maman', 'nom', 'prenom', 'adresse'];
+        // Priority keywords for accounting columns (HIGH priority)
+        var highPriorityKeywords = ['cb', 'esp', 'tr', 'total recette', 'total'];
+        // Medium priority
+        var mediumPriorityKeywords = ['recette', 'depense', 'ttc', 'ht', 'tva', 'ca', 'caisse', 'carte', 'ticket', 'cheque', 'virement'];
+        // Words to EXCLUDE (noise from display zones)
+        var excludeWords = ['ventilation', 'encaissement', 'mois de', 'ventes ttc', 'bleues', 'en especes'];
 
-        for (var col = range.s.c; col <= Math.min(range.e.c, 25); col++) {
+        // First pass: collect all formulas to identify calculated columns
+        for (var col = range.s.c; col <= Math.min(range.e.c, 30); col++) {
+          var colLetter = XLSX.utils.encode_col(col);
+          formulasByCol[colLetter] = [];
+          for (var row = 0; row <= Math.min(20, range.e.r); row++) {
+            var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
+            if (cell && cell.f) {
+              formulasByCol[colLetter].push({ row: row + 1, formula: cell.f });
+            }
+          }
+        }
+
+        // Second pass: find headers
+        for (var col = range.s.c; col <= Math.min(range.e.c, 30); col++) {
+          var colLetter = XLSX.utils.encode_col(col);
           for (var row = 0; row <= Math.min(10, range.e.r); row++) {
             var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
             if (cell && cell.v && typeof cell.v === 'string') {
               var name = cell.v.trim();
               var nameLower = name.toLowerCase();
 
-              // Skip if: empty, too long, pure numbers, single letters, or excluded words
+              // Skip noise
               if (!name || name.length > 25 || /^\d+$/.test(name) || /^[A-Z]$/i.test(name)) continue;
               if (excludeWords.some(function(w) { return nameLower.includes(w); })) continue;
               if (allHeaders.some(function(h) { return h.name === name; })) continue;
 
               // Calculate priority score
               var score = 0;
-              if (priorityKeywords.some(function(kw) { return nameLower.includes(kw); })) score += 10;
-              if (name.length <= 15) score += 2; // Shorter names are usually column headers
-              if (/^[A-Z\s]+$/.test(name)) score += 1; // All caps often indicates header
+              if (highPriorityKeywords.some(function(kw) { return nameLower === kw || nameLower.replace(/\s+/g, ' ') === kw; })) score += 20;
+              else if (mediumPriorityKeywords.some(function(kw) { return nameLower.includes(kw); })) score += 10;
+              if (name.length >= 2 && name.length <= 15) score += 3;
+              if (/^[A-Z\s]+$/.test(name)) score += 2;
 
-              if (score > 0 || (name.length >= 2 && name.length <= 20)) {
-                allHeaders.push({ name: name, score: score, col: XLSX.utils.encode_col(col) });
+              // Check if this column has formulas (calculated column)
+              var hasFormulas = formulasByCol[colLetter] && formulasByCol[colLetter].length > 3;
+
+              if (score > 0) {
+                allHeaders.push({
+                  name: name,
+                  score: score,
+                  col: colLetter,
+                  isCalculated: hasFormulas
+                });
               }
             }
-            if (cell && cell.f) {
-              formulas.push(XLSX.utils.encode_col(col) + ': ' + cell.f);
-            }
+          }
+        }
+
+        // Collect unique formulas for context
+        for (var colLetter in formulasByCol) {
+          if (formulasByCol[colLetter].length > 0) {
+            var firstFormula = formulasByCol[colLetter][0];
+            formulas.push(colLetter + firstFormula.row + ': ' + firstFormula.formula);
           }
         }
 
         // Sort by priority score and take top results
         allHeaders.sort(function(a, b) { return b.score - a.score; });
-        var headers = allHeaders.slice(0, 12).map(function(h) { return h.name; });
+        var headers = allHeaders.slice(0, 10);
 
         // Store for later use
         aiUploadedFileData = {
@@ -6613,18 +6644,30 @@
           file: file
         };
 
-        // Build headers with column letters for better context
-        var headersWithCols = allHeaders.slice(0, 12).map(function(h) {
-          return h.name + ' (col ' + h.col + ')';
-        });
+        // Separate manual input columns from calculated columns
+        var manualCols = headers.filter(function(h) { return !h.isCalculated; });
+        var calcCols = headers.filter(function(h) { return h.isCalculated; });
 
         // Build detailed message for Claude to analyze
         var userMessage = 'J\'ai uploade mon fichier Excel "' + file.name + '".\n\n';
-        userMessage += 'COLONNES DETECTEES:\n' + headersWithCols.join(', ') + '\n\n';
-        if (formulas.length > 0) {
-          userMessage += 'FORMULES TROUVEES:\n' + formulas.slice(0, 10).join('\n') + '\n\n';
+
+        if (manualCols.length > 0) {
+          userMessage += 'COLONNES DE SAISIE (sans formules):\n';
+          userMessage += manualCols.map(function(h) { return '- ' + h.name + ' (colonne ' + h.col + ')'; }).join('\n');
+          userMessage += '\n\n';
         }
-        userMessage += 'Analyse mon fichier et dis-moi ce que tu comprends de ma compta. Quelles colonnes je remplis manuellement ? Lesquelles sont calculees automatiquement ?';
+
+        if (calcCols.length > 0) {
+          userMessage += 'COLONNES CALCULEES (avec formules):\n';
+          userMessage += calcCols.map(function(h) { return '- ' + h.name + ' (colonne ' + h.col + ')'; }).join('\n');
+          userMessage += '\n\n';
+        }
+
+        if (formulas.length > 0) {
+          userMessage += 'EXEMPLES DE FORMULES:\n' + formulas.slice(0, 8).join('\n') + '\n\n';
+        }
+
+        userMessage += 'Dis-moi ce que tu comprends de ma compta. Les colonnes de saisie sont celles ou je rentre mes donnees (CB, ESP, TR...). Les colonnes calculees se remplissent toutes seules.';
 
         aiConversationHistory.push({ role: 'user', content: userMessage });
 
