@@ -3857,13 +3857,38 @@
         });
       }
 
-      // Charger les règles personnalisées existantes
+      // Charger les règles personnalisées existantes - parser la formule si nécessaire
       customRules = [];
       if (pendingConfig && pendingConfig.regles_calcul) {
         customRules = pendingConfig.regles_calcul.map(function(r) {
+          var sources = r.sources || [];
+          var operations = r.operations || [];
+
+          // Si on a une formule string (de l'AI), la parser
+          if (r.formula && typeof r.formula === 'string' && sources.length === 0) {
+            var parts = r.formula.split(/\s*([\+\-\*\/])\s*/);
+            sources = [];
+            operations = [];
+            for (var i = 0; i < parts.length; i++) {
+              var part = parts[i].trim();
+              if (part === '+' || part === '-' || part === '*' || part === '/') {
+                operations.push(part);
+              } else if (part) {
+                sources.push(part);
+              }
+            }
+          }
+
+          // Assurer qu'on a le bon nombre d'opérations
+          if (operations.length < sources.length - 1) {
+            while (operations.length < sources.length - 1) {
+              operations.push('+');
+            }
+          }
+
           return {
-            sources: r.sources || [],
-            operations: r.operations || (r.sources || []).slice(1).map(function() { return '+'; }),
+            sources: sources,
+            operations: operations,
             target: r.target || '',
             createTarget: r.createTarget || false
           };
@@ -6056,11 +6081,37 @@
           };
         });
 
-        // Charger les règles personnalisées
+        // Charger les règles personnalisées - parser la formule si nécessaire
         customRules = (pendingConfig.regles_calcul || []).map(function(rule) {
+          var sources = rule.sources || [];
+          var operations = rule.operations || [];
+
+          // Si on a une formule string (de l'AI), la parser
+          if (rule.formula && typeof rule.formula === 'string' && sources.length === 0) {
+            // Parser "CB + ESP + TR" ou "CB - Depenses"
+            var parts = rule.formula.split(/\s*([\+\-\*\/])\s*/);
+            sources = [];
+            operations = [];
+            for (var i = 0; i < parts.length; i++) {
+              var part = parts[i].trim();
+              if (part === '+' || part === '-' || part === '*' || part === '/') {
+                operations.push(part);
+              } else if (part) {
+                sources.push(part);
+              }
+            }
+          }
+
+          // Assurer qu'on a le bon nombre d'opérations
+          if (operations.length < sources.length - 1) {
+            while (operations.length < sources.length - 1) {
+              operations.push('+');
+            }
+          }
+
           return {
-            sources: rule.sources || [],
-            operations: rule.operations || (rule.sources || []).slice(1).map(function() { return '+'; }),
+            sources: sources,
+            operations: operations,
             target: rule.target || '',
             createTarget: rule.createTarget || false
           };
@@ -6661,13 +6712,31 @@
         });
       }
 
-      // Show rules as compact badges
+      // Show rules as compact badges with full formula
       if (config.regles_calcul && config.regles_calcul.length > 0) {
         rulesDiv.innerHTML = '';
         config.regles_calcul.forEach(function(rule) {
-          var ruleEl = document.createElement('span');
-          ruleEl.style.cssText = 'display: inline-block; padding: 4px 10px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 6px; font-size: 11px; color: rgba(255,255,255,0.7);';
-          ruleEl.textContent = rule.target;
+          var ruleEl = document.createElement('div');
+          ruleEl.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; margin-bottom: 6px;';
+
+          // Show formula (e.g., "CB + ESP + TR")
+          var formulaSpan = document.createElement('span');
+          formulaSpan.style.cssText = 'color: rgba(255,255,255,0.9); font-family: monospace;';
+          formulaSpan.textContent = rule.formula || '?';
+          ruleEl.appendChild(formulaSpan);
+
+          // Arrow
+          var arrowSpan = document.createElement('span');
+          arrowSpan.style.cssText = 'color: #ff6b35;';
+          arrowSpan.textContent = '→';
+          ruleEl.appendChild(arrowSpan);
+
+          // Target column
+          var targetSpan = document.createElement('span');
+          targetSpan.style.cssText = 'color: #4ade80; font-weight: 600;';
+          targetSpan.textContent = rule.target;
+          ruleEl.appendChild(targetSpan);
+
           rulesDiv.appendChild(ruleEl);
         });
         rulesSection.style.display = 'block';
