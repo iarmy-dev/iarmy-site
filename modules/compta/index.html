@@ -825,10 +825,22 @@
         return { terms: [{ name: '', op: '+' }], target: '' };
       });
 
+      // Ajouter mot-clé TOTAL automatiquement s'il n'existe pas (en dernier)
+      const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
+      if (!hasTotalColumn && keywords.length > 0) {
+        keywords.push({ nom: 'TOTAL', colonne: '', noteColumn: '', aliases: ['total'] });
+      }
+
+      // S'assurer que TOTAL est en dernier
+      const totalIdx = keywords.findIndex(k => k.nom && k.nom.toLowerCase() === 'total');
+      if (totalIdx >= 0 && totalIdx !== keywords.length - 1) {
+        const totalKw = keywords.splice(totalIdx, 1)[0];
+        keywords.push(totalKw);
+      }
+
       // Ajouter règle TOTAL par défaut si absente
       const hasTotal = rules.some(r => r.target && r.target.toLowerCase() === 'total');
-      const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
-      if (!hasTotal && hasTotalColumn && keywords.length > 1) {
+      if (!hasTotal && keywords.length > 1) {
         const otherColumns = keywords.filter(k => k.nom && k.nom.toLowerCase() !== 'total');
         if (otherColumns.length > 0) {
           rules.unshift({
