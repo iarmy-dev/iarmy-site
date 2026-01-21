@@ -1056,89 +1056,8 @@
         <h1 class="text-3xl font-bold mb-3">Comment veux-tu commencer ?</h1>
         <p class="text-white/40 mb-8">Choisis l'option qui te convient</p>
 
-        <!-- Option 1: Créer mon fichier (RECOMMANDÉ) -->
-        <div class="glass-card p-6 mb-5 max-w-lg mx-auto cursor-pointer hover:border-orange-500/50 transition-all" style="border: 1px solid rgba(255, 107, 53, 0.3); background: linear-gradient(135deg, rgba(255, 107, 53, 0.08), rgba(255, 107, 53, 0.02));" onclick="createEmptyTemplate()">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-500/10 flex items-center justify-center text-2xl flex-shrink-0">+</div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-lg font-semibold">Creer mon fichier</h3>
-                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/30">RECOMMANDE</span>
-              </div>
-              <p class="text-sm text-white/40">On te cree un Google Sheet pret a l'emploi</p>
-            </div>
-            <svg class="w-5 h-5 text-white/30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-          </div>
-        </div>
-
-        <!-- Séparateur "ou" -->
-        <div class="flex items-center gap-4 max-w-lg mx-auto my-4">
-          <div class="flex-1 h-px bg-white/10"></div>
-          <span class="text-white/30 text-sm">ou</span>
-          <div class="flex-1 h-px bg-white/10"></div>
-        </div>
-
-        <!-- Option 2: J'ai déjà un fichier -->
-        <div class="glass-card p-6 max-w-lg mx-auto" id="import-dropzone">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-xl">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <div><h3 class="text-lg font-semibold">J'ai deja un fichier</h3></div>
-          </div>
-
-          <!-- Google Drive button (prioritaire) -->
-          <button onclick="openSheetsPicker()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-4 px-4 text-sm font-medium transition-all flex items-center gap-3 mb-4">
-            <svg width="28" height="28" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
-              <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
-              <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
-              <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
-              <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
-              <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
-              <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
-            </svg>
-            <div class="text-left">
-              <div class="font-medium">Choisir depuis Google Drive</div>
-              <div class="text-xs text-white/40">Selectionne un fichier deja en ligne</div>
-            </div>
-          </button>
-
-          <!-- Or separator -->
-          <div class="flex items-center gap-3 mb-4">
-            <div class="flex-1 h-px bg-white/10"></div>
-            <span class="text-white/30 text-xs">ou</span>
-            <div class="flex-1 h-px bg-white/10"></div>
-          </div>
-
-          <!-- Drop zone area (secondaire) - Plus grande pour faciliter le drag & drop -->
-          <div id="drop-area" class="border-2 border-dashed border-white/15 rounded-xl py-8 px-6 text-center transition-all cursor-pointer hover:border-white/30 hover:bg-white/[0.03]" onclick="document.getElementById('file-input').click()">
-            <div class="flex flex-col items-center justify-center gap-3">
-              <div class="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-1">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/40">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-              </div>
-              <div class="text-center">
-                <p class="text-white/60 text-sm font-medium">Glisse ton fichier Excel ici</p>
-                <p class="text-white/30 text-xs mt-1">ou clique pour parcourir</p>
-              </div>
-            </div>
-          </div>
-
-          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden">
-        </div>
-
-        <!-- Séparateur "ou" -->
-        <div class="flex items-center gap-4 max-w-lg mx-auto my-4">
-          <div class="flex-1 h-px bg-white/10"></div>
-          <span class="text-white/30 text-sm">ou</span>
-          <div class="flex-1 h-px bg-white/10"></div>
-        </div>
-
-        <!-- Option 3: Configurer avec l'IA -->
-        <div class="glass-card p-6 max-w-lg mx-auto cursor-pointer hover:border-purple-500/50 transition-all" style="border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02));" onclick="startAIConversation()">
+        <!-- Option 1: Configurer avec l'IA (RECOMMANDÉ - EN PREMIER) -->
+        <div class="glass-card p-6 mb-5 max-w-lg mx-auto cursor-pointer hover:border-purple-500/50 transition-all" style="border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(168, 85, 247, 0.02));" onclick="startAIConversation()">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-500/10 flex items-center justify-center text-2xl flex-shrink-0">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1151,11 +1070,65 @@
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-1">
                 <h3 class="text-lg font-semibold">Configurer avec l'IA</h3>
-                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30">NOUVEAU</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30">RECOMMANDE</span>
               </div>
-              <p class="text-sm text-white/40">Explique ton workflow, l'IA configure tout pour toi</p>
+              <p class="text-sm text-white/40">Explique ton workflow ou envoie ton Excel, l'IA configure tout</p>
             </div>
             <svg class="w-5 h-5 text-white/30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <!-- Accordéon : Autres options -->
+        <div class="max-w-lg mx-auto mt-6">
+          <button onclick="toggleOtherOptions()" id="other-options-toggle" class="w-full flex items-center justify-between py-3 px-4 text-white/40 hover:text-white/60 transition-all text-sm">
+            <span>Autres options</span>
+            <svg id="other-options-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="other-options-content" style="display: none; padding-top: 12px;">
+            <!-- Option 2: Créer mon fichier -->
+            <div class="glass-card p-5 mb-4 cursor-pointer hover:border-orange-500/30 transition-all" style="border: 1px solid rgba(255, 255, 255, 0.08);" onclick="createEmptyTemplate()">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center text-xl flex-shrink-0">+</div>
+                <div class="flex-1">
+                  <h3 class="text-base font-semibold">Creer un fichier vide</h3>
+                  <p class="text-sm text-white/40">On te cree un Google Sheet de base</p>
+                </div>
+                <svg class="w-4 h-4 text-white/20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+
+            <!-- Option 3: J'ai déjà un fichier -->
+            <div class="glass-card p-5" id="import-dropzone" style="border: 1px solid rgba(255, 255, 255, 0.08);">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center text-xl">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div><h3 class="text-base font-semibold">J'ai deja un fichier</h3></div>
+              </div>
+
+              <!-- Google Drive button -->
+              <button onclick="openSheetsPicker()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 px-4 text-sm font-medium transition-all flex items-center gap-3 mb-3">
+                <svg width="24" height="24" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+                  <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+                  <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+                  <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+                  <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+                  <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+                  <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+                </svg>
+                <div class="text-left">
+                  <div class="font-medium text-sm">Depuis Google Drive</div>
+                </div>
+              </button>
+
+              <!-- Drop zone area -->
+              <div id="drop-area" class="border-2 border-dashed border-white/10 rounded-xl py-6 px-4 text-center transition-all cursor-pointer hover:border-white/20 hover:bg-white/[0.02]" onclick="document.getElementById('file-input').click()">
+                <p class="text-white/40 text-sm">Ou glisse ton fichier Excel ici</p>
+              </div>
+
+              <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden">
+            </div>
           </div>
         </div>
 
@@ -1927,6 +1900,19 @@
       }
 
       setupUploadZone();
+    }
+
+    // Accordéon pour les autres options
+    function toggleOtherOptions() {
+      var content = document.getElementById('other-options-content');
+      var chevron = document.getElementById('other-options-chevron');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.display = 'none';
+        chevron.style.transform = 'rotate(0deg)';
+      }
     }
 
     function showStepChoice() {
