@@ -7003,6 +7003,37 @@
           col.colonne = String.fromCharCode(66 + i); // B, C, D, etc. (A is Date)
         });
 
+        // Convert rules from formula string to sources/operations arrays
+        if (pendingConfig.regles_calcul) {
+          pendingConfig.regles_calcul = pendingConfig.regles_calcul.map(function(rule) {
+            // If already has sources array, keep it
+            if (rule.sources && Array.isArray(rule.sources)) {
+              return rule;
+            }
+            // Parse formula string to sources and operations
+            if (rule.formula && typeof rule.formula === 'string') {
+              var parts = rule.formula.split(/\s*([\+\-\*\/])\s*/);
+              var sources = [];
+              var operations = [];
+              for (var i = 0; i < parts.length; i++) {
+                var part = parts[i].trim();
+                if (part === '+' || part === '-' || part === '*' || part === '/') {
+                  operations.push(part);
+                } else if (part) {
+                  sources.push(part);
+                }
+              }
+              return {
+                sources: sources,
+                operations: operations,
+                target: rule.target
+              };
+            }
+            return rule;
+          });
+          console.log('[AI] Converted rules to sources/operations:', pendingConfig.regles_calcul);
+        }
+
         // Hide the AI chat section
         document.getElementById('ai-conversation-section').style.display = 'none';
 
