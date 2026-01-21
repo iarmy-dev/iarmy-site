@@ -825,6 +825,19 @@
         return { terms: [{ name: '', op: '+' }], target: '' };
       });
 
+      // Ajouter règle TOTAL par défaut si absente
+      const hasTotal = rules.some(r => r.target && r.target.toLowerCase() === 'total');
+      const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
+      if (!hasTotal && hasTotalColumn && keywords.length > 1) {
+        const otherColumns = keywords.filter(k => k.nom && k.nom.toLowerCase() !== 'total');
+        if (otherColumns.length > 0) {
+          rules.unshift({
+            terms: otherColumns.map(k => ({ name: k.nom, op: '+' })),
+            target: 'TOTAL'
+          });
+        }
+      }
+
       render();
 
       const sheetEl = document.getElementById('info-sheet');
