@@ -1428,6 +1428,42 @@
     function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
     function hideWelcome() { document.getElementById('welcome-overlay').classList.remove('active'); }
 
+    // Warning si config existante
+    function showExistingConfigWarning() {
+      return new Promise(function(resolve) {
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;';
+        overlay.innerHTML = `
+          <div style="background:rgba(30,30,30,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;max-width:400px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+            <h2 style="color:white;font-size:20px;margin-bottom:12px;">Module déjà configuré</h2>
+            <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.6;margin-bottom:24px;">
+              Tu as déjà le module Compta de connecté.<br>
+              <strong style="color:#FF6B35;">Continuer ici écrasera ta configuration actuelle.</strong>
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center;">
+              <button id="config-warning-back" style="padding:12px 24px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;color:white;font-size:14px;cursor:pointer;transition:all 0.2s;">
+                ← Retour aux réglages
+              </button>
+              <button id="config-warning-reset" style="padding:12px 24px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);border-radius:10px;color:#f87171;font-size:14px;cursor:pointer;transition:all 0.2s;">
+                Repartir de zéro
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        document.getElementById('config-warning-back').onclick = function() {
+          overlay.remove();
+          resolve(false);
+        };
+        document.getElementById('config-warning-reset').onclick = function() {
+          overlay.remove();
+          resolve(true);
+        };
+      });
+    }
+
     // Loader avec étapes visuelles
     var loaderSteps = [];
     var loaderCurrentStep = 0;
@@ -1655,6 +1691,23 @@
       currentUser = session.user;
       userProvider = session.user.app_metadata?.provider || 'email';
       console.log('[COMPTA] Connecte:', currentUser.email);
+
+      // Vérifier si une config existe déjà
+      var { data: existingConfig } = await supabaseClient
+        .from('module_configs')
+        .select('sheet_id, config')
+        .eq('user_id', currentUser.id)
+        .eq('module_name', 'compta')
+        .single();
+
+      if (existingConfig && existingConfig.sheet_id) {
+        // Config existante - demander confirmation
+        var wantsToReset = await showExistingConfigWarning();
+        if (!wantsToReset) {
+          window.location.href = '../'; // Retour aux settings
+          return;
+        }
+      }
 
       // Welcome uniquement a la premiere connexion
       var welcomeKey = 'iarmy_welcomed_' + currentUser.id;
