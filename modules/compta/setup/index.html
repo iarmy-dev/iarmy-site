@@ -6824,9 +6824,11 @@
               // Truncate long values but keep useful info
               if (val.length > 15) val = val.substring(0, 12) + '...';
 
-              if (cell.f) {
+              // Check for formula in cell.f OR in value starting with "="
+              var formula = cell.f || (cell.v && typeof cell.v === 'string' && cell.v.startsWith('=') ? cell.v.substring(1) : null);
+              if (formula) {
                 // Store ALL formulas - this is critical for understanding
-                formulas.push(colLetter + (row + 1) + ': =' + cell.f);
+                formulas.push(colLetter + (row + 1) + ': =' + formula);
                 val = '[CALC]';
               }
               if (val) rowData.push(colLetter + ':' + val);
