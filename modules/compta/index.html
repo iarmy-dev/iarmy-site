@@ -265,6 +265,54 @@
     .recap-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
     .recap-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
 
+    .btn-add-kw {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,107,53,0.05) 100%);
+      border: 1px solid rgba(255,107,53,0.2);
+      color: #FF6B35;
+      font-size: 24px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px auto 0;
+    }
+    .btn-add-kw:hover {
+      transform: scale(1.1) rotate(90deg);
+      background: linear-gradient(135deg, rgba(255,107,53,0.3) 0%, rgba(255,107,53,0.15) 100%);
+      border-color: rgba(255,107,53,0.4);
+      box-shadow: 0 8px 24px rgba(255,107,53,0.25);
+    }
+    .btn-add-kw:active { transform: scale(0.95) rotate(90deg); }
+
+    .btn-add-rule {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(139,92,246,0.05) 100%);
+      border: 1px solid rgba(139,92,246,0.2);
+      color: #8B5CF6;
+      font-size: 20px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 12px auto 0;
+    }
+    .btn-add-rule:hover {
+      transform: scale(1.1) rotate(90deg);
+      background: linear-gradient(135deg, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0.15) 100%);
+      border-color: rgba(139,92,246,0.4);
+      box-shadow: 0 8px 24px rgba(139,92,246,0.25);
+    }
+    .btn-add-rule:active { transform: scale(0.95) rotate(90deg); }
+
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
 
@@ -441,7 +489,7 @@
         <span class="section-count" id="kw-count">0</span>
       </div>
       <div class="kw-grid" id="kw-grid"></div>
-      <button class="btn-add" onclick="showAddKwWarning()">+ Ajouter un mot-clé</button>
+      <button class="btn-add-kw" onclick="showAddKwWarning()" title="Ajouter un mot-clé">+</button>
       <div id="add-kw-hint" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; color: rgba(255,255,255,0.6); position: relative;">
         <button onclick="closeAddKwHint()" style="position: absolute; top: 6px; right: 8px; background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 14px; padding: 0; line-height: 1;">×</button>
         💡 <strong>Avant d'ajouter</strong> : crée d'abord la colonne dans ton <a href="#" id="hint-sheet-link" target="_blank" style="color: #4ade80;">Google Sheet</a>, puis reviens ici pour la linker.
@@ -455,7 +503,7 @@
         <span class="section-count" id="rules-count">0</span>
       </div>
       <div id="rules-list"></div>
-      <button class="btn-add" onclick="addRule()">+ Ajouter</button>
+      <button class="btn-add-rule" onclick="addRule()" title="Ajouter une règle">+</button>
     </div>
 
     <!-- Ordre du récap -->
@@ -822,6 +870,8 @@
       if (tg?.telegram_user_id) {
         tgEl.textContent = 'Connecté';
         tgEl.classList.remove('pending');
+      } else {
+        tgEl.innerHTML = '<a href="https://t.me/iarmy_bot?start=connect" target="_blank" style="color: #4ade80;">Connecter</a>';
       }
 
       // Charger les settings d'export
@@ -1246,6 +1296,7 @@
     function showAddKwWarning() {
       const hint = document.getElementById('add-kw-hint');
       const hintLink = document.getElementById('hint-sheet-link');
+      const btn = document.querySelector('.btn-add-kw');
 
       if (!addKwWarningShown) {
         // Premier clic : afficher le hint
@@ -1254,12 +1305,18 @@
           hintLink.href = `https://docs.google.com/spreadsheets/d/${config.sheet_id}/edit`;
         }
         addKwWarningShown = true;
-        // Changer le texte du bouton
-        document.querySelector('.btn-add').textContent = '+ J\'ai créé ma colonne, ajouter';
+        // Passer le bouton en vert (prêt)
+        btn.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(34,197,94,0.1) 100%)';
+        btn.style.borderColor = 'rgba(34,197,94,0.4)';
+        btn.style.color = '#4ade80';
       } else {
         // Deuxième clic : ajouter le mot-clé
         addKw();
         closeAddKwHint();
+        // Reset le style du bouton
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
       }
     }
 
