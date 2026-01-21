@@ -441,7 +441,6 @@
 
     <!-- Preview -->
     <div class="preview-card">
-      <input type="text" class="preview-input" id="test-input" placeholder="Teste: cb 200 esp 100 tr 50" oninput="updatePreview()">
       <div class="preview-row">
         <div class="preview-box">
           <div class="preview-label"><span class="preview-label-icon">💬</span> Telegram</div>
@@ -489,21 +488,6 @@
       <div id="recap-order-panel" style="display: none;">
         <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px;">Ordre d'affichage dans le récap Telegram</div>
         <div id="recap-order-list"></div>
-      </div>
-    </div>
-
-    <!-- Connexions -->
-    <div class="section">
-      <div class="section-title">Connexions</div>
-      <div style="display: flex; gap: 12px;">
-        <div class="conn-row" style="flex: 1; margin: 0;">
-          <span class="conn-label">Sheets</span>
-          <span class="conn-status pending" id="info-sheet">-</span>
-        </div>
-        <div class="conn-row" style="flex: 1; margin: 0;">
-          <span class="conn-label">Telegram</span>
-          <span class="conn-status pending" id="info-tg">-</span>
-        </div>
       </div>
     </div>
 
@@ -860,25 +844,14 @@
 
       render();
 
-      const sheetEl = document.getElementById('info-sheet');
-      const tgEl = document.getElementById('info-tg');
-
       if (cfg?.sheet_id) {
         const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
-        sheetEl.innerHTML = `<a href="${sheetUrl}" target="_blank">Ouvrir</a>`;
-        sheetEl.classList.remove('pending');
         document.getElementById('export-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
         // Afficher le lien rapide près du preview
         const sheetLink = document.getElementById('sheet-link');
         sheetLink.href = sheetUrl;
         sheetLink.style.display = 'block';
-      }
-      if (tg?.telegram_user_id) {
-        tgEl.textContent = 'Connecté';
-        tgEl.classList.remove('pending');
-      } else {
-        tgEl.innerHTML = '<a href="https://t.me/IArmyBOT?start=connect" target="_blank" style="color: #4ade80;">Connecter</a>';
       }
 
       // Charger les settings d'export
