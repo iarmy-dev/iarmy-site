@@ -6655,67 +6655,64 @@
           throw new Error('Non authentifie');
         }
 
-        var sheetId, sheetName;
-
-        // Check if user selected an existing sheet from chat
-        if (aiSelectedSheetData && aiSelectedSheetData.id) {
-          // Use the existing sheet
-          console.log('[AI] Using existing sheet:', aiSelectedSheetData.name);
-          sheetId = aiSelectedSheetData.id;
-          sheetName = aiSelectedSheetData.name;
-
-          // Show nice transition in chat
-          var chatMessages = document.getElementById('ai-chat-messages');
-          chatMessages.insertAdjacentHTML('beforeend', `
-            <div class="ai-message" style="display: flex; gap: 10px; align-items: flex-start;">
-              <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-              </div>
-              <div style="flex: 1; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 10px; padding: 12px;">
-                <p style="color: #4ade80; font-size: 13px; font-weight: 500; margin: 0;">Configuration enregistree !</p>
-                <p style="color: rgba(255,255,255,0.6); font-size: 12px; margin: 4px 0 0 0;">Redirection vers Telegram...</p>
-              </div>
+        // Show nice transition in chat
+        var chatMessages = document.getElementById('ai-chat-messages');
+        chatMessages.insertAdjacentHTML('beforeend', `
+          <div class="ai-message" style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div style="width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
             </div>
-          `);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+            <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 12px;">
+              <p style="color: rgba(255,255,255,0.9); font-size: 13px; margin: 0;">Creation de ton fichier iArmy...</p>
+            </div>
+          </div>
+        `);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
 
-          // Wait a bit for user to see the message
-          await new Promise(function(r) { setTimeout(r, 1500); });
+        // Always create a NEW iArmy sheet with the config
+        var customColumns = [];
+        aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
+          customColumns.push(col.nom);
+        });
 
-        } else {
-          // No existing sheet - create a new one
-          showLoader('Creation du Google Sheet...');
+        console.log('[AI] Creating NEW iArmy sheet with columns:', customColumns);
 
-          var customColumns = [];
-          aiGeneratedConfig.colonnes_a_remplir.forEach(function(col) {
-            customColumns.push(col.nom);
-          });
+        var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.data.session.access_token
+          },
+          body: JSON.stringify({
+            templateType: 'compta-pro',
+            year: new Date().getFullYear(),
+            customColumns: customColumns
+          })
+        });
 
-          console.log('[AI] Creating sheet with columns:', customColumns);
+        var result = await response.json();
 
-          var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + session.data.session.access_token
-            },
-            body: JSON.stringify({
-              templateType: 'compta-pro',
-              year: new Date().getFullYear(),
-              customColumns: customColumns
-            })
-          });
-
-          var result = await response.json();
-
-          if (!result.success || !result.sheet) {
-            throw new Error(result.error || 'Erreur creation Google Sheet');
-          }
-
-          console.log('[AI] Sheet created:', result.sheet.id);
-          sheetId = result.sheet.id;
-          sheetName = result.sheet.name;
+        if (!result.success || !result.sheet) {
+          throw new Error(result.error || 'Erreur creation Google Sheet');
         }
+
+        console.log('[AI] Sheet created:', result.sheet.id);
+        var sheetId = result.sheet.id;
+        var sheetName = result.sheet.name;
+
+        // Update chat with success
+        chatMessages.lastElementChild.innerHTML = `
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div style="flex: 1; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 10px; padding: 12px;">
+            <p style="color: #4ade80; font-size: 13px; font-weight: 500; margin: 0;">Fichier cree : ${sheetName}</p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 12px; margin: 4px 0 0 0;">Configuration de Telegram...</p>
+          </div>
+        `;
+
+        // Wait a bit for user to see the message
+        await new Promise(function(r) { setTimeout(r, 1200); });
 
         // Store in excelData for the flow
         excelData = {
