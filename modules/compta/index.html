@@ -452,7 +452,10 @@
         </div>
       </div>
       <div class="preview-rules" id="preview-rules" style="display: none;"></div>
-      <a id="sheet-link" href="#" target="_blank" style="display: none; margin-top: 12px; padding: 12px 20px; background: linear-gradient(135deg, rgba(15,157,88,0.15) 0%, rgba(15,157,88,0.08) 100%); backdrop-filter: blur(10px); border: 1px solid rgba(15,157,88,0.2); border-radius: 12px; color: #4ade80; font-size: 13px; font-weight: 500; text-decoration: none; text-align: center; box-shadow: 0 2px 8px rgba(15,157,88,0.1); transition: all 0.3s;">↗ Ouvrir Google Sheet</a>
+      <div id="preview-links" style="display: none; margin-top: 12px; gap: 8px; flex-wrap: wrap;">
+        <a id="sheet-link" href="#" target="_blank" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(15,157,88,0.15) 0%, rgba(15,157,88,0.08) 100%); border: 1px solid rgba(15,157,88,0.2); border-radius: 10px; color: #4ade80; font-size: 12px; font-weight: 500; text-decoration: none; text-align: center;">↗ Google Sheet</a>
+        <a id="tg-link" href="https://t.me/IArmyBOT" target="_blank" style="flex: 1; padding: 10px 16px; background: linear-gradient(135deg, rgba(42,171,238,0.15) 0%, rgba(42,171,238,0.08) 100%); border: 1px solid rgba(42,171,238,0.2); border-radius: 10px; color: #2AABEE; font-size: 12px; font-weight: 500; text-decoration: none; text-align: center;">↗ Telegram Bot</a>
+      </div>
     </div>
 
     <!-- Keywords -->
@@ -848,10 +851,9 @@
         const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
         document.getElementById('export-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
-        // Afficher le lien rapide près du preview
-        const sheetLink = document.getElementById('sheet-link');
-        sheetLink.href = sheetUrl;
-        sheetLink.style.display = 'block';
+        // Afficher les liens rapides
+        document.getElementById('sheet-link').href = sheetUrl;
+        document.getElementById('preview-links').style.display = 'flex';
       }
 
       // Charger les settings d'export
