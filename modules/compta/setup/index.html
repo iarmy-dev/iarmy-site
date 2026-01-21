@@ -6851,8 +6851,11 @@
         userMessage += tableRows.join('\n');
         userMessage += '\n\n';
 
+        console.log('[AI] Formulas detected:', formulas.length, formulas);
         if (formulas.length > 0) {
           userMessage += '=== TOUTES LES FORMULES ===\n' + formulas.join('\n') + '\n\n';
+        } else {
+          userMessage += '=== AUCUNE FORMULE DETECTEE ===\nLe fichier ne contient que des valeurs, pas de formules Excel.\n\n';
         }
 
         userMessage += 'Analyse ce fichier EN PROFONDEUR et explique-moi ce que tu comprends de ma compta.';
