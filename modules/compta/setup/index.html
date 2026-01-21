@@ -5915,72 +5915,53 @@
     var aiGeneratedConfig = null;
     var isAIMode = false;
 
-    // Voice recording
+    // Voice recording (WhatsApp style)
     var isRecording = false;
-    var recognition = null;
+    var mediaRecorder = null;
+    var audioChunks = [];
+    var recordingStartTime = null;
 
-    function initSpeechRecognition() {
-      var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        console.log('[AI] Speech recognition not supported');
-        return null;
-      }
+    async function toggleVoiceRecording() {
+      if (isRecording) {
+        // Stop recording
+        mediaRecorder.stop();
+      } else {
+        // Start recording
+        try {
+          var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          recordingStartTime = Date.now();
 
-      var rec = new SpeechRecognition();
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.lang = 'fr-FR';
+          mediaRecorder.ondataavailable = function(event) {
+            audioChunks.push(event.data);
+          };
 
-      rec.onstart = function() {
-        console.log('[AI] Voice recording started');
-        isRecording = true;
-        updateMicButton(true);
-      };
+          mediaRecorder.onstop = async function() {
+            // Stop all tracks
+            stream.getTracks().forEach(function(track) { track.stop(); });
 
-      rec.onend = function() {
-        console.log('[AI] Voice recording ended');
-        isRecording = false;
-        updateMicButton(false);
-      };
+            var duration = Math.round((Date.now() - recordingStartTime) / 1000);
+            var audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
 
-      rec.onerror = function(event) {
-        console.error('[AI] Speech recognition error:', event.error);
-        isRecording = false;
-        updateMicButton(false);
-        if (event.error === 'not-allowed') {
+            // Add voice message bubble to chat
+            addVoiceMessageBubble(audioBlob, duration);
+
+            // Send to Whisper for transcription, then to Claude
+            await processVoiceMessage(audioBlob);
+
+            isRecording = false;
+            updateMicButton(false);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          updateMicButton(true);
+
+        } catch (err) {
+          console.error('[AI] Microphone error:', err);
           showToast('Autorise le micro dans ton navigateur');
         }
-      };
-
-      rec.onresult = function(event) {
-        var transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        var input = document.getElementById('ai-chat-input');
-        input.value = transcript;
-        input.style.height = 'auto';
-        input.style.height = Math.min(input.scrollHeight, 150) + 'px';
-      };
-
-      return rec;
-    }
-
-    function toggleVoiceRecording() {
-      if (!recognition) {
-        recognition = initSpeechRecognition();
-        if (!recognition) {
-          showToast('Ton navigateur ne supporte pas la reconnaissance vocale');
-          return;
-        }
-      }
-
-      if (isRecording) {
-        recognition.stop();
-      } else {
-        // Clear input before starting
-        document.getElementById('ai-chat-input').value = '';
-        recognition.start();
       }
     }
 
@@ -5992,8 +5973,7 @@
         btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
         btn.style.border = '1px solid #ef4444';
         btn.style.animation = 'pulse-recording 1.5s infinite';
-        hint.textContent = 'Parle... (clique pour arreter)';
-        hint.style.color = '#ef4444';
+        hint.innerHTML = '<span style="color: #ef4444;">Enregistrement en cours... (clique pour envoyer)</span>';
 
         // Add pulse animation if not exists
         if (!document.getElementById('recording-animation-style')) {
@@ -6006,8 +5986,102 @@
         btn.style.background = 'rgba(255,255,255,0.05)';
         btn.style.border = '1px solid rgba(255,255,255,0.15)';
         btn.style.animation = 'none';
-        hint.textContent = 'Appuie sur Entree pour envoyer ou clique sur le micro';
-        hint.style.color = 'rgba(255,255,255,0.3)';
+        btn.style.boxShadow = 'none';
+        hint.innerHTML = 'Tape un message ou envoie un vocal';
+      }
+    }
+
+    function addVoiceMessageBubble(audioBlob, duration) {
+      var chatMessages = document.getElementById('ai-chat-messages');
+      var audioUrl = URL.createObjectURL(audioBlob);
+      var minutes = Math.floor(duration / 60);
+      var seconds = duration % 60;
+      var durationText = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+
+      var messageHtml = '<div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">' +
+        '<div style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px; padding: 10px 14px; max-width: 70%; display: flex; align-items: center; gap: 10px;">' +
+        '<button onclick="this.nextElementSibling.paused ? this.nextElementSibling.play() : this.nextElementSibling.pause(); this.innerHTML = this.nextElementSibling.paused ? \'<svg width=16 height=16 viewBox=\\'0 0 24 24\\' fill=\\'white\\'><polygon points=\\'5 3 19 12 5 21 5 3\\'/></svg>\' : \'<svg width=16 height=16 viewBox=\\'0 0 24 24\\' fill=\\'white\\'><rect x=6 y=4 width=4 height=16/><rect x=14 y=4 width=4 height=16/></svg>\'" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+        '</button>' +
+        '<audio src="' + audioUrl + '" style="display: none;"></audio>' +
+        '<div style="flex: 1;">' +
+        '<div style="height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative;">' +
+        '<div style="height: 100%; width: 0%; background: #a855f7; border-radius: 2px;"></div>' +
+        '</div>' +
+        '</div>' +
+        '<span style="font-size: 11px; color: rgba(255,255,255,0.5);">' + durationText + '</span>' +
+        '</div>' +
+        '</div>';
+
+      chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function processVoiceMessage(audioBlob) {
+      // Show typing indicator
+      var typingId = showTypingIndicator();
+
+      try {
+        // Get session
+        var session = await supabaseClient.auth.getSession();
+        if (!session.data.session) {
+          throw new Error('Non authentifie');
+        }
+
+        // Convert blob to base64
+        var reader = new FileReader();
+        var base64Audio = await new Promise(function(resolve) {
+          reader.onloadend = function() {
+            resolve(reader.result.split(',')[1]);
+          };
+          reader.readAsDataURL(audioBlob);
+        });
+
+        // Send to Whisper Edge Function
+        var response = await fetch(SUPABASE_URL + '/functions/v1/whisper-transcribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.data.session.access_token
+          },
+          body: JSON.stringify({
+            audio: base64Audio,
+            language: 'fr'
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Erreur transcription');
+        }
+
+        var result = await response.json();
+        var transcript = result.text;
+
+        console.log('[AI] Voice transcribed:', transcript);
+
+        // Add to conversation history (user won't see the text)
+        aiConversationHistory.push({ role: 'user', content: transcript });
+
+        // Now call Claude
+        var aiResponse = await callAIConfigAssistant(aiConversationHistory);
+
+        // Remove typing indicator
+        removeTypingIndicator(typingId);
+
+        // Add AI response to chat
+        addChatMessage(aiResponse.message, 'ai');
+        aiConversationHistory.push({ role: 'assistant', content: aiResponse.message });
+
+        // If config was generated, show preview
+        if (aiResponse.config) {
+          aiGeneratedConfig = aiResponse.config;
+          showAIConfigPreview(aiResponse.config);
+        }
+
+      } catch (error) {
+        console.error('[AI] Voice processing error:', error);
+        removeTypingIndicator(typingId);
+        addChatMessage("Desole, j'ai pas compris ton message vocal. Peux-tu reessayer ou taper ton message ?", 'ai');
       }
     }
 
