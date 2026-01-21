@@ -6425,8 +6425,143 @@
     }
 
     function formatAIResponse(text) {
-      // Convert newlines to <br> and escape HTML
-      return escapeHtml(text).replace(/\n/g, '<br>');
+      // Convert markdown-style formatting to HTML
+      var html = escapeHtml(text);
+      // Bold: **text**
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #a855f7;">$1</strong>');
+      // Newlines
+      html = html.replace(/\n/g, '<br>');
+      return html;
+    }
+
+    // Add chat message with typing effect - displays progressively
+    async function addChatMessageWithTyping(text, sender) {
+      var chatMessages = document.getElementById('ai-chat-messages');
+
+      // Create message container
+      var messageId = 'typing-msg-' + Date.now();
+      var messageHtml = `
+        <div id="${messageId}" class="ai-message" style="display: flex; gap: 12px; align-items: flex-start; opacity: 0; transition: opacity 0.3s ease;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83m-8.48 8.48l-2.83 2.83m0-14.14l2.83 2.83m8.48 8.48l2.83 2.83"/></svg>
+          </div>
+          <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 14px 16px;">
+            <div id="${messageId}-content" style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6;"></div>
+          </div>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+
+      // Fade in
+      var msgEl = document.getElementById(messageId);
+      setTimeout(function() { msgEl.style.opacity = '1'; }, 50);
+
+      var contentEl = document.getElementById(messageId + '-content');
+      var formattedText = formatAIResponse(text);
+
+      // Split into paragraphs/sections for progressive display
+      var sections = formattedText.split(/<br><br>|<br>(?=<strong>)/);
+
+      for (var i = 0; i < sections.length; i++) {
+        var section = sections[i].trim();
+        if (!section) continue;
+
+        // Add section with fade effect
+        var sectionEl = document.createElement('div');
+        sectionEl.style.cssText = 'opacity: 0; transition: opacity 0.3s ease; margin-bottom: 8px;';
+        sectionEl.innerHTML = section;
+        contentEl.appendChild(sectionEl);
+
+        // Scroll to show new content
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Fade in after small delay
+        await new Promise(function(resolve) {
+          setTimeout(function() {
+            sectionEl.style.opacity = '1';
+            resolve();
+          }, 80);
+        });
+
+        // Small pause between sections
+        if (i < sections.length - 1) {
+          await new Promise(function(resolve) { setTimeout(resolve, 150); });
+        }
+      }
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Progress indicator with animated steps
+    var progressSteps = [
+      { text: "Lecture du fichier...", duration: 800 },
+      { text: "Analyse de la structure...", duration: 1200 },
+      { text: "Detection des formules...", duration: 1000 },
+      { text: "Reflexion en cours...", duration: 0 }
+    ];
+    var currentProgressInterval = null;
+
+    function showProgressIndicator() {
+      var id = 'progress-' + Date.now();
+      var chatMessages = document.getElementById('ai-chat-messages');
+      var html = `
+        <div id="${id}" class="ai-message" style="display: flex; gap: 12px; align-items: flex-start;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div style="width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          </div>
+          <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 14px 16px;">
+            <p id="${id}-text" style="color: rgba(255,255,255,0.85); font-size: 14px; margin: 0; transition: opacity 0.3s ease;">${progressSteps[0].text}</p>
+          </div>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML('beforeend', html);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Animate through steps
+      var stepIndex = 0;
+      var totalDelay = 0;
+
+      function showNextStep() {
+        stepIndex++;
+        if (stepIndex >= progressSteps.length) return;
+
+        var textEl = document.getElementById(id + '-text');
+        if (!textEl) return;
+
+        // Fade out
+        textEl.style.opacity = '0';
+        setTimeout(function() {
+          if (!textEl) return;
+          textEl.textContent = progressSteps[stepIndex].text;
+          // Fade in
+          textEl.style.opacity = '1';
+
+          // Schedule next step
+          if (stepIndex < progressSteps.length - 1 && progressSteps[stepIndex].duration > 0) {
+            currentProgressInterval = setTimeout(showNextStep, progressSteps[stepIndex].duration);
+          }
+        }, 300);
+      }
+
+      // Start animation
+      if (progressSteps[0].duration > 0) {
+        currentProgressInterval = setTimeout(showNextStep, progressSteps[0].duration);
+      }
+
+      return id;
+    }
+
+    function removeProgressIndicator(id) {
+      if (currentProgressInterval) {
+        clearTimeout(currentProgressInterval);
+        currentProgressInterval = null;
+      }
+      var el = document.getElementById(id);
+      if (el) {
+        el.style.transition = 'opacity 0.3s ease';
+        el.style.opacity = '0';
+        setTimeout(function() { if (el) el.remove(); }, 300);
+      }
     }
 
     function showTypingIndicator() {
@@ -6565,8 +6700,8 @@
       // Show file bubble in chat
       addFileBubble(file.name);
 
-      // Show typing indicator
-      var typingId = showTypingIndicator();
+      // Show progress indicator with steps
+      var progressId = showProgressIndicator();
 
       try {
         // Parse Excel file
@@ -6649,10 +6784,10 @@
         // Call Claude to analyze and generate config
         var aiResponse = await callAIConfigAssistant(aiConversationHistory);
 
-        removeTypingIndicator(typingId);
+        removeProgressIndicator(progressId);
 
-        // Add AI response to chat
-        addChatMessage(aiResponse.message, 'ai');
+        // Add AI response to chat with typing effect
+        await addChatMessageWithTyping(aiResponse.message, 'ai');
         aiConversationHistory.push({ role: 'assistant', content: aiResponse.message });
 
         // If config was generated, show preview
@@ -6663,8 +6798,8 @@
 
       } catch (error) {
         console.error('[AI] File parse error:', error);
-        removeTypingIndicator(typingId);
-        addChatMessage('Desole, je n\'arrive pas a lire ce fichier. Peux-tu m\'expliquer ta compta a la place ?', 'ai');
+        removeProgressIndicator(progressId);
+        addChatMessage('Desole, je n\'arrive pas a lire ce fichier. ' + error.message, 'ai');
       }
 
       // Reset file input
