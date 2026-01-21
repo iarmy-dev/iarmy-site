@@ -1536,24 +1536,33 @@
       const sheetEl = document.getElementById('preview-sheet');
       const rulesEl = document.getElementById('preview-rules');
 
-      // 1. Afficher exemple de message Telegram
-      const kwNames = keywords.filter(k => k.nom).map(k => k.nom.toLowerCase());
-      const exampleMsg = kwNames.length > 0 ? kwNames.slice(0, 3).join(' 100 ') + ' 100' : '';
-      tgEl.innerHTML = kwNames.length > 0 ? `<div class="tg-bubble">${exampleMsg}</div>` : '<span class="empty-state">Configure tes mots-clés</span>';
-
-      // 2. Vérifier si on a des mots-clés configurés
+      // 1. Générer des valeurs cohérentes pour Telegram et Excel
       const activeKeywords = keywords.filter(k => k.nom && k.colonne);
 
       if (activeKeywords.length === 0) {
+        tgEl.innerHTML = '<span class="empty-state">Configure tes mots-clés</span>';
         sheetEl.innerHTML = '<span class="empty-state">Configure tes mots-clés</span>';
         rulesEl.style.display = 'none';
         return;
       }
 
-      // 3. Construire le mini Excel avec valeurs exemples
-      const amounts = [200, 150, 80, 50, 120, 90, 75];
+      // Valeurs exemples cohérentes
+      const exampleValues = [200, 150, 100];
+      const examples = activeKeywords.slice(0, 3).map((k, i) => ({
+        nom: k.nom.toLowerCase(),
+        val: exampleValues[i] || 100
+      }));
+
+      // Message Telegram
+      const exampleMsg = examples.map(e => `${e.nom} ${e.val}`).join(' ');
+      tgEl.innerHTML = `<div class="tg-bubble">${exampleMsg}</div>`;
+
+      // Excel avec les mêmes valeurs
       const headerCells = activeKeywords.map(k => `<span>${k.colonne}</span>`).join('');
-      const valueCells = activeKeywords.map((k, i) => `<span>${amounts[i % amounts.length]}</span>`).join('');
+      const valueCells = activeKeywords.map((k, i) => {
+        const val = i < examples.length ? examples[i].val : '-';
+        return `<span>${val}</span>`;
+      }).join('');
       const labelCells = activeKeywords.map(k => {
         const displayName = k.nom.length > 8 ? k.nom.substring(0, 7) + '…' : k.nom;
         return `<span title="${k.nom}" style="background:#f5f5f5;color:#666;font-size:9px;">${displayName}</span>`;
