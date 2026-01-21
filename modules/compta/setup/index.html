@@ -6467,10 +6467,14 @@
 
     async function callAIConfigAssistant(history) {
       // Call Supabase Edge Function that wraps Claude API
+      // First refresh session to ensure token is valid
+      await supabaseClient.auth.refreshSession();
       var session = await supabaseClient.auth.getSession();
       if (!session.data.session) {
-        throw new Error('Non authentifie');
+        throw new Error('Non authentifie - reconnecte-toi');
       }
+
+      console.log('[AI] Calling API with token:', session.data.session.access_token.substring(0, 20) + '...');
 
       var response = await fetch(SUPABASE_URL + '/functions/v1/ai-config-assistant', {
         method: 'POST',
