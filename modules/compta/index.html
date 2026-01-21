@@ -1255,6 +1255,39 @@
       render();
       markAsModified();
     }
+    // Aliases par défaut selon le nom du mot-clé
+    function getDefaultAliases(name) {
+      const n = name.toLowerCase().trim();
+      const base = [n];
+
+      // CB - Carte Bancaire
+      if (n === 'cb' || n === 'carte bancaire' || n === 'cartebancaire') {
+        return [...new Set([...base, 'cb', 'carte', 'carte bancaire', 'carte bleue', 'cartebleue', 'cartebancaire', 'visa', 'mastercard', 'card'])];
+      }
+      // TR - Ticket Restaurant
+      if (n === 'tr' || n === 'ticket' || n === 'ticket resto' || n === 'ticketresto' || n === 'ticket restaurant') {
+        return [...new Set([...base, 'tr', 'ticket', 'tickets', 'ticket resto', 'ticket restaurant', 'ticketresto', 'ticketrestaurant'])];
+      }
+      // ESP - Espèces
+      if (n === 'esp' || n === 'especes' || n === 'espèces' || n === 'cash') {
+        return [...new Set([...base, 'esp', 'espèces', 'especes', 'espece', 'cash', 'liquide', 'liquid'])];
+      }
+      // DEP - Dépenses
+      if (n === 'dep' || n === 'depenses' || n === 'dépenses' || n === 'depense' || n === 'dépense') {
+        return [...new Set([...base, 'dep', 'dépense', 'depense', 'dépenses', 'depenses', 'frais'])];
+      }
+      // RAZ - Remise à zéro / Caisse
+      if (n === 'raz' || n === 'caisse' || n === 'z') {
+        return [...new Set([...base, 'raz', 'caisse', 'z', 'fond de caisse', 'recette', 'recettes'])];
+      }
+      // TOTAL
+      if (n === 'total' || n === 'tot') {
+        return [...new Set([...base, 'total', 'tot', 'somme'])];
+      }
+
+      return base;
+    }
+
     // Validation des conflits de mots-clés/aliases
     function checkKeywordConflict(value, excludeIndex = -1) {
       const normalized = value.trim().toLowerCase();
@@ -1299,7 +1332,8 @@
         }
 
         keywords[i].nom = v;
-        keywords[i].aliases = [v.toLowerCase()];
+        // Utiliser les aliases par défaut si disponibles
+        keywords[i].aliases = getDefaultAliases(v);
       }
       else if (f === 'colonne') {
         // Avertir si on change une colonne déjà configurée (données existantes)

@@ -2936,6 +2936,51 @@
       }
     }
 
+    // Aliases par défaut selon le nom du mot-clé
+    function getDefaultAliases(name) {
+      var n = name.toLowerCase().trim();
+      var base = [n]; // Toujours inclure le nom lui-même
+
+      // CB - Carte Bancaire
+      if (n === 'cb' || n === 'carte bancaire' || n === 'cartebancaire') {
+        return [...base, 'cb', 'carte', 'carte bancaire', 'carte bleue', 'cartebleue', 'cartebancaire', 'visa', 'mastercard', 'card'];
+      }
+      // TR - Ticket Restaurant
+      if (n === 'tr' || n === 'ticket' || n === 'ticket resto' || n === 'ticketresto' || n === 'ticket restaurant') {
+        return [...base, 'tr', 'ticket', 'tickets', 'ticket resto', 'ticket restaurant', 'ticketresto', 'ticketrestaurant'];
+      }
+      // ESP - Espèces
+      if (n === 'esp' || n === 'especes' || n === 'espèces' || n === 'cash') {
+        return [...base, 'esp', 'espèces', 'especes', 'espece', 'cash', 'liquide', 'liquid'];
+      }
+      // DEP - Dépenses
+      if (n === 'dep' || n === 'depenses' || n === 'dépenses' || n === 'depense' || n === 'dépense') {
+        return [...base, 'dep', 'dépense', 'depense', 'dépenses', 'depenses', 'frais'];
+      }
+      // RAZ - Remise à zéro / Caisse
+      if (n === 'raz' || n === 'caisse' || n === 'z') {
+        return [...base, 'raz', 'caisse', 'z', 'fond de caisse', 'recette', 'recettes'];
+      }
+      // TOTAL
+      if (n === 'total' || n === 'tot') {
+        return [...base, 'total', 'tot', 'somme'];
+      }
+
+      // Pas de défaut connu, juste le nom
+      return base;
+    }
+
+    // Dédupliquer les aliases (enlever les doublons)
+    function uniqueAliases(aliases) {
+      var seen = {};
+      return aliases.filter(function(a) {
+        var low = a.toLowerCase();
+        if (seen[low]) return false;
+        seen[low] = true;
+        return true;
+      });
+    }
+
     // Validation des conflits de colonnes/aliases
     function checkColumnConflict(value, excludeIndex) {
       var normalized = value.trim().toLowerCase();
@@ -3002,7 +3047,8 @@
         }
 
         col.name = trimmed;
-        col.aliases = [trimmed.toLowerCase()];
+        // Utiliser les aliases par défaut si disponibles
+        col.aliases = uniqueAliases(getDefaultAliases(trimmed));
         hasUnsavedChanges = true;
       }
       renderSheetEditor();
