@@ -6852,7 +6852,16 @@
           customColumns.push(col.nom);
         });
 
+        // Extract calculation rules
+        var calculationRules = [];
+        if (aiGeneratedConfig.regles_calcul) {
+          calculationRules = aiGeneratedConfig.regles_calcul.map(function(rule) {
+            return { target: rule.target, formula: rule.formula };
+          });
+        }
+
         console.log('[AI] Creating NEW iArmy sheet with columns:', customColumns);
+        console.log('[AI] With calculation rules:', calculationRules);
 
         var response = await fetch(SUPABASE_URL + '/functions/v1/create-template-sheet', {
           method: 'POST',
@@ -6863,7 +6872,8 @@
           body: JSON.stringify({
             templateType: 'compta-pro',
             year: new Date().getFullYear(),
-            customColumns: customColumns
+            customColumns: customColumns,
+            calculationRules: calculationRules
           })
         });
 
