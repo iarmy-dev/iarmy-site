@@ -6312,13 +6312,23 @@
         var headers = [];
         var formulas = [];
 
-        for (var col = range.s.c; col <= Math.min(range.e.c, 15); col++) {
-          for (var row = 0; row <= Math.min(5, range.e.r); row++) {
+        // Known short column names to accept
+        var knownShortNames = ['cb', 'tr', 'esp', 'ca', 'ht', 'ttc', 'tva', 'dep'];
+
+        for (var col = range.s.c; col <= Math.min(range.e.c, 20); col++) {
+          for (var row = 0; row <= Math.min(8, range.e.r); row++) {
             var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-            if (cell && cell.v && typeof cell.v === 'string' && cell.v.length > 0 && cell.v.length < 30) {
+            if (cell && cell.v && typeof cell.v === 'string') {
               var name = cell.v.trim();
-              if (name && !headers.includes(name) && !/^\d+$/.test(name)) {
-                headers.push(name);
+              // Skip empty, too long, pure numbers, or single letters (unless known)
+              var isKnown = knownShortNames.includes(name.toLowerCase());
+              var isValidLength = name.length >= 3 && name.length < 30;
+              var isTwoCharValid = name.length === 2 && isKnown;
+
+              if (name && !headers.includes(name) && !/^\d+$/.test(name) && !/^[A-Z]$/i.test(name)) {
+                if (isValidLength || isTwoCharValid || isKnown) {
+                  headers.push(name);
+                }
               }
             }
             if (cell && cell.f) {
