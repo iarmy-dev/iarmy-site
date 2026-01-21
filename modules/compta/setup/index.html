@@ -6866,8 +6866,31 @@
           file: file
         };
 
+        // Build column mapping from header row
+        var columnMapping = [];
+        if (headerRow >= 0) {
+          for (var col = 0; col <= maxCol; col++) {
+            var cell = sheet[XLSX.utils.encode_cell({ r: headerRow, c: col })];
+            if (cell && cell.v) {
+              var colLetter = XLSX.utils.encode_col(col);
+              var name = String(cell.v).trim();
+              if (name && name.length < 20) {
+                columnMapping.push(colLetter + ' = ' + name);
+              }
+            }
+          }
+        }
+
         // Build comprehensive message for Claude
         var userMessage = 'Voici mon fichier Excel "' + file.name + '" (onglet: ' + sheetName + ').\n\n';
+
+        // Add explicit column mapping first
+        if (columnMapping.length > 0) {
+          userMessage += '=== MAPPING COLONNES (IMPORTANT - utilise ces NOMS pas les lettres) ===\n';
+          userMessage += columnMapping.join('\n');
+          userMessage += '\n\n';
+        }
+
         userMessage += '=== TABLEAU COMPLET ===\n';
         userMessage += tableRows.join('\n');
         userMessage += '\n\n';
