@@ -233,38 +233,6 @@
     .alias-input:focus { outline: none; border-color: #4ade80; }
     .alias-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    /* Ordre récap */
-    .recap-order-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-      margin-bottom: 6px;
-    }
-    .recap-order-item:last-child { margin-bottom: 0; }
-    .recap-order-name { font-size: 13px; font-weight: 600; }
-    .recap-order-btns { display: flex; gap: 4px; }
-    .recap-order-btn {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      color: rgba(255,255,255,0.4);
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .recap-order-btn:hover { background: rgba(255,107,53,0.2); color: #FF8B5E; border-color: rgba(255,107,53,0.3); }
-    .recap-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    .recap-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
-
     .btn-add-kw, .btn-add-rule {
       width: 32px;
       height: 32px;
@@ -480,26 +448,6 @@
       </div>
       <div id="rules-list"></div>
       <button class="btn-add-rule" onclick="addRule()" title="Ajouter une règle">+</button>
-    </div>
-
-    <!-- Ordre du récap Telegram -->
-    <div class="section">
-      <div class="section-header" style="cursor: pointer;" onclick="toggleRecapOrder()">
-        <div class="section-title">📱 Récap Telegram<span class="section-badge">ordre</span></div>
-        <span id="recap-toggle" style="font-size: 12px; color: rgba(255,255,255,0.4);">▼</span>
-      </div>
-      <div id="recap-order-panel" style="display: none;">
-        <!-- Aperçu du récap -->
-        <div style="background: rgba(42,171,238,0.08); border: 1px solid rgba(42,171,238,0.2); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
-          <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; text-transform: uppercase;">Aperçu du récap</div>
-          <div id="recap-preview" style="font-size: 12px; color: white; line-height: 1.6;">
-            <!-- Généré dynamiquement -->
-          </div>
-        </div>
-        <!-- Liste de réordonnancement -->
-        <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 8px;">Réorganise l'ordre d'affichage :</div>
-        <div id="recap-order-list"></div>
-      </div>
     </div>
 
     <!-- Export Comptable -->
@@ -1160,7 +1108,6 @@
     function render() {
       renderKw();
       renderRules();
-      renderRecapOrder();
       updatePreview();
       updateCounts();
       updatePlaceholder();
@@ -1340,60 +1287,6 @@
       markAsModified();
     }
     function delKw(i) { keywords.splice(i, 1); render(); markAsModified(); }
-
-    function moveKw(i, dir) {
-      const newIndex = i + dir;
-      if (newIndex < 0 || newIndex >= keywords.length) return;
-      const temp = keywords[i];
-      keywords[i] = keywords[newIndex];
-      keywords[newIndex] = temp;
-      render();
-      markAsModified();
-    }
-
-    // Ordre récap
-    function toggleRecapOrder() {
-      const panel = document.getElementById('recap-order-panel');
-      const toggle = document.getElementById('recap-toggle');
-      if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        toggle.textContent = '▲';
-      } else {
-        panel.style.display = 'none';
-        toggle.textContent = '▼';
-      }
-    }
-
-    function renderRecapOrder() {
-      const validKw = keywords.filter(k => k.nom);
-      const recapPreview = document.getElementById('recap-preview');
-      const recapList = document.getElementById('recap-order-list');
-
-      if (validKw.length === 0) {
-        recapPreview.innerHTML = '<span style="color: rgba(255,255,255,0.3);">Configure tes mots-clés</span>';
-        recapList.innerHTML = '<div style="font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 12px;">Ajoute des mots-clés d\'abord</div>';
-        return;
-      }
-
-      // Générer l'aperçu du récap comme dans Telegram
-      const exampleValues = [200, 150, 100, 80, 60, 50];
-      const recapItems = validKw.map((k, i) => {
-        const val = exampleValues[i] || 50;
-        return `<strong>${k.nom}:</strong> ${val}€`;
-      });
-      recapPreview.innerHTML = `📊 ${recapItems.join(' • ')}<br><span style="color: #4ade80;">💰 <strong>TOTAL: ${recapItems.length > 0 ? '450€' : '0€'}</strong></span>`;
-
-      // Liste de réordonnancement
-      recapList.innerHTML = validKw.map((k, i) => `
-        <div class="recap-order-item">
-          <span class="recap-order-name">${k.nom}</span>
-          <div class="recap-order-btns">
-            <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},-1)" ${i === 0 ? 'disabled' : ''}>▲</button>
-            <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},1)" ${i === validKw.length - 1 ? 'disabled' : ''}>▼</button>
-          </div>
-        </div>
-      `).join('');
-    }
 
     // Aliases
     function showAliasInput(i) {
