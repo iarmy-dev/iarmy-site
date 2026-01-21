@@ -759,11 +759,27 @@
           return {
             terms: r.sources.map((s, idx) => ({
               name: s,
-              // operations[0] = entre source[0] et source[1], donc décalage de 1
               op: idx === 0 ? '+' : (r.operations && r.operations[idx - 1] ? r.operations[idx - 1] : '+')
             })),
             target: r.target || ''
           };
+        }
+        // Format AI avec formula string (ex: "CB + ESP + TR")
+        if (r.formula && typeof r.formula === 'string') {
+          const parts = r.formula.split(/\s*([\+\-\*\/])\s*/);
+          const terms = [];
+          let currentOp = '+';
+          for (const part of parts) {
+            const p = part.trim();
+            if (p === '+' || p === '-' || p === '*' || p === '/') {
+              currentOp = p;
+            } else if (p) {
+              terms.push({ name: p, op: currentOp });
+              currentOp = '+';
+            }
+          }
+          if (terms.length > 0) terms[0].op = '+'; // First term always +
+          return { terms: terms.length > 0 ? terms : [{ name: '', op: '+' }], target: r.target || '' };
         }
         return { terms: [{ name: '', op: '+' }], target: '' };
       });
