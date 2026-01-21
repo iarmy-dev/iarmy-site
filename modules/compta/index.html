@@ -626,7 +626,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let config = null, keywords = [], rules = [], sheetHeaders = {}, exportSettings = {};
+    let config = null, keywords = [], rules = [], sheetHeaders = {}, exportSettings = {}, protectedColumns = [];
     let userEmail = '';
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let hasUnsavedChanges = false;
@@ -783,6 +783,9 @@
         }
         return { terms: [{ name: '', op: '+' }], target: '' };
       });
+
+      // Charger les colonnes protégées (calculées)
+      protectedColumns = cfg?.excel_config?.colonnes_protegees || [];
 
       // Ajouter mot-clé TOTAL automatiquement s'il n'existe pas (en dernier)
       const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
@@ -1184,6 +1187,8 @@
 
     function renderRules() {
       const names = keywords.map(k => k.nom).filter(n => n);
+      // Combiner keywords et colonnes protégées pour les cibles (sans doublons)
+      const allTargets = [...new Set([...names, ...protectedColumns])];
 
       document.getElementById('rules-list').innerHTML = rules.map((r, i) => {
         const termsHtml = r.terms.map((t, j) => {
@@ -1214,7 +1219,7 @@
               <span class="rule-arrow">=</span>
               <select class="rule-select" onchange="updRuleTarget(${i},this.value)">
                 <option value="">cible</option>
-                ${names.map(n => `<option value="${n}" ${r.target === n ? 'selected' : ''}>${n}</option>`).join('')}
+                ${allTargets.map(n => `<option value="${n}" ${r.target === n ? 'selected' : ''}>${n}</option>`).join('')}
               </select>
               <button class="rule-del-btn" onclick="delRule(${i})" title="Supprimer">×</button>
             </div>
