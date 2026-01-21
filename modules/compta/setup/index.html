@@ -1365,22 +1365,15 @@
           <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid rgba(168, 85, 247, 0.2);">
 
             <!-- Chat Messages -->
-            <div id="ai-chat-messages" style="height: 400px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div id="ai-chat-messages" style="height: 350px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
               <!-- Message de bienvenue de l'IA -->
-              <div class="ai-message" style="display: flex; gap: 12px; align-items: flex-start;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83m-8.48 8.48l-2.83 2.83m0-14.14l2.83 2.83m8.48 8.48l2.83 2.83"/></svg>
+              <div class="ai-message" style="display: flex; gap: 10px; align-items: flex-start;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #a855f7, #7c3aed); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2"/></svg>
                 </div>
-                <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 14px 16px;">
-                  <p style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6; margin: 0;">
-                    Salut ! Je suis la pour t'aider a configurer ton module compta.
-                    <br><br>
-                    <strong>Explique-moi simplement :</strong>
-                    <br>• Quelles colonnes tu utilises (CB, Especes, Tickets resto, etc.)
-                    <br>• Si tu as des calculs automatiques (ex: TOTAL = CB + ESP)
-                    <br>• Si certaines colonnes ne doivent pas etre modifiees
-                    <br><br>
-                    <em style="color: rgba(255,255,255,0.5);">Exemple : "J'ai CB, Especes et Tickets. Le Total se calcule automatiquement."</em>
+                <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 12px 14px;">
+                  <p style="color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.5; margin: 0;">
+                    Hello ! Envoie-moi ton fichier Excel pour que je l'analyse, ou explique-moi simplement ta compta.
                   </p>
                 </div>
               </div>
@@ -1389,10 +1382,20 @@
             <!-- Input Area -->
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding: 16px; background: rgba(0,0,0,0.2);">
               <div style="display: flex; gap: 10px; align-items: flex-end;">
-                <textarea id="ai-chat-input" placeholder="Decris ton workflow ici..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px; resize: none; height: 52px; outline: none; font-family: inherit;" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendAIMessage(); }"></textarea>
+                <!-- File upload button -->
+                <button onclick="document.getElementById('ai-file-input').click()" id="ai-file-btn" style="width: 44px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" title="Ajouter un fichier Excel">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                  </svg>
+                </button>
+                <input type="file" id="ai-file-input" accept=".xlsx,.xls" style="display: none;" onchange="handleAIFileUpload(event)">
+                <textarea id="ai-chat-input" placeholder="Decris ton workflow ou ajoute un fichier..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: white; font-size: 14px; resize: none; height: 52px; outline: none; font-family: inherit;" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendAIMessage(); }"></textarea>
                 <!-- Microphone button -->
-                <button onclick="toggleVoiceRecording()" id="ai-mic-btn" style="width: 52px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="if(!isRecording) this.style.background='rgba(255,255,255,0.05)'">
-                  <svg id="mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button onclick="toggleVoiceRecording()" id="ai-mic-btn" style="width: 44px; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="if(!isRecording) this.style.background='rgba(255,255,255,0.05)'">
+                  <svg id="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                     <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -1404,7 +1407,7 @@
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
               </div>
-              <p id="ai-input-hint" style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; text-align: center;">Appuie sur Entree pour envoyer ou clique sur le micro</p>
+              <p id="ai-input-hint" style="font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; text-align: center;">Tape, parle ou ajoute ton fichier Excel</p>
             </div>
           </div>
 
@@ -6080,14 +6083,7 @@
           </div>
           <div style="flex: 1; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 14px 16px;">
             <p style="color: rgba(255,255,255,0.9); font-size: 14px; line-height: 1.6; margin: 0;">
-              Salut ! Je suis la pour t'aider a configurer ton module compta.
-              <br><br>
-              <strong>Explique-moi simplement :</strong>
-              <br>• Quelles colonnes tu utilises (CB, Especes, Tickets resto, etc.)
-              <br>• Si tu as des calculs automatiques (ex: TOTAL = CB + ESP)
-              <br>• Si certaines colonnes ne doivent pas etre modifiees
-              <br><br>
-              <em style="color: rgba(255,255,255,0.5);">Exemple : "J'ai CB, Especes et Tickets. Le Total se calcule automatiquement."</em>
+              Hello ! Envoie-moi ton fichier Excel pour que je l'analyse, ou explique-moi simplement ta compta.
             </p>
           </div>
         </div>
@@ -6286,6 +6282,98 @@
       var input = document.getElementById('ai-chat-input');
       input.focus();
       input.placeholder = "Dis-moi ce que tu veux modifier...";
+    }
+
+    // Handle Excel file upload in AI chat
+    var aiUploadedFileData = null;
+
+    async function handleAIFileUpload(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+
+      console.log('[AI] File uploaded:', file.name);
+
+      // Show file bubble in chat
+      addFileBubble(file.name);
+
+      // Show typing indicator
+      var typingId = showTypingIndicator();
+
+      try {
+        // Parse Excel file
+        var arrayBuffer = await file.arrayBuffer();
+        var workbook = XLSX.read(arrayBuffer, { type: 'array', cellFormula: true });
+
+        // Extract info from first sheet
+        var sheetName = workbook.SheetNames[0];
+        var sheet = workbook.Sheets[sheetName];
+        var range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+
+        // Find headers (first few rows)
+        var headers = [];
+        var formulas = [];
+
+        for (var col = range.s.c; col <= Math.min(range.e.c, 15); col++) {
+          for (var row = 0; row <= Math.min(5, range.e.r); row++) {
+            var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
+            if (cell && cell.v && typeof cell.v === 'string' && cell.v.length > 0 && cell.v.length < 30) {
+              var name = cell.v.trim();
+              if (name && !headers.includes(name) && !/^\d+$/.test(name)) {
+                headers.push(name);
+              }
+            }
+            if (cell && cell.f) {
+              formulas.push(XLSX.utils.encode_col(col) + ': ' + cell.f);
+            }
+          }
+        }
+
+        // Store for later use
+        aiUploadedFileData = {
+          fileName: file.name,
+          sheetName: sheetName,
+          headers: headers.slice(0, 15),
+          formulas: formulas.slice(0, 10),
+          file: file
+        };
+
+        // Build message for Claude
+        var fileInfo = 'J\'ai analyse le fichier "' + file.name + '".\n';
+        if (headers.length > 0) {
+          fileInfo += 'Colonnes detectees: ' + headers.join(', ') + '\n';
+        }
+        if (formulas.length > 0) {
+          fileInfo += 'Formules: ' + formulas.slice(0, 5).join(', ');
+        }
+
+        // Add to conversation
+        aiConversationHistory.push({ role: 'user', content: '[Fichier Excel uploade: ' + file.name + ']' });
+        aiConversationHistory.push({ role: 'assistant', content: fileInfo });
+
+        removeTypingIndicator(typingId);
+
+        // Add AI response
+        addChatMessage('J\'ai analyse ton fichier ! Je vois ' + headers.length + ' colonnes: ' + headers.slice(0, 5).join(', ') + (headers.length > 5 ? '...' : '') + '\n\nC\'est bien ca ? Tu veux que je cree ta config avec ces colonnes ?', 'ai');
+
+      } catch (error) {
+        console.error('[AI] File parse error:', error);
+        removeTypingIndicator(typingId);
+        addChatMessage('Desole, je n\'arrive pas a lire ce fichier. Peux-tu m\'expliquer ta compta a la place ?', 'ai');
+      }
+
+      // Reset file input
+      event.target.value = '';
+    }
+
+    function addFileBubble(fileName) {
+      var chatMessages = document.getElementById('ai-chat-messages');
+      var html = '<div style="display: flex; justify-content: flex-end;">' +
+        '<div style="background: rgba(33, 115, 70, 0.2); border: 1px solid rgba(33, 115, 70, 0.3); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 8px;">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="#4ade80"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#4ade80" stroke-width="2"/><line x1="3" y1="9" x2="21" y2="9" stroke="#4ade80" stroke-width="1.5"/><line x1="9" y1="3" x2="9" y2="21" stroke="#4ade80" stroke-width="1.5"/></svg>' +
+        '<span style="font-size: 13px; color: #4ade80;">' + escapeHtml(fileName) + '</span>' +
+        '</div></div>';
+      chatMessages.insertAdjacentHTML('beforeend', html);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     async function acceptAIConfig() {
