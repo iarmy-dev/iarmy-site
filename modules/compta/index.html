@@ -233,29 +233,37 @@
     .alias-input:focus { outline: none; border-color: #4ade80; }
     .alias-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    /* Boutons ordre */
-    .kw-order-btns {
+    /* Ordre récap */
+    .recap-order-item {
       display: flex;
-      flex-direction: column;
-      gap: 2px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      margin-bottom: 6px;
     }
-    .kw-order-btn {
+    .recap-order-item:last-child { margin-bottom: 0; }
+    .recap-order-name { font-size: 13px; font-weight: 600; }
+    .recap-order-btns { display: flex; gap: 4px; }
+    .recap-order-btn {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 4px;
-      width: 22px;
-      height: 18px;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
       color: rgba(255,255,255,0.4);
-      font-size: 10px;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
     }
-    .kw-order-btn:hover { background: rgba(255,107,53,0.2); color: #FF8B5E; border-color: rgba(255,107,53,0.3); }
-    .kw-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    .kw-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
+    .recap-order-btn:hover { background: rgba(255,107,53,0.2); color: #FF8B5E; border-color: rgba(255,107,53,0.3); }
+    .recap-order-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    .recap-order-btn:disabled:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
 
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
     .btn-add:hover { border-color: #FF6B35; color: #FF8B5E; }
@@ -448,6 +456,18 @@
       </div>
       <div id="rules-list"></div>
       <button class="btn-add" onclick="addRule()">+ Ajouter</button>
+    </div>
+
+    <!-- Ordre du récap -->
+    <div class="section">
+      <div class="section-header" style="cursor: pointer;" onclick="toggleRecapOrder()">
+        <div class="section-title">Ordre du recap<span class="section-badge">optionnel</span></div>
+        <span id="recap-toggle" style="font-size: 12px; color: rgba(255,255,255,0.4);">▼</span>
+      </div>
+      <div id="recap-order-panel" style="display: none;">
+        <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 10px;">Ordre d'affichage dans le récap Telegram</div>
+        <div id="recap-order-list"></div>
+      </div>
     </div>
 
     <!-- Connexions -->
@@ -1100,6 +1120,7 @@
     function render() {
       renderKw();
       renderRules();
+      renderRecapOrder();
       updatePreview();
       updateCounts();
       updatePlaceholder();
@@ -1149,13 +1170,7 @@
         <div class="kw-card ${incomplete ? 'incomplete' : ''}">
           <div class="kw-header">
             <input class="kw-name-input" value="${k.nom}" onchange="updKw(${i},'nom',this.value)" oninput="this.value=this.value.substring(0,20)" maxlength="20" placeholder="NOM">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="kw-order-btns">
-                <button class="kw-order-btn" onclick="moveKw(${i},-1)" ${i === 0 ? 'disabled' : ''} title="Monter">▲</button>
-                <button class="kw-order-btn" onclick="moveKw(${i},1)" ${i === keywords.length - 1 ? 'disabled' : ''} title="Descendre">▼</button>
-              </div>
-              <button class="kw-del" onclick="delKw(${i})" title="Supprimer">×</button>
-            </div>
+            <button class="kw-del" onclick="delKw(${i})" title="Supprimer">×</button>
           </div>
           <div class="kw-mapping">
             <div class="kw-chip kw-chip-col ${!k.colonne ? 'empty' : ''}">
@@ -1312,6 +1327,34 @@
       keywords[newIndex] = temp;
       render();
       markAsModified();
+    }
+
+    // Ordre récap
+    function toggleRecapOrder() {
+      const panel = document.getElementById('recap-order-panel');
+      const toggle = document.getElementById('recap-toggle');
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        toggle.textContent = '▲';
+      } else {
+        panel.style.display = 'none';
+        toggle.textContent = '▼';
+      }
+    }
+
+    function renderRecapOrder() {
+      const validKw = keywords.filter(k => k.nom);
+      document.getElementById('recap-order-list').innerHTML = validKw.length === 0
+        ? '<div style="font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 12px;">Ajoute des mots-clés d\'abord</div>'
+        : validKw.map((k, i) => `
+          <div class="recap-order-item">
+            <span class="recap-order-name">${k.nom}</span>
+            <div class="recap-order-btns">
+              <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},-1)" ${i === 0 ? 'disabled' : ''}>▲</button>
+              <button class="recap-order-btn" onclick="moveKw(${keywords.indexOf(k)},1)" ${i === validKw.length - 1 ? 'disabled' : ''}>▼</button>
+            </div>
+          </div>
+        `).join('');
     }
 
     // Aliases
