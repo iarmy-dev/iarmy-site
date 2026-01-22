@@ -730,8 +730,100 @@
         return;
       }
 
-      await loadConfig(link.user_id);
+      // Charger la config via fonction PostgreSQL securisee
+      await loadConfigFromTelegram(telegramUserId.toString(), link.user_id);
       document.getElementById('loading').style.display = 'none';
+    }
+
+    // Charge la config en mode Telegram via RPC securisee
+    async function loadConfigFromTelegram(tgUserId, userId) {
+      const { data: moduleConfig, error } = await supabaseClient
+        .rpc('get_module_config_by_telegram', { p_telegram_user_id: tgUserId, p_module_name: 'compta' })
+        .single();
+
+      if (error || !moduleConfig) {
+        console.log('[TG] Config error:', error);
+        window.location.href = './setup/' + `?tg=1&tguid=${tgUserId}`;
+        return;
+      }
+
+      // Mapper pour compatibilité avec l'ancien format
+      const cfg = {
+        user_id: userId,
+        sheet_id: moduleConfig.sheet_id,
+        excel_config: moduleConfig.config,
+        created_at: moduleConfig.created_at
+      };
+      config = cfg;
+      config.createdYear = cfg.created_at ? new Date(cfg.created_at).getFullYear() : new Date().getFullYear();
+
+      if (cfg?.excel_config?.colonnes_detectees) {
+        cfg.excel_config.colonnes_detectees.forEach(c => {
+          if (c.colonne && c.nom) sheetHeaders[c.colonne] = c.nom;
+        });
+      }
+
+      keywords = (cfg?.excel_config?.colonnes_a_remplir || []).map(c => ({
+        nom: c.nom,
+        colonne: c.colonne || '',
+        noteColumn: c.noteColumn || '',
+        aliases: c.aliases || []
+      }));
+
+      // Convertir ancien format regles vers nouveau
+      rules = (cfg?.excel_config?.regles_calcul || []).map(r => {
+        if (r.terms && Array.isArray(r.terms)) {
+          return { terms: r.terms, target: r.target || '' };
+        }
+        if (r.sources && Array.isArray(r.sources)) {
+          return {
+            terms: r.sources.map((s, idx) => ({
+              name: s,
+              op: idx === 0 ? '+' : (r.operations && r.operations[idx - 1] ? r.operations[idx - 1] : '+')
+            })),
+            target: r.target || ''
+          };
+        }
+        if (r.formula && typeof r.formula === 'string') {
+          const parts = r.formula.split(/\s*([\+\-\*\/])\s*/);
+          const terms = [];
+          let currentOp = '+';
+          for (const part of parts) {
+            const p = part.trim();
+            if (p === '+' || p === '-' || p === '*' || p === '/') {
+              currentOp = p;
+            } else if (p) {
+              terms.push({ name: p, op: currentOp });
+              currentOp = '+';
+            }
+          }
+          if (terms.length > 0) terms[0].op = '+';
+          return { terms: terms.length > 0 ? terms : [{ name: '', op: '+' }], target: r.target || '' };
+        }
+        return { terms: [{ name: '', op: '+' }], target: '' };
+      });
+
+      // Charger les colonnes protegees (calculees)
+      protectedColumns = cfg?.excel_config?.colonnes_protegees || [];
+
+      // Ajouter mot-cle TOTAL automatiquement s'il n'existe pas
+      const hasTotalColumn = keywords.some(k => k.nom && k.nom.toLowerCase() === 'total');
+      if (!hasTotalColumn && keywords.length > 0) {
+        let totalCol = '';
+        for (const [col, name] of Object.entries(sheetHeaders)) {
+          if (name && name.toLowerCase() === 'total') {
+            totalCol = col;
+            break;
+          }
+        }
+        if (totalCol) {
+          keywords.push({ nom: 'Total', colonne: totalCol, noteColumn: '', aliases: ['total'] });
+        }
+      }
+
+      exportSettings = cfg?.excel_config?.export_settings || {};
+
+      renderAll();
     }
 
     function showTelegramError(message) {
