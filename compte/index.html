@@ -764,17 +764,40 @@
       const userId = link.user_id;
       currentUserId = userId;
 
-      // Afficher le nom Telegram
-      const userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
+      // Recuperer le vrai nom depuis Google (via module_configs ou autre)
+      let userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
+      let userEmail = '@' + (telegramUser.username || telegramUserId);
+
+      // Essayer de recuperer les infos du compte Google
+      const { data: googleCreds } = await supabaseClient
+        .from('google_credentials')
+        .select('email')
+        .eq('user_id', userId)
+        .single();
+
+      if (googleCreds?.email) {
+        userEmail = googleCreds.email;
+        // Extraire le nom de l'email si pas de nom Telegram
+        if (!telegramUser.last_name) {
+          userName = googleCreds.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+      }
+
       const userAvatar = telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('profile-avatar').src = userAvatar;
       document.getElementById('profile-name').textContent = userName;
-      document.getElementById('profile-email').textContent = '@' + (telegramUser.username || telegramUserId);
+      document.getElementById('profile-email').textContent = userEmail;
 
       // Cacher la nav (on est dans Telegram)
       document.querySelector('nav').style.display = 'none';
       document.querySelector('.page-container').style.paddingTop = '20px';
+
+      // Desactiver les liens des modules (on reste dans le Mini App)
+      document.querySelectorAll('.module-card').forEach(card => {
+        card.style.pointerEvents = 'none';
+        card.removeAttribute('href');
+      });
 
       // Charger les donnees
       await loadModuleData(userId);
@@ -783,7 +806,7 @@
       // Adapter le profil edit pour Telegram
       document.getElementById('edit-avatar').src = userAvatar;
       document.getElementById('edit-name').value = userName;
-      document.querySelector('.profile-note').textContent = 'La photo vient de ton compte Telegram';
+      document.querySelector('.profile-note').textContent = 'Nom depuis ton compte Google';
 
       console.log('[TG] Chargement termine');
     }
