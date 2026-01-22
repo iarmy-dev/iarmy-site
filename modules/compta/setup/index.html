@@ -7033,6 +7033,7 @@
           ruleEl.style.cssText = 'display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s;';
           ruleEl.onmouseover = function() { this.style.background = 'rgba(255,107,53,0.2)'; };
           ruleEl.onmouseout = function() { this.style.background = 'rgba(255,107,53,0.1)'; };
+          ruleEl.onclick = function() { editRule(index); }; // Click to edit
 
           // Formula
           var formulaSpan = document.createElement('span');
@@ -7078,23 +7079,49 @@
       rulesDiv.appendChild(addBtn);
     }
 
+    var editingRuleIndex = -1; // -1 = creating new, >= 0 = editing existing
+
     function showAddRuleForm() {
+      editingRuleIndex = -1;
+      openRuleForm(null);
+    }
+
+    function editRule(index) {
+      editingRuleIndex = index;
+      var rule = aiGeneratedConfig.regles_calcul[index];
+      openRuleForm(rule);
+    }
+
+    function openRuleForm(existingRule) {
       var form = document.getElementById('ai-add-rule-form');
       form.style.display = 'block';
 
       // Populate selects with available columns
       var cols = aiGeneratedConfig.colonnes_a_remplir.map(function(c) { return c.nom; });
-      var col1 = document.getElementById('rule-col1');
-      var col2 = document.getElementById('rule-col2');
+      var col1El = document.getElementById('rule-col1');
+      var col2El = document.getElementById('rule-col2');
+      var opEl = document.getElementById('rule-op');
+      var targetEl = document.getElementById('rule-target');
 
-      col1.innerHTML = cols.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
-      col2.innerHTML = cols.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+      col1El.innerHTML = cols.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+      col2El.innerHTML = cols.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
 
-      // Default: second column different from first
-      if (cols.length > 1) col2.selectedIndex = 1;
+      if (existingRule && existingRule.formula) {
+        // Parse existing formula: "Col1 + Col2" or "Col1 - Col2"
+        var parts = existingRule.formula.match(/^(.+?)\s*([+\-])\s*(.+)$/);
+        if (parts) {
+          col1El.value = parts[1].trim();
+          opEl.value = parts[2];
+          col2El.value = parts[3].trim();
+        }
+        targetEl.value = existingRule.target || '';
+      } else {
+        // Default for new rule
+        if (cols.length > 1) col2El.selectedIndex = 1;
+        targetEl.value = '';
+      }
 
-      document.getElementById('rule-target').value = '';
-      document.getElementById('rule-target').focus();
+      targetEl.focus();
     }
 
     function confirmAddRule() {
@@ -7114,10 +7141,13 @@
         aiGeneratedConfig.regles_calcul = [];
       }
 
-      aiGeneratedConfig.regles_calcul.push({
-        formula: formula,
-        target: target
-      });
+      if (editingRuleIndex >= 0) {
+        // Update existing rule
+        aiGeneratedConfig.regles_calcul[editingRuleIndex] = { formula: formula, target: target };
+      } else {
+        // Add new rule
+        aiGeneratedConfig.regles_calcul.push({ formula: formula, target: target });
+      }
 
       cancelAddRule();
       renderEditableRules();
@@ -7125,6 +7155,7 @@
 
     function cancelAddRule() {
       document.getElementById('ai-add-rule-form').style.display = 'none';
+      editingRuleIndex = -1;
     }
 
     function editColumnName(index, spanEl) {
