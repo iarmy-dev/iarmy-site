@@ -748,12 +748,14 @@
 
       if (error || !link) {
         console.error('[TG] User non trouve:', error);
+        console.error('[TG] Query was for telegram_user_id:', telegramUserId);
         document.querySelector('.main-card').innerHTML = `
           <div style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
             <h2 style="margin-bottom: 12px;">Compte non lie</h2>
-            <p style="color: rgba(255,255,255,0.6);">Connecte d'abord ton compte sur iarmy.fr</p>
+            <p style="color: rgba(255,255,255,0.6);">Erreur: ${error?.message || 'Non trouve'}</p>
             <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 12px;">Telegram ID: ${telegramUserId}</p>
+            <a href="https://iarmy.fr/compte/" target="_blank" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #FF6B35; color: white; text-decoration: none; border-radius: 10px; font-weight: 600;">Reconnecter sur iarmy.fr</a>
           </div>
         `;
         return;
