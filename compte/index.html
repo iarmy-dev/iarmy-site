@@ -808,13 +808,13 @@
       document.querySelector('nav').style.display = 'none';
       document.querySelector('.page-container').style.paddingTop = '20px';
 
-      // Dans Mini App: clic sur module -> ouvrir la page de config avec ?tg=1
+      // Dans Mini App: clic sur module -> ouvrir la page de config avec ?tg=1 et tguid
       document.querySelectorAll('.module-card[data-module]').forEach(card => {
         card.addEventListener('click', (e) => {
           e.preventDefault();
           const moduleName = card.dataset.module;
-          // Naviguer vers la page de config du module
-          window.location.href = `../modules/${moduleName}/?tg=1`;
+          // Naviguer vers la page de config du module avec telegram user id
+          window.location.href = `../modules/${moduleName}/?tg=1&tguid=${telegramUserId}`;
         });
         card.style.cursor = 'pointer';
       });
@@ -822,7 +822,7 @@
       // Modifier aussi le lien dans le panel si visible
       const configLink = document.getElementById('module-config-link');
       if (configLink) {
-        configLink.href = configLink.href + '?tg=1';
+        configLink.href = configLink.href + `?tg=1&tguid=${telegramUserId}`;
       }
 
       // Charger les donnees

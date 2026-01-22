@@ -680,13 +680,19 @@
         });
       }
 
-      // Recuperer telegram_user_id
+      // Recuperer telegram_user_id (depuis URL ou SDK)
+      const urlParams = new URLSearchParams(window.location.search);
+      const tguidFromUrl = urlParams.get('tguid');
       const telegramUser = tg?.initDataUnsafe?.user;
-      if (!telegramUser?.id) {
+
+      if (tguidFromUrl) {
+        telegramUserId = tguidFromUrl;
+      } else if (telegramUser?.id) {
+        telegramUserId = telegramUser.id;
+      } else {
         showTelegramError('Impossible de recuperer votre compte Telegram');
         return;
       }
-      telegramUserId = telegramUser.id;
 
       // Chercher le user via telegram_links
       const { data: link, error } = await supabaseClient
@@ -830,7 +836,7 @@
     async function loadConfig(userId) {
       const { data: moduleConfig } = await supabaseClient.from('module_configs').select('sheet_id, config, created_at').eq('user_id', userId).eq('module_name', 'compta').single();
 
-      if (!moduleConfig) { window.location.href = './setup/' + (isTelegramMode ? '?tg=1' : ''); return; }
+      if (!moduleConfig) { window.location.href = './setup/' + (isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : ''); return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
@@ -1871,7 +1877,7 @@
 
       if (!userId) return;
       await supabaseClient.from('module_configs').delete().eq('user_id', userId).eq('module_name', 'compta');
-      window.location.href = './setup/' + (isTelegramMode ? '?tg=1' : '');
+      window.location.href = './setup/' + (isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : '');
     }
 
     async function exportDataManual() {
