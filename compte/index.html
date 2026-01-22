@@ -640,25 +640,94 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', init);
-
     // === TELEGRAM MINI APP ===
     const tg = window.Telegram?.WebApp;
-    if (tg) {
+    let isTelegramMiniApp = false;
+
+    if (tg && tg.initDataUnsafe?.user) {
+      isTelegramMiniApp = true;
+      console.log('[TG] Mini App detecte');
+      console.log('[TG] User:', tg.initDataUnsafe.user);
+
       // Initialiser le Mini App
       tg.ready();
-      tg.expand(); // Ouvrir en plein ecran
+      tg.expand();
 
-      // Appliquer le theme Telegram
-      document.body.style.backgroundColor = tg.backgroundColor || '#030303';
-
-      // Bouton retour
+      // Bouton retour - fermer le Mini App
       tg.BackButton.show();
-      tg.BackButton.onClick(() => tg.close());
+      tg.BackButton.onClick(function() {
+        tg.close();
+      });
 
-      console.log('[TG] Mini App initialise');
-      console.log('[TG] User:', tg.initDataUnsafe?.user);
+      // Theme
+      document.body.style.backgroundColor = tg.backgroundColor || '#030303';
     }
+
+    // Init selon le contexte
+    async function initFromTelegram() {
+      const telegramUser = tg.initDataUnsafe.user;
+      const telegramUserId = telegramUser.id.toString();
+
+      console.log('[TG] Chargement user Telegram:', telegramUserId);
+
+      // Chercher le user via telegram_links
+      const { data: link, error } = await supabaseClient
+        .from('telegram_links')
+        .select('user_id')
+        .eq('telegram_user_id', telegramUserId)
+        .single();
+
+      if (error || !link) {
+        console.error('[TG] User non trouve:', error);
+        document.querySelector('.main-card').innerHTML = `
+          <div style="text-align: center; padding: 40px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
+            <h2 style="margin-bottom: 12px;">Compte non lié</h2>
+            <p style="color: rgba(255,255,255,0.6);">Connecte d'abord ton compte sur iarmy.fr</p>
+          </div>
+        `;
+        return;
+      }
+
+      const userId = link.user_id;
+      currentUserId = userId;
+
+      // Charger les infos user depuis Supabase auth (via user_id)
+      const { data: userData } = await supabaseClient
+        .from('telegram_links')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      // Afficher le nom Telegram
+      const userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
+      const userAvatar = telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+
+      document.getElementById('profile-avatar').src = userAvatar;
+      document.getElementById('profile-name').textContent = userName;
+      document.getElementById('profile-email').textContent = '@' + (telegramUser.username || telegramUserId);
+
+      // Cacher la nav (on est dans Telegram)
+      document.querySelector('nav').style.display = 'none';
+      document.querySelector('.page-container').style.paddingTop = '20px';
+
+      // Charger les donnees
+      await loadModuleData(userId);
+      await loadSubscriptionData(userId);
+
+      // Adapter le profil edit pour Telegram
+      document.getElementById('edit-avatar').src = userAvatar;
+      document.getElementById('edit-name').value = userName;
+      document.querySelector('.profile-note').textContent = 'La photo vient de ton compte Telegram';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (isTelegramMiniApp) {
+        initFromTelegram();
+      } else {
+        init();
+      }
+    });
   </script>
   <script src="../js/analytics.js"></script>
 </body>
