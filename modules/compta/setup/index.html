@@ -1536,8 +1536,8 @@
       'date', 'jour', 'jours',
       // Autres
       'avoir', 'remise', 'réduction', 'annulation', 'pourboire', 'tips', 'service', 'tva', 'ht', 'montant', 'virement', 'chèque', 'cheque',
-      // Réel vs Déclaré
-      'réel', 'reel', 'déclaré', 'declare', 'saisi', 'manuel'
+      // Termes de saisie
+      'saisi', 'manuel', 'input', 'saisie'
     ];
 
     function showWelcome(firstName) { document.getElementById('welcome-title').textContent = 'Bienvenue ' + firstName + ' ! 👋'; document.getElementById('welcome-subtitle').textContent = 'Préparation de ton espace...'; document.getElementById('welcome-overlay').classList.add('active'); }
@@ -6179,6 +6179,240 @@
     var aiGeneratedConfig = null;
     var isAIMode = false;
 
+    // ========================================
+    // SMART EXCEL ANALYSIS (reduces tokens, improves accuracy)
+    // ========================================
+
+    // Build dependency graph from formulas
+    function buildDependencyGraph(sheet, maxCol, maxRow) {
+      var graph = {};
+      var reverseGraph = {}; // Which cells depend on this cell
+
+      for (var row = 0; row <= maxRow; row++) {
+        for (var col = 0; col <= maxCol; col++) {
+          var cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+          var cell = sheet[cellRef];
+          if (cell && cell.f) {
+            // Parse formula references (A1, B2, etc.)
+            var refs = cell.f.match(/[A-Z]+\d+/g) || [];
+            graph[cellRef] = refs;
+            // Build reverse graph
+            refs.forEach(function(ref) {
+              if (!reverseGraph[ref]) reverseGraph[ref] = [];
+              reverseGraph[ref].push(cellRef);
+            });
+          }
+        }
+      }
+      return { forward: graph, reverse: reverseGraph };
+    }
+
+    // Group cells into logical zones based on position and dependencies
+    function groupLogicalZones(sheet, maxCol, maxRow, dependencies) {
+      var zones = [];
+      var visited = {};
+
+      // Find clusters of related cells
+      var inputCols = []; // Columns with manual input (no formulas)
+      var calcCols = [];  // Columns with formulas
+
+      for (var col = 0; col <= maxCol; col++) {
+        var colLetter = XLSX.utils.encode_col(col);
+        var hasFormula = false;
+        var hasValue = false;
+
+        for (var row = 0; row <= Math.min(maxRow, 20); row++) {
+          var cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+          var cell = sheet[cellRef];
+          if (cell) {
+            if (cell.f) hasFormula = true;
+            if (cell.v !== undefined && cell.v !== null && cell.v !== '') hasValue = true;
+          }
+        }
+
+        if (hasFormula) {
+          calcCols.push(colLetter);
+        } else if (hasValue) {
+          inputCols.push(colLetter);
+        }
+      }
+
+      // Detect zone boundaries (gaps in columns)
+      var allCols = inputCols.concat(calcCols).sort();
+      var zoneStart = null;
+      var currentZone = [];
+
+      for (var i = 0; i < allCols.length; i++) {
+        var colNum = XLSX.utils.decode_col(allCols[i]);
+        if (zoneStart === null) {
+          zoneStart = colNum;
+          currentZone = [allCols[i]];
+        } else if (colNum - XLSX.utils.decode_col(currentZone[currentZone.length - 1]) > 2) {
+          // Gap detected, new zone
+          zones.push({
+            columns: currentZone,
+            type: currentZone.some(function(c) { return calcCols.includes(c); }) ? 'mixed' : 'input'
+          });
+          currentZone = [allCols[i]];
+        } else {
+          currentZone.push(allCols[i]);
+        }
+      }
+      if (currentZone.length > 0) {
+        zones.push({
+          columns: currentZone,
+          type: currentZone.some(function(c) { return calcCols.includes(c); }) ? 'mixed' : 'input'
+        });
+      }
+
+      return { zones: zones, inputColumns: inputCols, calculatedColumns: calcCols };
+    }
+
+    // Detect business logic patterns (payment methods, totals, etc.)
+    function detectBusinessLogic(sheet, headerRow, maxCol) {
+      var patterns = {
+        paymentMethods: [],
+        totals: [],
+        dates: [],
+        expenses: [],
+        other: []
+      };
+
+      var keywords = {
+        card: ['cb', 'carte', 'cartes', 'card', 'visa', 'mastercard', 'bleue', 'bleues'],
+        cash: ['esp', 'espèces', 'especes', 'espece', 'cash', 'liquide'],
+        tickets: ['tr', 'ticket', 'tickets', 'resto', 'restaurant'],
+        total: ['total', 'somme', 'sum', 'ttc', 'recette', 'recettes', 'ca'],
+        date: ['date', 'jour', 'jours', 'day'],
+        expense: ['dep', 'dépense', 'depense', 'dépenses', 'depenses', 'achat', 'achats']
+      };
+
+      if (headerRow >= 0) {
+        for (var col = 0; col <= maxCol; col++) {
+          var cellRef = XLSX.utils.encode_cell({ r: headerRow, c: col });
+          var cell = sheet[cellRef];
+          if (cell && cell.v) {
+            var name = String(cell.v).toLowerCase().trim();
+            var colLetter = XLSX.utils.encode_col(col);
+
+            // Check which category this header belongs to
+            if (keywords.card.some(function(k) { return name.includes(k); })) {
+              patterns.paymentMethods.push({ type: 'card', name: cell.v, column: colLetter });
+            } else if (keywords.cash.some(function(k) { return name.includes(k); })) {
+              patterns.paymentMethods.push({ type: 'cash', name: cell.v, column: colLetter });
+            } else if (keywords.tickets.some(function(k) { return name.includes(k); })) {
+              patterns.paymentMethods.push({ type: 'tickets', name: cell.v, column: colLetter });
+            } else if (keywords.total.some(function(k) { return name.includes(k); })) {
+              patterns.totals.push({ name: cell.v, column: colLetter });
+            } else if (keywords.date.some(function(k) { return name.includes(k); })) {
+              patterns.dates.push({ name: cell.v, column: colLetter });
+            } else if (keywords.expense.some(function(k) { return name.includes(k); })) {
+              patterns.expenses.push({ name: cell.v, column: colLetter });
+            } else if (name.length > 0 && name.length < 20) {
+              patterns.other.push({ name: cell.v, column: colLetter });
+            }
+          }
+        }
+      }
+
+      return patterns;
+    }
+
+    // Simplify formulas for Claude (replace cell refs with column names)
+    function simplifyFormulas(formulas, headerRow, sheet, maxCol) {
+      var colNames = {};
+      if (headerRow >= 0) {
+        for (var col = 0; col <= maxCol; col++) {
+          var cellRef = XLSX.utils.encode_cell({ r: headerRow, c: col });
+          var cell = sheet[cellRef];
+          if (cell && cell.v) {
+            var colLetter = XLSX.utils.encode_col(col);
+            colNames[colLetter] = String(cell.v).trim();
+          }
+        }
+      }
+
+      var simplified = [];
+      var seenPatterns = {};
+
+      formulas.forEach(function(f) {
+        // Extract the formula part after the cell reference
+        var match = f.match(/^([A-Z]+)(\d+):\s*=(.+)$/);
+        if (match) {
+          var targetCol = match[1];
+          var formula = match[3];
+
+          // Replace column references with names
+          var simplified_formula = formula;
+          Object.keys(colNames).forEach(function(col) {
+            var regex = new RegExp(col + '\\d+', 'g');
+            simplified_formula = simplified_formula.replace(regex, colNames[col] || col);
+          });
+
+          // Simplify common patterns
+          simplified_formula = simplified_formula
+            .replace(/IF\(AND\(OR\([^)]+\),[^)]+\),"",([^)]+)\)/gi, '$1')
+            .replace(/IF\(OR\([^)]+\),"",([^)]+)\)/gi, '$1')
+            .replace(/SUM\(([^)]+)\)/gi, '$1');
+
+          // Create pattern key to avoid duplicates
+          var patternKey = targetCol + ':' + simplified_formula.replace(/\d+/g, 'X');
+          if (!seenPatterns[patternKey]) {
+            seenPatterns[patternKey] = true;
+            var targetName = colNames[targetCol] || targetCol;
+            simplified.push(targetName + ' = ' + simplified_formula);
+          }
+        }
+      });
+
+      return simplified;
+    }
+
+    // Main analysis function - combines all intelligence
+    function buildSmartAnalysis(sheet, maxCol, maxRow) {
+      // Find header row
+      var headerRow = -1;
+      for (var row = 0; row <= Math.min(7, maxRow); row++) {
+        var textCells = 0;
+        for (var col = 0; col <= maxCol; col++) {
+          var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
+          if (cell && cell.t === 's' && cell.v) textCells++;
+        }
+        if (textCells >= 3) {
+          headerRow = row;
+          break;
+        }
+      }
+
+      // Build dependency graph
+      var dependencies = buildDependencyGraph(sheet, maxCol, maxRow);
+
+      // Group into zones
+      var zoneInfo = groupLogicalZones(sheet, maxCol, maxRow, dependencies);
+
+      // Detect business patterns
+      var businessLogic = detectBusinessLogic(sheet, headerRow, maxCol);
+
+      // Extract and simplify formulas
+      var rawFormulas = [];
+      for (var cellRef in sheet) {
+        if (cellRef[0] !== '!' && sheet[cellRef].f) {
+          rawFormulas.push(cellRef + ': =' + sheet[cellRef].f);
+        }
+      }
+      var simplifiedFormulas = simplifyFormulas(rawFormulas, headerRow, sheet, maxCol);
+
+      return {
+        headerRow: headerRow,
+        zones: zoneInfo.zones,
+        inputColumns: zoneInfo.inputColumns,
+        calculatedColumns: zoneInfo.calculatedColumns,
+        businessLogic: businessLogic,
+        formulas: simplifiedFormulas.slice(0, 10), // Limit to 10 most important
+        formulaCount: rawFormulas.length
+      };
+    }
+
     // Voice recording (WhatsApp style)
     var isRecording = false;
     var mediaRecorder = null;
@@ -6810,99 +7044,84 @@
           }
         });
 
-        // Build a COMPLETE view of the file for Claude - global vision
-        var tableRows = [];
-        var formulas = [];
-        var maxCol = Math.min(range.e.c, 25); // Max 25 columns for full view
-        var maxRows = Math.min(range.e.r, 25); // Max 25 rows for full view
+        // SMART ANALYSIS - Pre-analyze Excel to reduce tokens and improve accuracy
+        var maxCol = Math.min(range.e.c, 25);
+        var maxRows = Math.min(range.e.r, 50);
 
-        // First pass: identify header row (usually row 1 or 2)
-        var headerRow = -1;
-        for (var row = 0; row <= Math.min(5, range.e.r); row++) {
-          var textCells = 0;
-          for (var col = 0; col <= maxCol; col++) {
-            var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-            if (cell && cell.t === 's') textCells++;
-          }
-          if (textCells >= 3) {
-            headerRow = row;
-            break;
-          }
-        }
-
-        // Read ALL rows to understand structure
-        for (var row = 0; row <= maxRows; row++) {
-          var rowData = [];
-          var hasData = false;
-          for (var col = 0; col <= maxCol; col++) {
-            var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-            var colLetter = XLSX.utils.encode_col(col);
-            if (cell) {
-              hasData = true;
-              var val = cell.v !== undefined ? String(cell.v).trim() : '';
-              // Truncate long values but keep useful info
-              if (val.length > 15) val = val.substring(0, 12) + '...';
-
-              // Check for formula in cell.f OR in value starting with "="
-              var formula = cell.f || (cell.v && typeof cell.v === 'string' && cell.v.startsWith('=') ? cell.v.substring(1) : null);
-              if (formula) {
-                // Store ALL formulas - this is critical for understanding
-                formulas.push(colLetter + (row + 1) + ': =' + formula);
-                val = '[CALC]';
-              }
-              if (val) rowData.push(colLetter + ':' + val);
-            }
-          }
-          if (hasData && rowData.length > 0) {
-            var rowLabel = row === headerRow ? 'HEADER' : 'Row ' + (row + 1);
-            tableRows.push(rowLabel + ': ' + rowData.join(' | '));
-          }
-        }
+        console.log('[AI SMART] Starting smart analysis...');
+        var analysis = buildSmartAnalysis(sheet, maxCol, maxRows);
+        console.log('[AI SMART] Analysis result:', analysis);
 
         // Store for later use
         aiUploadedFileData = {
           fileName: file.name,
           sheetName: sheetName,
-          file: file
+          file: file,
+          analysis: analysis
         };
 
-        // Build column mapping from header row
-        var columnMapping = [];
-        if (headerRow >= 0) {
-          for (var col = 0; col <= maxCol; col++) {
-            var cell = sheet[XLSX.utils.encode_cell({ r: headerRow, c: col })];
-            if (cell && cell.v) {
-              var colLetter = XLSX.utils.encode_col(col);
-              var name = String(cell.v).trim();
-              if (name && name.length < 20) {
-                columnMapping.push(colLetter + ' = ' + name);
-              }
-            }
-          }
+        // Build CONDENSED message for Claude (much fewer tokens!)
+        var userMessage = 'Fichier: "' + file.name + '" (onglet: ' + sheetName + ')\n\n';
+
+        // Payment methods detected
+        if (analysis.businessLogic.paymentMethods.length > 0) {
+          userMessage += 'MOYENS DE PAIEMENT DETECTES:\n';
+          analysis.businessLogic.paymentMethods.forEach(function(pm) {
+            userMessage += '- ' + pm.name + ' (col ' + pm.column + ', type: ' + pm.type + ')\n';
+          });
+          userMessage += '\n';
         }
 
-        // Build comprehensive message for Claude
-        var userMessage = 'Voici mon fichier Excel "' + file.name + '" (onglet: ' + sheetName + ').\n\n';
-
-        // Add explicit column mapping first
-        if (columnMapping.length > 0) {
-          userMessage += '=== MAPPING COLONNES (IMPORTANT - utilise ces NOMS pas les lettres) ===\n';
-          userMessage += columnMapping.join('\n');
-          userMessage += '\n\n';
+        // Totals detected
+        if (analysis.businessLogic.totals.length > 0) {
+          userMessage += 'TOTAUX DETECTES:\n';
+          analysis.businessLogic.totals.forEach(function(t) {
+            userMessage += '- ' + t.name + ' (col ' + t.column + ')\n';
+          });
+          userMessage += '\n';
         }
 
-        userMessage += '=== TABLEAU COMPLET ===\n';
-        userMessage += tableRows.join('\n');
-        userMessage += '\n\n';
-
-        console.log('[AI] Formulas detected:', formulas.length, formulas);
-        if (formulas.length > 0) {
-          userMessage += '=== TOUTES LES FORMULES ===\n' + formulas.join('\n') + '\n\n';
-        } else {
-          userMessage += '=== AUCUNE FORMULE DETECTEE ===\nLe fichier ne contient que des valeurs, pas de formules Excel.\n\n';
+        // Expenses detected
+        if (analysis.businessLogic.expenses.length > 0) {
+          userMessage += 'DEPENSES DETECTEES:\n';
+          analysis.businessLogic.expenses.forEach(function(e) {
+            userMessage += '- ' + e.name + ' (col ' + e.column + ')\n';
+          });
+          userMessage += '\n';
         }
 
-        userMessage += 'Analyse ce fichier EN PROFONDEUR et explique-moi ce que tu comprends de ma compta.';
+        // Other columns
+        if (analysis.businessLogic.other.length > 0) {
+          userMessage += 'AUTRES COLONNES:\n';
+          analysis.businessLogic.other.slice(0, 8).forEach(function(o) {
+            userMessage += '- ' + o.name + ' (col ' + o.column + ')\n';
+          });
+          userMessage += '\n';
+        }
+
+        // Zones detected
+        if (analysis.zones.length > 1) {
+          userMessage += 'STRUCTURE: ' + analysis.zones.length + ' zones detectees\n';
+          analysis.zones.forEach(function(zone, i) {
+            userMessage += '- Zone ' + (i + 1) + ': colonnes ' + zone.columns.join(',') + ' (' + zone.type + ')\n';
+          });
+          userMessage += '\n';
+        }
+
+        // Input vs calculated columns
+        userMessage += 'COLONNES SAISIE: ' + (analysis.inputColumns.length > 0 ? analysis.inputColumns.join(', ') : 'aucune') + '\n';
+        userMessage += 'COLONNES CALCULEES: ' + (analysis.calculatedColumns.length > 0 ? analysis.calculatedColumns.join(', ') : 'aucune') + '\n\n';
+
+        // Simplified formulas (already translated to column names)
+        if (analysis.formulas.length > 0) {
+          userMessage += 'FORMULES SIMPLIFIEES (' + analysis.formulaCount + ' au total):\n';
+          analysis.formulas.forEach(function(f) {
+            userMessage += '- ' + f + '\n';
+          });
+          userMessage += '\n';
+        }
+
+        userMessage += 'Confirme cette analyse et propose la config (colonnes a saisir + regles de calcul).';
 
         aiConversationHistory.push({ role: 'user', content: userMessage });
 
