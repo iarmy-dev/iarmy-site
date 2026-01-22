@@ -764,25 +764,9 @@
       const userId = link.user_id;
       currentUserId = userId;
 
-      // Recuperer le vrai nom depuis Google (via module_configs ou autre)
-      let userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
-      let userEmail = '@' + (telegramUser.username || telegramUserId);
-
-      // Essayer de recuperer les infos du compte Google
-      const { data: googleCreds } = await supabaseClient
-        .from('google_credentials')
-        .select('email')
-        .eq('user_id', userId)
-        .single();
-
-      if (googleCreds?.email) {
-        userEmail = googleCreds.email;
-        // Extraire le nom de l'email si pas de nom Telegram
-        if (!telegramUser.last_name) {
-          userName = googleCreds.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        }
-      }
-
+      // Utiliser le nom Telegram
+      const userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
+      const userEmail = telegramUser.username ? '@' + telegramUser.username : 'Telegram';
       const userAvatar = telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('profile-avatar').src = userAvatar;
@@ -806,7 +790,7 @@
       // Adapter le profil edit pour Telegram
       document.getElementById('edit-avatar').src = userAvatar;
       document.getElementById('edit-name').value = userName;
-      document.querySelector('.profile-note').textContent = 'Nom depuis ton compte Google';
+      document.querySelector('.profile-note').textContent = 'Infos depuis ton compte Telegram';
 
       console.log('[TG] Chargement termine');
     }
