@@ -739,10 +739,10 @@
 
       console.log('[TG] Chargement user Telegram:', telegramUserId);
 
-      // Chercher le user via telegram_links
+      // Chercher le user via telegram_links (avec display_name)
       const { data: link, error } = await supabaseClient
         .from('telegram_links')
-        .select('user_id')
+        .select('user_id, display_name')
         .eq('telegram_user_id', telegramUserId)
         .single();
 
@@ -764,9 +764,9 @@
       const userId = link.user_id;
       currentUserId = userId;
 
-      // Utiliser le nom Telegram
-      const userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
-      const userEmail = telegramUser.username ? '@' + telegramUser.username : 'Telegram';
+      // Utiliser le display_name du compte, sinon Telegram
+      const userName = link.display_name || telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
+      const userEmail = telegramUser.username ? '@' + telegramUser.username : 'via Telegram';
       const userAvatar = telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('profile-avatar').src = userAvatar;
