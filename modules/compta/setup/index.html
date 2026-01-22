@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
@@ -6016,6 +6017,37 @@
     document.addEventListener('DOMContentLoaded', async function() {
       console.log('[COMPTA] 📱 Page chargée');
       var urlParams = new URLSearchParams(window.location.search);
+
+      // Detecter si on est dans Telegram Mini App
+      var fromTelegram = urlParams.get('tg') === '1';
+      var tg = window.Telegram?.WebApp;
+      var sdkDetected = tg && (tg.initData || (tg.platform && tg.platform !== 'unknown') || window.TelegramWebviewProxy);
+
+      if (fromTelegram || sdkDetected) {
+        // Le setup ne fonctionne pas en mode Telegram (pas de session Supabase)
+        // Afficher un message pour faire le setup sur le navigateur
+        if (tg) {
+          tg.ready();
+          tg.expand();
+          tg.BackButton.show();
+          tg.BackButton.onClick(() => tg.close());
+        }
+        document.body.innerHTML = `
+          <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: #0a0a0a;">
+            <div style="text-align: center; max-width: 400px;">
+              <div style="font-size: 64px; margin-bottom: 24px;">🌐</div>
+              <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 12px; color: white;">Configuration requise</h2>
+              <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px; line-height: 1.6;">
+                Pour configurer Compta Express, connecte-toi sur le site web <strong style="color: #FF8B5E;">iarmy.fr</strong> depuis ton navigateur.
+              </p>
+              <p style="color: rgba(255,255,255,0.4); font-size: 13px;">
+                Une fois la configuration terminée, tu pourras utiliser le module directement depuis Telegram !
+              </p>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
       // Check payment success/canceled
       if (urlParams.get('payment') === 'success') {

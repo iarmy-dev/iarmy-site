@@ -233,6 +233,37 @@
           </div>
         </div>
 
+        <!-- Module Settings Panel (shown when clicking on a module) -->
+        <div id="module-panel" style="display: none; margin-bottom: 24px;">
+          <div class="subscription-card">
+            <div class="subscription-header">
+              <div class="subscription-icon" id="module-panel-icon">🍽️</div>
+              <div class="subscription-info">
+                <h3 id="module-panel-title">Compta Express</h3>
+                <p id="module-panel-subtitle">Configuration du module</p>
+              </div>
+              <button onclick="closeModulePanel()" style="background: none; border: none; color: rgba(255,255,255,0.5); font-size: 20px; cursor: pointer; padding: 4px;">✕</button>
+            </div>
+            <div class="subscription-details">
+              <div class="subscription-row">
+                <span class="subscription-label">Google Sheets</span>
+                <span class="subscription-value" id="module-sheet-status">-</span>
+              </div>
+              <div class="subscription-row">
+                <span class="subscription-label">Colonnes</span>
+                <span class="subscription-value" id="module-columns">-</span>
+              </div>
+              <div class="subscription-row">
+                <span class="subscription-label">Calculs auto</span>
+                <span class="subscription-value" id="module-rules">-</span>
+              </div>
+            </div>
+            <a href="/modules/compta/" id="module-config-link" class="btn-manage" style="display: block; text-align: center; text-decoration: none; margin-top: 16px;">
+              Modifier la configuration
+            </a>
+          </div>
+        </div>
+
         <!-- Subscription Info -->
         <div class="subscription-card" id="subscription-card">
           <div class="subscription-header">
@@ -777,15 +808,22 @@
       document.querySelector('nav').style.display = 'none';
       document.querySelector('.page-container').style.paddingTop = '20px';
 
-      // Dans Mini App: clic sur module -> ouvrir la page du module
+      // Dans Mini App: clic sur module -> ouvrir la page de config avec ?tg=1
       document.querySelectorAll('.module-card[data-module]').forEach(card => {
         card.addEventListener('click', (e) => {
           e.preventDefault();
           const moduleName = card.dataset.module;
-          window.location.href = '/modules/' + moduleName + '/?tg=1';
+          // Naviguer vers la page de config du module
+          window.location.href = `../modules/${moduleName}/?tg=1`;
         });
         card.style.cursor = 'pointer';
       });
+
+      // Modifier aussi le lien dans le panel si visible
+      const configLink = document.getElementById('module-config-link');
+      if (configLink) {
+        configLink.href = configLink.href + '?tg=1';
+      }
 
       // Charger les donnees
       await loadModuleData(userId);

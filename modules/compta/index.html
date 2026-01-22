@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
@@ -384,7 +385,7 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <nav class="glass fixed top-0 left-0 right-0 z-50">
+  <nav id="main-nav" class="glass fixed top-0 left-0 right-0 z-50">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="../../compte/" class="flex items-center gap-3">
         <div class="logo-i">i</div>
@@ -608,7 +609,7 @@
     </div>
   </div>
 
-  <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
+  <footer id="main-footer" style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
     <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
       <a href="../../">Accueil</a>
       <a href="../../compte/">Compte</a>
@@ -630,11 +631,119 @@
     let userEmail = '';
     const cols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let hasUnsavedChanges = false;
+    let isTelegramMode = false;
+    let telegramUserId = null;
 
     // Nouveau format règles: { terms: [{name, op}], target }
     // op: '+' ou '-' (premier terme toujours '+')
 
+    // Detecter si on est dans Telegram Mini App
+    function detectTelegram() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromUrl = urlParams.get('tg') === '1';
+      const tg = window.Telegram?.WebApp;
+      const sdkDetected = tg && (tg.initData || (tg.platform && tg.platform !== 'unknown') || window.TelegramWebviewProxy);
+      return fromUrl || sdkDetected;
+    }
+
+    // Init depuis Telegram Mini App
+    async function initFromTelegram() {
+      isTelegramMode = true;
+      const tg = window.Telegram?.WebApp;
+
+      // Cacher nav et footer en mode Mini App
+      const nav = document.getElementById('main-nav');
+      const footer = document.getElementById('main-footer');
+      if (nav) nav.style.display = 'none';
+      if (footer) footer.style.display = 'none';
+
+      // Ajuster le padding sans nav
+      const pageContainer = document.querySelector('.page-container');
+      if (pageContainer) pageContainer.style.paddingTop = '20px';
+
+      // Theme Telegram
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        document.body.style.backgroundColor = tg.backgroundColor || '#030303';
+
+        // Bouton retour
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+          if (hasUnsavedChanges) {
+            if (confirm('Des modifications non sauvegardees seront perdues. Quitter ?')) {
+              tg.close();
+            }
+          } else {
+            tg.close();
+          }
+        });
+      }
+
+      // Recuperer telegram_user_id
+      const telegramUser = tg?.initDataUnsafe?.user;
+      if (!telegramUser?.id) {
+        showTelegramError('Impossible de recuperer votre compte Telegram');
+        return;
+      }
+      telegramUserId = telegramUser.id;
+
+      // Chercher le user via telegram_links
+      const { data: link, error } = await supabaseClient
+        .from('telegram_links')
+        .select('user_id, display_name, avatar_url, email')
+        .eq('telegram_user_id', telegramUserId)
+        .single();
+
+      if (error || !link) {
+        showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
+        return;
+      }
+
+      // Afficher le profil
+      const userName = link.display_name || telegramUser.first_name || 'User';
+      userEmail = link.email || '';
+      const userAvatar = link.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+
+      document.getElementById('auth-section').innerHTML = `
+        <div class="nav-user-section">
+          <span class="nav-profile" style="cursor: default;">
+            <img src="${userAvatar}" class="nav-avatar">
+            <span>${userName.split(' ')[0]}</span>
+          </span>
+        </div>
+      `;
+
+      // Verifier l'abonnement
+      const hasAccess = await checkModuleAccess(link.user_id, 'compta');
+      if (!hasAccess) {
+        showNoAccessScreen();
+        return;
+      }
+
+      await loadConfig(link.user_id);
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    function showTelegramError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.querySelector('.page-container').innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">${message}</h2>
+          <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px;">
+            Connectez-vous d'abord sur le site web et liez votre compte Telegram.
+          </p>
+        </div>
+      `;
+    }
+
     async function init() {
+      // Detecter Telegram Mini App
+      if (detectTelegram()) {
+        return initFromTelegram();
+      }
+
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) { location.href = '../../'; return; }
 
@@ -721,7 +830,7 @@
     async function loadConfig(userId) {
       const { data: moduleConfig } = await supabaseClient.from('module_configs').select('sheet_id, config, created_at').eq('user_id', userId).eq('module_name', 'compta').single();
 
-      if (!moduleConfig) { window.location.href = './setup/'; return; }
+      if (!moduleConfig) { window.location.href = './setup/' + (isTelegramMode ? '?tg=1' : ''); return; }
 
       const { data: tg } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
@@ -1749,10 +1858,20 @@
 
     async function doResetConfig() {
       document.getElementById('reset-modal')?.remove();
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) return;
-      await supabaseClient.from('module_configs').delete().eq('user_id', session.user.id).eq('module_name', 'compta');
-      window.location.href = './setup/';
+
+      // En mode Telegram, on utilise l'userId stocké dans config
+      let userId;
+      if (isTelegramMode) {
+        userId = config?.user_id;
+      } else {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        userId = session.user.id;
+      }
+
+      if (!userId) return;
+      await supabaseClient.from('module_configs').delete().eq('user_id', userId).eq('module_name', 'compta');
+      window.location.href = './setup/' + (isTelegramMode ? '?tg=1' : '');
     }
 
     async function exportDataManual() {
