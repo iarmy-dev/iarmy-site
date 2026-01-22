@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installer iArmy</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="iArmy">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+        }
+        .icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 24px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .features {
+            text-align: left;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .feature:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            font-size: 20px;
+        }
+        .btn-install {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        .btn-install:active {
+            transform: scale(0.98);
+        }
+        .btn-install:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .already-installed {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+        }
+        .already-installed a {
+            color: white;
+            font-weight: 600;
+        }
+        .ios-instructions {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            text-align: left;
+        }
+        .ios-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .ios-step:last-child {
+            margin-bottom: 0;
+        }
+        .step-num {
+            background: white;
+            color: #667eea;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .skip-link {
+            display: block;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🍽️</div>
+        <h1>Installer iArmy</h1>
+        <p>Accede a ton dashboard directement depuis ton ecran d'accueil !</p>
+
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                <span>Acces rapide en 1 clic</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📊</span>
+                <span>Dashboard et reglages</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔔</span>
+                <span>Notifications (bientot)</span>
+            </div>
+        </div>
+
+        <button class="btn-install" id="install-btn">
+            📲 Installer l'application
+        </button>
+
+        <div class="already-installed" id="already-installed">
+            ✅ L'app est deja installee !<br><br>
+            <a href="/compte/">Ouvrir le dashboard →</a>
+        </div>
+
+        <div class="ios-instructions" id="ios-instructions">
+            <div class="ios-step">
+                <span class="step-num">1</span>
+                <span>Appuie sur le bouton <strong>Partager</strong> en bas de Safari</span>
+            </div>
+            <div class="ios-step">
+                <span class="step-num">2</span>
+                <span>Fais defiler et appuie sur <strong>"Sur l'ecran d'accueil"</strong></span>
+            </div>
+            <div class="ios-step">
+                <span class="step-num">3</span>
+                <span>Appuie sur <strong>Ajouter</strong> en haut a droite</span>
+            </div>
+        </div>
+
+        <a href="/compte/" class="skip-link">Continuer sans installer →</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+        const alreadyInstalled = document.getElementById('already-installed');
+        const iosInstructions = document.getElementById('ios-instructions');
+
+        // Detecter si deja installe (mode standalone)
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            installBtn.style.display = 'none';
+            alreadyInstalled.style.display = 'block';
+            markPWAInstalled();
+        }
+
+        // Detecter iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isInStandaloneMode = window.navigator.standalone;
+
+        if (isIOS && !isInStandaloneMode) {
+            installBtn.style.display = 'none';
+            iosInstructions.style.display = 'block';
+        }
+
+        // Capturer l'evenement beforeinstallprompt (Android/Chrome)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+            iosInstructions.style.display = 'none';
+        });
+
+        // Bouton installation
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                // Fallback pour navigateurs qui ne supportent pas
+                if (isIOS) {
+                    iosInstructions.style.display = 'block';
+                } else {
+                    alert('Utilise Chrome ou Safari pour installer l\'app');
+                }
+                return;
+            }
+
+            installBtn.disabled = true;
+            installBtn.textContent = '⏳ Installation...';
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                installBtn.textContent = '✅ Installe !';
+                await markPWAInstalled();
+                setTimeout(() => {
+                    window.location.href = '/compte/';
+                }, 1500);
+            } else {
+                installBtn.disabled = false;
+                installBtn.textContent = '📲 Installer l\'application';
+            }
+
+            deferredPrompt = null;
+        });
+
+        // Detecter quand l'app est installee
+        window.addEventListener('appinstalled', async () => {
+            console.log('PWA installee!');
+            await markPWAInstalled();
+        });
+
+        // Marquer la PWA comme installee dans Supabase
+        async function markPWAInstalled() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return;
+
+                // Recuperer le telegram_user_id depuis le user metadata ou une autre source
+                const userId = session.user.id;
+
+                // Mettre a jour via une fonction RPC ou directement
+                const { error } = await supabase
+                    .from('telegram_links')
+                    .update({ pwa_installed: true })
+                    .eq('user_id', userId);
+
+                if (!error) {
+                    console.log('PWA marquee comme installee');
+                }
+            } catch (e) {
+                console.error('Erreur marquage PWA:', e);
+            }
+        }
+    </script>
+</body>
+</html>

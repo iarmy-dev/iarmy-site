@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Compte - iArmy</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="iArmy">
+  <link rel="apple-touch-icon" href="/icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -638,6 +645,26 @@
     }
 
     document.addEventListener('DOMContentLoaded', init);
+
+    // === PWA DETECTION ===
+    // Detecter si l'app est en mode standalone (installee)
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      console.log('[PWA] Mode standalone detecte');
+      markPWAInstalled();
+    }
+
+    async function markPWAInstalled() {
+      try {
+        if (!currentUserId) return;
+        const { error } = await supabaseClient
+          .from('telegram_links')
+          .update({ pwa_installed: true })
+          .eq('user_id', currentUserId);
+        if (!error) console.log('[PWA] Marque comme installee');
+      } catch (e) {
+        console.error('[PWA] Erreur:', e);
+      }
+    }
   </script>
   <script src="../js/analytics.js"></script>
 </body>
