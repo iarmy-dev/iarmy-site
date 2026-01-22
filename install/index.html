@@ -5,42 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installer iArmy</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#FF6B35">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="iArmy">
     <link rel="apple-touch-icon" href="/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #030303;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             color: white;
+            position: relative;
+            overflow: hidden;
         }
+
+        /* Orbes animees comme le site */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: float 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+            top: -200px;
+            right: -100px;
+            opacity: 0.2;
+        }
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #6B35FF, #8B5EFF);
+            bottom: -150px;
+            left: -100px;
+            opacity: 0.15;
+            animation-delay: -7s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
         .container {
             text-align: center;
             max-width: 400px;
+            position: relative;
+            z-index: 10;
         }
         .icon {
-            width: 120px;
-            height: 120px;
-            background: white;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
             border-radius: 24px;
             margin: 0 auto 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            font-size: 50px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
         }
         h1 {
             font-size: 28px;
@@ -49,22 +89,25 @@
         }
         p {
             font-size: 16px;
-            opacity: 0.9;
+            color: rgba(255,255,255,0.6);
             line-height: 1.6;
             margin-bottom: 32px;
         }
         .features {
             text-align: left;
-            background: rgba(255,255,255,0.15);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 32px;
+            backdrop-filter: blur(10px);
         }
         .feature {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            color: rgba(255,255,255,0.8);
         }
         .feature:last-child {
             margin-bottom: 0;
@@ -73,17 +116,21 @@
             font-size: 20px;
         }
         .btn-install {
-            background: white;
-            color: #667eea;
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%);
+            color: white;
             border: none;
             padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 14px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             width: 100%;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+        .btn-install:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4);
         }
         .btn-install:active {
             transform: scale(0.98);
@@ -91,24 +138,28 @@
         .btn-install:disabled {
             opacity: 0.7;
             cursor: not-allowed;
+            transform: none;
         }
         .already-installed {
             display: none;
             margin-top: 20px;
             padding: 20px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
         }
         .already-installed a {
-            color: white;
+            color: #FF6B35;
             font-weight: 600;
+            text-decoration: none;
         }
         .ios-instructions {
             display: none;
             margin-top: 20px;
             padding: 20px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
             text-align: left;
         }
         .ios-step {
@@ -116,13 +167,14 @@
             align-items: flex-start;
             gap: 12px;
             margin-bottom: 16px;
+            color: rgba(255,255,255,0.8);
         }
         .ios-step:last-child {
             margin-bottom: 0;
         }
         .step-num {
-            background: white;
-            color: #667eea;
+            background: linear-gradient(135deg, #FF6B35, #FF8B5E);
+            color: white;
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -130,23 +182,30 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             flex-shrink: 0;
         }
         .skip-link {
             display: block;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.7);
+            margin-top: 24px;
+            color: rgba(255,255,255,0.4);
             text-decoration: none;
             font-size: 14px;
+            transition: color 0.2s;
+        }
+        .skip-link:hover {
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
 <body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
     <div class="container">
-        <div class="icon">🍽️</div>
+        <div class="icon">i</div>
         <h1>Installer iArmy</h1>
-        <p>Accede a ton dashboard directement depuis ton ecran d'accueil !</p>
+        <p>Accede a ton dashboard directement depuis ton ecran d'accueil</p>
 
         <div class="features">
             <div class="feature">
@@ -164,7 +223,7 @@
         </div>
 
         <button class="btn-install" id="install-btn">
-            📲 Installer l'application
+            Installer l'application
         </button>
 
         <div class="already-installed" id="already-installed">
@@ -175,38 +234,38 @@
         <div class="ios-instructions" id="ios-instructions">
             <div class="ios-step">
                 <span class="step-num">1</span>
-                <span>Appuie sur le bouton <strong>Partager</strong> en bas de Safari</span>
+                <span>Appuie sur <strong>Partager</strong> en bas de Safari</span>
             </div>
             <div class="ios-step">
                 <span class="step-num">2</span>
-                <span>Fais defiler et appuie sur <strong>"Sur l'ecran d'accueil"</strong></span>
+                <span>Choisis <strong>"Sur l'ecran d'accueil"</strong></span>
             </div>
             <div class="ios-step">
                 <span class="step-num">3</span>
-                <span>Appuie sur <strong>Ajouter</strong> en haut a droite</span>
+                <span>Appuie sur <strong>Ajouter</strong></span>
             </div>
         </div>
 
         <a href="/compte/" class="skip-link">Continuer sans installer →</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
-
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Enregistrer le Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[SW] Registered'))
+                .catch(err => console.error('[SW] Error:', err));
+        }
 
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
         const alreadyInstalled = document.getElementById('already-installed');
         const iosInstructions = document.getElementById('ios-instructions');
 
-        // Detecter si deja installe (mode standalone)
+        // Detecter si deja installe
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
             installBtn.style.display = 'none';
             alreadyInstalled.style.display = 'block';
-            markPWAInstalled();
         }
 
         // Detecter iOS
@@ -214,78 +273,54 @@
         const isInStandaloneMode = window.navigator.standalone;
 
         if (isIOS && !isInStandaloneMode) {
-            installBtn.style.display = 'none';
-            iosInstructions.style.display = 'block';
+            installBtn.textContent = 'Comment installer';
+            installBtn.addEventListener('click', () => {
+                iosInstructions.style.display = iosInstructions.style.display === 'block' ? 'none' : 'block';
+            });
         }
 
-        // Capturer l'evenement beforeinstallprompt (Android/Chrome)
+        // Capturer beforeinstallprompt (Chrome/Edge/Android)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'block';
-            iosInstructions.style.display = 'none';
+            console.log('[PWA] Install prompt ready');
         });
 
-        // Bouton installation
-        installBtn.addEventListener('click', async () => {
-            if (!deferredPrompt) {
-                // Fallback pour navigateurs qui ne supportent pas
-                if (isIOS) {
-                    iosInstructions.style.display = 'block';
+        // Bouton installation (non-iOS)
+        if (!isIOS) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) {
+                    // Pas de prompt dispo - montrer message
+                    alert('Installation non disponible.\n\nUtilise Chrome ou Edge sur Android/PC.');
+                    return;
+                }
+
+                installBtn.disabled = true;
+                installBtn.textContent = 'Installation...';
+
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+
+                if (outcome === 'accepted') {
+                    installBtn.textContent = 'Installe !';
+                    setTimeout(() => {
+                        window.location.href = '/compte/';
+                    }, 1500);
                 } else {
-                    alert('Utilise Chrome ou Safari pour installer l\'app');
+                    installBtn.disabled = false;
+                    installBtn.textContent = 'Installer l\'application';
                 }
-                return;
-            }
 
-            installBtn.disabled = true;
-            installBtn.textContent = '⏳ Installation...';
-
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-
-            if (outcome === 'accepted') {
-                installBtn.textContent = '✅ Installe !';
-                await markPWAInstalled();
-                setTimeout(() => {
-                    window.location.href = '/compte/';
-                }, 1500);
-            } else {
-                installBtn.disabled = false;
-                installBtn.textContent = '📲 Installer l\'application';
-            }
-
-            deferredPrompt = null;
-        });
-
-        // Detecter quand l'app est installee
-        window.addEventListener('appinstalled', async () => {
-            console.log('PWA installee!');
-            await markPWAInstalled();
-        });
-
-        // Marquer la PWA comme installee dans Supabase
-        async function markPWAInstalled() {
-            try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (!session) return;
-
-                // Recuperer le telegram_user_id depuis le user metadata ou une autre source
-                const userId = session.user.id;
-
-                // Mettre a jour via une fonction RPC ou directement
-                const { error } = await supabase
-                    .from('telegram_links')
-                    .update({ pwa_installed: true })
-                    .eq('user_id', userId);
-
-                if (!error) {
-                    console.log('PWA marquee comme installee');
-                }
-            } catch (e) {
-                console.error('Erreur marquage PWA:', e);
-            }
+                deferredPrompt = null;
+            });
         }
+
+        // Event quand installe
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] Installed!');
+            installBtn.style.display = 'none';
+            alreadyInstalled.style.display = 'block';
+        });
     </script>
 </body>
 </html>

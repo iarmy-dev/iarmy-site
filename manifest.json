@@ -4,8 +4,8 @@
   "description": "Compta, Personnel, Objectifs automatises pour restaurants",
   "start_url": "/compte/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#667eea",
+  "background_color": "#030303",
+  "theme_color": "#FF6B35",
   "orientation": "portrait",
   "icons": [
     {
