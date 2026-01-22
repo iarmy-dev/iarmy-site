@@ -232,13 +232,33 @@
         }
         // iOS
         else if (isIOS) {
-            subtitle.textContent = 'Utilise Safari pour installer';
-            installBtn.textContent = 'Voir les instructions';
-            installBtn.onclick = () => {
-                instructions.style.display = instructions.style.display === 'block' ? 'none' : 'block';
-            };
-            if (!isSafari) {
-                status.textContent = '⚠️ Tu es sur ' + (navigator.userAgent.includes('CriOS') ? 'Chrome' : 'un navigateur') + '. Ouvre cette page dans Safari pour installer.';
+            if (isSafari) {
+                // Safari iOS - montrer instructions directement
+                subtitle.textContent = 'Ajoute l\'app sur ton ecran d\'accueil';
+                installBtn.textContent = 'Comment faire ?';
+                instructions.style.display = 'block';
+                installBtn.onclick = () => {
+                    instructions.scrollIntoView({ behavior: 'smooth' });
+                };
+            } else {
+                // Chrome/autre sur iOS - proposer de copier le lien
+                subtitle.textContent = 'Ouvre cette page dans Safari';
+                installBtn.textContent = '📋 Copier le lien';
+                installBtn.onclick = async () => {
+                    try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        installBtn.textContent = '✅ Lien copie !';
+                        status.textContent = 'Ouvre Safari et colle le lien dans la barre d\'adresse';
+                        status.style.display = 'block';
+                        setTimeout(() => {
+                            installBtn.textContent = '📋 Copier le lien';
+                        }, 3000);
+                    } catch (e) {
+                        // Fallback
+                        prompt('Copie ce lien et ouvre-le dans Safari :', window.location.href);
+                    }
+                };
+                status.textContent = '⚠️ Sur iPhone, seul Safari permet d\'installer les apps web';
                 status.style.display = 'block';
             }
         }
