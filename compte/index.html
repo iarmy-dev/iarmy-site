@@ -653,26 +653,24 @@
 
     // === TELEGRAM MINI APP ===
     console.log('[BOOT] Script loaded');
-    console.log('[BOOT] Telegram obj:', !!window.Telegram);
-    console.log('[BOOT] WebApp obj:', !!window.Telegram?.WebApp);
 
     const tg = window.Telegram?.WebApp;
     let isTelegramMiniApp = false;
 
-    // Detecter si on est dans Telegram - multiple checks
-    const inTelegram = tg && (
-      tg.initData ||  // initData present = on vient de Telegram
-      (tg.platform && tg.platform !== 'unknown') ||  // platform connu
-      window.TelegramWebviewProxy  // proxy webview present
+    // Detecter si on est dans Telegram - URL param OU SDK
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromTelegram = urlParams.get('tg') === '1';
+
+    const sdkDetected = tg && (
+      tg.initData ||
+      (tg.platform && tg.platform !== 'unknown') ||
+      window.TelegramWebviewProxy
     );
 
-    console.log('[BOOT] inTelegram:', inTelegram);
-    if (tg) {
-      console.log('[BOOT] tg.initData:', tg.initData);
-      console.log('[BOOT] tg.platform:', tg.platform);
-    }
+    console.log('[BOOT] fromTelegram (URL):', fromTelegram);
+    console.log('[BOOT] sdkDetected:', sdkDetected);
 
-    if (inTelegram) {
+    if (fromTelegram || sdkDetected) {
       isTelegramMiniApp = true;
       console.log('[TG] TELEGRAM DETECTE!');
       console.log('[TG] Platform:', tg.platform);
