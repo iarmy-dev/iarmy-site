@@ -390,7 +390,15 @@
       checkUrlParams();
 
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = '../'; return; }
+      if (!session) {
+        // Si on est dans Telegram, ne pas rediriger
+        if (isTelegramMiniApp) {
+          console.log('[TG] Pas de session Supabase, mais on est dans Telegram');
+          return;
+        }
+        window.location.href = '../';
+        return;
+      }
 
       const user = session.user;
       currentUser = user;
@@ -644,27 +652,70 @@
     const tg = window.Telegram?.WebApp;
     let isTelegramMiniApp = false;
 
-    if (tg && tg.initDataUnsafe?.user) {
+    // Detecter si on est dans Telegram (meme si user pas encore dispo)
+    if (tg && tg.platform && tg.platform !== 'unknown') {
       isTelegramMiniApp = true;
-      console.log('[TG] Mini App detecte');
-      console.log('[TG] User:', tg.initDataUnsafe.user);
+      console.log('[TG] Platform:', tg.platform);
+      console.log('[TG] initData:', tg.initData);
+      console.log('[TG] initDataUnsafe:', JSON.stringify(tg.initDataUnsafe));
 
       // Initialiser le Mini App
       tg.ready();
+
+      // Expand en plein ecran
       tg.expand();
+      tg.enableClosingConfirmation && tg.disableClosingConfirmation();
 
-      // Bouton retour - fermer le Mini App
-      tg.BackButton.show();
-      tg.BackButton.onClick(function() {
-        tg.close();
-      });
+      // Forcer la hauteur viewport
+      document.documentElement.style.height = '100%';
+      document.body.style.height = '100%';
+      document.body.style.minHeight = tg.viewportStableHeight + 'px';
 
-      // Theme
+      // Bouton retour
+      if (tg.BackButton) {
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+          console.log('[TG] Back button clicked');
+          tg.close();
+        });
+      }
+
+      // Appliquer les couleurs Telegram
       document.body.style.backgroundColor = tg.backgroundColor || '#030303';
+      document.body.style.setProperty('--tg-theme-bg-color', tg.backgroundColor || '#030303');
+
+      // Styles specifiques Mini App
+      const style = document.createElement('style');
+      style.textContent = `
+        body.tg-mini-app { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        body.tg-mini-app .page-container { padding-top: 10px !important; padding-bottom: 30px; }
+        body.tg-mini-app nav { display: none !important; }
+        body.tg-mini-app .main-card { border-radius: 20px; }
+        body.tg-mini-app footer { display: none; }
+        body.tg-mini-app .orb { display: none; }
+      `;
+      document.head.appendChild(style);
+      document.body.classList.add('tg-mini-app');
     }
 
     // Init selon le contexte
     async function initFromTelegram() {
+      console.log('[TG] initFromTelegram called');
+
+      // Verifier que les donnees user sont presentes
+      if (!tg.initDataUnsafe?.user) {
+        console.error('[TG] Pas de user dans initDataUnsafe');
+        document.querySelector('.main-card').innerHTML = `
+          <div style="text-align: center; padding: 40px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <h2 style="margin-bottom: 12px;">Erreur Telegram</h2>
+            <p style="color: rgba(255,255,255,0.6);">Donnees utilisateur non disponibles.</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 12px;">Platform: ${tg.platform}<br>initData: ${tg.initData ? 'present' : 'vide'}</p>
+          </div>
+        `;
+        return;
+      }
+
       const telegramUser = tg.initDataUnsafe.user;
       const telegramUserId = telegramUser.id.toString();
 
@@ -682,8 +733,9 @@
         document.querySelector('.main-card').innerHTML = `
           <div style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
-            <h2 style="margin-bottom: 12px;">Compte non lié</h2>
+            <h2 style="margin-bottom: 12px;">Compte non lie</h2>
             <p style="color: rgba(255,255,255,0.6);">Connecte d'abord ton compte sur iarmy.fr</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 12px;">Telegram ID: ${telegramUserId}</p>
           </div>
         `;
         return;
@@ -691,13 +743,6 @@
 
       const userId = link.user_id;
       currentUserId = userId;
-
-      // Charger les infos user depuis Supabase auth (via user_id)
-      const { data: userData } = await supabaseClient
-        .from('telegram_links')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
 
       // Afficher le nom Telegram
       const userName = telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
@@ -719,6 +764,8 @@
       document.getElementById('edit-avatar').src = userAvatar;
       document.getElementById('edit-name').value = userName;
       document.querySelector('.profile-note').textContent = 'La photo vient de ton compte Telegram';
+
+      console.log('[TG] Chargement termine');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
