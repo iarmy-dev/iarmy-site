@@ -777,9 +777,19 @@
       document.querySelector('nav').style.display = 'none';
       document.querySelector('.page-container').style.paddingTop = '20px';
 
-      // Desactiver les liens des modules (on reste dans le Mini App)
-      document.querySelectorAll('.module-card').forEach(card => {
-        card.style.pointerEvents = 'none';
+      // Dans Mini App: clic sur module -> aller aux parametres
+      document.querySelectorAll('.module-card:not(.soon)').forEach(card => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          // Activer l'onglet Parametres
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.querySelector('.tab-btn[data-tab="parametres"]').classList.add('active');
+          document.getElementById('tab-parametres').classList.add('active');
+          // Scroll en haut
+          document.querySelector('.page-container').scrollTo(0, 0);
+        });
+        card.style.cursor = 'pointer';
         card.removeAttribute('href');
       });
 
