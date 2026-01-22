@@ -720,9 +720,12 @@
         </div>
       `;
 
-      // Verifier l'abonnement
-      const hasAccess = await checkModuleAccess(link.user_id, 'compta');
-      if (!hasAccess) {
+      // Verifier l'abonnement via fonction PostgreSQL securisee
+      const { data: hasAccess, error: accessError } = await supabaseClient
+        .rpc('check_module_access', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
+
+      if (accessError || !hasAccess) {
+        console.log('[TG] Access check:', hasAccess, accessError);
         showNoAccessScreen();
         return;
       }
