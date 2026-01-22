@@ -387,15 +387,18 @@
     }
 
     async function init() {
+      console.log('[INIT] init() called, isTelegramMiniApp:', isTelegramMiniApp);
       checkUrlParams();
+
+      // Si on est dans Telegram, ne JAMAIS rediriger
+      if (isTelegramMiniApp) {
+        console.log('[INIT] Dans Telegram, skip session check');
+        return;
+      }
 
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        // Si on est dans Telegram, ne pas rediriger
-        if (isTelegramMiniApp) {
-          console.log('[TG] Pas de session Supabase, mais on est dans Telegram');
-          return;
-        }
+        console.log('[INIT] Pas de session, redirection');
         window.location.href = '../';
         return;
       }
@@ -649,12 +652,29 @@
     }
 
     // === TELEGRAM MINI APP ===
+    console.log('[BOOT] Script loaded');
+    console.log('[BOOT] Telegram obj:', !!window.Telegram);
+    console.log('[BOOT] WebApp obj:', !!window.Telegram?.WebApp);
+
     const tg = window.Telegram?.WebApp;
     let isTelegramMiniApp = false;
 
-    // Detecter si on est dans Telegram (meme si user pas encore dispo)
-    if (tg && tg.platform && tg.platform !== 'unknown') {
+    // Detecter si on est dans Telegram - multiple checks
+    const inTelegram = tg && (
+      tg.initData ||  // initData present = on vient de Telegram
+      (tg.platform && tg.platform !== 'unknown') ||  // platform connu
+      window.TelegramWebviewProxy  // proxy webview present
+    );
+
+    console.log('[BOOT] inTelegram:', inTelegram);
+    if (tg) {
+      console.log('[BOOT] tg.initData:', tg.initData);
+      console.log('[BOOT] tg.platform:', tg.platform);
+    }
+
+    if (inTelegram) {
       isTelegramMiniApp = true;
+      console.log('[TG] TELEGRAM DETECTE!');
       console.log('[TG] Platform:', tg.platform);
       console.log('[TG] initData:', tg.initData);
       console.log('[TG] initDataUnsafe:', JSON.stringify(tg.initDataUnsafe));
