@@ -6370,19 +6370,35 @@
 
     // Main analysis function - combines all intelligence
     function buildSmartAnalysis(sheet, maxCol, maxRow) {
-      // Find header row
+      // Find header row - look for row with accounting keywords
       var headerRow = -1;
-      for (var row = 0; row <= Math.min(7, maxRow); row++) {
+      var bestScore = 0;
+      var accountingKeywords = ['cb', 'esp', 'tr', 'total', 'date', 'jour', 'recette', 'depense', 'carte', 'espece', 'ticket', 'montant', 'ca', 'ttc'];
+
+      for (var row = 0; row <= Math.min(15, maxRow); row++) {
         var textCells = 0;
+        var keywordScore = 0;
         for (var col = 0; col <= maxCol; col++) {
           var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
-          if (cell && cell.t === 's' && cell.v) textCells++;
+          if (cell && cell.v) {
+            var val = String(cell.v).toLowerCase().trim();
+            if (val.length > 0 && val.length < 30) {
+              textCells++;
+              // Check if it's an accounting keyword
+              accountingKeywords.forEach(function(kw) {
+                if (val.includes(kw)) keywordScore += 2;
+              });
+            }
+          }
         }
-        if (textCells >= 3) {
+        // Score = keywords found + text cells (prefer rows with accounting terms)
+        var totalScore = keywordScore + (textCells >= 3 ? textCells : 0);
+        if (totalScore > bestScore) {
+          bestScore = totalScore;
           headerRow = row;
-          break;
         }
       }
+      console.log('[SMART] Header row detected:', headerRow, 'with score:', bestScore);
 
       // Build dependency graph
       var dependencies = buildDependencyGraph(sheet, maxCol, maxRow);
@@ -7063,39 +7079,56 @@
         // Build CONDENSED message for Claude (much fewer tokens!)
         var userMessage = 'Fichier: "' + file.name + '" (onglet: ' + sheetName + ')\n\n';
 
-        // Payment methods detected
-        if (analysis.businessLogic.paymentMethods.length > 0) {
-          userMessage += 'MOYENS DE PAIEMENT DETECTES:\n';
-          analysis.businessLogic.paymentMethods.forEach(function(pm) {
-            userMessage += '- ' + pm.name + ' (col ' + pm.column + ', type: ' + pm.type + ')\n';
-          });
-          userMessage += '\n';
-        }
+        // Check if smart analysis found anything useful
+        var hasSmartData = analysis.businessLogic.paymentMethods.length > 0 ||
+                           analysis.businessLogic.totals.length > 0 ||
+                           analysis.businessLogic.expenses.length > 0;
 
-        // Totals detected
-        if (analysis.businessLogic.totals.length > 0) {
-          userMessage += 'TOTAUX DETECTES:\n';
-          analysis.businessLogic.totals.forEach(function(t) {
-            userMessage += '- ' + t.name + ' (col ' + t.column + ')\n';
-          });
-          userMessage += '\n';
-        }
+        if (hasSmartData) {
+          // Use smart analysis
+          if (analysis.businessLogic.paymentMethods.length > 0) {
+            userMessage += 'MOYENS DE PAIEMENT DETECTES:\n';
+            analysis.businessLogic.paymentMethods.forEach(function(pm) {
+              userMessage += '- ' + pm.name + ' (col ' + pm.column + ', type: ' + pm.type + ')\n';
+            });
+            userMessage += '\n';
+          }
 
-        // Expenses detected
-        if (analysis.businessLogic.expenses.length > 0) {
-          userMessage += 'DEPENSES DETECTEES:\n';
-          analysis.businessLogic.expenses.forEach(function(e) {
-            userMessage += '- ' + e.name + ' (col ' + e.column + ')\n';
-          });
-          userMessage += '\n';
-        }
+          if (analysis.businessLogic.totals.length > 0) {
+            userMessage += 'TOTAUX DETECTES:\n';
+            analysis.businessLogic.totals.forEach(function(t) {
+              userMessage += '- ' + t.name + ' (col ' + t.column + ')\n';
+            });
+            userMessage += '\n';
+          }
 
-        // Other columns
-        if (analysis.businessLogic.other.length > 0) {
-          userMessage += 'AUTRES COLONNES:\n';
-          analysis.businessLogic.other.slice(0, 8).forEach(function(o) {
-            userMessage += '- ' + o.name + ' (col ' + o.column + ')\n';
-          });
+          if (analysis.businessLogic.expenses.length > 0) {
+            userMessage += 'DEPENSES DETECTEES:\n';
+            analysis.businessLogic.expenses.forEach(function(e) {
+              userMessage += '- ' + e.name + ' (col ' + e.column + ')\n';
+            });
+            userMessage += '\n';
+          }
+
+          if (analysis.businessLogic.other.length > 0) {
+            userMessage += 'AUTRES COLONNES:\n';
+            analysis.businessLogic.other.slice(0, 8).forEach(function(o) {
+              userMessage += '- ' + o.name + ' (col ' + o.column + ')\n';
+            });
+            userMessage += '\n';
+          }
+        } else {
+          // Fallback: send raw header row data
+          console.log('[AI SMART] No business logic detected, sending raw headers');
+          userMessage += 'HEADERS DETECTES (ligne ' + (analysis.headerRow + 1) + '):\n';
+          for (var col = 0; col <= maxCol; col++) {
+            var cellRef = XLSX.utils.encode_cell({ r: analysis.headerRow, c: col });
+            var cell = sheet[cellRef];
+            if (cell && cell.v) {
+              var colLetter = XLSX.utils.encode_col(col);
+              userMessage += '- ' + colLetter + ': ' + String(cell.v).trim() + '\n';
+            }
+          }
           userMessage += '\n';
         }
 
@@ -7108,7 +7141,7 @@
           userMessage += '\n';
         }
 
-        // Input vs calculated columns
+        // Input vs calculated columns (always useful)
         userMessage += 'COLONNES SAISIE: ' + (analysis.inputColumns.length > 0 ? analysis.inputColumns.join(', ') : 'aucune') + '\n';
         userMessage += 'COLONNES CALCULEES: ' + (analysis.calculatedColumns.length > 0 ? analysis.calculatedColumns.join(', ') : 'aucune') + '\n\n';
 
