@@ -739,10 +739,10 @@
 
       console.log('[TG] Chargement user Telegram:', telegramUserId);
 
-      // Chercher le user via telegram_links (avec display_name)
+      // Chercher le user via telegram_links (avec toutes les infos)
       const { data: link, error } = await supabaseClient
         .from('telegram_links')
-        .select('user_id, display_name')
+        .select('user_id, display_name, avatar_url, email')
         .eq('telegram_user_id', telegramUserId)
         .single();
 
@@ -764,10 +764,10 @@
       const userId = link.user_id;
       currentUserId = userId;
 
-      // Utiliser le display_name du compte, sinon Telegram
-      const userName = link.display_name || telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : '');
-      const userEmail = telegramUser.username ? '@' + telegramUser.username : 'via Telegram';
-      const userAvatar = telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+      // Utiliser les infos du compte Google stockees dans telegram_links
+      const userName = link.display_name || telegramUser.first_name;
+      const userEmail = link.email || (telegramUser.username ? '@' + telegramUser.username : '');
+      const userAvatar = link.avatar_url || telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('profile-avatar').src = userAvatar;
       document.getElementById('profile-name').textContent = userName;
