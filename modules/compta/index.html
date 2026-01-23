@@ -683,7 +683,20 @@
       // Recuperer telegram_user_id (depuis URL ou SDK)
       const urlParams = new URLSearchParams(window.location.search);
       const tguidFromUrl = urlParams.get('tguid');
+      const initData = tg?.initData;
       const telegramUser = tg?.initDataUnsafe?.user;
+
+      // Debug
+      console.log('[TG] initData present:', !!initData, 'length:', initData?.length || 0);
+      console.log('[TG] telegramUser:', telegramUser);
+      console.log('[TG] tguidFromUrl:', tguidFromUrl);
+
+      // Verifier initData obligatoire
+      if (!initData) {
+        console.error('[TG] Pas d\'initData disponible');
+        showTelegramError('Erreur Telegram: relance l\'app depuis le menu');
+        return;
+      }
 
       if (tguidFromUrl) {
         telegramUserId = tguidFromUrl;
@@ -701,7 +714,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            initData: tg?.initData || null,
+            initData: initData,
             telegramUserId: telegramUserId
           })
         });
@@ -710,7 +723,13 @@
 
         if (!response.ok || authData.error) {
           console.log('[TG] Auth error:', authData);
-          showTelegramError(authData.code === 'NOT_LINKED' ? 'Compte non lie. Liez votre Telegram sur iarmy.fr/compte' : 'Erreur d\'authentification');
+          if (authData.code === 'NOT_LINKED') {
+            showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
+          } else if (authData.code === 'INVALID_SIGNATURE') {
+            showTelegramError('Session expiree. Ferme et reouvre l\'app.');
+          } else {
+            showTelegramError(authData.error || 'Erreur d\'authentification');
+          }
           return;
         }
 

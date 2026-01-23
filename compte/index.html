@@ -565,6 +565,18 @@
       const initData = tg?.initData; // Donnees signees par Telegram
       const telegramUser = tg?.initDataUnsafe?.user;
 
+      // Debug: afficher ce qu'on a
+      console.log('[TG] initData present:', !!initData, 'length:', initData?.length || 0);
+      console.log('[TG] telegramUser:', telegramUser);
+      console.log('[TG] tguidFromUrl:', tguidFromUrl);
+
+      // Si pas d'initData, afficher erreur immediatement
+      if (!initData) {
+        console.error('[TG] Pas d\'initData disponible');
+        showTelegramError('Erreur Telegram: relance l\'app depuis le menu');
+        return;
+      }
+
       // Stocker l'ID Telegram AVANT l'auth (pour navigation ulterieure)
       const actualTelegramId = tguidFromUrl || telegramUser?.id?.toString() || null;
 
