@@ -7397,65 +7397,8 @@
           analysis: analysis
         };
 
-        // Build CONDENSED message for Claude (much fewer tokens!)
-        var userMessage = 'Fichier: "' + file.name + '" (onglet: ' + sheetName + ')\n\n';
-
-        // Check if smart analysis found anything useful
-        var hasSmartData = analysis.businessLogic.paymentMethods.length > 0 ||
-                           analysis.businessLogic.totals.length > 0 ||
-                           analysis.businessLogic.expenses.length > 0;
-
-        if (hasSmartData) {
-          // Use smart analysis
-          if (analysis.businessLogic.paymentMethods.length > 0) {
-            userMessage += 'MOYENS DE PAIEMENT DETECTES:\n';
-            analysis.businessLogic.paymentMethods.forEach(function(pm) {
-              userMessage += '- ' + pm.name + ' (col ' + pm.column + ', type: ' + pm.type + ')\n';
-            });
-            userMessage += '\n';
-          }
-
-          if (analysis.businessLogic.totals.length > 0) {
-            userMessage += 'TOTAUX DETECTES:\n';
-            analysis.businessLogic.totals.forEach(function(t) {
-              userMessage += '- ' + t.name + ' (col ' + t.column + ')\n';
-            });
-            userMessage += '\n';
-          }
-
-          if (analysis.businessLogic.expenses.length > 0) {
-            userMessage += 'DEPENSES DETECTEES:\n';
-            analysis.businessLogic.expenses.forEach(function(e) {
-              userMessage += '- ' + e.name + ' (col ' + e.column + ')\n';
-            });
-            userMessage += '\n';
-          }
-
-          if (analysis.businessLogic.other.length > 0) {
-            userMessage += 'AUTRES COLONNES:\n';
-            analysis.businessLogic.other.slice(0, 8).forEach(function(o) {
-              userMessage += '- ' + o.name + ' (col ' + o.column + ')\n';
-            });
-            userMessage += '\n';
-          }
-        } else {
-          // Fallback: send raw header row data
-          console.log('[AI SMART] No business logic detected, sending raw headers');
-          userMessage += 'HEADERS DETECTES (ligne ' + (analysis.headerRow + 1) + '):\n';
-          for (var col = 0; col <= maxCol; col++) {
-            var cellRef = XLSX.utils.encode_cell({ r: analysis.headerRow, c: col });
-            var cell = sheet[cellRef];
-            if (cell && cell.v) {
-              var colLetter = XLSX.utils.encode_col(col);
-              userMessage += '- ' + colLetter + ': ' + String(cell.v).trim() + '\n';
-            }
-          }
-          userMessage += '\n';
-        }
-
-        // Zones detected - skip, not useful for AI (it has the business logic already)
-
-        // Input vs calculated columns - convert letters to names
+        // Build SIMPLIFIED message for AI (2-step approach)
+        // Convert column letters to names
         function colLetterToName(colLetter) {
           var colNum = XLSX.utils.decode_col(colLetter);
           var cellRef = XLSX.utils.encode_cell({ r: analysis.headerRow, c: colNum });
@@ -7466,30 +7409,20 @@
         var inputNames = analysis.inputColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
         var calcNames = analysis.calculatedColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
 
-        // Remove duplicates (same column can appear multiple times)
+        // Remove duplicates
         inputNames = [...new Set(inputNames)];
         calcNames = [...new Set(calcNames)];
 
-        // If a column appears in BOTH lists, it means there are 2 columns with same name
-        // One has formula, one doesn't - the INPUT one is what user fills
-        var duplicateNames = inputNames.filter(function(n) { return calcNames.includes(n); });
-        if (duplicateNames.length > 0) {
-          userMessage += 'NOTE: ' + duplicateNames.join(', ') + ' apparait en double (une version calculee, une a saisir). La version a SAISIR est celle que tu dois inclure.\n\n';
-        }
+        // Build simple message
+        var userMessage = 'Mon fichier Excel:\n';
+        userMessage += 'Colonnes a remplir: ' + (inputNames.length > 0 ? inputNames.join(', ') : 'aucune') + '\n';
 
-        userMessage += 'COLONNES A SAISIR (sans formule): ' + (inputNames.length > 0 ? inputNames.join(', ') : 'aucune') + '\n';
-        userMessage += 'COLONNES CALCULEES (avec formule, a ignorer): ' + (calcNames.length > 0 ? calcNames.join(', ') : 'aucune') + '\n\n';
-
-        // Simplified formulas (already translated to column names)
+        // Add formulas if any
         if (analysis.formulas.length > 0) {
-          userMessage += 'FORMULES SIMPLIFIEES (' + analysis.formulaCount + ' au total):\n';
-          analysis.formulas.forEach(function(f) {
-            userMessage += '- ' + f + '\n';
-          });
-          userMessage += '\n';
+          userMessage += 'Formules: ' + analysis.formulas.join('; ') + '\n';
         }
 
-        userMessage += 'Confirme cette analyse et propose la config (colonnes a saisir + regles de calcul).';
+        userMessage += '\nGenere la config.';
 
         aiConversationHistory.push({ role: 'user', content: userMessage });
 
