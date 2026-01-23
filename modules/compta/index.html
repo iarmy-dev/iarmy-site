@@ -524,10 +524,6 @@
         </div>
       </div>
       <div class="preview-rules" id="preview-rules" style="display: none;"></div>
-      <div id="preview-links" style="display: none; margin-top: 10px; justify-content: center; gap: 16px;">
-        <a id="sheet-link" href="#" target="_blank" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;">↗ Sheet</a>
-        <a id="tg-link" href="https://t.me/IArmyBOT" target="_blank" style="color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none;">↗ Bot</a>
-      </div>
     </div>
 
     <!-- Keywords -->
@@ -555,27 +551,35 @@
         <div class="section-title">Exports</div>
       </div>
 
-      <!-- Envoi automatique -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <div style="font-size: 13px; font-weight: 600; color: white;">📧 Envoi automatique</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Envoie le PDF à ta comptable chaque mois</div>
+      <!-- Envoi automatique (accordéon) -->
+      <div id="auto-export-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; margin-bottom: 12px;">
+        <!-- Header cliquable -->
+        <div onclick="toggleAutoExportAccordion()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px;">
+                📧 Envoi automatique
+                <span id="auto-export-status-badge" style="display: none; font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(74,222,128,0.15); color: #4ade80;">Actif</span>
+              </div>
+              <div id="auto-export-subtitle" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Envoie le PDF à ta comptable chaque mois</div>
+            </div>
           </div>
-          <label style="position: relative; width: 44px; height: 24px;">
-            <input type="checkbox" id="auto-export-toggle" onchange="toggleAutoExport()" style="opacity: 0; width: 0; height: 0;">
-            <span style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border-radius: 12px; transition: 0.3s;"></span>
-            <span id="toggle-dot" style="position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s;"></span>
-          </label>
+          <span id="auto-export-arrow" style="color: rgba(255,255,255,0.4); transition: transform 0.2s;">▼</span>
         </div>
-        <div id="auto-export-settings" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);">
-          <input type="email" id="export-email" placeholder="Email de ta comptable" style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px; margin-bottom: 10px;" oninput="updateEmailPreview()" onchange="saveAutoExportSettings()">
-          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-            <select id="auto-export-day" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="saveAutoExportSettings()">
+        <!-- Contenu accordéon -->
+        <div id="auto-export-content" style="display: none; padding: 0 14px 14px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <!-- Email -->
+          <div style="margin-top: 12px;">
+            <input type="email" id="export-email" placeholder="Email de ta comptable" style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 13px;" oninput="updateEmailPreview(); validateExportEmail(); updateAutoExportBadge(document.getElementById('auto-export-toggle').checked);" onchange="saveAutoExportSettings();">
+            <div id="email-error" style="display: none; font-size: 11px; color: #f87171; margin-top: 6px; padding-left: 4px;">Email invalide</div>
+          </div>
+          <!-- Options -->
+          <div style="display: flex; gap: 8px; margin: 10px 0;">
+            <select id="auto-export-day" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="saveAutoExportSettings();">
               <option value="1">1er du mois</option>
               <option value="5">5 du mois</option>
             </select>
-            <select id="auto-export-format" style="width: 80px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="saveAutoExportSettings()">
+            <select id="auto-export-format" style="width: 80px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: white; font-size: 12px;" onchange="saveAutoExportSettings();">
               <option value="pdf">PDF</option>
               <option value="xlsx">Excel</option>
             </select>
@@ -588,12 +592,21 @@
             </div>
           </div>
           <!-- Info Telegram -->
-          <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 10px; padding: 8px 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
+          <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px; padding: 8px 10px; background: rgba(255,255,255,0.02); border-radius: 6px;">
             📱 Tu recevras une validation sur Telegram avant l'envoi
           </div>
           <input type="hidden" id="require-telegram-confirm" value="true">
+          <!-- Toggle activation -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 12px;">
+            <div style="font-size: 13px; color: white;">Activer l'envoi automatique</div>
+            <label style="position: relative; width: 44px; height: 24px;">
+              <input type="checkbox" id="auto-export-toggle" onchange="toggleAutoExport()" style="opacity: 0; width: 0; height: 0;">
+              <span style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border-radius: 12px; transition: 0.3s;"></span>
+              <span id="toggle-dot" style="position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; background: rgba(255,255,255,0.4); border-radius: 50%; transition: 0.3s;"></span>
+            </label>
+          </div>
           <!-- Preview email -->
-          <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+          <div style="padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
             <div style="font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Aperçu du mail</div>
             <div style="background: white; border-radius: 8px; padding: 12px; color: #333;">
               <div style="font-size: 10px; color: #666; margin-bottom: 8px;">
@@ -990,8 +1003,6 @@
         document.getElementById('export-section').style.display = 'block';
         document.getElementById('notif-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
-        document.getElementById('sheet-link').href = sheetUrl;
-        document.getElementById('preview-links').style.display = 'flex';
       }
 
       // Charger les settings d'export et notifications
@@ -1210,9 +1221,6 @@
         document.getElementById('export-section').style.display = 'block';
         document.getElementById('notif-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
-        // Afficher les liens rapides
-        document.getElementById('sheet-link').href = sheetUrl;
-        document.getElementById('preview-links').style.display = 'flex';
       }
 
       // Charger les settings d'export
@@ -1226,7 +1234,7 @@
         document.getElementById('auto-export-toggle').checked = true;
         document.getElementById('toggle-dot').classList.add('toggle-dot-active');
         document.getElementById('toggle-dot').previousElementSibling.classList.add('toggle-active');
-        document.getElementById('auto-export-settings').style.display = 'block';
+        updateAutoExportBadge(true);
       }
       if (exportSettings.export_email) {
         document.getElementById('export-email').value = exportSettings.export_email;
@@ -1928,21 +1936,84 @@
     }
 
 
+    // Accordéon envoi automatique
+    function toggleAutoExportAccordion() {
+      const content = document.getElementById('auto-export-content');
+      const arrow = document.getElementById('auto-export-arrow');
+      const isOpen = content.style.display !== 'none';
+
+      content.style.display = isOpen ? 'none' : 'block';
+      arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // Mettre à jour le badge de statut
+    function updateAutoExportBadge(isActive) {
+      const badge = document.getElementById('auto-export-status-badge');
+      const subtitle = document.getElementById('auto-export-subtitle');
+      const email = document.getElementById('export-email').value;
+
+      if (isActive && email) {
+        badge.style.display = 'inline';
+        subtitle.textContent = email;
+      } else {
+        badge.style.display = 'none';
+        subtitle.textContent = 'Envoie le PDF à ta comptable chaque mois';
+      }
+    }
+
+    // Valider l'email
+    function validateExportEmail() {
+      const emailInput = document.getElementById('export-email');
+      const errorDiv = document.getElementById('email-error');
+      const email = emailInput.value.trim();
+
+      if (!email) {
+        errorDiv.style.display = 'none';
+        emailInput.style.borderColor = 'rgba(255,255,255,0.08)';
+        return true; // Vide = OK (pas encore rempli)
+      }
+
+      // Regex simple pour validation email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const isValid = emailRegex.test(email);
+
+      if (!isValid) {
+        errorDiv.style.display = 'block';
+        emailInput.style.borderColor = 'rgba(248,113,113,0.5)';
+      } else {
+        errorDiv.style.display = 'none';
+        emailInput.style.borderColor = 'rgba(74,222,128,0.3)';
+      }
+
+      return isValid;
+    }
+
     // Toggle envoi automatique
     function toggleAutoExport() {
       const toggle = document.getElementById('auto-export-toggle');
       const dot = document.getElementById('toggle-dot');
-      const settings = document.getElementById('auto-export-settings');
+      const email = document.getElementById('export-email').value.trim();
 
+      // Si on essaie d'activer, vérifier l'email
       if (toggle.checked) {
+        if (!email) {
+          showToast('Entre l\'email de ta comptable', true);
+          toggle.checked = false;
+          return;
+        }
+        if (!validateExportEmail()) {
+          showToast('Email invalide', true);
+          toggle.checked = false;
+          return;
+        }
         dot.classList.add('toggle-dot-active');
         dot.previousElementSibling.classList.add('toggle-active');
-        settings.style.display = 'block';
       } else {
         dot.classList.remove('toggle-dot-active');
         dot.previousElementSibling.classList.remove('toggle-active');
-        settings.style.display = 'none';
       }
+
+      updateAutoExportBadge(toggle.checked);
       saveAutoExportSettings();
     }
 
