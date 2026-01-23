@@ -7453,18 +7453,21 @@
           userMessage += '\n';
         }
 
-        // Zones detected
-        if (analysis.zones.length > 1) {
-          userMessage += 'STRUCTURE: ' + analysis.zones.length + ' zones detectees\n';
-          analysis.zones.forEach(function(zone, i) {
-            userMessage += '- Zone ' + (i + 1) + ': colonnes ' + zone.columns.join(',') + ' (' + zone.type + ')\n';
-          });
-          userMessage += '\n';
+        // Zones detected - skip, not useful for AI (it has the business logic already)
+
+        // Input vs calculated columns - convert letters to names
+        function colLetterToName(colLetter) {
+          var colNum = XLSX.utils.decode_col(colLetter);
+          var cellRef = XLSX.utils.encode_cell({ r: analysis.headerRow, c: colNum });
+          var cell = sheet[cellRef];
+          return cell && cell.v ? String(cell.v).trim() : colLetter;
         }
 
-        // Input vs calculated columns (always useful)
-        userMessage += 'COLONNES SAISIE: ' + (analysis.inputColumns.length > 0 ? analysis.inputColumns.join(', ') : 'aucune') + '\n';
-        userMessage += 'COLONNES CALCULEES: ' + (analysis.calculatedColumns.length > 0 ? analysis.calculatedColumns.join(', ') : 'aucune') + '\n\n';
+        var inputNames = analysis.inputColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
+        var calcNames = analysis.calculatedColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
+
+        userMessage += 'COLONNES SAISIE (sans formule): ' + (inputNames.length > 0 ? inputNames.join(', ') : 'aucune') + '\n';
+        userMessage += 'COLONNES CALCULEES (avec formule): ' + (calcNames.length > 0 ? calcNames.join(', ') : 'aucune') + '\n\n';
 
         // Simplified formulas (already translated to column names)
         if (analysis.formulas.length > 0) {
