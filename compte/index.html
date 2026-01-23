@@ -614,8 +614,13 @@
 
       // Subscription info
       if (sub) {
-        document.getElementById('billing-product').textContent = sub.productName || 'Compta Express';
-        document.getElementById('billing-price').textContent = formatAmount(sub.amount, sub.currency) + '/' + (sub.interval === 'month' ? 'mois' : 'an');
+        document.getElementById('billing-product').textContent = sub.productName || 'iArmy Compta';
+        // Afficher "Gratuit" pour les testeurs
+        if (sub.isTester || sub.status === 'tester') {
+          document.getElementById('billing-price').textContent = 'Gratuit';
+        } else {
+          document.getElementById('billing-price').textContent = formatAmount(sub.amount, sub.currency) + '/' + (sub.interval === 'month' ? 'mois' : 'an');
+        }
 
         // Status badge
         const badge = document.getElementById('billing-status-badge');
@@ -628,6 +633,13 @@
           document.getElementById('billing-renewal-label').textContent = 'Prochaine facture';
           document.getElementById('billing-renewal').textContent = formatDate(sub.currentPeriodEnd);
           document.getElementById('cancel-section').style.display = 'block';
+        } else if (sub.status === 'tester' || sub.isTester) {
+          badge.textContent = 'Testeur';
+          badge.className = 'status-badge tester';
+          statusText.textContent = 'Acces testeur gratuit';
+          document.getElementById('billing-renewal-label').textContent = 'Statut';
+          document.getElementById('billing-renewal').textContent = 'Illimite';
+          // Pas de bouton annuler pour les testeurs
         } else if (sub.status === 'trialing') {
           badge.textContent = 'Essai gratuit';
           badge.className = 'status-badge trialing';
