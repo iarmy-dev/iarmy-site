@@ -7466,8 +7466,19 @@
         var inputNames = analysis.inputColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
         var calcNames = analysis.calculatedColumns.map(colLetterToName).filter(function(n) { return n && n.length > 1; });
 
-        userMessage += 'COLONNES SAISIE (sans formule): ' + (inputNames.length > 0 ? inputNames.join(', ') : 'aucune') + '\n';
-        userMessage += 'COLONNES CALCULEES (avec formule): ' + (calcNames.length > 0 ? calcNames.join(', ') : 'aucune') + '\n\n';
+        // Remove duplicates (same column can appear multiple times)
+        inputNames = [...new Set(inputNames)];
+        calcNames = [...new Set(calcNames)];
+
+        // If a column appears in BOTH lists, it means there are 2 columns with same name
+        // One has formula, one doesn't - the INPUT one is what user fills
+        var duplicateNames = inputNames.filter(function(n) { return calcNames.includes(n); });
+        if (duplicateNames.length > 0) {
+          userMessage += 'NOTE: ' + duplicateNames.join(', ') + ' apparait en double (une version calculee, une a saisir). La version a SAISIR est celle que tu dois inclure.\n\n';
+        }
+
+        userMessage += 'COLONNES A SAISIR (sans formule): ' + (inputNames.length > 0 ? inputNames.join(', ') : 'aucune') + '\n';
+        userMessage += 'COLONNES CALCULEES (avec formule, a ignorer): ' + (calcNames.length > 0 ? calcNames.join(', ') : 'aucune') + '\n\n';
 
         // Simplified formulas (already translated to column names)
         if (analysis.formulas.length > 0) {
