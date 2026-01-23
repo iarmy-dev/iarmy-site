@@ -678,16 +678,20 @@
 
       } catch (err) {
         console.error('[TG] Auth exception:', err);
-        showTelegramError('Erreur de connexion');
+        showTelegramError('Erreur reseau: ' + (err.message || 'connexion impossible'), true);
       }
     }
 
-    function showTelegramError(message) {
+    function showTelegramError(message, isNetworkError = false) {
+      const subtitle = isNetworkError
+        ? 'Verifie ta connexion internet et reessaie.'
+        : 'Connecte-toi d\'abord sur le site web.';
       document.querySelector('.container').innerHTML = `
         <div style="text-align: center; padding: 60px 20px;">
           <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
           <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">${message}</h2>
-          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">Connecte-toi d'abord sur le site web.</p>
+          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">${subtitle}</p>
+          <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: #FF6B35; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">Reessayer</button>
         </div>
       `;
     }
