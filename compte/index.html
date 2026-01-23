@@ -87,7 +87,7 @@
     .connection-card.connected { border-color: rgba(34,197,94,0.2); }
     .connection-card:hover { background: rgba(255,255,255,0.04); }
     .connection-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .connection-icon { font-size: 18px; }
+    .connection-icon { width: 20px; height: 20px; flex-shrink: 0; }
     .connection-name { font-size: 13px; font-weight: 500; }
     .connection-status { font-size: 12px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 6px; }
     .connection-status.ok { color: #4ade80; }
@@ -167,6 +167,16 @@
     .toast.error { background: rgba(239,68,68,0.9); }
     @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
+    /* Deletion banner */
+    .deletion-banner { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05)); border: 1px solid rgba(239,68,68,0.3); border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; display: none; }
+    .deletion-banner.active { display: block; }
+    .deletion-banner-content { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .deletion-banner-text { flex: 1; min-width: 200px; }
+    .deletion-banner-title { font-size: 14px; font-weight: 600; color: #f87171; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .deletion-banner-desc { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .btn-cancel-deletion { padding: 10px 20px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); border-radius: 10px; color: #4ade80; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .btn-cancel-deletion:hover { background: rgba(34,197,94,0.25); }
+
     /* Loading */
     .loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
     .spinner { width: 24px; height: 24px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #FF6B35; border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -225,6 +235,20 @@
       </div>
     </div>
 
+    <!-- Deletion Banner -->
+    <div class="deletion-banner" id="deletion-banner">
+      <div class="deletion-banner-content">
+        <div class="deletion-banner-text">
+          <div class="deletion-banner-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Suppression programmee
+          </div>
+          <div class="deletion-banner-desc">Ton compte sera supprime le <strong id="deletion-date">-</strong></div>
+        </div>
+        <button class="btn-cancel-deletion" onclick="cancelDeletion()">Annuler la suppression</button>
+      </div>
+    </div>
+
     <!-- Stats -->
     <div id="stats-section" style="display: none;">
       <div class="section-title">Ce mois</div>
@@ -279,7 +303,11 @@
     <div class="connections-grid">
       <div class="connection-card" id="conn-sheets">
         <div class="connection-header">
-          <span class="connection-icon">📊</span>
+          <svg class="connection-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3z" fill="#0F9D58"/>
+            <path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3z" fill="#0F9D58"/>
+            <path d="M7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z" fill="white"/>
+          </svg>
           <span class="connection-name">Google Sheets</span>
         </div>
         <div class="connection-status" id="sheets-status">
@@ -288,7 +316,9 @@
       </div>
       <div class="connection-card" id="conn-telegram">
         <div class="connection-header">
-          <span class="connection-icon">✈️</span>
+          <svg class="connection-icon" width="20" height="20" viewBox="0 0 24 24" fill="#2AABEE">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.28-.37.78-.57 3.05-1.33 5.08-2.21 6.1-2.63 2.91-1.21 3.52-1.42 3.91-1.43.09 0 .28.02.41.12.1.09.13.21.15.34-.01.05.01.18 0 .28z"/>
+          </svg>
           <span class="connection-name">Telegram</span>
         </div>
         <div class="connection-status" id="telegram-status">
@@ -460,15 +490,30 @@
 
   <!-- Delete Confirmation Modal -->
   <div class="modal-overlay" id="modal-delete">
-    <div class="modal" style="max-width: 380px;">
-      <div class="modal-body" style="text-align: center; padding: 32px;">
-        <div style="font-size: 40px; margin-bottom: 16px;">⚠️</div>
-        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #f87171;">Supprimer ton compte ?</h3>
-        <p style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px;">Cette action est irreversible. Toutes tes donnees seront supprimees.</p>
-        <div style="display: flex; gap: 12px;">
-          <button class="btn-small" style="flex: 1;" onclick="closeModal('delete')">Annuler</button>
-          <button class="btn-danger-small" style="flex: 1; padding: 12px;" onclick="deleteAccount()">Oui, supprimer</button>
+    <div class="modal" style="max-width: 420px;">
+      <div class="modal-header">
+        <span class="modal-title" style="color: #f87171;">Supprimer ton compte</span>
+        <button class="modal-close" onclick="closeModal('delete')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <p style="font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 12px;">Cette action va desactiver ton compte. Tu as <strong style="color: #fbbf24;">30 jours</strong> pour changer d'avis.</p>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.5);">Apres ce delai, sera supprime definitivement :</p>
+          <ul style="font-size: 12px; color: rgba(255,255,255,0.4); margin: 8px 0 0 16px; line-height: 1.8;">
+            <li>Tes donnees de comptabilite</li>
+            <li>Ton historique Telegram</li>
+            <li>Ton abonnement (sans remboursement)</li>
+          </ul>
         </div>
+        <p style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Tape <strong style="color: #f87171;">SUPPRIMER</strong> pour confirmer :</p>
+        <input type="text" id="delete-confirm-input" class="settings-input" style="width: 100%; margin-bottom: 16px;" placeholder="Tape SUPPRIMER" autocomplete="off">
+        <div style="display: flex; gap: 12px;">
+          <button class="btn-small" style="flex: 1; padding: 12px;" onclick="closeModal('delete')">Annuler</button>
+          <button class="btn-danger-small" style="flex: 1; padding: 12px; opacity: 0.5; cursor: not-allowed;" id="btn-confirm-delete" onclick="deleteAccount()" disabled>Supprimer mon compte</button>
+        </div>
+        <p style="font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 12px;">Tes Google Sheets ne seront pas affectes.</p>
       </div>
     </div>
   </div>
@@ -485,9 +530,155 @@
     let stripe = null;
     let cardElement = null;
     let moduleConfig = null;
+    let isTelegramMode = false;
+    let telegramUserId = null;
+
+    // Detecter Telegram Mini App
+    function detectTelegram() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromUrl = urlParams.get('tg') === '1';
+      const tg = window.Telegram?.WebApp;
+      const sdkDetected = tg && (tg.initData || (tg.platform && tg.platform !== 'unknown') || window.TelegramWebviewProxy);
+      return fromUrl || sdkDetected;
+    }
+
+    // Init depuis Telegram
+    async function initFromTelegram() {
+      isTelegramMode = true;
+      const tg = window.Telegram?.WebApp;
+
+      // Cacher le bouton deconnexion en mode Telegram
+      document.querySelector('.btn-icon.danger')?.remove();
+
+      // Theme Telegram
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        document.body.style.backgroundColor = tg.backgroundColor || '#030303';
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => tg.close());
+      }
+
+      // Recuperer telegram_user_id
+      const urlParams = new URLSearchParams(window.location.search);
+      const tguidFromUrl = urlParams.get('tguid');
+      const telegramUser = tg?.initDataUnsafe?.user;
+
+      if (tguidFromUrl) {
+        telegramUserId = tguidFromUrl;
+      } else if (telegramUser?.id) {
+        telegramUserId = telegramUser.id;
+      } else {
+        showTelegramError('Impossible de recuperer votre compte Telegram');
+        return;
+      }
+
+      // Chercher le user via RPC
+      const { data: linkData, error } = await supabaseClient
+        .rpc('get_telegram_link', { p_telegram_user_id: telegramUserId.toString() });
+
+      const link = linkData?.[0];
+      if (error || !link) {
+        console.log('[TG] Link error:', error, linkData);
+        showTelegramError('Compte non lie. Connecte-toi sur iarmy.fr');
+        return;
+      }
+
+      // Creer un pseudo currentUser pour compatibilite
+      currentUser = {
+        id: link.user_id,
+        email: link.email,
+        user_metadata: {
+          full_name: link.display_name,
+          avatar_url: link.avatar_url
+        }
+      };
+
+      // Afficher les infos
+      const userName = link.display_name || 'Utilisateur';
+      const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+      document.getElementById('user-name').textContent = userName;
+      document.getElementById('user-email').textContent = link.email || '';
+      document.getElementById('avatar-initials').textContent = initials;
+
+      if (link.avatar_url) {
+        document.getElementById('avatar').innerHTML = `<img src="${link.avatar_url}" alt="">`;
+      }
+
+      // Settings modal
+      document.getElementById('settings-name').value = userName;
+      document.getElementById('settings-email').textContent = link.email || '';
+      document.getElementById('avatar-edit-initials').textContent = initials;
+      if (link.avatar_url) {
+        document.getElementById('avatar-edit').innerHTML = `<img src="${link.avatar_url}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+      }
+
+      // Charger les donnees
+      await loadModuleDataTelegram();
+      await loadUserStatusTelegram();
+    }
+
+    function showTelegramError(message) {
+      document.querySelector('.container').innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">${message}</h2>
+          <p style="color: rgba(255,255,255,0.5); font-size: 14px;">Connecte-toi d'abord sur le site web.</p>
+        </div>
+      `;
+    }
+
+    async function loadModuleDataTelegram() {
+      try {
+        const { data: configData } = await supabaseClient
+          .rpc('get_module_config_by_telegram', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
+
+        const config = configData?.[0];
+        moduleConfig = config;
+
+        if (config?.sheet_id) {
+          document.getElementById('module-status').textContent = 'Actif';
+          document.getElementById('conn-sheets').classList.add('connected');
+          document.getElementById('sheets-status').innerHTML = '<span class="dot"></span> Connecte';
+          document.getElementById('sheets-status').classList.add('ok');
+        } else {
+          document.getElementById('module-status').textContent = 'A configurer';
+          document.getElementById('module-compta').classList.add('inactive');
+        }
+
+        // Telegram est forcement connecte si on est la
+        document.getElementById('conn-telegram').classList.add('connected');
+        document.getElementById('telegram-status').innerHTML = '<span class="dot"></span> Connecte';
+        document.getElementById('telegram-status').classList.add('ok');
+
+      } catch (err) {
+        console.log('Error loading module data:', err);
+      }
+    }
+
+    async function loadUserStatusTelegram() {
+      try {
+        const hasAccess = await supabaseClient
+          .rpc('check_module_access', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
+
+        if (hasAccess.data) {
+          document.getElementById('user-badge').style.display = 'inline-block';
+          document.getElementById('user-badge').textContent = 'Actif';
+          document.getElementById('user-badge').className = 'badge active';
+        }
+      } catch (err) {
+        console.log('No subscription');
+      }
+    }
 
     // Init
     async function init() {
+      // Mode Telegram ?
+      if (detectTelegram()) {
+        return initFromTelegram();
+      }
+
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
         window.location.href = '../';
@@ -526,6 +717,7 @@
       // Load data
       await loadModuleData();
       await loadUserStatus();
+      await checkPendingDeletion();
     }
 
     async function loadUserStatus() {
@@ -610,10 +802,11 @@
     }
 
     function goToModule() {
+      const tgParams = isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : '';
       if (moduleConfig?.sheet_id) {
-        window.location.href = '../modules/compta/';
+        window.location.href = '../modules/compta/' + tgParams;
       } else {
-        window.location.href = '../modules/compta/setup/';
+        window.location.href = '../modules/compta/setup/' + tgParams;
       }
     }
 
@@ -980,13 +1173,38 @@
     function confirmDeleteAccount() {
       closeModal('settings');
       openModal('delete');
+      // Reset input
+      const input = document.getElementById('delete-confirm-input');
+      const btn = document.getElementById('btn-confirm-delete');
+      input.value = '';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
     }
 
+    // Enable delete button only when "SUPPRIMER" is typed
+    document.getElementById('delete-confirm-input').addEventListener('input', function() {
+      const btn = document.getElementById('btn-confirm-delete');
+      if (this.value === 'SUPPRIMER') {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
+    });
+
     async function deleteAccount() {
+      const btn = document.getElementById('btn-confirm-delete');
+      btn.disabled = true;
+      btn.textContent = 'Suppression...';
+
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
 
-        await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
+        const response = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -994,10 +1212,82 @@
           }
         });
 
-        await supabaseClient.auth.signOut();
-        window.location.href = '../';
+        const result = await response.json();
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        // Show success message then sign out
+        closeModal('delete');
+        showToast('Compte desactive. Tu as 30 jours pour changer d\'avis.');
+
+        // Sign out after delay
+        setTimeout(async () => {
+          await supabaseClient.auth.signOut();
+          window.location.href = '../';
+        }, 2000);
+
       } catch (err) {
         showToast('Erreur: ' + err.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Supprimer mon compte';
+      }
+    }
+
+    // Check pending deletion
+    async function checkPendingDeletion() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('account_deletions')
+          .select('delete_after')
+          .eq('user_id', currentUser.id)
+          .is('cancelled_at', null)
+          .is('executed_at', null)
+          .maybeSingle();
+
+        // Si erreur (table n'existe pas) ou pas de data, on ignore
+        if (error || !data || !data.delete_after) return;
+
+        const deleteDate = new Date(data.delete_after);
+        document.getElementById('deletion-date').textContent = deleteDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('deletion-banner').classList.add('active');
+      } catch (err) {
+        // Table n'existe pas encore, on ignore
+      }
+    }
+
+    // Cancel deletion
+    async function cancelDeletion() {
+      const btn = document.querySelector('.btn-cancel-deletion');
+      btn.disabled = true;
+      btn.textContent = 'Annulation...';
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        const response = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ action: 'cancel' })
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        document.getElementById('deletion-banner').classList.remove('active');
+        showToast('Suppression annulee ! Ton compte est reactif.');
+
+      } catch (err) {
+        showToast('Erreur: ' + err.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Annuler la suppression';
       }
     }
 

@@ -16,20 +16,23 @@
     @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
     .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
-    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.15; }
-    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.12; animation-delay: -7s; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.12; }
+    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.08; animation-delay: -7s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
 
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-    .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
+    /* Nav - matching /compte style */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(3,3,3,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .nav-inner { max-width: 600px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .logo-i { width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+    .btn-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-icon:hover { background: rgba(255,255,255,0.08); color: white; }
 
-    .nav-user-section { display: flex; align-items: center; gap: 12px; }
-    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
+    .nav-user-section { display: flex; align-items: center; gap: 8px; }
+    .nav-profile { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration: none; color: white; font-weight: 500; font-size: 13px; }
     .nav-profile:hover { background: rgba(255,255,255,0.08); }
-    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+    .nav-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
 
-    .page-container { max-width: 640px; margin: 0 auto; padding: 90px 20px 30px; position: relative; z-index: 10; }
+    .page-container { max-width: 600px; margin: 0 auto; padding: 90px 20px 40px; position: relative; z-index: 10; }
 
     /* Loading */
     .loading-overlay { position: fixed; inset: 0; background: rgba(3,3,3,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; }
@@ -37,21 +40,28 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Header page */
-    .page-header { text-align: center; margin-bottom: 24px; }
-    .page-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-    .page-subtitle { font-size: 14px; color: rgba(255,255,255,0.7); }
+    .page-header { margin-bottom: 24px; }
+    .page-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .page-header-left { display: flex; align-items: center; gap: 12px; }
+    .page-title { font-size: 20px; font-weight: 600; }
+    .page-subtitle { font-size: 13px; color: rgba(255,255,255,0.4); }
 
     /* Preview Card */
-    .preview-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
-    .preview-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 14px; color: white; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
-    .preview-input:focus { outline: none; border-color: #FF6B35; }
+    .preview-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; margin-bottom: 24px; }
+    .preview-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; color: white; font-size: 14px; font-family: inherit; margin-bottom: 16px; }
+    .preview-input:focus { outline: none; border-color: rgba(255,107,53,0.5); }
     .preview-input::placeholder { color: rgba(255,255,255,0.3); }
     .preview-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
-    .preview-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; min-height: 80px; }
-    .preview-label { font-size: 10px; color: rgba(255,255,255,0.7); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .preview-box { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 14px; min-height: 80px; }
+    .preview-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .preview-label-icon { font-size: 12px; }
     .tg-bubble { background: #2AABEE; padding: 10px 14px; border-radius: 14px 14px 14px 4px; font-size: 13px; display: inline-block; max-width: 100%; word-break: break-word; }
-    .empty-state { color: rgba(255,255,255,0.25); font-size: 12px; }
+    .empty-state { color: rgba(255,255,255,0.2); font-size: 12px; }
+
+    /* Footer Links - matching /compte */
+    .footer-links { display: flex; justify-content: center; gap: 24px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 32px; flex-wrap: wrap; }
+    .footer-link { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 500; cursor: pointer; transition: color 0.2s; background: none; border: none; text-decoration: none; }
+    .footer-link:hover { color: white; }
 
     /* Mini Excel preview */
     .mini-excel-wrapper { position: relative; padding: 0 20px; }
@@ -77,43 +87,29 @@
     .preview-rules { margin-top: 10px; padding: 8px 10px; background: rgba(255,107,53,0.08); border-radius: 8px; font-size: 11px; color: rgba(255,255,255,0.6); }
     .preview-rules strong { color: #FF8B5E; }
 
-    /* Section */
+    /* Section - matching /compte style */
     .section { margin-bottom: 24px; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .section-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.5px; }
-    .section-count { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .section-badge { font-size: 10px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; color: rgba(255,255,255,0.6); margin-left: 6px; }
+    .section-title { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; }
+    .section-count { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .section-badge { font-size: 10px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; color: rgba(255,255,255,0.4); margin-left: 6px; }
 
     /* Keywords grid - 2 colonnes */
     .kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .kw-card {
-      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 16px;
       padding: 16px;
       position: relative;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
       overflow: hidden;
     }
-    .kw-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #FF6B35, #FF8B5E);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
     .kw-card:hover {
-      border-color: rgba(255,107,53,0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(255,107,53,0.1);
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.1);
     }
-    .kw-card:hover::before { opacity: 1; }
-    .kw-card.incomplete { border-color: rgba(239,68,68,0.4); }
-    .kw-card.incomplete::before { background: linear-gradient(90deg, #ef4444, #f87171); opacity: 1; }
+    .kw-card.incomplete { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.03); }
 
     .kw-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .kw-name-input {
@@ -261,11 +257,12 @@
 
     /* Rules */
     .rule-card {
-      background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(139,92,246,0.02) 100%);
+      background: rgba(139,92,246,0.05);
       border: 1px solid rgba(139,92,246,0.15);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
+      transition: all 0.2s;
       position: relative;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -385,11 +382,11 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <nav id="main-nav" class="glass fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-      <a href="../../compte/" class="flex items-center gap-3">
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="../../compte/" style="text-decoration: none; color: white; display: flex; align-items: center; gap: 10px;">
         <div class="logo-i">i</div>
-        <span class="font-semibold text-lg">iArmy</span>
+        <span style="font-weight: 600;">iArmy</span>
       </a>
       <div id="auth-section"></div>
     </div>
@@ -397,12 +394,14 @@
 
   <div class="page-container">
     <div class="page-header">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <a href="../../compte/" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: rgba(255,255,255,0.6); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='white'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.color='rgba(255,255,255,0.6)'">←</a>
+      <div class="page-header-row">
+        <div class="page-header-left">
+          <a href="../../compte/" class="btn-icon" title="Retour">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
           <div>
             <div class="page-title">Compta Express</div>
-            <div class="page-subtitle">Configure ton robot</div>
+            <div class="page-subtitle">Configure ton robot comptable</div>
           </div>
         </div>
       </div>
@@ -604,21 +603,22 @@
     </div>
 
     <!-- Lien discret pour nouveau fichier -->
-    <div style="text-align: center; margin-top: 40px;">
-      <button onclick="resetConfig()" style="background: none; border: none; color: rgba(255,255,255,0.25); font-size: 11px; cursor: pointer; padding: 8px 16px; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">↻ Nouveau fichier</button>
+    <!-- Footer Links -->
+    <div class="footer-links" id="main-footer">
+      <button class="footer-link" onclick="resetConfig()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        Reconfigurer
+      </button>
+      <a href="https://t.me/IArmyBOT" target="_blank" class="footer-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 4-1.73 6.67-2.88 8.02-3.45 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
+        Ouvrir le bot
+      </a>
+      <a href="mailto:support@iarmy.fr" class="footer-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Support
+      </a>
     </div>
   </div>
-
-  <footer id="main-footer" style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
-    <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
-      <a href="../../">Accueil</a>
-      <a href="../../compte/">Compte</a>
-      <a href="../../privacy/">Confidentialite</a>
-      <a href="../../cgu/">CGU</a>
-      <a href="mailto:support@iarmy.fr">Contact</a>
-    </div>
-    <p style="color: rgba(255,255,255,0.25); font-size: 12px; text-align: center; margin-top: 12px;">© 2026 iArmy</p>
-  </footer>
 
   <div class="toast" id="toast"></div>
 
@@ -694,14 +694,13 @@
         return;
       }
 
-      // Chercher le user via telegram_links
-      const { data: link, error } = await supabaseClient
-        .from('telegram_links')
-        .select('user_id, display_name, avatar_url, email')
-        .eq('telegram_user_id', telegramUserId)
-        .single();
+      // Chercher le user via RPC securisee
+      const { data: linkData, error } = await supabaseClient
+        .rpc('get_telegram_link', { p_telegram_user_id: telegramUserId.toString() });
 
+      const link = linkData?.[0];
       if (error || !link) {
+        console.log('[TG] Link error:', error, linkData);
         showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
         return;
       }
