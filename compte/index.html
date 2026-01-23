@@ -162,6 +162,10 @@
     /* Empty state */
     .empty-state { text-align: center; padding: 24px; color: rgba(255,255,255,0.4); font-size: 13px; }
 
+    /* Avatar edit hover */
+    .avatar-edit:hover > div { opacity: 1 !important; }
+    .avatar-edit img { width: 100%; height: 100%; object-fit: cover; }
+
     /* Responsive */
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -357,6 +361,18 @@
         <div class="settings-section">
           <div class="settings-title">Profil</div>
           <div class="settings-card">
+            <div class="settings-row" style="justify-content: center; padding: 20px;">
+              <div style="text-align: center;">
+                <div class="avatar-edit" id="avatar-edit" onclick="document.getElementById('avatar-input').click()" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #FF6B35, #FF8B5E); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: white; cursor: pointer; margin: 0 auto 12px; overflow: hidden; position: relative; transition: all 0.2s;">
+                  <span id="avatar-edit-initials">?</span>
+                  <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </div>
+                </div>
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="uploadAvatar(this)">
+                <div style="font-size: 12px; color: rgba(255,255,255,0.4);">Clique pour changer</div>
+              </div>
+            </div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <div class="settings-row-label">Nom</div>
@@ -472,6 +488,12 @@
       document.getElementById('settings-name').addEventListener('input', () => {
         document.getElementById('btn-save-profile').disabled = false;
       });
+
+      // Avatar in settings modal
+      document.getElementById('avatar-edit-initials').textContent = initials;
+      if (userAvatar) {
+        document.getElementById('avatar-edit').innerHTML = `<img src="${userAvatar}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+      }
 
       // Load data
       await loadModuleData();
@@ -810,6 +832,58 @@
       } catch (err) {
         showToast('Erreur: ' + err.message, true);
       }
+    }
+
+    // Avatar upload
+    async function uploadAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // Check file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image trop lourde (max 2MB)', true);
+        return;
+      }
+
+      const avatarEl = document.getElementById('avatar-edit');
+      avatarEl.style.opacity = '0.5';
+
+      try {
+        // Upload to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${currentUser.id}.${fileExt}`;
+
+        const { data, error } = await supabaseClient.storage
+          .from('avatars')
+          .upload(fileName, file, { upsert: true });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+
+        // Add cache buster
+        const avatarUrl = publicUrl + '?t=' + Date.now();
+
+        // Update user metadata
+        await supabaseClient.auth.updateUser({
+          data: { avatar_url: avatarUrl }
+        });
+
+        // Update UI
+        document.getElementById('avatar').innerHTML = `<img src="${avatarUrl}" alt="">`;
+        document.getElementById('avatar-edit').innerHTML = `<img src="${avatarUrl}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+
+        showToast('Photo mise a jour !');
+      } catch (err) {
+        console.error('Upload error:', err);
+        showToast('Erreur upload: ' + err.message, true);
+      }
+
+      avatarEl.style.opacity = '1';
+      input.value = '';
     }
 
     // Profile
