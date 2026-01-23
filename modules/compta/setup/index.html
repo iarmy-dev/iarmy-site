@@ -6949,10 +6949,10 @@
     }
 
     async function callAIConfigAssistant(history) {
-      // Call Supabase Edge Function (Gemini par defaut, ?ai=claude pour Claude)
+      // Call Supabase Edge Function (Claude par defaut, ?ai=gemini pour Gemini)
       var urlParams = new URLSearchParams(window.location.search);
-      var aiProvider = urlParams.get('ai') || 'gemini';
-      var endpoint = aiProvider === 'claude' ? 'ai-config-assistant' : 'ai-config-assistant-gemini';
+      var aiProvider = urlParams.get('ai') || 'claude';
+      var endpoint = aiProvider === 'gemini' ? 'ai-config-assistant-gemini' : 'ai-config-assistant';
 
       // First refresh session to ensure token is valid
       await supabaseClient.auth.refreshSession();
