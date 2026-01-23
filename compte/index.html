@@ -585,6 +585,10 @@
           console.log('[TG] Auth error:', authData);
           if (authData.code === 'NOT_LINKED') {
             showTelegramError('Compte non lie. Connecte-toi sur iarmy.fr');
+          } else if (authData.code === 'NO_INIT_DATA') {
+            showTelegramError('Ouvre l\'app depuis Telegram (pas un navigateur)');
+          } else if (authData.code === 'INVALID_SIGNATURE') {
+            showTelegramError('Session expiree. Ferme et reouvre l\'app.');
           } else {
             showTelegramError(authData.error || 'Erreur d\'authentification');
           }
