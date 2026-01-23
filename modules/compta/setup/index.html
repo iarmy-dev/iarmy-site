@@ -6949,7 +6949,7 @@
     }
 
     async function callAIConfigAssistant(history) {
-      // Call Supabase Edge Function (Gemini par defaut, ?ai=claude pour Claude)
+      // Call Supabase Edge Function (Gemini par defaut)
       var urlParams = new URLSearchParams(window.location.search);
       var aiProvider = urlParams.get('ai') || 'gemini';
       var endpoint = aiProvider === 'claude' ? 'ai-config-assistant' : 'ai-config-assistant-gemini';
