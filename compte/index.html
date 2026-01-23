@@ -206,7 +206,7 @@
 
   <nav>
     <div class="nav-inner">
-      <a href="../" style="text-decoration: none; color: white; display: flex; align-items: center; gap: 10px;">
+      <a id="logo-link" href="../" style="text-decoration: none; color: white; display: flex; align-items: center; gap: 10px;">
         <div class="logo-i">i</div>
         <span style="font-weight: 600;">iArmy</span>
       </a>
@@ -551,6 +551,14 @@
       // Cacher les boutons inutiles en mode Telegram (deconnexion + parametres)
       document.querySelector('.btn-icon.danger')?.remove();
       document.querySelector('.btn-icon[onclick*="settings"]')?.remove();
+
+      // Désactiver le lien logo (en mode Telegram, /compte est la "home")
+      const logoLink = document.getElementById('logo-link');
+      if (logoLink) {
+        logoLink.removeAttribute('href');
+        logoLink.style.cursor = 'default';
+        logoLink.onclick = (e) => e.preventDefault();
+      }
 
       // Theme Telegram
       if (tg) {
