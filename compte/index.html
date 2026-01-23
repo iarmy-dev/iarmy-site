@@ -531,6 +531,7 @@
     let moduleConfig = null;
     let isTelegramMode = false;
     let telegramUserId = null;
+    let telegramSubscription = null;
 
     // Detecter Telegram Mini App
     function detectTelegram() {
@@ -646,14 +647,15 @@
           document.getElementById('avatar-edit').innerHTML = `<img src="${authData.user.avatarUrl}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
         }
 
-        // Afficher le statut
-        if (authData.subscription) {
+        // Stocker et afficher le statut subscription
+        telegramSubscription = authData.subscription;
+        if (telegramSubscription) {
           const badge = document.getElementById('user-badge');
           badge.style.display = 'inline-block';
-          if (authData.subscription.isTester) {
+          if (telegramSubscription.isTester) {
             badge.textContent = 'Testeur';
             badge.className = 'badge tester';
-          } else if (authData.subscription.status === 'active') {
+          } else if (telegramSubscription.status === 'active') {
             badge.textContent = 'Pro';
             badge.className = 'badge active';
           }
@@ -861,7 +863,28 @@
     // Billing
     async function loadBillingData() {
       try {
+        // Mode Telegram: utiliser les données de subscription déjà récupérées
+        if (isTelegramMode && telegramSubscription) {
+          document.getElementById('billing-loading').style.display = 'none';
+          document.getElementById('billing-content').style.display = 'block';
+          billingData = {
+            subscription: {
+              isTester: telegramSubscription.isTester,
+              status: telegramSubscription.status,
+              productName: 'iArmy Compta'
+            },
+            paymentMethod: null,
+            invoices: []
+          };
+          renderBillingData();
+          return;
+        }
+
         const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+          document.getElementById('billing-loading').innerHTML = '<p style="color: rgba(255,255,255,0.5);">Connecte-toi pour voir la facturation</p>';
+          return;
+        }
 
         const response = await fetch(SUPABASE_URL + '/functions/v1/stripe-billing', {
           method: 'POST',
