@@ -565,6 +565,9 @@
       const initData = tg?.initData; // Donnees signees par Telegram
       const telegramUser = tg?.initDataUnsafe?.user;
 
+      // Stocker l'ID Telegram AVANT l'auth (pour navigation ulterieure)
+      const actualTelegramId = tguidFromUrl || telegramUser?.id?.toString() || null;
+
       // Authentification securisee via Edge Function
       try {
         const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-auth', {
@@ -572,7 +575,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             initData: initData || null,
-            telegramUserId: tguidFromUrl || telegramUser?.id || null
+            telegramUserId: actualTelegramId
           })
         });
 
@@ -588,8 +591,8 @@
           return;
         }
 
-        // Stocker le token de session
-        telegramUserId = authData.user.id;
+        // Stocker l'ID Telegram (PAS le UUID Supabase!)
+        telegramUserId = actualTelegramId;
         window.telegramSessionToken = authData.sessionToken;
 
         // Afficher badge de securite si valide par HMAC
