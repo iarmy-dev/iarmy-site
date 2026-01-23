@@ -822,7 +822,8 @@
     }
 
     function goToModule() {
-      const tgParams = isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : '';
+      // Telegram mode: passer le sessionToken pour eviter de re-authentifier
+      const tgParams = isTelegramMode ? `?tg=1&tguid=${telegramUserId}&token=${window.telegramSessionToken}` : '';
       // Telegram mode uses sheetId (camelCase), web mode uses sheet_id (snake_case)
       const hasConfig = moduleConfig?.sheet_id || moduleConfig?.sheetId;
       if (hasConfig) {

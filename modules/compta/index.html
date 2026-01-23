@@ -680,30 +680,32 @@
         });
       }
 
-      // Recuperer telegram_user_id (depuis URL ou SDK)
+      // Recuperer les parametres depuis URL et SDK
       const urlParams = new URLSearchParams(window.location.search);
       const tguidFromUrl = urlParams.get('tguid');
+      const tokenFromUrl = urlParams.get('token'); // Session token passe depuis /compte
       const initData = tg?.initData;
       const telegramUser = tg?.initDataUnsafe?.user;
 
       // Debug
       console.log('[TG] initData present:', !!initData, 'length:', initData?.length || 0);
-      console.log('[TG] telegramUser:', telegramUser);
+      console.log('[TG] tokenFromUrl present:', !!tokenFromUrl);
       console.log('[TG] tguidFromUrl:', tguidFromUrl);
 
-      // Verifier initData obligatoire
-      if (!initData) {
-        console.error('[TG] Pas d\'initData disponible');
-        showTelegramError('Erreur Telegram: relance l\'app depuis le menu');
-        return;
-      }
-
+      // Determiner le telegramUserId
       if (tguidFromUrl) {
         telegramUserId = tguidFromUrl;
       } else if (telegramUser?.id) {
         telegramUserId = telegramUser.id;
       } else {
         showTelegramError('Impossible de recuperer votre compte Telegram');
+        return;
+      }
+
+      // Verifier qu'on a soit initData soit sessionToken
+      if (!initData && !tokenFromUrl) {
+        console.error('[TG] Ni initData ni sessionToken disponible');
+        showTelegramError('Session expiree. Retourne au menu principal.');
         return;
       }
 
@@ -714,7 +716,8 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            initData: initData,
+            initData: initData || null,
+            sessionToken: tokenFromUrl || null,
             telegramUserId: telegramUserId
           })
         });
@@ -725,7 +728,7 @@
           console.log('[TG] Auth error:', authData);
           if (authData.code === 'NOT_LINKED') {
             showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
-          } else if (authData.code === 'INVALID_SIGNATURE') {
+          } else if (authData.code === 'AUTH_REQUIRED') {
             showTelegramError('Session expiree. Ferme et reouvre l\'app.');
           } else {
             showTelegramError(authData.error || 'Erreur d\'authentification');
