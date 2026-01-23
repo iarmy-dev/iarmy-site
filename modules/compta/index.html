@@ -689,10 +689,16 @@
       const initData = tg?.initData;
       const telegramUser = tg?.initDataUnsafe?.user;
 
-      // Debug
-      console.log('[TG] initData present:', !!initData, 'length:', initData?.length || 0);
-      console.log('[TG] tokenFromUrl present:', !!tokenFromUrl);
-      console.log('[TG] tguidFromUrl:', tguidFromUrl);
+      // Debug visible
+      const debugDiv = document.createElement('div');
+      debugDiv.id = 'tg-debug';
+      debugDiv.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-size:10px;padding:8px;z-index:9999;max-height:150px;overflow:auto;font-family:monospace;';
+      document.body.appendChild(debugDiv);
+      const log = (msg) => { debugDiv.innerHTML += msg + '<br>'; console.log('[TG]', msg); };
+
+      log('initData: ' + (initData ? 'YES (' + initData.length + ' chars)' : 'NO'));
+      log('tokenFromUrl: ' + (tokenFromUrl ? 'YES' : 'NO'));
+      log('tguidFromUrl: ' + tguidFromUrl);
 
       // Determiner le telegramUserId
       if (tguidFromUrl) {
@@ -714,6 +720,7 @@
       // Authentification securisee via Edge Function
       let authData;
       try {
+        log('Calling telegram-auth...');
         const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -724,10 +731,12 @@
           })
         });
 
+        log('Response status: ' + response.status);
         authData = await response.json();
+        log('Response parsed');
 
         if (!response.ok || authData.error) {
-          console.log('[TG] Auth error:', authData);
+          log('Auth ERROR: ' + authData.error + ' (' + authData.code + ')');
           if (authData.code === 'NOT_LINKED') {
             showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
           } else if (authData.code === 'AUTH_REQUIRED') {
@@ -740,11 +749,10 @@
 
         // Stocker le token de session
         window.telegramSessionToken = authData.sessionToken;
-        if (authData.validated) console.log('[TG] Session validee par HMAC');
 
       } catch (err) {
-        console.error('[TG] Auth exception:', err);
-        showTelegramError('Erreur de connexion');
+        log('EXCEPTION: ' + err.message);
+        showTelegramError('Erreur de connexion: ' + err.message);
         return;
       }
 
@@ -763,7 +771,8 @@
       `;
 
       // Debug auth response
-      console.log('[TG] Auth success, authData:', JSON.stringify(authData, null, 2));
+      log('Auth SUCCESS');
+      log('subscription: ' + JSON.stringify(authData.subscription));
 
       // Verifier l'abonnement (deja dans authData)
       const hasAccess = authData.subscription &&
@@ -771,27 +780,28 @@
          authData.subscription.status === 'active' ||
          authData.subscription.status === 'trialing');
 
-      console.log('[TG] hasAccess:', hasAccess, 'subscription:', authData.subscription);
+      log('hasAccess: ' + hasAccess);
 
       if (!hasAccess) {
-        console.log('[TG] No access, showing no access screen');
+        log('NO ACCESS - showing screen');
         showNoAccessScreen();
         return;
       }
 
       // Utiliser la config retournee par telegram-auth (securise, pas d'appel RPC)
-      console.log('[TG] moduleConfig:', authData.moduleConfig);
+      log('moduleConfig: ' + (authData.moduleConfig ? 'YES' : 'NO'));
       if (!authData.moduleConfig || !authData.moduleConfig.sheetId) {
-        console.log('[TG] No config found, redirecting to setup');
+        log('No config - redirecting to setup');
         window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}&token=${authData.sessionToken}`;
         return;
       }
 
       // Charger la config depuis authData (deja validee par Edge Function)
-      console.log('[TG] Loading config from authData...');
+      log('Loading config...');
       loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
-      console.log('[TG] Config loaded, hiding loading screen');
+      log('DONE - hiding loading');
       document.getElementById('loading').style.display = 'none';
+      debugDiv.remove(); // Supprimer debug quand tout va bien
     }
 
     // Charge la config depuis les donnees retournees par telegram-auth (securise)
