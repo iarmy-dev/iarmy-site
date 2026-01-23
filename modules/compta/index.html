@@ -23,7 +23,8 @@
     /* Nav - matching /compte style */
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(3,3,3,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
     .nav-inner { max-width: 600px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .logo-i { width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+    .logo-i { width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .logo-i:hover { transform: scale(1.15) rotate(-12deg); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
     .btn-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; text-decoration: none; }
     .btn-icon:hover { background: rgba(255,255,255,0.08); color: white; }
 
@@ -230,7 +231,34 @@
     .alias-input:focus { outline: none; border-color: #4ade80; }
     .alias-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    .btn-add-kw, .btn-add-rule {
+    /* Add card - dans la grille */
+    .kw-add-card {
+      background: transparent;
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 16px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .kw-add-card:hover {
+      border-color: rgba(255,107,53,0.4);
+      background: rgba(255,107,53,0.03);
+    }
+    .kw-add-card span {
+      color: rgba(255,255,255,0.2);
+      font-size: 28px;
+      font-weight: 300;
+      transition: all 0.2s;
+    }
+    .kw-add-card:hover span {
+      color: rgba(255,107,53,0.6);
+      transform: scale(1.1);
+    }
+
+    .btn-add-rule {
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -246,10 +274,86 @@
       justify-content: center;
       margin: 12px auto 0;
     }
-    .btn-add-kw:hover, .btn-add-rule:hover {
+    .btn-add-rule:hover {
       border-color: rgba(255,255,255,0.25);
       color: rgba(255,255,255,0.5);
       transform: scale(1.05);
+    }
+
+    /* Delete confirmation modal */
+    .delete-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .delete-modal-overlay.active { display: flex; }
+    .delete-modal {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+    }
+    .delete-modal-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(239,68,68,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #ef4444;
+    }
+    .delete-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .delete-modal-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 20px;
+    }
+    .delete-modal-name {
+      color: #FF8B5E;
+      font-weight: 600;
+    }
+    .delete-modal-btns {
+      display: flex;
+      gap: 12px;
+    }
+    .delete-modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+    .delete-modal-btn.cancel {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+    }
+    .delete-modal-btn.cancel:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .delete-modal-btn.confirm {
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+    }
+    .delete-modal-btn.confirm:hover {
+      background: rgba(239,68,68,0.25);
     }
 
     .btn-add { width: 100%; padding: 12px; background: transparent; border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: 10px; }
@@ -433,11 +537,6 @@
         <span class="section-count" id="kw-count">0</span>
       </div>
       <div class="kw-grid" id="kw-grid"></div>
-      <button class="btn-add-kw" onclick="showAddKwWarning()" title="Ajouter un mot-clé">+</button>
-      <div id="add-kw-hint" style="display: none; margin-top: 8px; padding: 10px 12px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); border-radius: 8px; font-size: 12px; color: rgba(255,255,255,0.6); position: relative;">
-        <button onclick="closeAddKwHint()" style="position: absolute; top: 6px; right: 8px; background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 14px; padding: 0; line-height: 1;">×</button>
-        💡 <strong>Avant d'ajouter</strong> : crée d'abord la colonne dans ton <a href="#" id="hint-sheet-link" target="_blank" style="color: #4ade80;">Google Sheet</a>, puis reviens ici pour la linker.
-      </div>
     </div>
 
     <!-- Rules -->
@@ -609,10 +708,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
         Reconfigurer
       </button>
-      <a href="https://t.me/IArmyBOT" target="_blank" class="footer-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 4-1.73 6.67-2.88 8.02-3.45 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.53.17.14.12.18.28.2.45-.01.06.01.24 0 .38z"/></svg>
-        Ouvrir le bot
-      </a>
       <a href="mailto:support@iarmy.fr" class="footer-link">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Support
@@ -621,6 +716,21 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- Modal suppression mot-clé -->
+  <div class="delete-modal-overlay" id="delete-kw-modal">
+    <div class="delete-modal">
+      <div class="delete-modal-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+      </div>
+      <div class="delete-modal-title">Supprimer ce mot-clé ?</div>
+      <div class="delete-modal-text">Le mot-clé <span class="delete-modal-name" id="delete-kw-name"></span> sera supprimé de ta config.</div>
+      <div class="delete-modal-btns">
+        <button class="delete-modal-btn cancel" onclick="closeDeleteModal()">Annuler</button>
+        <button class="delete-modal-btn confirm" onclick="confirmDeleteKw()">Supprimer</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
@@ -662,6 +772,10 @@
       // Ajuster le padding sans nav
       const pageContainer = document.querySelector('.page-container');
       if (pageContainer) pageContainer.style.paddingTop = '20px';
+
+      // Cacher le bouton retour HTML (Telegram a son propre BackButton)
+      const backBtn = document.querySelector('.page-header-left .btn-icon');
+      if (backBtn) backBtn.style.display = 'none';
 
       // Theme Telegram
       if (tg) {
@@ -1410,7 +1524,7 @@
     }
 
     function renderKw() {
-      document.getElementById('kw-grid').innerHTML = keywords.map((k, i) => {
+      const kwCards = keywords.map((k, i) => {
         const incomplete = k.nom && !k.colonne;
         const colHeader = k.colonne && sheetHeaders[k.colonne] ? sheetHeaders[k.colonne] : null;
 
@@ -1448,6 +1562,11 @@
           ${colHeader ? `<div class="kw-footer">Colonne "${colHeader}"</div>` : ''}
         </div>
       `}).join('');
+
+      // Carte "+" pour ajouter
+      const addCard = `<div class="kw-add-card" onclick="addKw()" title="Ajouter un mot-clé"><span>+</span></div>`;
+
+      document.getElementById('kw-grid').innerHTML = kwCards + addCard;
     }
 
     function renderRules() {
@@ -1491,38 +1610,6 @@
           </div>
         `;
       }).join('');
-    }
-
-    // Keywords
-    let addKwWarningShown = false;
-
-    function showAddKwWarning() {
-      const hint = document.getElementById('add-kw-hint');
-      const hintLink = document.getElementById('hint-sheet-link');
-      const btn = document.querySelector('.btn-add-kw');
-
-      if (!addKwWarningShown) {
-        // Premier clic : afficher le hint
-        hint.style.display = 'block';
-        if (config?.sheet_id) {
-          hintLink.href = `https://docs.google.com/spreadsheets/d/${config.sheet_id}/edit`;
-        }
-        addKwWarningShown = true;
-        btn.style.borderColor = 'rgba(74,222,128,0.4)';
-        btn.style.color = 'rgba(74,222,128,0.6)';
-      } else {
-        // Deuxième clic : ajouter le mot-clé
-        addKw();
-        closeAddKwHint();
-        btn.style.borderColor = '';
-        btn.style.color = '';
-      }
-    }
-
-    function closeAddKwHint() {
-      document.getElementById('add-kw-hint').style.display = 'none';
-      addKwWarningShown = false;
-      document.querySelector('.btn-add').textContent = '+ Ajouter un mot-clé';
     }
 
     function addKw() {
@@ -1646,12 +1733,27 @@
       render();
       markAsModified();
     }
+    let pendingDeleteIndex = null;
+
     function delKw(i) {
       const kw = keywords[i];
-      if (!confirm('Supprimer le mot-clé "' + (kw?.nom || 'sans nom') + '" ?')) return;
-      keywords.splice(i, 1);
-      render();
-      markAsModified();
+      pendingDeleteIndex = i;
+      document.getElementById('delete-kw-name').textContent = kw?.nom || 'sans nom';
+      document.getElementById('delete-kw-modal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('delete-kw-modal').classList.remove('active');
+      pendingDeleteIndex = null;
+    }
+
+    function confirmDeleteKw() {
+      if (pendingDeleteIndex !== null) {
+        keywords.splice(pendingDeleteIndex, 1);
+        render();
+        markAsModified();
+      }
+      closeDeleteModal();
     }
 
     // Aliases
