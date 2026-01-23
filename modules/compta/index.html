@@ -750,29 +750,26 @@
         return;
       }
 
-      // Charger la config via fonction PostgreSQL securisee
-      await loadConfigFromTelegram(telegramUserId.toString(), authData.user.id);
-      document.getElementById('loading').style.display = 'none';
-    }
-
-    // Charge la config en mode Telegram via RPC securisee
-    async function loadConfigFromTelegram(tgUserId, userId) {
-      const { data: moduleConfig, error } = await supabaseClient
-        .rpc('get_module_config_by_telegram', { p_telegram_user_id: tgUserId, p_module_name: 'compta' })
-        .single();
-
-      if (error || !moduleConfig) {
-        console.log('[TG] Config error:', error);
-        window.location.href = './setup/' + `?tg=1&tguid=${tgUserId}`;
+      // Utiliser la config retournee par telegram-auth (securise, pas d'appel RPC)
+      if (!authData.moduleConfig || !authData.moduleConfig.sheetId) {
+        console.log('[TG] No config found, redirecting to setup');
+        window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}`;
         return;
       }
 
-      // Mapper pour compatibilité avec l'ancien format
+      // Charger la config depuis authData (deja validee par Edge Function)
+      loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    // Charge la config depuis les donnees retournees par telegram-auth (securise)
+    function loadConfigFromAuthData(moduleConfig, userId) {
+      // Mapper pour compatibilite avec l'ancien format
       const cfg = {
         user_id: userId,
-        sheet_id: moduleConfig.sheet_id,
+        sheet_id: moduleConfig.sheetId,
         excel_config: moduleConfig.config,
-        created_at: moduleConfig.created_at
+        created_at: moduleConfig.createdAt
       };
       config = cfg;
       config.createdYear = cfg.created_at ? new Date(cfg.created_at).getFullYear() : new Date().getFullYear();
@@ -1701,12 +1698,6 @@
     }
 
     async function autoSave() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
-        toast('Session expirée', true);
-        return;
-      }
-
       const validKw = keywords.filter(k => k.nom.trim());
       const validRules = rules.filter(r => r.terms.some(t => t.name) && r.target);
 
@@ -1725,6 +1716,44 @@
         export_settings: exportSettings
       };
 
+      // Mode Telegram: utiliser Edge Function securisee
+      if (isTelegramMode) {
+        try {
+          const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-module-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'save_config',
+              sessionToken: window.telegramSessionToken,
+              telegramUserId: telegramUserId,
+              moduleName: 'compta',
+              data: { config: newCfg }
+            })
+          });
+
+          const result = await response.json();
+          if (!response.ok || result.error) {
+            toast('Erreur sauvegarde: ' + (result.error || 'Erreur serveur'), true);
+            return;
+          }
+
+          if (config) config.excel_config = newCfg;
+          hasUnsavedChanges = false;
+          toast('Sauvegarde');
+        } catch (err) {
+          console.error('[TG] Save error:', err);
+          toast('Erreur de connexion', true);
+        }
+        return;
+      }
+
+      // Mode web: utiliser Supabase directement
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        toast('Session expiree', true);
+        return;
+      }
+
       const { error } = await supabaseClient.from('module_configs').update({
         config: newCfg,
         updated_at: new Date().toISOString()
@@ -1735,10 +1764,9 @@
         return;
       }
 
-      // Succès silencieux
       if (config) config.excel_config = newCfg;
       hasUnsavedChanges = false;
-      toast('✓ Sauvegardé');
+      toast('Sauvegarde');
     }
 
 
@@ -1980,19 +2008,40 @@
     async function doResetConfig() {
       document.getElementById('reset-modal')?.remove();
 
-      // En mode Telegram, on utilise l'userId stocké dans config
-      let userId;
+      // Mode Telegram: utiliser Edge Function securisee
       if (isTelegramMode) {
-        userId = config?.user_id;
-      } else {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-        userId = session.user.id;
+        try {
+          const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-module-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'delete_config',
+              sessionToken: window.telegramSessionToken,
+              telegramUserId: telegramUserId,
+              moduleName: 'compta'
+            })
+          });
+
+          const result = await response.json();
+          if (!response.ok || result.error) {
+            toast('Erreur: ' + (result.error || 'Erreur serveur'), true);
+            return;
+          }
+
+          window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}`;
+        } catch (err) {
+          console.error('[TG] Delete error:', err);
+          toast('Erreur de connexion', true);
+        }
+        return;
       }
 
-      if (!userId) return;
-      await supabaseClient.from('module_configs').delete().eq('user_id', userId).eq('module_name', 'compta');
-      window.location.href = './setup/' + (isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : '');
+      // Mode web: utiliser Supabase directement
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return;
+
+      await supabaseClient.from('module_configs').delete().eq('user_id', session.user.id).eq('module_name', 'compta');
+      window.location.href = './setup/';
     }
 
     async function exportDataManual() {
