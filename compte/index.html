@@ -542,7 +542,7 @@
       return fromUrl || sdkDetected;
     }
 
-    // Init depuis Telegram
+    // Init depuis Telegram avec validation HMAC
     async function initFromTelegram() {
       isTelegramMode = true;
       const tg = window.Telegram?.WebApp;
@@ -559,64 +559,108 @@
         tg.BackButton.onClick(() => tg.close());
       }
 
-      // Recuperer telegram_user_id
+      // Recuperer les donnees Telegram
       const urlParams = new URLSearchParams(window.location.search);
       const tguidFromUrl = urlParams.get('tguid');
+      const initData = tg?.initData; // Donnees signees par Telegram
       const telegramUser = tg?.initDataUnsafe?.user;
 
-      if (tguidFromUrl) {
-        telegramUserId = tguidFromUrl;
-      } else if (telegramUser?.id) {
-        telegramUserId = telegramUser.id;
-      } else {
-        showTelegramError('Impossible de recuperer votre compte Telegram');
-        return;
-      }
+      // Authentification securisee via Edge Function
+      try {
+        const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            initData: initData || null,
+            telegramUserId: tguidFromUrl || telegramUser?.id || null
+          })
+        });
 
-      // Chercher le user via RPC
-      const { data: linkData, error } = await supabaseClient
-        .rpc('get_telegram_link', { p_telegram_user_id: telegramUserId.toString() });
+        const authData = await response.json();
 
-      const link = linkData?.[0];
-      if (error || !link) {
-        console.log('[TG] Link error:', error, linkData);
-        showTelegramError('Compte non lie. Connecte-toi sur iarmy.fr');
-        return;
-      }
-
-      // Creer un pseudo currentUser pour compatibilite
-      currentUser = {
-        id: link.user_id,
-        email: link.email,
-        user_metadata: {
-          full_name: link.display_name,
-          avatar_url: link.avatar_url
+        if (!response.ok || authData.error) {
+          console.log('[TG] Auth error:', authData);
+          if (authData.code === 'NOT_LINKED') {
+            showTelegramError('Compte non lie. Connecte-toi sur iarmy.fr');
+          } else {
+            showTelegramError(authData.error || 'Erreur d\'authentification');
+          }
+          return;
         }
-      };
 
-      // Afficher les infos
-      const userName = link.display_name || 'Utilisateur';
-      const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        // Stocker le token de session
+        telegramUserId = authData.user.id;
+        window.telegramSessionToken = authData.sessionToken;
 
-      document.getElementById('user-name').textContent = userName;
-      document.getElementById('user-email').textContent = link.email || '';
-      document.getElementById('avatar-initials').textContent = initials;
+        // Afficher badge de securite si valide par HMAC
+        if (authData.validated) {
+          console.log('[TG] Session validee par signature HMAC');
+        }
 
-      if (link.avatar_url) {
-        document.getElementById('avatar').innerHTML = `<img src="${link.avatar_url}" alt="">`;
+        // Creer un pseudo currentUser pour compatibilite
+        currentUser = {
+          id: authData.user.id,
+          email: authData.user.email,
+          user_metadata: {
+            full_name: authData.user.displayName,
+            avatar_url: authData.user.avatarUrl
+          }
+        };
+
+        // Afficher les infos
+        const userName = authData.user.displayName || 'Utilisateur';
+        const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('user-email').textContent = authData.user.email || '';
+        document.getElementById('avatar-initials').textContent = initials;
+
+        if (authData.user.avatarUrl) {
+          document.getElementById('avatar').innerHTML = `<img src="${authData.user.avatarUrl}" alt="">`;
+        }
+
+        // Settings modal
+        document.getElementById('settings-name').value = userName;
+        document.getElementById('settings-email').textContent = authData.user.email || '';
+        document.getElementById('avatar-edit-initials').textContent = initials;
+        if (authData.user.avatarUrl) {
+          document.getElementById('avatar-edit').innerHTML = `<img src="${authData.user.avatarUrl}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+        }
+
+        // Afficher le statut
+        if (authData.subscription) {
+          const badge = document.getElementById('user-badge');
+          badge.style.display = 'inline-block';
+          if (authData.subscription.isTester) {
+            badge.textContent = 'Testeur';
+            badge.className = 'badge tester';
+          } else if (authData.subscription.status === 'active') {
+            badge.textContent = 'Pro';
+            badge.className = 'badge active';
+          }
+        }
+
+        // Module config
+        moduleConfig = authData.moduleConfig;
+        if (moduleConfig?.sheetId) {
+          document.getElementById('module-status').textContent = 'Actif';
+          document.getElementById('conn-sheets').classList.add('connected');
+          document.getElementById('sheets-status').innerHTML = '<span class="dot"></span> Connecte';
+          document.getElementById('sheets-status').classList.add('ok');
+        } else {
+          document.getElementById('module-status').textContent = 'A configurer';
+          document.getElementById('module-compta').classList.add('inactive');
+        }
+
+        // Telegram est forcement connecte
+        document.getElementById('conn-telegram').classList.add('connected');
+        document.getElementById('telegram-status').innerHTML = '<span class="dot"></span> Connecte';
+        document.getElementById('telegram-status').classList.add('ok');
+
+      } catch (err) {
+        console.error('[TG] Auth exception:', err);
+        showTelegramError('Erreur de connexion');
       }
-
-      // Settings modal
-      document.getElementById('settings-name').value = userName;
-      document.getElementById('settings-email').textContent = link.email || '';
-      document.getElementById('avatar-edit-initials').textContent = initials;
-      if (link.avatar_url) {
-        document.getElementById('avatar-edit').innerHTML = `<img src="${link.avatar_url}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
-      }
-
-      // Charger les donnees
-      await loadModuleDataTelegram();
-      await loadUserStatusTelegram();
     }
 
     function showTelegramError(message) {
@@ -627,49 +671,6 @@
           <p style="color: rgba(255,255,255,0.5); font-size: 14px;">Connecte-toi d'abord sur le site web.</p>
         </div>
       `;
-    }
-
-    async function loadModuleDataTelegram() {
-      try {
-        const { data: configData } = await supabaseClient
-          .rpc('get_module_config_by_telegram', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
-
-        const config = configData?.[0];
-        moduleConfig = config;
-
-        if (config?.sheet_id) {
-          document.getElementById('module-status').textContent = 'Actif';
-          document.getElementById('conn-sheets').classList.add('connected');
-          document.getElementById('sheets-status').innerHTML = '<span class="dot"></span> Connecte';
-          document.getElementById('sheets-status').classList.add('ok');
-        } else {
-          document.getElementById('module-status').textContent = 'A configurer';
-          document.getElementById('module-compta').classList.add('inactive');
-        }
-
-        // Telegram est forcement connecte si on est la
-        document.getElementById('conn-telegram').classList.add('connected');
-        document.getElementById('telegram-status').innerHTML = '<span class="dot"></span> Connecte';
-        document.getElementById('telegram-status').classList.add('ok');
-
-      } catch (err) {
-        console.log('Error loading module data:', err);
-      }
-    }
-
-    async function loadUserStatusTelegram() {
-      try {
-        const hasAccess = await supabaseClient
-          .rpc('check_module_access', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
-
-        if (hasAccess.data) {
-          document.getElementById('user-badge').style.display = 'inline-block';
-          document.getElementById('user-badge').textContent = 'Actif';
-          document.getElementById('user-badge').className = 'badge active';
-        }
-      } catch (err) {
-        console.log('No subscription');
-      }
     }
 
     // Init

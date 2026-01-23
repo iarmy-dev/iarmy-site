@@ -694,21 +694,40 @@
         return;
       }
 
-      // Chercher le user via RPC securisee
-      const { data: linkData, error } = await supabaseClient
-        .rpc('get_telegram_link', { p_telegram_user_id: telegramUserId.toString() });
+      // Authentification securisee via Edge Function
+      let authData;
+      try {
+        const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            initData: tg?.initData || null,
+            telegramUserId: telegramUserId
+          })
+        });
 
-      const link = linkData?.[0];
-      if (error || !link) {
-        console.log('[TG] Link error:', error, linkData);
-        showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
+        authData = await response.json();
+
+        if (!response.ok || authData.error) {
+          console.log('[TG] Auth error:', authData);
+          showTelegramError(authData.code === 'NOT_LINKED' ? 'Compte non lie. Liez votre Telegram sur iarmy.fr/compte' : 'Erreur d\'authentification');
+          return;
+        }
+
+        // Stocker le token de session
+        window.telegramSessionToken = authData.sessionToken;
+        if (authData.validated) console.log('[TG] Session validee par HMAC');
+
+      } catch (err) {
+        console.error('[TG] Auth exception:', err);
+        showTelegramError('Erreur de connexion');
         return;
       }
 
       // Afficher le profil
-      const userName = link.display_name || telegramUser.first_name || 'User';
-      userEmail = link.email || '';
-      const userAvatar = link.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+      const userName = authData.user.displayName || telegramUser?.first_name || 'User';
+      userEmail = authData.user.email || '';
+      const userAvatar = authData.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('auth-section').innerHTML = `
         <div class="nav-user-section">
@@ -719,18 +738,20 @@
         </div>
       `;
 
-      // Verifier l'abonnement via fonction PostgreSQL securisee
-      const { data: hasAccess, error: accessError } = await supabaseClient
-        .rpc('check_module_access', { p_telegram_user_id: telegramUserId.toString(), p_module_name: 'compta' });
+      // Verifier l'abonnement (deja dans authData)
+      const hasAccess = authData.subscription &&
+        (authData.subscription.isTester ||
+         authData.subscription.status === 'active' ||
+         authData.subscription.status === 'trialing');
 
-      if (accessError || !hasAccess) {
-        console.log('[TG] Access check:', hasAccess, accessError);
+      if (!hasAccess) {
+        console.log('[TG] No access:', authData.subscription);
         showNoAccessScreen();
         return;
       }
 
       // Charger la config via fonction PostgreSQL securisee
-      await loadConfigFromTelegram(telegramUserId.toString(), link.user_id);
+      await loadConfigFromTelegram(telegramUserId.toString(), authData.user.id);
       document.getElementById('loading').style.display = 'none';
     }
 
