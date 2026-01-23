@@ -549,10 +549,10 @@
       <button class="btn-add-rule" onclick="addRule()" title="Ajouter une règle">+</button>
     </div>
 
-    <!-- Export Comptable -->
+    <!-- Section Exports -->
     <div class="section" id="export-section" style="margin-top: 28px; display: none;">
       <div class="section-header">
-        <div class="section-title">Export Comptable</div>
+        <div class="section-title">Exports</div>
       </div>
 
       <!-- Envoi automatique -->
@@ -613,65 +613,11 @@
         </div>
       </div>
 
-      <!-- Notifications Telegram (accordéon) -->
-      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden;">
-        <div onclick="toggleNotifications()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
-          <div>
-            <div style="font-size: 13px; font-weight: 600; color: white;">📱 Notifications</div>
-            <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Récaps automatiques sur Telegram</div>
-          </div>
-          <span id="notif-arrow" style="color: rgba(255,255,255,0.4); transition: transform 0.2s;">▼</span>
-        </div>
-        <div id="notif-content" style="display: none; padding: 0 14px 14px; border-top: 1px solid rgba(255,255,255,0.06);">
-          <!-- Récap hebdo -->
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
-            <div>
-              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">Récap hebdo</div>
-              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Chaque lundi : total, meilleur jour, évolution</div>
-            </div>
-            <input type="checkbox" id="notif-weekly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
-          </label>
-
-          <!-- Récap mensuel -->
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; cursor: pointer;">
-            <div>
-              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">Récap mensuel</div>
-              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Le 1er : bilan du mois + comparatif</div>
-            </div>
-            <input type="checkbox" id="notif-monthly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
-          </label>
-
-          <!-- Records -->
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
-            <div>
-              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">🏆 Records</div>
-              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Notification quand tu bats un record</div>
-            </div>
-            <input type="checkbox" id="notif-records" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
-          </label>
-
-          <!-- Objectif mensuel -->
-          <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
-            <div>
-              <div style="font-size: 12px; color: rgba(255,255,255,0.9);">🎯 Objectif mensuel</div>
-              <div style="font-size: 10px; color: rgba(255,255,255,0.4);">Alerte quand tu atteins ton objectif</div>
-            </div>
-            <input type="checkbox" id="notif-objective" onchange="toggleObjectiveInput(); saveNotificationSettings()" style="accent-color: #4ade80; width: 16px; height: 16px;">
-          </label>
-          <div id="objective-input-row" style="display: none; padding: 8px 0 4px; border-top: 1px solid rgba(255,255,255,0.04);">
-            <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
-              <input type="number" id="monthly-objective" placeholder="10000" min="0" step="100" onchange="saveNotificationSettings()" style="width: 100px; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 13px; text-align: right;">
-              <span style="color: rgba(255,255,255,0.5); font-size: 13px;">€</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Export manuel (accordéon) -->
+      <!-- Export manuel -->
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden;">
         <div onclick="toggleExportManual()" style="padding: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <div style="font-size: 13px; font-weight: 600; color: white;">📥 Export manuel</div>
+            <div style="font-size: 13px; font-weight: 600; color: white;">📥 Téléchargement</div>
             <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;">Télécharge les données d'un mois</div>
           </div>
           <span id="export-manual-arrow" style="color: rgba(255,255,255,0.4); transition: transform 0.2s;">▼</span>
@@ -697,6 +643,57 @@
           <button id="export-year-btn" onclick="exportFullYear()" disabled style="width: 100%; padding: 10px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 500; cursor: not-allowed; transition: all 0.2s;">
             📅 Année complète <span id="export-year-status">(disponible en décembre)</span>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Notifications -->
+    <div class="section" id="notif-section" style="margin-top: 24px; display: none;">
+      <div class="section-header">
+        <div class="section-title">Notifications Telegram</div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
+        <!-- Récap hebdo -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+          <div>
+            <div style="font-size: 13px; color: white;">📊 Récap hebdo</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Chaque lundi : total, meilleur jour, évolution</div>
+          </div>
+          <input type="checkbox" id="notif-weekly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 18px; height: 18px;">
+        </label>
+
+        <!-- Récap mensuel -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+          <div>
+            <div style="font-size: 13px; color: white;">📅 Récap mensuel</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Le 1er : bilan du mois + comparatif</div>
+          </div>
+          <input type="checkbox" id="notif-monthly-recap" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 18px; height: 18px;">
+        </label>
+
+        <!-- Records -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer;">
+          <div>
+            <div style="font-size: 13px; color: white;">🏆 Records</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Notification quand tu bats un record</div>
+          </div>
+          <input type="checkbox" id="notif-records" onchange="saveNotificationSettings()" style="accent-color: #4ade80; width: 18px; height: 18px;">
+        </label>
+
+        <!-- Objectif mensuel -->
+        <label style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer;">
+          <div>
+            <div style="font-size: 13px; color: white;">🎯 Objectif mensuel</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.4);">Alerte quand tu atteins ton objectif</div>
+          </div>
+          <input type="checkbox" id="notif-objective" onchange="toggleObjectiveInput(); saveNotificationSettings()" style="accent-color: #4ade80; width: 18px; height: 18px;">
+        </label>
+        <div id="objective-input-row" style="display: none; padding: 8px 0 4px; border-top: 1px solid rgba(255,255,255,0.04);">
+          <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
+            <input type="number" id="monthly-objective" placeholder="10000" min="0" step="100" onchange="saveNotificationSettings()" style="width: 100px; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 13px; text-align: right;">
+            <span style="color: rgba(255,255,255,0.5); font-size: 13px;">€</span>
+          </div>
         </div>
       </div>
     </div>
@@ -783,15 +780,20 @@
         tg.expand();
         document.body.style.backgroundColor = tg.backgroundColor || '#030303';
 
-        // Bouton retour
+        // Bouton retour - retourne à /compte au lieu de fermer
         tg.BackButton.show();
         tg.BackButton.onClick(() => {
+          const goBack = () => {
+            const token = window.telegramSessionToken || '';
+            const tguid = telegramUserId || '';
+            window.location.href = `../../compte/?tg=1&tguid=${tguid}&token=${token}`;
+          };
           if (hasUnsavedChanges) {
             if (confirm('Des modifications non sauvegardees seront perdues. Quitter ?')) {
-              tg.close();
+              goBack();
             }
           } else {
-            tg.close();
+            goBack();
           }
         });
       }
@@ -982,10 +984,11 @@
 
       render();
 
-      // Afficher la section export si config valide
+      // Afficher les sections export et notifications si config valide
       if (cfg?.sheet_id) {
         const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
         document.getElementById('export-section').style.display = 'block';
+        document.getElementById('notif-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
         document.getElementById('sheet-link').href = sheetUrl;
         document.getElementById('preview-links').style.display = 'flex';
@@ -1205,6 +1208,7 @@
       if (cfg?.sheet_id) {
         const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
         document.getElementById('export-section').style.display = 'block';
+        document.getElementById('notif-section').style.display = 'block';
         document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
         // Afficher les liens rapides
         document.getElementById('sheet-link').href = sheetUrl;
@@ -1737,8 +1741,16 @@
 
     function delKw(i) {
       const kw = keywords[i];
+      // Si le mot-clé est vide (pas de nom), supprimer directement sans confirmation
+      if (!kw?.nom || kw.nom.trim() === '') {
+        keywords.splice(i, 1);
+        render();
+        markAsModified();
+        return;
+      }
+      // Sinon afficher le modal de confirmation
       pendingDeleteIndex = i;
-      document.getElementById('delete-kw-name').textContent = kw?.nom || 'sans nom';
+      document.getElementById('delete-kw-name').textContent = kw.nom;
       document.getElementById('delete-kw-modal').classList.add('active');
     }
 
