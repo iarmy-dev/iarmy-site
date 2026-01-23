@@ -1470,18 +1470,17 @@
               ✓ Prélèvement après l'essai
             </div>
           </div>
+          <!-- Loader pendant le chargement -->
+          <div id="payment-loading-container" style="text-align: center; padding: 20px;">
+            <div style="width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #FF6B35; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;"></div>
+            <p style="color: rgba(255,255,255,0.5); font-size: 14px;">Chargement du formulaire...</p>
+          </div>
           <!-- Formulaire de carte Stripe Elements -->
           <div id="payment-form-container" style="display: none;">
             <div id="payment-element" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 16px;"></div>
             <div id="payment-error" style="color: #f87171; font-size: 13px; margin-bottom: 12px; display: none;"></div>
             <button id="btn-confirm-payment" onclick="confirmPayment()" style="width: 100%; padding: 16px 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; color: white; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
               Activer mon essai gratuit
-            </button>
-          </div>
-          <!-- Bouton initial pour charger le formulaire -->
-          <div id="payment-init-container">
-            <button id="btn-start-trial" onclick="initStripePayment()" style="width: 100%; padding: 16px 32px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 14px; color: white; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s;">
-              Commencer l'essai gratuit
             </button>
           </div>
           <p class="text-xs text-white/30 mt-4 text-center">🔒 Paiement sécurisé - Tes données ne quittent jamais cette page</p>
@@ -5834,6 +5833,8 @@
           document.getElementById('step4-subtitle').textContent = 'Active ton essai gratuit';
           document.getElementById('telegram-payment').style.display = 'block';
           document.getElementById('telegram-initial').style.display = 'none';
+          // Initialiser Stripe automatiquement
+          initStripePayment();
           return;
         }
 
@@ -5860,7 +5861,7 @@
     }
 
     // Stripe Elements configuration
-    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51SnhCpQnTQdmBOkyvcPgFDg8LQbPZzwAdBv9X1LeLhy8WKtlAorKQeqdiZKC2l994bjKJXxndPYal8G6izNilG15002j0OaFcP';
+    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51SnfoGQnTQdmBOkyXQ0lVJWGO24O9zzKNdXKNFQfq8r37uZRmKJgqmwQz66BYYjX96L1lP3XRQPFWwzIU8HxGKG300gNkmRVSd';
     let stripe = null;
     let elements = null;
     let paymentElement = null;
@@ -5868,9 +5869,7 @@
     let currentSubscriptionId = null;
 
     async function initStripePayment() {
-      var btn = document.getElementById('btn-start-trial');
-      btn.disabled = true;
-      btn.textContent = 'Vérification...';
+      var loadingEl = document.getElementById('payment-loading-container');
 
       try {
         // D'abord re-vérifier si l'utilisateur est devenu testeur entre-temps
@@ -5897,8 +5896,6 @@
           document.getElementById('step4-subtitle').textContent = 'Connecte ton robot Telegram';
           return;
         }
-
-        btn.textContent = 'Chargement...';
 
         // Créer la subscription et obtenir le client_secret
         var response = await fetch(SUPABASE_URL + '/functions/v1/create-subscription', {
@@ -5955,14 +5952,14 @@
         paymentElement.mount('#payment-element');
 
         // Afficher le formulaire
-        document.getElementById('payment-init-container').style.display = 'none';
+        document.getElementById('payment-loading-container').style.display = 'none';
         document.getElementById('payment-form-container').style.display = 'block';
 
       } catch (err) {
         console.error('Init Stripe error:', err);
         showToast('Erreur: ' + err.message);
-        btn.disabled = false;
-        btn.textContent = 'Commencer l\'essai gratuit';
+        // En cas d'erreur, afficher un message et retry button
+        loadingEl.innerHTML = '<p style="color: #f87171; margin-bottom: 12px;">Erreur de chargement</p><button onclick="initStripePayment()" style="padding: 12px 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: white; cursor: pointer;">Réessayer</button>';
       }
     }
 
