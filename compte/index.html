@@ -434,7 +434,6 @@
             <div class="settings-row">
               <div class="settings-row-info">
                 <div class="settings-row-label">Nom</div>
-                <div class="settings-row-value">Affiche dans l'app</div>
               </div>
               <input type="text" class="settings-input" id="settings-name" placeholder="Ton nom">
             </div>
@@ -547,8 +546,9 @@
       isTelegramMode = true;
       const tg = window.Telegram?.WebApp;
 
-      // Cacher le bouton deconnexion en mode Telegram
+      // Cacher les boutons inutiles en mode Telegram (deconnexion + parametres)
       document.querySelector('.btn-icon.danger')?.remove();
+      document.querySelector('.btn-icon[onclick*="settings"]')?.remove();
 
       // Theme Telegram
       if (tg) {
