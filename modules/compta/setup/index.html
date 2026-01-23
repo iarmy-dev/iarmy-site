@@ -6772,9 +6772,57 @@
       var html = escapeHtml(text);
       // Bold: **text**
       html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #a855f7;">$1</strong>');
+
+      // Interactive buttons: [+COL:Depenses] -> clickable button to add column
+      html = html.replace(/\[\+COL:([^\]]+)\]/g, function(match, colName) {
+        return '<button onclick="addColumnFromChat(\'' + colName + '\')" style="background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.4); color: #22c55e; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin: 2px;">[+ ' + colName + ']</button>';
+      });
+
+      // Interactive buttons: [+RULE:ECART=Recettes-TOTAL] -> clickable button to add rule
+      html = html.replace(/\[\+RULE:([^=\]]+)=([^\]]+)\]/g, function(match, target, formula) {
+        return '<button onclick="addRuleFromChat(\'' + target + '\', \'' + formula + '\')" style="background: rgba(251, 146, 60, 0.2); border: 1px solid rgba(251, 146, 60, 0.4); color: #fb923c; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin: 2px;">[+ ' + target + ' = ' + formula + ']</button>';
+      });
+
       // Newlines
       html = html.replace(/\n/g, '<br>');
       return html;
+    }
+
+    // Add column from chat button click
+    function addColumnFromChat(colName) {
+      if (!aiGeneratedConfig) {
+        aiGeneratedConfig = { colonnes_a_remplir: [], regles_calcul: [], colonnes_protegees: [] };
+      }
+      // Check if already exists
+      var exists = aiGeneratedConfig.colonnes_a_remplir.some(function(c) { return c.nom === colName; });
+      if (!exists) {
+        aiGeneratedConfig.colonnes_a_remplir.push({
+          nom: colName,
+          aliases: [colName.toLowerCase()]
+        });
+        showAIConfigPreview(aiGeneratedConfig);
+        console.log('[AI] Added column from chat:', colName);
+      }
+    }
+
+    // Add rule from chat button click
+    function addRuleFromChat(target, formula) {
+      if (!aiGeneratedConfig) {
+        aiGeneratedConfig = { colonnes_a_remplir: [], regles_calcul: [], colonnes_protegees: [] };
+      }
+      // Check if already exists
+      var exists = aiGeneratedConfig.regles_calcul.some(function(r) { return r.target === target; });
+      if (!exists) {
+        aiGeneratedConfig.regles_calcul.push({
+          target: target,
+          formula: formula
+        });
+        if (!aiGeneratedConfig.colonnes_protegees.includes(target)) {
+          aiGeneratedConfig.colonnes_protegees.push(target);
+        }
+        showAIConfigPreview(aiGeneratedConfig);
+        console.log('[AI] Added rule from chat:', target, '=', formula);
+      }
     }
 
     // Add chat message with typing effect - displays progressively
