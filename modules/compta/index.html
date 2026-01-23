@@ -797,9 +797,9 @@
         tg.BackButton.show();
         tg.BackButton.onClick(() => {
           const goBack = () => {
-            const token = window.telegramSessionToken || '';
             const tguid = telegramUserId || '';
-            window.location.href = `../../compte/?tg=1&tguid=${tguid}&token=${token}`;
+            // SECURITY: Token is in sessionStorage, not URL
+            window.location.href = `../../compte/?tg=1&tguid=${tguid}`;
           };
           if (hasUnsavedChanges) {
             if (confirm('Des modifications non sauvegardees seront perdues. Quitter ?')) {
@@ -814,12 +814,13 @@
       // Recuperer les parametres depuis URL et SDK
       const urlParams = new URLSearchParams(window.location.search);
       const tguidFromUrl = urlParams.get('tguid');
-      const tokenFromUrl = urlParams.get('token'); // Session token passe depuis /compte
+      // SECURITY: Read token from sessionStorage instead of URL
+      const tokenFromStorage = sessionStorage.getItem('tg_session_token');
       const initData = tg?.initData;
       const telegramUser = tg?.initDataUnsafe?.user;
 
       // Log pour debug (console uniquement)
-      console.log('[TG] initData:', !!initData, 'token:', !!tokenFromUrl, 'tguid:', tguidFromUrl);
+      console.log('[TG] initData:', !!initData, 'token:', !!tokenFromStorage, 'tguid:', tguidFromUrl);
 
       // Determiner le telegramUserId
       if (tguidFromUrl) {
@@ -832,7 +833,7 @@
       }
 
       // Verifier qu'on a soit initData soit sessionToken
-      if (!initData && !tokenFromUrl) {
+      if (!initData && !tokenFromStorage) {
         console.error('[TG] Ni initData ni sessionToken disponible');
         showTelegramError('Session expiree. Retourne au menu principal.');
         return;
@@ -846,7 +847,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             initData: initData || null,
-            sessionToken: tokenFromUrl || null,
+            sessionToken: tokenFromStorage || null,
             telegramUserId: telegramUserId
           })
         });
@@ -865,8 +866,9 @@
           return;
         }
 
-        // Stocker le token de session
-        window.telegramSessionToken = authData.sessionToken;
+        // SECURITY: Store token in sessionStorage
+        sessionStorage.setItem('tg_session_token', authData.sessionToken);
+        window.telegramSessionToken = authData.sessionToken; // Keep for compatibility
 
       } catch (err) {
         log('EXCEPTION: ' + err.message);
@@ -903,7 +905,8 @@
       // Verifier la config
       if (!authData.moduleConfig || !authData.moduleConfig.sheetId) {
         console.log('[TG] No config, redirecting to setup');
-        window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}&token=${authData.sessionToken}`;
+        // SECURITY: Token is in sessionStorage, not URL
+        window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}`;
         return;
       }
 

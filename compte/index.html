@@ -534,6 +534,35 @@
     let telegramUserId = null;
     let telegramSubscription = null;
 
+    // SECURITY: Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // SECURITY: Validate and sanitize URL for images
+    function sanitizeImageUrl(url) {
+      if (!url) return null;
+      try {
+        const parsed = new URL(url);
+        // Only allow https URLs from trusted domains
+        if (parsed.protocol !== 'https:') return null;
+        const trustedDomains = [
+          't.me', 'telegram.org',
+          'googleusercontent.com', 'lh3.googleusercontent.com',
+          'githubusercontent.com',
+          'supabase.co', 'supabase.com' // Supabase Storage avatars
+        ];
+        const isTrusted = trustedDomains.some(d => parsed.hostname === d || parsed.hostname.endsWith('.' + d));
+        if (!isTrusted) return null;
+        return url;
+      } catch {
+        return null;
+      }
+    }
+
     // Detecter Telegram Mini App
     function detectTelegram() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -619,7 +648,9 @@
 
         // Stocker l'ID Telegram (PAS le UUID Supabase!)
         telegramUserId = actualTelegramId;
-        window.telegramSessionToken = authData.sessionToken;
+        // SECURITY: Store token in sessionStorage instead of URL
+        sessionStorage.setItem('tg_session_token', authData.sessionToken);
+        window.telegramSessionToken = authData.sessionToken; // Keep for compatibility
 
         // Afficher badge de securite si valide par HMAC
         if (authData.validated) {
@@ -644,16 +675,26 @@
         document.getElementById('user-email').textContent = authData.user.email || '';
         document.getElementById('avatar-initials').textContent = initials;
 
-        if (authData.user.avatarUrl) {
-          document.getElementById('avatar').innerHTML = `<img src="${authData.user.avatarUrl}" alt="">`;
+        const safeAvatarUrl = sanitizeImageUrl(authData.user.avatarUrl);
+        if (safeAvatarUrl) {
+          const img = document.createElement('img');
+          img.src = safeAvatarUrl;
+          img.alt = '';
+          document.getElementById('avatar').innerHTML = '';
+          document.getElementById('avatar').appendChild(img);
         }
 
         // Settings modal
         document.getElementById('settings-name').value = userName;
         document.getElementById('settings-email').textContent = authData.user.email || '';
         document.getElementById('avatar-edit-initials').textContent = initials;
-        if (authData.user.avatarUrl) {
-          document.getElementById('avatar-edit').innerHTML = `<img src="${authData.user.avatarUrl}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+        if (safeAvatarUrl) {
+          const editContainer = document.getElementById('avatar-edit');
+          editContainer.innerHTML = '<div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>';
+          const img = document.createElement('img');
+          img.src = safeAvatarUrl;
+          img.alt = '';
+          editContainer.insertBefore(img, editContainer.firstChild);
         }
 
         // Stocker et afficher le statut subscription
@@ -732,8 +773,13 @@
       document.getElementById('user-email').textContent = currentUser.email;
       document.getElementById('avatar-initials').textContent = initials;
 
-      if (userAvatar) {
-        document.getElementById('avatar').innerHTML = `<img src="${userAvatar}" alt="">`;
+      const safeUserAvatar = sanitizeImageUrl(userAvatar);
+      if (safeUserAvatar) {
+        const img = document.createElement('img');
+        img.src = safeUserAvatar;
+        img.alt = '';
+        document.getElementById('avatar').innerHTML = '';
+        document.getElementById('avatar').appendChild(img);
       }
 
       // Settings
@@ -745,8 +791,13 @@
 
       // Avatar in settings modal
       document.getElementById('avatar-edit-initials').textContent = initials;
-      if (userAvatar) {
-        document.getElementById('avatar-edit').innerHTML = `<img src="${userAvatar}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+      if (safeUserAvatar) {
+        const editContainer = document.getElementById('avatar-edit');
+        editContainer.innerHTML = '<div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>';
+        const img = document.createElement('img');
+        img.src = safeUserAvatar;
+        img.alt = '';
+        editContainer.insertBefore(img, editContainer.firstChild);
       }
 
       // Load data
@@ -837,8 +888,8 @@
     }
 
     function goToModule() {
-      // Telegram mode: passer le sessionToken pour eviter de re-authentifier
-      const tgParams = isTelegramMode ? `?tg=1&tguid=${telegramUserId}&token=${window.telegramSessionToken}` : '';
+      // SECURITY: Token is in sessionStorage, not URL (only pass tguid)
+      const tgParams = isTelegramMode ? `?tg=1&tguid=${telegramUserId}` : '';
       // Telegram mode uses sheetId (camelCase), web mode uses sheet_id (snake_case)
       const hasConfig = moduleConfig?.sheet_id || moduleConfig?.sheetId;
       if (hasConfig) {
@@ -1185,9 +1236,20 @@
           data: { avatar_url: avatarUrl }
         });
 
-        // Update UI
-        document.getElementById('avatar').innerHTML = `<img src="${avatarUrl}" alt="">`;
-        document.getElementById('avatar-edit').innerHTML = `<img src="${avatarUrl}" alt=""><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
+        // Update UI (URL from Supabase storage is trusted)
+        const avatarContainer = document.getElementById('avatar');
+        avatarContainer.innerHTML = '';
+        const img1 = document.createElement('img');
+        img1.src = avatarUrl;
+        img1.alt = '';
+        avatarContainer.appendChild(img1);
+
+        const editContainer = document.getElementById('avatar-edit');
+        editContainer.innerHTML = '<div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>';
+        const img2 = document.createElement('img');
+        img2.src = avatarUrl;
+        img2.alt = '';
+        editContainer.insertBefore(img2, editContainer.firstChild);
 
         showToast('Photo mise a jour !');
       } catch (err) {
