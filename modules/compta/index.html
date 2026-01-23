@@ -648,8 +648,10 @@
 
     // Init depuis Telegram Mini App
     async function initFromTelegram() {
+      console.log('[TG] initFromTelegram() called');
       isTelegramMode = true;
       const tg = window.Telegram?.WebApp;
+      console.log('[TG] Telegram WebApp:', tg ? 'available' : 'NOT available');
 
       // Cacher nav et footer en mode Mini App
       const nav = document.getElementById('main-nav');
@@ -760,27 +762,35 @@
         </div>
       `;
 
+      // Debug auth response
+      console.log('[TG] Auth success, authData:', JSON.stringify(authData, null, 2));
+
       // Verifier l'abonnement (deja dans authData)
       const hasAccess = authData.subscription &&
         (authData.subscription.isTester ||
          authData.subscription.status === 'active' ||
          authData.subscription.status === 'trialing');
 
+      console.log('[TG] hasAccess:', hasAccess, 'subscription:', authData.subscription);
+
       if (!hasAccess) {
-        console.log('[TG] No access:', authData.subscription);
+        console.log('[TG] No access, showing no access screen');
         showNoAccessScreen();
         return;
       }
 
       // Utiliser la config retournee par telegram-auth (securise, pas d'appel RPC)
+      console.log('[TG] moduleConfig:', authData.moduleConfig);
       if (!authData.moduleConfig || !authData.moduleConfig.sheetId) {
         console.log('[TG] No config found, redirecting to setup');
-        window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}`;
+        window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}&token=${authData.sessionToken}`;
         return;
       }
 
       // Charger la config depuis authData (deja validee par Edge Function)
+      console.log('[TG] Loading config from authData...');
       loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
+      console.log('[TG] Config loaded, hiding loading screen');
       document.getElementById('loading').style.display = 'none';
     }
 
