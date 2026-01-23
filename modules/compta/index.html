@@ -689,16 +689,8 @@
       const initData = tg?.initData;
       const telegramUser = tg?.initDataUnsafe?.user;
 
-      // Debug visible
-      const debugDiv = document.createElement('div');
-      debugDiv.id = 'tg-debug';
-      debugDiv.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#111;color:#0f0;font-size:10px;padding:8px;z-index:9999;max-height:150px;overflow:auto;font-family:monospace;';
-      document.body.appendChild(debugDiv);
-      const log = (msg) => { debugDiv.innerHTML += msg + '<br>'; console.log('[TG]', msg); };
-
-      log('initData: ' + (initData ? 'YES (' + initData.length + ' chars)' : 'NO'));
-      log('tokenFromUrl: ' + (tokenFromUrl ? 'YES' : 'NO'));
-      log('tguidFromUrl: ' + tguidFromUrl);
+      // Log pour debug (console uniquement)
+      console.log('[TG] initData:', !!initData, 'token:', !!tokenFromUrl, 'tguid:', tguidFromUrl);
 
       // Determiner le telegramUserId
       if (tguidFromUrl) {
@@ -720,7 +712,6 @@
       // Authentification securisee via Edge Function
       let authData;
       try {
-        log('Calling telegram-auth...');
         const response = await fetch(SUPABASE_URL + '/functions/v1/telegram-auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -731,12 +722,10 @@
           })
         });
 
-        log('Response status: ' + response.status);
         authData = await response.json();
-        log('Response parsed');
 
         if (!response.ok || authData.error) {
-          log('Auth ERROR: ' + authData.error + ' (' + authData.code + ')');
+          console.log('[TG] Auth error:', authData);
           if (authData.code === 'NOT_LINKED') {
             showTelegramError('Compte non lie. Liez votre Telegram sur iarmy.fr/compte');
           } else if (authData.code === 'AUTH_REQUIRED') {
@@ -770,42 +759,32 @@
         </div>
       `;
 
-      // Debug auth response
-      log('Auth SUCCESS');
-      log('subscription: ' + JSON.stringify(authData.subscription));
-
-      // Verifier l'abonnement (deja dans authData)
+      // Verifier l'abonnement
       const hasAccess = authData.subscription &&
         (authData.subscription.isTester ||
          authData.subscription.status === 'active' ||
          authData.subscription.status === 'trialing');
 
-      log('hasAccess: ' + hasAccess);
-
       if (!hasAccess) {
-        log('NO ACCESS - showing screen');
+        console.log('[TG] No access:', authData.subscription);
         showNoAccessScreen();
         return;
       }
 
-      // Utiliser la config retournee par telegram-auth (securise, pas d'appel RPC)
-      log('moduleConfig: ' + (authData.moduleConfig ? 'YES' : 'NO'));
+      // Verifier la config
       if (!authData.moduleConfig || !authData.moduleConfig.sheetId) {
-        log('No config - redirecting to setup');
+        console.log('[TG] No config, redirecting to setup');
         window.location.href = './setup/' + `?tg=1&tguid=${telegramUserId}&token=${authData.sessionToken}`;
         return;
       }
 
-      // Charger la config depuis authData (deja validee par Edge Function)
-      log('Loading config...');
+      // Charger la config
       try {
         loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
-        log('DONE - hiding loading');
         document.getElementById('loading').style.display = 'none';
-        debugDiv.remove(); // Supprimer debug quand tout va bien
       } catch (configErr) {
-        log('CONFIG ERROR: ' + configErr.message);
-        log('Stack: ' + configErr.stack?.substring(0, 200));
+        console.error('[TG] Config error:', configErr);
+        showTelegramError('Erreur de configuration: ' + configErr.message);
       }
     }
 
@@ -888,6 +867,18 @@
       exportSettings = cfg?.excel_config?.export_settings || {};
 
       render();
+
+      // Afficher la section export si config valide
+      if (cfg?.sheet_id) {
+        const sheetUrl = `https://docs.google.com/spreadsheets/d/${cfg.sheet_id}/edit`;
+        document.getElementById('export-section').style.display = 'block';
+        document.getElementById('export-month').value = String(new Date().getMonth() + 1).padStart(2, '0');
+        document.getElementById('sheet-link').href = sheetUrl;
+        document.getElementById('preview-links').style.display = 'flex';
+      }
+
+      // Charger les settings d'export et notifications
+      loadExportSettings();
     }
 
     function showTelegramError(message) {
@@ -1655,7 +1646,13 @@
       render();
       markAsModified();
     }
-    function delKw(i) { keywords.splice(i, 1); render(); markAsModified(); }
+    function delKw(i) {
+      const kw = keywords[i];
+      if (!confirm('Supprimer le mot-clé "' + (kw?.nom || 'sans nom') + '" ?')) return;
+      keywords.splice(i, 1);
+      render();
+      markAsModified();
+    }
 
     // Aliases
     function showAliasInput(i) {
