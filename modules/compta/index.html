@@ -798,10 +798,15 @@
 
       // Charger la config depuis authData (deja validee par Edge Function)
       log('Loading config...');
-      loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
-      log('DONE - hiding loading');
-      document.getElementById('loading').style.display = 'none';
-      debugDiv.remove(); // Supprimer debug quand tout va bien
+      try {
+        loadConfigFromAuthData(authData.moduleConfig, authData.user.id);
+        log('DONE - hiding loading');
+        document.getElementById('loading').style.display = 'none';
+        debugDiv.remove(); // Supprimer debug quand tout va bien
+      } catch (configErr) {
+        log('CONFIG ERROR: ' + configErr.message);
+        log('Stack: ' + configErr.stack?.substring(0, 200));
+      }
     }
 
     // Charge la config depuis les donnees retournees par telegram-auth (securise)
