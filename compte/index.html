@@ -9,6 +9,8 @@
   <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Stripe.js for payment method updates -->
+  <script src="https://js.stripe.com/v3/"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,14 +44,14 @@
     .profile-email { font-size: 14px; color: rgba(255,255,255,0.5); }
 
     /* Tab navigation */
-    .tab-nav { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; }
-    .tab-btn { padding: 10px 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .tab-nav { display: flex; gap: 6px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
     .tab-btn:hover { background: rgba(255,255,255,0.08); color: white; }
     .tab-btn.active { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.3); color: #FF6B35; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .section-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
 
     .modules-grid { display: flex; gap: 16px; margin-bottom: 28px; justify-content: center; flex-wrap: wrap; }
     .module-card { width: 140px; height: 140px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.02) 100%); border: 1px solid rgba(255,107,53,0.25); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: white; transition: all 0.3s; padding: 16px; }
@@ -73,29 +75,60 @@
     .module-card.soon { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); opacity: 0.4; pointer-events: none; }
     .module-card.soon .module-anim { opacity: 0.3; }
 
-    /* Subscription card */
-    .subscription-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; text-align: left; }
-    .subscription-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .subscription-icon { width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .subscription-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-    .subscription-info p { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .subscription-details { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .subscription-row { display: flex; justify-content: space-between; align-items: center; }
-    .subscription-label { font-size: 13px; color: rgba(255,255,255,0.5); }
-    .subscription-value { font-size: 13px; font-weight: 500; }
-    .subscription-value.free { color: #4ade80; }
-    .btn-manage { margin-top: 16px; width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-    .btn-manage:hover { background: rgba(255,255,255,0.08); color: white; }
-    .btn-manage:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-subscribe { margin-top: 16px; width: 100%; padding: 14px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-    .btn-subscribe:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
-    .btn-subscribe:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    /* Billing card */
+    .billing-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 20px; }
+    .billing-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .billing-icon { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .billing-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+    .billing-info p { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .billing-details { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .billing-row { display: flex; justify-content: space-between; align-items: center; }
+    .billing-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+    .billing-value { font-size: 13px; font-weight: 500; }
+
+    /* Payment method box */
+    .payment-method-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+    .payment-method-info { display: flex; align-items: center; gap: 12px; }
+    .card-brand { width: 36px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+    .card-brand.visa { background: linear-gradient(135deg, #1a1f71, #0a1551); }
+    .card-brand.mastercard { background: linear-gradient(135deg, #eb001b, #f79e1b); }
+    .card-brand.amex { background: linear-gradient(135deg, #006fcf, #00a1df); }
+    .card-details { font-size: 13px; }
+    .card-details .last4 { font-weight: 600; }
+    .card-details .exp { color: rgba(255,255,255,0.5); font-size: 12px; }
+    .btn-change-card { padding: 8px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-change-card:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* Invoices */
+    .invoices-list { margin-top: 8px; }
+    .invoice-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-info { display: flex; align-items: center; gap: 12px; }
+    .invoice-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .invoice-details { font-size: 13px; }
+    .invoice-details .date { font-weight: 500; }
+    .invoice-details .desc { color: rgba(255,255,255,0.5); font-size: 12px; }
+    .invoice-amount { font-size: 14px; font-weight: 600; }
+    .invoice-status { font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-left: 8px; }
+    .invoice-status.paid { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .invoice-status.open { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .btn-download { padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: rgba(255,255,255,0.6); font-size: 12px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .btn-download:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* Cancel subscription */
+    .cancel-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .btn-cancel-sub { width: 100%; padding: 12px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; color: #f87171; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-cancel-sub:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
+    .btn-reactivate { width: 100%; padding: 12px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 10px; color: #4ade80; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-reactivate:hover { background: rgba(34,197,94,0.2); }
+
     .status-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
     .status-badge.active { background: rgba(34,197,94,0.15); color: #4ade80; }
     .status-badge.trialing { background: rgba(59,130,246,0.15); color: #60a5fa; }
     .status-badge.tester { background: rgba(168,85,247,0.15); color: #c084fc; }
     .status-badge.canceled { background: rgba(239,68,68,0.15); color: #f87171; }
     .status-badge.past_due { background: rgba(245,158,11,0.15); color: #fbbf24; }
+
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; background: rgba(34,197,94,0.9); color: white; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 1000; animation: slideUp 0.3s ease; }
     .toast.error { background: rgba(239,68,68,0.9); }
     @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
@@ -108,38 +141,8 @@
     .info-status { font-size: 13px; color: #4ade80; font-weight: 600; }
     .info-status.pending { color: rgba(255,255,255,0.3); }
 
-    /* Notifications */
-    .notif-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 4px 0; }
-    .notif-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .notif-row:last-of-type { border-bottom: none; }
-    .notif-info { display: flex; align-items: center; gap: 12px; }
-    .notif-icon { font-size: 18px; }
-    .notif-label { font-size: 14px; font-weight: 500; }
-    .notif-desc { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
-    .notif-note { display: flex; align-items: center; gap: 8px; padding: 12px 18px; font-size: 12px; color: rgba(255,255,255,0.5); background: rgba(255,107,53,0.05); border-top: 1px solid rgba(255,255,255,0.04); border-radius: 0 0 16px 16px; }
-
-    /* Toggle switch */
-    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); transition: 0.3s; border-radius: 24px; }
-    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: rgba(255,255,255,0.5); transition: 0.3s; border-radius: 50%; }
-    .toggle input:checked + .toggle-slider { background: rgba(255,107,53,0.6); }
-    .toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: #FF6B35; }
-    .toggle input:disabled + .toggle-slider { opacity: 0.4; cursor: not-allowed; }
-
-    /* Objective input */
-    .objective-input-row { padding: 12px 18px; background: rgba(255,107,53,0.05); border-top: 1px solid rgba(255,255,255,0.04); }
-    .objective-input-wrapper { display: flex; align-items: center; gap: 8px; max-width: 160px; margin-left: auto; }
-    .objective-input-wrapper input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; color: white; font-size: 14px; text-align: right; width: 100px; }
-    .objective-input-wrapper input:focus { outline: none; border-color: rgba(255,107,53,0.5); }
-    .objective-input-wrapper input::placeholder { color: rgba(255,255,255,0.3); }
-    .objective-currency { color: rgba(255,255,255,0.5); font-size: 14px; font-weight: 500; }
-
-    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
-    footer a:hover { color: #FF8B5E; }
-
     /* Profile edit */
-    .profile-edit-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+    .profile-edit-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 24px; text-align: left; }
     .profile-edit-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
     .profile-edit-row:last-child { margin-bottom: 0; }
     .profile-edit-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
@@ -154,7 +157,7 @@
     .profile-note { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 12px; }
 
     /* Danger zone */
-    .danger-card { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); border-radius: 16px; padding: 4px 0; }
+    .danger-card { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); border-radius: 16px; padding: 4px 0; text-align: left; }
     .danger-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
     .danger-info { display: flex; align-items: center; gap: 12px; }
     .danger-icon { font-size: 18px; }
@@ -165,14 +168,38 @@
 
     /* Modal */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .modal-box { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px; max-width: 400px; width: 100%; text-align: center; }
-    .modal-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; color: #f87171; }
+    .modal-box { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px; max-width: 420px; width: 100%; }
+    .modal-box.centered { text-align: center; }
+    .modal-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+    .modal-box h3.danger { color: #f87171; }
     .modal-box p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.5; }
     .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
     .btn-cancel { flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500; cursor: pointer; }
     .btn-cancel:hover { background: rgba(255,255,255,0.1); }
     .btn-confirm-delete { flex: 1; padding: 12px; background: #ef4444; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
     .btn-confirm-delete:hover { background: #dc2626; }
+    .btn-confirm { flex: 1; padding: 12px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-confirm:hover { box-shadow: 0 4px 12px rgba(255,107,53,0.3); }
+    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Stripe Elements */
+    #card-element { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 16px; margin: 20px 0; }
+    #card-element.StripeElement--focus { border-color: rgba(255,107,53,0.5); }
+    #card-errors { color: #f87171; font-size: 13px; margin-top: 8px; min-height: 20px; }
+
+    .btn-subscribe { margin-top: 16px; width: 100%; padding: 14px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-subscribe:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
+    .btn-subscribe:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .empty-state { text-align: center; padding: 32px 20px; color: rgba(255,255,255,0.4); }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    .loading-spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1); border-top-color: #FF6B35; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: #FF8B5E; }
   </style>
 </head>
 <body class="bg-gradient-animate">
@@ -200,14 +227,14 @@
 
       <!-- Tab Navigation -->
       <div class="tab-nav">
-        <button class="tab-btn active" data-tab="abonnement">Abonnement</button>
+        <button class="tab-btn active" data-tab="modules">Modules</button>
+        <button class="tab-btn" data-tab="facturation">Facturation</button>
         <button class="tab-btn" data-tab="parametres">Parametres</button>
       </div>
 
-      <!-- Abonnement Tab -->
-      <div id="tab-abonnement" class="tab-content active">
-        <!-- Modules -->
-        <div class="section-title">Modules actifs</div>
+      <!-- Modules Tab -->
+      <div id="tab-modules" class="tab-content active">
+        <div class="section-title">Mes modules</div>
         <div class="modules-grid">
           <a href="../modules/compta/" class="module-card" data-module="compta">
             <div class="module-anim">
@@ -233,70 +260,97 @@
           </div>
         </div>
 
-        <!-- Module Settings Panel (shown when clicking on a module) -->
-        <div id="module-panel" style="display: none; margin-bottom: 24px;">
-          <div class="subscription-card">
-            <div class="subscription-header">
-              <div class="subscription-icon" id="module-panel-icon">🍽️</div>
-              <div class="subscription-info">
-                <h3 id="module-panel-title">Compta Express</h3>
-                <p id="module-panel-subtitle">Configuration du module</p>
-              </div>
-              <button onclick="closeModulePanel()" style="background: none; border: none; color: rgba(255,255,255,0.5); font-size: 20px; cursor: pointer; padding: 4px;">✕</button>
-            </div>
-            <div class="subscription-details">
-              <div class="subscription-row">
-                <span class="subscription-label">Google Sheets</span>
-                <span class="subscription-value" id="module-sheet-status">-</span>
-              </div>
-              <div class="subscription-row">
-                <span class="subscription-label">Colonnes</span>
-                <span class="subscription-value" id="module-columns">-</span>
-              </div>
-              <div class="subscription-row">
-                <span class="subscription-label">Calculs auto</span>
-                <span class="subscription-value" id="module-rules">-</span>
-              </div>
-            </div>
-            <a href="/modules/compta/" id="module-config-link" class="btn-manage" style="display: block; text-align: center; text-decoration: none; margin-top: 16px;">
-              Modifier la configuration
-            </a>
+        <!-- Quick Stats -->
+        <div class="info-row">
+          <div class="info-box active">
+            <span class="info-icon">🔗</span>
+            <span class="info-label">Google</span>
+            <span class="info-status">✓</span>
+          </div>
+          <div class="info-box" id="telegram-conn">
+            <span class="info-icon">📱</span>
+            <span class="info-label">Telegram</span>
+            <span class="info-status pending" id="telegram-status">-</span>
+          </div>
+          <div class="info-box" id="sheet-conn">
+            <span class="info-icon">📊</span>
+            <span class="info-label">Sheets</span>
+            <span class="info-status pending" id="sheet-status">-</span>
           </div>
         </div>
+      </div>
 
-        <!-- Subscription Info -->
-        <div class="subscription-card" id="subscription-card">
-          <div class="subscription-header">
-            <div class="subscription-icon">💎</div>
-            <div class="subscription-info">
-              <h3>Mon abonnement</h3>
-              <p>Gere ton forfait et ta facturation</p>
+      <!-- Facturation Tab -->
+      <div id="tab-facturation" class="tab-content">
+        <div id="billing-loading" style="text-align: center; padding: 40px;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 12px; color: rgba(255,255,255,0.5);">Chargement...</p>
+        </div>
+
+        <div id="billing-content" style="display: none;">
+          <!-- Subscription Card -->
+          <div class="section-title">Abonnement</div>
+          <div class="billing-card" id="subscription-card">
+            <div class="billing-header">
+              <div class="billing-icon" id="billing-icon">💎</div>
+              <div class="billing-info">
+                <h3 id="billing-product">Compta Express</h3>
+                <p id="billing-status-text">Chargement...</p>
+              </div>
+              <span id="billing-status-badge" class="status-badge">-</span>
+            </div>
+            <div class="billing-details">
+              <div class="billing-row">
+                <span class="billing-label">Prix</span>
+                <span class="billing-value" id="billing-price">-</span>
+              </div>
+              <div class="billing-row" id="billing-renewal-row">
+                <span class="billing-label" id="billing-renewal-label">Renouvellement</span>
+                <span class="billing-value" id="billing-renewal">-</span>
+              </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="payment-method-box" id="payment-method-box" style="display: none;">
+              <div class="payment-method-info">
+                <div class="card-brand" id="card-brand">-</div>
+                <div class="card-details">
+                  <span class="last4">•••• <span id="card-last4">-</span></span>
+                  <span class="exp">Exp: <span id="card-exp">-</span></span>
+                </div>
+              </div>
+              <button class="btn-change-card" onclick="openCardModal()">Modifier</button>
+            </div>
+
+            <!-- Cancel Section -->
+            <div class="cancel-section" id="cancel-section" style="display: none;">
+              <button class="btn-cancel-sub" id="btn-cancel-sub" onclick="openCancelModal()">Annuler l'abonnement</button>
+            </div>
+            <div class="cancel-section" id="reactivate-section" style="display: none;">
+              <p style="font-size: 13px; color: #fbbf24; margin-bottom: 12px; text-align: center;" id="cancel-notice"></p>
+              <button class="btn-reactivate" onclick="reactivateSubscription()">Reactiver l'abonnement</button>
+            </div>
+
+            <!-- Subscribe Button (for non-subscribers) -->
+            <button class="btn-subscribe" id="btn-subscribe" onclick="startCheckout('compta')" style="display: none;">
+              S'abonner - 29€/mois
+            </button>
+            <p id="trial-note" style="display: none; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
+              7 jours d'essai gratuit, puis 29€/mois
+            </p>
+          </div>
+
+          <!-- Invoices Card -->
+          <div class="section-title">Factures</div>
+          <div class="billing-card">
+            <div id="invoices-list" class="invoices-list">
+              <!-- Invoices will be loaded here -->
+            </div>
+            <div id="no-invoices" class="empty-state" style="display: none;">
+              <div class="icon">📄</div>
+              <p>Aucune facture pour le moment</p>
             </div>
           </div>
-          <div class="subscription-details">
-            <div class="subscription-row">
-              <span class="subscription-label">Statut</span>
-              <span id="subscription-status" class="status-badge">Chargement...</span>
-            </div>
-            <div class="subscription-row">
-              <span class="subscription-label">Module Compta</span>
-              <span class="subscription-value" id="compta-status">-</span>
-            </div>
-            <div class="subscription-row" id="next-billing-row" style="display: none;">
-              <span class="subscription-label">Prochaine facture</span>
-              <span class="subscription-value" id="next-billing">-</span>
-            </div>
-            <div class="subscription-row" id="trial-ends-row" style="display: none;">
-              <span class="subscription-label">Fin de l'essai</span>
-              <span class="subscription-value" id="trial-ends" style="color: #60a5fa;">-</span>
-            </div>
-          </div>
-          <button class="btn-subscribe" id="btn-subscribe" onclick="startCheckout('compta')" style="display: none;">
-            S'abonner - 39€/mois
-          </button>
-          <p id="trial-note" style="display: none; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5); text-align: center;">
-            7 jours d'essai gratuit inclus
-          </p>
         </div>
       </div>
 
@@ -315,26 +369,6 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
             <p class="profile-note">La photo vient de ton compte Google</p>
             <button class="btn-save-profile" onclick="saveProfile()" id="btn-save-profile" disabled>Enregistrer</button>
-          </div>
-        </div>
-
-        <!-- Connexions -->
-        <div class="section-title">Connexions</div>
-        <div class="info-row">
-          <div class="info-box active">
-            <span class="info-icon">🔗</span>
-            <span class="info-label">Google</span>
-            <span class="info-status">✓</span>
-          </div>
-          <div class="info-box" id="telegram-conn">
-            <span class="info-icon">📱</span>
-            <span class="info-label">Telegram</span>
-            <span class="info-status pending" id="telegram-status">-</span>
-          </div>
-          <div class="info-box" id="sheet-conn">
-            <span class="info-icon">📊</span>
-            <span class="info-label">Sheets</span>
-            <span class="info-status pending" id="sheet-status">-</span>
           </div>
         </div>
 
@@ -358,13 +392,43 @@
 
   <!-- Delete Account Modal -->
   <div id="delete-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <h3>Supprimer ton compte ?</h3>
+    <div class="modal-box centered">
+      <h3 class="danger">Supprimer ton compte ?</h3>
       <p>Cette action est irreversible. Toutes tes donnees seront supprimees.</p>
       <p style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5);">Tes Google Sheets ne seront pas affectes.</p>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeDeleteModal()">Annuler</button>
         <button class="btn-confirm-delete" onclick="deleteAccount()">Oui, supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Subscription Modal -->
+  <div id="cancel-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box centered">
+      <h3 class="danger">Annuler ton abonnement ?</h3>
+      <p>Tu garderas l'acces jusqu'a la fin de ta periode en cours.</p>
+      <p style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.5);">Tu pourras te reabonner a tout moment.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeCancelModal()">Non, garder</button>
+        <button class="btn-confirm-delete" id="btn-confirm-cancel" onclick="cancelSubscription()">Oui, annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Card Modal -->
+  <div id="card-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Modifier ma carte</h3>
+        <button onclick="closeCardModal()" style="background: none; border: none; color: rgba(255,255,255,0.5); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+      <p style="margin-bottom: 16px;">Entre les informations de ta nouvelle carte bancaire.</p>
+      <div id="card-element"></div>
+      <div id="card-errors"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeCardModal()">Annuler</button>
+        <button class="btn-confirm" id="btn-save-card" onclick="saveNewCard()">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -383,9 +447,14 @@
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
+    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51SnfoGQnTQdmBOkyXQ0lVJWGO24O9zzKNdXKNFQfq8r37uZRmKJgqmwQz66BYYjX96L1lP3XRQPFWwzIU8HxGKG300gNkmRVSd';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
+    let currentUserId = null;
+    let billingData = null;
+    let stripe = null;
+    let cardElement = null;
 
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -394,6 +463,11 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+        // Load billing data when switching to facturation tab
+        if (btn.dataset.tab === 'facturation' && !billingData) {
+          loadBillingData();
+        }
       });
     });
 
@@ -403,6 +477,9 @@
       if (params.get('success') === '1') {
         showToast('Abonnement active avec succes !');
         window.history.replaceState({}, '', window.location.pathname);
+        // Switch to facturation tab and reload
+        document.querySelector('[data-tab="facturation"]').click();
+        setTimeout(() => loadBillingData(), 500);
       } else if (params.get('canceled') === '1') {
         showToast('Paiement annule', true);
         window.history.replaceState({}, '', window.location.pathname);
@@ -417,11 +494,19 @@
       setTimeout(() => toast.remove(), 4000);
     }
 
+    function formatDate(timestamp) {
+      const date = typeof timestamp === 'number' ? new Date(timestamp * 1000) : new Date(timestamp);
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function formatAmount(amount, currency = 'eur') {
+      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: currency }).format(amount / 100);
+    }
+
     async function init() {
-      console.log('[INIT] init() called, isTelegramMiniApp:', isTelegramMiniApp);
+      console.log('[INIT] init() called');
       checkUrlParams();
 
-      // Si on est dans Telegram, ne JAMAIS rediriger
       if (isTelegramMiniApp) {
         console.log('[INIT] Dans Telegram, skip session check');
         return;
@@ -429,13 +514,13 @@
 
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        console.log('[INIT] Pas de session, redirection');
         window.location.href = '../';
         return;
       }
 
       const user = session.user;
       currentUser = user;
+      currentUserId = user.id;
       const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
       const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
@@ -457,93 +542,160 @@
       `;
 
       await loadModuleData(user.id);
-      await loadSubscriptionData(user.id);
       initProfileEdit(user);
+      initStripe();
     }
 
-    let currentUserId = null;
-    let currentExcelConfig = null;
+    function initStripe() {
+      stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+    }
 
-    async function loadSubscriptionData(userId) {
+    async function loadModuleData(userId) {
+      currentUserId = userId;
       try {
-        const { data: subscription } = await supabaseClient
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('module_name', 'compta')
-          .maybeSingle();
+        const { data: config } = await supabaseClient.from('module_configs').select('sheet_id, config').eq('user_id', userId).eq('module_name', 'compta').single();
+        const { data: telegramLink } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
 
-        const statusEl = document.getElementById('subscription-status');
-        const comptaStatusEl = document.getElementById('compta-status');
-        const btnSubscribe = document.getElementById('btn-subscribe');
-        const trialNote = document.getElementById('trial-note');
-        const nextBillingRow = document.getElementById('next-billing-row');
-        const trialEndsRow = document.getElementById('trial-ends-row');
-
-        if (!subscription) {
-          // Pas d'abonnement
-          statusEl.textContent = 'Aucun abonnement';
-          statusEl.className = 'status-badge';
-          comptaStatusEl.textContent = 'Non abonne';
-          comptaStatusEl.style.color = 'rgba(255,255,255,0.4)';
-          btnSubscribe.style.display = 'block';
-          trialNote.style.display = 'block';
-        } else if (subscription.is_tester) {
-          // Testeur
-          statusEl.textContent = 'Testeur';
-          statusEl.className = 'status-badge tester';
-          comptaStatusEl.textContent = 'Acces illimite';
-          comptaStatusEl.style.color = '#c084fc';
-        } else if (subscription.status === 'trialing') {
-          // En essai
-          statusEl.textContent = 'Essai gratuit';
-          statusEl.className = 'status-badge trialing';
-          comptaStatusEl.textContent = 'Actif';
-          comptaStatusEl.style.color = '#4ade80';
-          if (subscription.trial_ends_at) {
-            trialEndsRow.style.display = 'flex';
-            document.getElementById('trial-ends').textContent = formatDate(subscription.trial_ends_at);
-          }
-        } else if (subscription.status === 'active') {
-          // Actif
-          statusEl.textContent = 'Actif';
-          statusEl.className = 'status-badge active';
-          comptaStatusEl.textContent = '39€/mois';
-          comptaStatusEl.style.color = '#4ade80';
-          if (subscription.current_period_end) {
-            nextBillingRow.style.display = 'flex';
-            document.getElementById('next-billing').textContent = formatDate(subscription.current_period_end);
-          }
-        } else if (subscription.status === 'canceled') {
-          // Annule
-          statusEl.textContent = 'Annule';
-          statusEl.className = 'status-badge canceled';
-          if (subscription.current_period_end && new Date(subscription.current_period_end) > new Date()) {
-            comptaStatusEl.textContent = 'Actif jusqu\'au ' + formatDate(subscription.current_period_end);
-            comptaStatusEl.style.color = '#fbbf24';
-          } else {
-            comptaStatusEl.textContent = 'Expire';
-            comptaStatusEl.style.color = 'rgba(255,255,255,0.4)';
-            btnSubscribe.style.display = 'block';
-            trialNote.style.display = 'none';
-            btnSubscribe.textContent = 'Se reabonner - 39€/mois';
-          }
-        } else if (subscription.status === 'past_due') {
-          // Paiement en retard
-          statusEl.textContent = 'Paiement en retard';
-          statusEl.className = 'status-badge past_due';
-          comptaStatusEl.textContent = 'A regulariser';
-          comptaStatusEl.style.color = '#fbbf24';
+        if (telegramLink?.telegram_user_id) {
+          document.getElementById('telegram-status').textContent = '✓';
+          document.getElementById('telegram-status').className = 'info-status';
+          document.getElementById('telegram-conn').classList.add('active');
         }
+
+        if (config?.sheet_id) {
+          document.getElementById('sheet-status').textContent = '✓';
+          document.getElementById('sheet-status').className = 'info-status';
+          document.getElementById('sheet-conn').classList.add('active');
+          document.getElementById('sheet-conn').style.cursor = 'pointer';
+          document.getElementById('sheet-conn').onclick = () => window.open('https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit', '_blank');
+        } else {
+          document.getElementById('compta-badge').textContent = 'A configurer';
+          document.getElementById('compta-badge').className = 'module-badge inactive';
+        }
+      } catch (err) { console.log('No config'); }
+    }
+
+    // ==================== BILLING ====================
+
+    async function loadBillingData() {
+      const loadingEl = document.getElementById('billing-loading');
+      const contentEl = document.getElementById('billing-content');
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const response = await fetch(SUPABASE_URL + '/functions/v1/stripe-billing', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          }
+        });
+
+        billingData = await response.json();
+        console.log('[BILLING] Data:', billingData);
+
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+
+        renderBillingData();
+
       } catch (err) {
-        console.error('Error loading subscription:', err);
-        document.getElementById('subscription-status').textContent = 'Erreur';
+        console.error('Billing error:', err);
+        loadingEl.innerHTML = '<p style="color: #f87171;">Erreur de chargement</p>';
       }
     }
 
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    function renderBillingData() {
+      const sub = billingData.subscription;
+      const pm = billingData.paymentMethod;
+      const invoices = billingData.invoices;
+
+      // Subscription info
+      if (sub) {
+        document.getElementById('billing-product').textContent = sub.productName || 'Compta Express';
+        document.getElementById('billing-price').textContent = formatAmount(sub.amount, sub.currency) + '/' + (sub.interval === 'month' ? 'mois' : 'an');
+
+        // Status badge
+        const badge = document.getElementById('billing-status-badge');
+        const statusText = document.getElementById('billing-status-text');
+
+        if (sub.status === 'active') {
+          badge.textContent = 'Actif';
+          badge.className = 'status-badge active';
+          statusText.textContent = 'Ton abonnement est actif';
+          document.getElementById('billing-renewal-label').textContent = 'Prochaine facture';
+          document.getElementById('billing-renewal').textContent = formatDate(sub.currentPeriodEnd);
+          document.getElementById('cancel-section').style.display = 'block';
+        } else if (sub.status === 'trialing') {
+          badge.textContent = 'Essai gratuit';
+          badge.className = 'status-badge trialing';
+          statusText.textContent = 'Tu es en periode d\'essai';
+          document.getElementById('billing-renewal-label').textContent = 'Fin de l\'essai';
+          document.getElementById('billing-renewal').textContent = formatDate(sub.trialEnd);
+          document.getElementById('cancel-section').style.display = 'block';
+        } else if (sub.status === 'canceled' || sub.cancelAtPeriodEnd) {
+          badge.textContent = 'Annule';
+          badge.className = 'status-badge canceled';
+          statusText.textContent = 'Abonnement annule';
+          document.getElementById('billing-renewal-label').textContent = 'Acces jusqu\'au';
+          document.getElementById('billing-renewal').textContent = formatDate(sub.currentPeriodEnd);
+          document.getElementById('reactivate-section').style.display = 'block';
+          document.getElementById('cancel-notice').textContent = 'Ton abonnement sera desactive le ' + formatDate(sub.currentPeriodEnd);
+        } else if (sub.status === 'past_due') {
+          badge.textContent = 'Paiement en retard';
+          badge.className = 'status-badge past_due';
+          statusText.textContent = 'Probleme de paiement';
+        }
+
+        // Payment method
+        if (pm) {
+          document.getElementById('payment-method-box').style.display = 'flex';
+          const brandEl = document.getElementById('card-brand');
+          brandEl.textContent = pm.brand.toUpperCase();
+          brandEl.className = 'card-brand ' + pm.brand.toLowerCase();
+          document.getElementById('card-last4').textContent = pm.last4;
+          document.getElementById('card-exp').textContent = pm.expMonth + '/' + pm.expYear;
+        }
+
+      } else {
+        // No subscription
+        document.getElementById('billing-status-badge').textContent = 'Aucun';
+        document.getElementById('billing-status-badge').className = 'status-badge';
+        document.getElementById('billing-status-text').textContent = 'Pas d\'abonnement actif';
+        document.getElementById('billing-price').textContent = '-';
+        document.getElementById('billing-renewal-row').style.display = 'none';
+        document.getElementById('btn-subscribe').style.display = 'block';
+        document.getElementById('trial-note').style.display = 'block';
+      }
+
+      // Invoices
+      const invoicesList = document.getElementById('invoices-list');
+      const noInvoices = document.getElementById('no-invoices');
+
+      if (invoices && invoices.length > 0) {
+        invoicesList.innerHTML = invoices.map(inv => `
+          <div class="invoice-row">
+            <div class="invoice-info">
+              <div class="invoice-icon">📄</div>
+              <div class="invoice-details">
+                <span class="date">${formatDate(inv.date)}</span>
+                <span class="desc">${inv.description}</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="invoice-amount">${formatAmount(inv.amount, inv.currency)}</span>
+              <span class="invoice-status ${inv.status === 'paid' ? 'paid' : 'open'}">${inv.status === 'paid' ? 'Payee' : 'En attente'}</span>
+              ${inv.pdfUrl ? `<a href="${inv.pdfUrl}" target="_blank" class="btn-download"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>` : ''}
+            </div>
+          </div>
+        `).join('');
+        noInvoices.style.display = 'none';
+      } else {
+        invoicesList.innerHTML = '';
+        noInvoices.style.display = 'block';
+      }
     }
 
     async function startCheckout(moduleName) {
@@ -568,50 +720,191 @@
         if (data.error) throw new Error(data.error);
         if (data.url) {
           window.location.href = data.url;
-        } else {
-          throw new Error('No checkout URL returned');
         }
       } catch (err) {
         console.error('Checkout error:', err);
         showToast('Erreur: ' + err.message, true);
         btn.disabled = false;
-        btn.textContent = 'S\'abonner - 39€/mois';
+        btn.textContent = 'S\'abonner - 29€/mois';
       }
     }
 
-    async function loadModuleData(userId) {
-      currentUserId = userId;
-      try {
-        const { data: config } = await supabaseClient.from('module_configs').select('sheet_id, config').eq('user_id', userId).eq('module_name', 'compta').single();
-        const { data: telegramLink } = await supabaseClient.from('telegram_links').select('telegram_user_id').eq('user_id', userId).maybeSingle();
+    // ==================== CARD MODAL ====================
 
-        const hasTelegram = !!telegramLink?.telegram_user_id;
+    function openCardModal() {
+      document.getElementById('card-modal').style.display = 'flex';
 
-        if (hasTelegram) {
-          document.getElementById('telegram-status').textContent = '✓';
-          document.getElementById('telegram-status').className = 'info-status';
-          document.getElementById('telegram-conn').classList.add('active');
-        }
-
-        if (config?.sheet_id) {
-          document.getElementById('sheet-status').textContent = '✓';
-          document.getElementById('sheet-status').className = 'info-status';
-          document.getElementById('sheet-conn').classList.add('active');
-          document.getElementById('sheet-conn').style.cursor = 'pointer';
-          document.getElementById('sheet-conn').onclick = () => window.open('https://docs.google.com/spreadsheets/d/' + config.sheet_id + '/edit', '_blank');
-        } else {
-          document.getElementById('compta-badge').textContent = 'A configurer';
-          document.getElementById('compta-badge').className = 'module-badge inactive';
-        }
-      } catch (err) { console.log('No config'); }
+      if (!cardElement) {
+        const elements = stripe.elements();
+        cardElement = elements.create('card', {
+          style: {
+            base: {
+              color: '#ffffff',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              '::placeholder': { color: 'rgba(255,255,255,0.4)' }
+            }
+          }
+        });
+        cardElement.mount('#card-element');
+        cardElement.on('change', (event) => {
+          document.getElementById('card-errors').textContent = event.error ? event.error.message : '';
+        });
+      }
     }
+
+    function closeCardModal() {
+      document.getElementById('card-modal').style.display = 'none';
+    }
+
+    async function saveNewCard() {
+      const btn = document.getElementById('btn-save-card');
+      btn.disabled = true;
+      btn.textContent = 'Enregistrement...';
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        // Create SetupIntent
+        const setupResponse = await fetch(SUPABASE_URL + '/functions/v1/stripe-update-card', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ action: 'create_setup_intent' })
+        });
+
+        const { clientSecret } = await setupResponse.json();
+
+        // Confirm with Stripe
+        const { setupIntent, error } = await stripe.confirmCardSetup(clientSecret, {
+          payment_method: { card: cardElement }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        // Set as default
+        await fetch(SUPABASE_URL + '/functions/v1/stripe-update-card', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({
+            action: 'set_default',
+            paymentMethodId: setupIntent.payment_method
+          })
+        });
+
+        closeCardModal();
+        showToast('Carte mise a jour !');
+
+        // Reload billing data
+        billingData = null;
+        loadBillingData();
+
+      } catch (err) {
+        console.error('Card update error:', err);
+        document.getElementById('card-errors').textContent = err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer';
+      }
+    }
+
+    // ==================== CANCEL SUBSCRIPTION ====================
+
+    function openCancelModal() {
+      document.getElementById('cancel-modal').style.display = 'flex';
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancel-modal').style.display = 'none';
+    }
+
+    async function cancelSubscription() {
+      const btn = document.getElementById('btn-confirm-cancel');
+      btn.disabled = true;
+      btn.textContent = 'Annulation...';
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        const response = await fetch(SUPABASE_URL + '/functions/v1/stripe-cancel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ action: 'cancel' })
+        });
+
+        const result = await response.json();
+
+        if (result.error) throw new Error(result.error);
+
+        closeCancelModal();
+        showToast(result.message);
+
+        // Reload billing data
+        billingData = null;
+        loadBillingData();
+
+      } catch (err) {
+        console.error('Cancel error:', err);
+        showToast('Erreur: ' + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Oui, annuler';
+      }
+    }
+
+    async function reactivateSubscription() {
+      const btn = document.querySelector('.btn-reactivate');
+      btn.disabled = true;
+      btn.textContent = 'Reactivation...';
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        const response = await fetch(SUPABASE_URL + '/functions/v1/stripe-cancel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ action: 'reactivate' })
+        });
+
+        const result = await response.json();
+
+        if (result.error) throw new Error(result.error);
+
+        showToast('Abonnement reactive !');
+
+        // Reload billing data
+        billingData = null;
+        loadBillingData();
+
+      } catch (err) {
+        console.error('Reactivate error:', err);
+        showToast('Erreur: ' + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Reactiver l\'abonnement';
+      }
+    }
+
+    // ==================== PROFILE ====================
 
     async function signOut() {
       await supabaseClient.auth.signOut();
       window.location.href = '../';
     }
 
-    // Profile edit
     let originalName = '';
 
     function initProfileEdit(user) {
@@ -655,7 +948,8 @@
       }
     }
 
-    // Delete account
+    // ==================== DELETE ACCOUNT ====================
+
     function confirmDeleteAccount() {
       document.getElementById('delete-modal').style.display = 'flex';
     }
@@ -666,14 +960,12 @@
 
     async function deleteAccount() {
       try {
-        // Delete user data from all tables
         if (currentUserId) {
           await supabaseClient.from('module_configs').delete().eq('user_id', currentUserId);
           await supabaseClient.from('telegram_links').delete().eq('user_id', currentUserId);
           await supabaseClient.from('google_credentials').delete().eq('user_id', currentUserId);
         }
 
-        // Sign out (actual user deletion requires admin or edge function)
         await supabaseClient.auth.signOut();
         window.location.href = '../?deleted=1';
       } catch (err) {
@@ -682,13 +974,12 @@
       }
     }
 
-    // === TELEGRAM MINI APP ===
+    // ==================== TELEGRAM MINI APP ====================
     console.log('[BOOT] Script loaded');
 
     const tg = window.Telegram?.WebApp;
     let isTelegramMiniApp = false;
 
-    // Detecter si on est dans Telegram - URL param OU SDK
     const urlParams = new URLSearchParams(window.location.search);
     const fromTelegram = urlParams.get('tg') === '1';
 
@@ -698,48 +989,21 @@
       window.TelegramWebviewProxy
     );
 
-    console.log('[BOOT] fromTelegram (URL):', fromTelegram);
-    console.log('[BOOT] sdkDetected:', sdkDetected);
-
     if (fromTelegram || sdkDetected) {
       isTelegramMiniApp = true;
-      console.log('[TG] TELEGRAM DETECTE!');
-      console.log('[TG] Platform:', tg.platform);
-      console.log('[TG] initData:', tg.initData);
-      console.log('[TG] initDataUnsafe:', JSON.stringify(tg.initDataUnsafe));
-
-      // Initialiser le Mini App
       tg.ready();
-
-      // Expand en plein ecran
       tg.expand();
-      tg.enableClosingConfirmation && tg.disableClosingConfirmation();
 
-      // Forcer la hauteur viewport
-      document.documentElement.style.height = '100%';
-      document.body.style.height = '100%';
-      document.body.style.minHeight = tg.viewportStableHeight + 'px';
-
-      // Bouton retour
       if (tg.BackButton) {
         tg.BackButton.show();
-        tg.BackButton.onClick(() => {
-          console.log('[TG] Back button clicked');
-          tg.close();
-        });
+        tg.BackButton.onClick(() => tg.close());
       }
 
-      // Appliquer les couleurs Telegram
-      document.body.style.backgroundColor = tg.backgroundColor || '#030303';
-      document.body.style.setProperty('--tg-theme-bg-color', tg.backgroundColor || '#030303');
-
-      // Styles specifiques Mini App
       const style = document.createElement('style');
       style.textContent = `
         body.tg-mini-app { padding-bottom: env(safe-area-inset-bottom, 20px); }
-        body.tg-mini-app .page-container { padding-top: 10px !important; padding-bottom: 30px; }
+        body.tg-mini-app .page-container { padding-top: 10px !important; }
         body.tg-mini-app nav { display: none !important; }
-        body.tg-mini-app .main-card { border-radius: 20px; }
         body.tg-mini-app footer { display: none; }
         body.tg-mini-app .orb { display: none; }
       `;
@@ -747,19 +1011,13 @@
       document.body.classList.add('tg-mini-app');
     }
 
-    // Init selon le contexte
     async function initFromTelegram() {
-      console.log('[TG] initFromTelegram called');
-
-      // Verifier que les donnees user sont presentes
       if (!tg.initDataUnsafe?.user) {
-        console.error('[TG] Pas de user dans initDataUnsafe');
         document.querySelector('.main-card').innerHTML = `
           <div style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
             <h2 style="margin-bottom: 12px;">Erreur Telegram</h2>
             <p style="color: rgba(255,255,255,0.6);">Donnees utilisateur non disponibles.</p>
-            <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 12px;">Platform: ${tg.platform}<br>initData: ${tg.initData ? 'present' : 'vide'}</p>
           </div>
         `;
         return;
@@ -768,9 +1026,6 @@
       const telegramUser = tg.initDataUnsafe.user;
       const telegramUserId = telegramUser.id.toString();
 
-      console.log('[TG] Chargement user Telegram:', telegramUserId);
-
-      // Chercher le user via telegram_links (avec toutes les infos)
       const { data: link, error } = await supabaseClient
         .from('telegram_links')
         .select('user_id, display_name, avatar_url, email')
@@ -778,63 +1033,28 @@
         .single();
 
       if (error || !link) {
-        console.error('[TG] User non trouve:', error);
-        console.error('[TG] Query was for telegram_user_id:', telegramUserId);
         document.querySelector('.main-card').innerHTML = `
           <div style="text-align: center; padding: 40px;">
             <div style="font-size: 48px; margin-bottom: 16px;">🔗</div>
             <h2 style="margin-bottom: 12px;">Compte non lie</h2>
-            <p style="color: rgba(255,255,255,0.6);">Erreur: ${error?.message || 'Non trouve'}</p>
-            <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 12px;">Telegram ID: ${telegramUserId}</p>
-            <a href="https://iarmy.fr/compte/" target="_blank" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #FF6B35; color: white; text-decoration: none; border-radius: 10px; font-weight: 600;">Reconnecter sur iarmy.fr</a>
+            <a href="https://iarmy.fr/compte/" target="_blank" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #FF6B35; color: white; text-decoration: none; border-radius: 10px; font-weight: 600;">Connecter sur iarmy.fr</a>
           </div>
         `;
         return;
       }
 
-      const userId = link.user_id;
-      currentUserId = userId;
-
-      // Utiliser les infos du compte Google stockees dans telegram_links
+      currentUserId = link.user_id;
       const userName = link.display_name || telegramUser.first_name;
-      const userEmail = link.email || (telegramUser.username ? '@' + telegramUser.username : '');
-      const userAvatar = link.avatar_url || telegramUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
+      const userAvatar = link.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
 
       document.getElementById('profile-avatar').src = userAvatar;
       document.getElementById('profile-name').textContent = userName;
-      document.getElementById('profile-email').textContent = userEmail;
+      document.getElementById('profile-email').textContent = link.email || '';
 
-      // Cacher la nav (on est dans Telegram)
-      document.querySelector('nav').style.display = 'none';
-      document.querySelector('.page-container').style.paddingTop = '20px';
+      await loadModuleData(link.user_id);
 
-      // Dans Mini App: clic sur module -> ouvrir la page de config avec ?tg=1 et tguid
-      document.querySelectorAll('.module-card[data-module]').forEach(card => {
-        card.addEventListener('click', (e) => {
-          e.preventDefault();
-          const moduleName = card.dataset.module;
-          // Naviguer vers la page de config du module avec telegram user id
-          window.location.href = `../modules/${moduleName}/?tg=1&tguid=${telegramUserId}`;
-        });
-        card.style.cursor = 'pointer';
-      });
-
-      // Modifier aussi le lien dans le panel si visible
-      const configLink = document.getElementById('module-config-link');
-      if (configLink) {
-        configLink.href = configLink.href + `?tg=1&tguid=${telegramUserId}`;
-      }
-
-      // Charger les donnees
-      await loadModuleData(userId);
-      await loadSubscriptionData(userId);
-
-      // Adapter le profil edit pour Telegram
       document.getElementById('edit-avatar').src = userAvatar;
       document.getElementById('edit-name').value = userName;
-      document.querySelector('.profile-note').textContent = 'Infos depuis ton compte Telegram';
-
-      console.log('[TG] Chargement termine');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
