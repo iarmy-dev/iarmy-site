@@ -300,7 +300,24 @@
   <script>
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_8mpFx9ubrV29KfKtgAb3eg_dyazidfT';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Cookie storage pour partager la session entre iarmy.fr et app.iarmy.fr
+    const cookieStorage = {
+      getItem: (key) => {
+        const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+      },
+      setItem: (key, value) => {
+        document.cookie = `${key}=${encodeURIComponent(value)}; domain=.iarmy.fr; path=/; max-age=31536000; SameSite=Lax; Secure`;
+      },
+      removeItem: (key) => {
+        document.cookie = `${key}=; domain=.iarmy.fr; path=/; max-age=0`;
+      }
+    };
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { storage: cookieStorage, storageKey: 'sb-auth-token' }
+    });
     
     console.log('[INDEX] 🚀 Init');
 
