@@ -429,16 +429,9 @@
     }
 
     async function launchRobot() {
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          window.location.href = 'https://app.iarmy.fr/compta/setup';
-        } else {
-          openModal('login');
-        }
-      } catch (e) {
-        openModal('login');
-      }
+      // Toujours rediriger vers app.iarmy.fr - il gerera l'auth lui-meme
+      // (les sessions ne sont pas partagees entre domaines)
+      window.location.href = 'https://app.iarmy.fr';
     }
 
     function openModal(tab = 'login') {
