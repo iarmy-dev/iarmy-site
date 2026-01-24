@@ -68,14 +68,25 @@ iArmy
 
 ## STRUCTURE DES REPOS
 
-### iarmy-site (GitHub Pages)
+### iarmy-site (GitHub Pages - iarmy.fr)
 ```
 iarmy-site/
-├── index.html         # Landing + modal connexion
-├── compte/            # Dashboard utilisateur
-├── modules/compta/    # Module comptabilité
-├── auth/callback.html # OAuth callback
+├── index.html         # Landing page + modal connexion
+├── privacy/           # Politique de confidentialite
+├── cgu/               # Conditions generales
 └── CNAME              # Domaine iarmy.fr
+```
+
+### iarmy-app (GitHub Pages - app.iarmy.fr)
+```
+iarmy-app/
+├── index.html         # Dashboard utilisateur
+├── compta/            # Module comptabilite
+│   ├── index.html
+│   └── setup/
+├── auth/callback.html # OAuth callback
+├── admin/             # Panel admin
+└── CNAME              # Domaine app.iarmy.fr
 ```
 
 ### iarmy-bot (Render)
