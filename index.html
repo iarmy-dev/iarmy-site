@@ -412,13 +412,14 @@
             .maybeSingle();
 
           if (config?.sheet_id) {
-            // Module configuré → afficher "Installé" au lieu de "NOUVEAU"
+            // Module configuré → badge discret
             const badge = document.getElementById('module-badge');
             if (badge) {
-              badge.textContent = '✓ Installé · Configurer';
-              badge.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(74,222,128,0.2))';
+              badge.innerHTML = '✓ Installé';
+              badge.style.background = 'rgba(34,197,94,0.15)';
               badge.style.color = '#4ade80';
-              badge.style.borderColor = 'rgba(34,197,94,0.5)';
+              badge.style.borderColor = 'rgba(34,197,94,0.3)';
+              badge.style.animation = 'none';
             }
             // Changer le onclick pour aller direct aux settings
             const moduleCard = document.querySelector('.module-card');
