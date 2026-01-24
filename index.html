@@ -206,7 +206,7 @@
       <div class="text-center mb-12"><span class="text-white/30 text-sm uppercase tracking-widest">✨ Nouveau module disponible</span></div>
       <div style="display: flex; justify-content: center;">
         <div class="module-card" onclick="launchRobot()">
-          <div class="flex items-center gap-3 mb-4"><span class="badge-new">🎉 NOUVEAU</span></div>
+          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="module-badge">🎉 NOUVEAU</span></div>
           <div style="display:flex; justify-content:center; margin-bottom:20px;">
             <div class="animated-logo-ultra-simple">
               <div class="logo-telegram-xl"><svg width="56" height="56" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-xl" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-xl)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
@@ -397,6 +397,25 @@
         if (session) {
           console.log('[INDEX] ✅ Connecté:', session.user.email);
           showLoggedInNav(session.user);
+
+          // Vérifier si le module compta est configuré
+          const { data: config } = await supabaseClient
+            .from('module_configs')
+            .select('sheet_id')
+            .eq('user_id', session.user.id)
+            .eq('module_name', 'compta')
+            .maybeSingle();
+
+          if (config?.sheet_id) {
+            // Module configuré → afficher "Configurer" au lieu de "NOUVEAU"
+            const badge = document.getElementById('module-badge');
+            if (badge) {
+              badge.textContent = '⚙️ Configurer';
+              badge.style.background = 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(74,222,128,0.2))';
+              badge.style.color = '#4ade80';
+              badge.style.borderColor = 'rgba(34,197,94,0.5)';
+            }
+          }
         } else {
           console.log('[INDEX] ❌ Non connecté');
           showLoggedOutNav();
