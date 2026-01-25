@@ -451,6 +451,27 @@
               moduleCard.onclick = () => { window.location.href = 'https://app.iarmy.fr/compta/'; };
             }
           }
+
+          // Vérifier si le module planning est configuré (a une subscription active ou is_tester)
+          const { data: planningConfig } = await supabaseClient
+            .from('subscriptions')
+            .select('status, is_tester')
+            .eq('user_id', session.user.id)
+            .eq('module_name', 'planning')
+            .maybeSingle();
+
+          if (planningConfig?.status === 'active' || planningConfig?.is_tester) {
+            planningConfigured = true;
+            // Module configuré → badge discret
+            const planningBadge = document.getElementById('planning-badge');
+            if (planningBadge) {
+              planningBadge.innerHTML = '✓ Installé';
+              planningBadge.style.background = 'rgba(34,197,94,0.15)';
+              planningBadge.style.color = '#4ade80';
+              planningBadge.style.borderColor = 'rgba(34,197,94,0.3)';
+              planningBadge.style.animation = 'none';
+            }
+          }
         } else {
           console.log('[INDEX] ❌ Non connecté');
           showLoggedOutNav();
@@ -505,8 +526,15 @@
       window.location.href = 'https://app.iarmy.fr';
     }
 
+    // Variable globale pour savoir si planning est configuré
+    let planningConfigured = false;
+
     function goToPlanning() {
-      window.location.href = 'https://app.iarmy.fr/planning/setup/';
+      if (planningConfigured) {
+        window.location.href = 'https://app.iarmy.fr/planning/';
+      } else {
+        window.location.href = 'https://app.iarmy.fr/planning/setup/';
+      }
     }
 
     function openModal(tab = 'login') {
