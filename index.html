@@ -253,6 +253,29 @@
             <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📄 Contrats</span>
           </div>
         </div>
+        <div class="module-card" onclick="goToStock()" id="module-stock">
+          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="stock-badge">🎉 NOUVEAU</span></div>
+          <div style="display:flex; justify-content:center; margin-bottom:20px;">
+            <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
+              <div style="width:56px; height:56px; background:linear-gradient(135deg, #10B981, #34D399); border-radius:14px; display:flex; align-items:center; justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                  <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Stock</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Gestion de stock pour bars<br>Tickets Z, inventaires, marges</p>
+          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
+            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
+            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Bars & Cocktails</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🍸 Cocktails</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📊 Marges</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📦 Stock</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -472,6 +495,26 @@
               planningBadge.style.animation = 'none';
             }
           }
+
+          // Vérifier si le module stock est configuré
+          const { data: stockConfig } = await supabaseClient
+            .from('subscriptions')
+            .select('status, is_tester')
+            .eq('user_id', session.user.id)
+            .eq('module_name', 'stock')
+            .maybeSingle();
+
+          if (stockConfig?.status === 'active' || stockConfig?.is_tester) {
+            stockConfigured = true;
+            const stockBadge = document.getElementById('stock-badge');
+            if (stockBadge) {
+              stockBadge.innerHTML = '✓ Installé';
+              stockBadge.style.background = 'rgba(34,197,94,0.15)';
+              stockBadge.style.color = '#4ade80';
+              stockBadge.style.borderColor = 'rgba(34,197,94,0.3)';
+              stockBadge.style.animation = 'none';
+            }
+          }
         } else {
           console.log('[INDEX] ❌ Non connecté');
           showLoggedOutNav();
@@ -526,14 +569,23 @@
       window.location.href = 'https://app.iarmy.fr';
     }
 
-    // Variable globale pour savoir si planning est configuré
+    // Variables globales pour savoir si les modules sont configures
     let planningConfigured = false;
+    let stockConfigured = false;
 
     function goToPlanning() {
       if (planningConfigured) {
         window.location.href = 'https://app.iarmy.fr/planning/';
       } else {
         window.location.href = 'https://app.iarmy.fr/planning/setup/';
+      }
+    }
+
+    function goToStock() {
+      if (stockConfigured) {
+        window.location.href = 'https://app.iarmy.fr/stock/';
+      } else {
+        window.location.href = 'https://app.iarmy.fr/stock/setup/';
       }
     }
 
