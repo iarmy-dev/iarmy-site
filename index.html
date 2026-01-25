@@ -204,8 +204,8 @@
   
   <section class="py-20 px-6 relative z-10">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12"><span class="text-white/30 text-sm uppercase tracking-widest">✨ Nouveau module disponible</span></div>
-      <div style="display: flex; justify-content: center;">
+      <div class="text-center mb-12"><span class="text-white/30 text-sm uppercase tracking-widest">✨ Nos modules</span></div>
+      <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
         <div class="module-card" onclick="launchRobot()">
           <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="module-badge">🎉 NOUVEAU</span></div>
           <div style="display:flex; justify-content:center; margin-bottom:20px;">
@@ -227,16 +227,40 @@
             <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🍸 Bar</span>
           </div>
         </div>
+        <div class="module-card" onclick="goToPlanning()" id="module-planning">
+          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="planning-badge">🎉 NOUVEAU</span></div>
+          <div style="display:flex; justify-content:center; margin-bottom:20px;">
+            <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
+              <div style="width:56px; height:56px; background:linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius:14px; display:flex; align-items:center; justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Planning</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Gere ton equipe facilement<br>Plannings, absences, contrats</p>
+          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
+            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
+            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Gestion d'equipe</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📅 Plannings</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">👥 Equipe</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📄 Contrats</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
   
   <section class="py-12 px-6 relative z-10">
     <div class="max-w-4xl mx-auto text-center">
-      <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres modules arrivent très vite</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres modules arrivent bientot</p>
       <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
-        <div class="robot-card"><span class="robot-emoji">🤖</span></div>
-        <div class="robot-card"><span class="robot-emoji">🤖</span></div>
         <div class="robot-card"><span class="robot-emoji">🤖</span></div>
         <div class="robot-card"><span class="robot-emoji">🤖</span></div>
         <div class="robot-card"><span class="robot-emoji">🤖</span></div>
@@ -479,6 +503,10 @@
       // Toujours rediriger vers app.iarmy.fr - il gerera l'auth lui-meme
       // (les sessions ne sont pas partagees entre domaines)
       window.location.href = 'https://app.iarmy.fr';
+    }
+
+    function goToPlanning() {
+      window.location.href = 'https://app.iarmy.fr/planning/setup/';
     }
 
     function openModal(tab = 'login') {
