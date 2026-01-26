@@ -127,17 +127,21 @@
     .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    /* Mini paie animation - team silhouettes + euro */
-    .mini-team { width: 44px; height: 32px; display: flex; align-items: flex-end; justify-content: center; position: relative; gap: 1px; }
-    .mini-person { display: flex; flex-direction: column; align-items: center; opacity: 0.3; animation: personAppear 3s ease-in-out infinite; }
-    .mini-person-1 { animation-delay: 0s; }
-    .mini-person-2 { animation-delay: 0.25s; }
-    .mini-person-3 { animation-delay: 0.5s; }
-    .mini-person-head { width: 8px; height: 8px; border-radius: 50%; background: white; margin-bottom: 1px; }
-    .mini-person-body { width: 10px; height: 10px; background: white; border-radius: 4px 4px 2px 2px; }
-    @keyframes personAppear { 0%, 15% { opacity: 0.25; transform: scale(0.9); } 25%, 75% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0.25; transform: scale(0.9); } }
-    .mini-team-euro { position: absolute; bottom: 0; right: -8px; font-size: 16px; font-weight: 800; color: #4ade80; opacity: 0; animation: euroPop 3s ease-out infinite; animation-delay: 0.9s; text-shadow: 0 2px 8px rgba(74,222,128,0.5); }
-    @keyframes euroPop { 0%, 20% { opacity: 0; transform: scale(0); } 35% { opacity: 1; transform: scale(1.2); } 50%, 70% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0; transform: scale(0.8) translateY(-3px); } }
+    /* Mini paie animation - team transforms to euro */
+    .mini-team { width: 40px; height: 32px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .mini-team-people { display: flex; align-items: flex-end; gap: 2px; position: absolute; animation: peopleToEuro 3.5s ease-in-out infinite; }
+    .mini-person { display: flex; flex-direction: column; align-items: center; }
+    .mini-person-head { width: 7px; height: 7px; border-radius: 50%; background: white; margin-bottom: 1px; }
+    .mini-person-body { width: 9px; height: 9px; background: white; border-radius: 3px 3px 1px 1px; }
+    .mini-person-1 { animation: person1Move 3.5s ease-in-out infinite; }
+    .mini-person-2 { animation: person2Move 3.5s ease-in-out infinite; }
+    .mini-person-3 { animation: person3Move 3.5s ease-in-out infinite; }
+    @keyframes peopleToEuro { 0%, 50% { opacity: 1; } 60%, 90% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes person1Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(12px); } 60%, 90% { transform: translateX(12px); opacity: 0; } 100% { transform: translateX(0); } }
+    @keyframes person2Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(0); } 60%, 90% { transform: translateX(0); opacity: 0; } 100% { transform: translateX(0); } }
+    @keyframes person3Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(-12px); } 60%, 90% { transform: translateX(-12px); opacity: 0; } 100% { transform: translateX(0); } }
+    .mini-team-euro { position: absolute; font-size: 22px; font-weight: 800; color: white; opacity: 0; animation: euroAppear 3.5s ease-in-out infinite; }
+    @keyframes euroAppear { 0%, 50% { opacity: 0; transform: scale(0.5); } 65% { opacity: 1; transform: scale(1.1); } 75%, 85% { opacity: 1; transform: scale(1); } 95%, 100% { opacity: 0; transform: scale(0.8); } }
 
     @media (max-width: 768px) { .hero-demo { flex-direction: column !important; } .iphone, .sheet { width: 200px; } .module-card { min-width: 260px; } }
   </style>
@@ -269,17 +273,19 @@
             <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
               <div style="width:56px; height:56px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:14px; display:flex; align-items:center; justify-content:center; position:relative;">
                 <div class="mini-team">
-                  <div class="mini-person mini-person-1">
-                    <div class="mini-person-head"></div>
-                    <div class="mini-person-body"></div>
-                  </div>
-                  <div class="mini-person mini-person-2">
-                    <div class="mini-person-head"></div>
-                    <div class="mini-person-body"></div>
-                  </div>
-                  <div class="mini-person mini-person-3">
-                    <div class="mini-person-head"></div>
-                    <div class="mini-person-body"></div>
+                  <div class="mini-team-people">
+                    <div class="mini-person mini-person-1">
+                      <div class="mini-person-head"></div>
+                      <div class="mini-person-body"></div>
+                    </div>
+                    <div class="mini-person mini-person-2">
+                      <div class="mini-person-head"></div>
+                      <div class="mini-person-body"></div>
+                    </div>
+                    <div class="mini-person mini-person-3">
+                      <div class="mini-person-head"></div>
+                      <div class="mini-person-body"></div>
+                    </div>
                   </div>
                   <div class="mini-team-euro">€</div>
                 </div>
