@@ -276,10 +276,36 @@
             <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📦 Stock</span>
           </div>
         </div>
+        <div class="module-card" onclick="goToPaie()" id="module-paie">
+          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="paie-badge">🎉 NOUVEAU</span></div>
+          <div style="display:flex; justify-content:center; margin-bottom:20px;">
+            <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
+              <div style="width:56px; height:56px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:14px; display:flex; align-items:center; justify-content:center; position:relative;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M20 8v6"/>
+                  <path d="M23 11h-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Paie</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Prepare la paie facilement<br>Absences, retards, recap mensuel</p>
+          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
+            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
+            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Preparation paie</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">👥 Equipe</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📋 Recap</span>
+            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">💰 Net</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
-  
+
   <section class="py-12 px-6 relative z-10">
     <div class="max-w-4xl mx-auto text-center">
       <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres modules arrivent bientot</p>
@@ -572,12 +598,21 @@
     // Variables globales pour savoir si les modules sont configures
     let planningConfigured = false;
     let stockConfigured = false;
+    let paieConfigured = false;
 
     function goToPlanning() {
       if (planningConfigured) {
         window.location.href = 'https://app.iarmy.fr/planning/';
       } else {
         window.location.href = 'https://app.iarmy.fr/planning/setup/';
+      }
+    }
+
+    function goToPaie() {
+      if (paieConfigured) {
+        window.location.href = 'https://app.iarmy.fr/paie/';
+      } else {
+        window.location.href = 'https://app.iarmy.fr/setup/?module=paie';
       }
     }
 
