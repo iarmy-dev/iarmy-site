@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://byqfnpdcnifauhwgetcq.supabase.co;">
   <title>iArmy - Une armée de robots pour ton quotidien</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><rect x='35' y='18' width='30' height='12' rx='6' fill='white'/><rect x='32' y='26' width='36' height='5' rx='2' fill='white'/><circle cx='50' cy='42' r='10' fill='white'/><rect x='44' y='52' width='12' height='28' rx='3' fill='white'/></svg>">
   <meta name="theme-color" content="#FF6B35">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -334,7 +334,13 @@
 
   <!-- Welcome overlay -->
   <div class="welcome-overlay" id="welcome-overlay">
-    <div class="welcome-logo">i</div>
+    <div class="welcome-logo">
+      <div class="logo-i-soldier" style="transform:scale(2.5);">
+        <div class="logo-i-cap" style="animation:none;"></div>
+        <div class="logo-i-dot"></div>
+        <div class="logo-i-body"></div>
+      </div>
+    </div>
     <h1 class="welcome-title" id="welcome-title">Bienvenue !</h1>
     <p class="welcome-subtitle" id="welcome-subtitle">Preparation de ton espace...</p>
     <div class="welcome-dots"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
@@ -383,7 +389,13 @@
         </div>
         <div class="glide-container hidden md:block">
           <div class="glide-line"></div>
-          <div class="glide-logo" id="glide-logo">i</div>
+          <div class="glide-logo" id="glide-logo">
+              <div class="logo-i-soldier" style="transform:scale(0.9);">
+                <div class="logo-i-cap"></div>
+                <div class="logo-i-dot"></div>
+                <div class="logo-i-body"></div>
+              </div>
+            </div>
         </div>
         <div class="sheet animate-float" style="animation-delay: -2s;">
           <div class="sheet-header">
