@@ -35,8 +35,9 @@
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-    .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
+    .logo-i:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
+    .logo-i svg { width: 24px; height: 24px; }
 
     .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
     .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); opacity: 0; transition: opacity 0.3s; }
@@ -175,39 +176,36 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     }
-    .module-card:hover { transform: translateY(-6px) scale(1.02); }
+    .module-card:hover { border-color: rgba(255,255,255,0.3); }
 
     /* Compta - Green background */
     .module-card.compta {
-      background: linear-gradient(145deg, rgba(34,197,94,0.15), rgba(22,163,74,0.08));
-      border-color: rgba(34,197,94,0.25);
-      box-shadow: 0 4px 30px rgba(34,197,94,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+      background: linear-gradient(145deg, rgba(34,197,94,0.12), rgba(22,163,74,0.06));
+      border-color: rgba(34,197,94,0.2);
     }
     .module-card.compta:hover {
-      box-shadow: 0 12px 50px rgba(34,197,94,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
-      border-color: rgba(34,197,94,0.4);
+      border-color: rgba(34,197,94,0.5);
+      box-shadow: 0 0 30px rgba(34,197,94,0.15);
     }
 
     /* Stock - Cyan background */
     .module-card.stock {
-      background: linear-gradient(145deg, rgba(6,182,212,0.15), rgba(8,145,178,0.08));
-      border-color: rgba(6,182,212,0.25);
-      box-shadow: 0 4px 30px rgba(6,182,212,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+      background: linear-gradient(145deg, rgba(6,182,212,0.12), rgba(8,145,178,0.06));
+      border-color: rgba(6,182,212,0.2);
     }
     .module-card.stock:hover {
-      box-shadow: 0 12px 50px rgba(6,182,212,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
-      border-color: rgba(6,182,212,0.4);
+      border-color: rgba(6,182,212,0.5);
+      box-shadow: 0 0 30px rgba(6,182,212,0.15);
     }
 
     /* Paie - Gold/Amber background */
     .module-card.paie {
-      background: linear-gradient(145deg, rgba(245,158,11,0.15), rgba(217,119,6,0.08));
-      border-color: rgba(245,158,11,0.25);
-      box-shadow: 0 4px 30px rgba(245,158,11,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+      background: linear-gradient(145deg, rgba(245,158,11,0.12), rgba(217,119,6,0.06));
+      border-color: rgba(245,158,11,0.2);
     }
     .module-card.paie:hover {
-      box-shadow: 0 12px 50px rgba(245,158,11,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
-      border-color: rgba(245,158,11,0.4);
+      border-color: rgba(245,158,11,0.5);
+      box-shadow: 0 0 30px rgba(245,158,11,0.15);
     }
 
 
@@ -303,7 +301,17 @@
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
-        <div class="logo-i">i</div>
+        <div class="logo-i">
+          <svg viewBox="0 0 24 24" fill="white">
+            <!-- Helmet -->
+            <ellipse cx="12" cy="6" rx="6" ry="4" fill="white"/>
+            <rect x="6" y="5" width="12" height="3" fill="white"/>
+            <!-- Face/dot of i -->
+            <circle cx="12" cy="8" r="2.5" fill="white"/>
+            <!-- Body of i -->
+            <rect x="10" y="12" width="4" height="10" rx="1" fill="white"/>
+          </svg>
+        </div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
       <div id="auth-buttons">
@@ -378,7 +386,7 @@
   <!-- Modules -->
   <section class="py-20 px-6 relative z-10 grid-section">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos modules</span></div>
+      <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos soldats</span></div>
 
       <div class="modules-grid">
         <!-- Compta -->
@@ -388,8 +396,8 @@
             <!-- Telegram icon -->
             <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-c" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-c)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
             <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- Google Sheets icon with animated cells -->
-            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 56 56"><defs><linearGradient id="sheet-grad-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs><rect x="6" y="6" width="44" height="44" rx="8" fill="url(#sheet-grad-c)"/><line x1="10" y1="18" x2="46" y2="18" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="10" y1="28" x2="46" y2="28" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="10" y1="38" x2="46" y2="38" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="22" y1="10" x2="22" y2="46" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><line x1="34" y1="10" x2="34" y2="46" stroke="rgba(255,255,255,0.3)" stroke-width="1"/><rect class="cell-fill cell-fill-1" x="10" y="28" width="12" height="10" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-2" x="22" y="28" width="12" height="10" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-3" x="34" y="28" width="12" height="10" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-4" x="10" y="38" width="12" height="8" fill="#86efac" opacity="0"/></svg></div>
+            <!-- Google Sheets icon with animated cells - same size as Telegram -->
+            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="sheet-grad-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#sheet-grad-c)"/><rect x="55" y="55" width="130" height="130" rx="12" fill="rgba(255,255,255,0.15)"/><line x1="55" y1="95" x2="185" y2="95" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="55" y1="135" x2="185" y2="135" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="100" y1="55" x2="100" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="145" y1="55" x2="145" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><rect class="cell-fill cell-fill-1" x="55" y="135" width="45" height="40" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-2" x="100" y="135" width="45" height="40" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-3" x="145" y="135" width="40" height="40" fill="#86efac" opacity="0"/></svg></div>
           </div>
           <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Compta</h3>
           <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Envoie ta caisse sur <strong style="color:#0088cc;">Telegram</strong><br>Elle arrive dans <strong style="color:#22c55e;">Sheets</strong></p>
@@ -403,8 +411,8 @@
         <div class="module-card stock" onclick="goToStock()" id="module-stock">
           <span class="badge-new cyan" id="stock-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
           <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
-            <!-- Bottles icon -->
-            <div class="logo-telegram-xl" style="background:linear-gradient(135deg, #06B6D4, #0891b2); width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <!-- Bottles icon - round -->
+            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
               <div class="mini-stock-xl" style="transform:scale(0.85);">
                 <div class="mini-bottle-xl mini-bottle-xl-1">
                   <div class="mini-bottle-cap-xl"></div>
@@ -419,12 +427,12 @@
               </div>
             </div>
             <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- Numbers/Stats icon -->
+            <!-- Numbers/Stats icon - same size circle -->
             <div class="logo-spreadsheet-xl">
-              <svg width="44" height="44" viewBox="0 0 56 56">
-                <rect x="6" y="6" width="44" height="44" rx="10" fill="#06B6D4"/>
-                <text x="28" y="26" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="white" text-anchor="middle">12</text>
-                <text x="28" y="42" font-family="Inter, sans-serif" font-size="10" fill="rgba(255,255,255,0.7)" text-anchor="middle">bouteilles</text>
+              <svg width="44" height="44" viewBox="0 0 240 240">
+                <circle cx="120" cy="120" r="120" fill="#06B6D4"/>
+                <text x="120" y="105" font-family="Arial, sans-serif" font-size="60" font-weight="700" fill="white" text-anchor="middle">12</text>
+                <text x="120" y="155" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.8)" text-anchor="middle">bouteilles</text>
               </svg>
             </div>
           </div>
@@ -440,22 +448,22 @@
         <div class="module-card paie" onclick="goToPaie()" id="module-paie">
           <span class="badge-new gold" id="paie-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
           <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
-            <!-- People/Team icon -->
-            <div class="logo-telegram-xl" style="background:linear-gradient(135deg, #f59e0b, #d97706); width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center;">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <!-- People/Team icon - round -->
+            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #fbbf24, #f59e0b); display:flex; align-items:center; justify-content:center;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                 <circle cx="9" cy="7" r="3" fill="white"/>
-                <circle cx="17" cy="7" r="2.5" fill="rgba(255,255,255,0.6)"/>
-                <path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <path d="M15 13c2.2 0 4 1.8 4 4v2" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <circle cx="17" cy="7" r="2.5" fill="rgba(255,255,255,0.7)"/>
+                <path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M15 13c2.2 0 4 1.8 4 4v2" stroke="rgba(255,255,255,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
               </svg>
             </div>
             <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- PDF icon -->
+            <!-- PDF icon - same size circle -->
             <div class="logo-spreadsheet-xl">
-              <svg width="44" height="44" viewBox="0 0 56 56">
-                <rect x="6" y="6" width="44" height="44" rx="10" fill="#ef4444"/>
-                <rect x="14" y="14" width="28" height="28" rx="3" fill="white"/>
-                <text x="28" y="32" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#ef4444" text-anchor="middle">PDF</text>
+              <svg width="44" height="44" viewBox="0 0 240 240">
+                <circle cx="120" cy="120" r="120" fill="#ef4444"/>
+                <rect x="70" y="50" width="100" height="130" rx="8" fill="white"/>
+                <text x="120" y="130" font-family="Arial, sans-serif" font-size="36" font-weight="800" fill="#ef4444" text-anchor="middle">PDF</text>
               </svg>
             </div>
           </div>
