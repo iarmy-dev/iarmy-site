@@ -137,26 +137,26 @@
     .mini-team-euro { position: absolute; font-size: 22px; font-weight: 800; color: white; opacity: 0; animation: euroAppear 3.5s ease-in-out infinite; }
     @keyframes euroAppear { 0%, 50% { opacity: 0; transform: scale(0.5); } 65% { opacity: 1; transform: scale(1.1); } 75%, 85% { opacity: 1; transform: scale(1); } 95%, 100% { opacity: 0; transform: scale(0.8); } }
 
-    /* Module cards - compact squares */
+    /* Module cards - square grid */
     .modules-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 720px;
+      gap: 24px;
+      max-width: 900px;
       margin: 0 auto;
     }
-    @media (max-width: 768px) {
-      .modules-grid { grid-template-columns: repeat(2, 1fr); max-width: 400px; }
+    @media (max-width: 900px) {
+      .modules-grid { grid-template-columns: repeat(2, 1fr); max-width: 580px; }
     }
-    @media (max-width: 480px) {
-      .modules-grid { grid-template-columns: 1fr; max-width: 240px; }
+    @media (max-width: 600px) {
+      .modules-grid { grid-template-columns: 1fr; max-width: 280px; }
     }
 
     .module-card {
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 24px 16px;
+      border-radius: 24px;
+      padding: 28px 20px;
       aspect-ratio: 1;
       width: 100%;
       transition: all 0.3s ease;
@@ -166,7 +166,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       text-align: center;
     }
     .module-card::before {
@@ -216,14 +216,21 @@
       100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
     }
 
-    /* Grid section background */
+    /* Grid section background - Stripe style */
     .grid-section {
       position: relative;
-      background:
-        linear-gradient(rgba(15,15,15,0.95), rgba(15,15,15,0.95)),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 100% 100%, 40px 40px, 40px 40px;
+    }
+    .grid-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 40%, transparent 100%);
+      pointer-events: none;
     }
 
     /* Badges with module colors */
@@ -370,18 +377,25 @@
       <div class="modules-grid">
         <!-- Compta -->
         <div class="module-card compta" onclick="launchRobot()">
-          <div style="width:52px; height:52px; background:linear-gradient(135deg, #22c55e, #16a34a); border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          <span class="badge-new green" id="module-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-xl2" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-xl2)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 56 56"><defs><linearGradient id="sheet-grad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sheet-grad2)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><rect class="cell-fill cell-fill-1" x="12" y="28" width="10" height="8" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-2" x="22" y="28" width="12" height="8" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-3" x="34" y="28" width="10" height="8" fill="#86efac" opacity="0"/></svg></div>
           </div>
-          <h3 style="font-size:18px; font-weight:700; margin-bottom:6px;">Compta</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:12px; line-height:1.4;">Telegram → Sheets</p>
-          <span class="badge-new green" id="module-badge" style="margin-top:10px; font-size:9px; padding:4px 8px;">NOUVEAU</span>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Compta</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Envoie ta caisse sur <strong style="color:#0088cc;">Telegram</strong><br>Elle arrive dans <strong style="color:#22c55e;">Sheets</strong></p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Restaurant</span>
+            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Commerce</span>
+          </div>
         </div>
 
         <!-- Stock -->
         <div class="module-card stock" onclick="goToStock()" id="module-stock">
-          <div style="width:52px; height:52px; background:linear-gradient(135deg, #06B6D4, #22D3EE); border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
-            <div class="mini-stock-xl" style="transform:scale(0.8);">
+          <span class="badge-new cyan" id="stock-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
+          <div style="width:64px; height:64px; background:linear-gradient(135deg, #06B6D4, #22D3EE); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+            <div class="mini-stock-xl">
               <div class="mini-bottle-xl mini-bottle-xl-1">
                 <div class="mini-bottle-cap-xl"></div>
                 <div class="mini-bottle-neck-xl"></div>
@@ -395,26 +409,33 @@
               <div class="mini-stock-count-xl">2</div>
             </div>
           </div>
-          <h3 style="font-size:18px; font-weight:700; margin-bottom:6px;">Stock</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:12px; line-height:1.4;">Inventaire bouteilles</p>
-          <span class="badge-new cyan" id="stock-badge" style="margin-top:10px; font-size:9px; padding:4px 8px;">NOUVEAU</span>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Stock</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Compte tes <strong style="color:#22d3ee;">bouteilles</strong><br>Inventaire automatique</p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Bar</span>
+            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Cocktails</span>
+          </div>
         </div>
 
         <!-- Paie -->
         <div class="module-card paie" onclick="goToPaie()" id="module-paie">
-          <div style="width:52px; height:52px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; position:relative;">
-            <div class="mini-team" style="transform:scale(0.9);">
+          <span class="badge-new gold" id="paie-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
+          <div style="width:64px; height:64px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; position:relative;">
+            <div class="mini-team">
               <div class="mini-team-people">
                 <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
                 <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
                 <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
               </div>
-              <div class="mini-team-euro" style="font-size:18px;">EUR</div>
+              <div class="mini-team-euro">EUR</div>
             </div>
           </div>
-          <h3 style="font-size:18px; font-weight:700; margin-bottom:6px;">Paie</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:12px; line-height:1.4;">Absences → Recap</p>
-          <span class="badge-new gold" id="paie-badge" style="margin-top:10px; font-size:9px; padding:4px 8px;">NOUVEAU</span>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Paie</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Gere les <strong style="color:#fbbf24;">absences</strong><br>Recap pour ton comptable</p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Equipe</span>
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Salaires</span>
+          </div>
         </div>
       </div>
     </div>
