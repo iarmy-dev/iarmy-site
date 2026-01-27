@@ -471,7 +471,7 @@
 
       <div class="modules-grid">
         <!-- Compta -->
-        <div class="module-card compta" onclick="openModal('register')">
+        <div class="module-card compta" onclick="window.location.href='https://app.iarmy.fr/setup/?module=compta'">
           <span class="badge-new green" id="module-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
           <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
             <!-- Telegram icon -->
@@ -833,19 +833,13 @@
     let paieConfigured = false;
 
     function goToPaie() {
-      if (paieConfigured) {
-        window.location.href = 'https://app.iarmy.fr/paie/';
-      } else {
-        window.location.href = 'https://app.iarmy.fr/setup/?module=paie';
-      }
+      // Toujours aller vers setup, il redirige vers settings si déjà configuré
+      window.location.href = 'https://app.iarmy.fr/setup/?module=paie';
     }
 
     function goToStock() {
-      if (stockConfigured) {
-        window.location.href = 'https://app.iarmy.fr/stock/';
-      } else {
-        window.location.href = 'https://app.iarmy.fr/stock/setup/';
-      }
+      // Toujours aller vers setup, il redirige vers settings si déjà configuré
+      window.location.href = 'https://app.iarmy.fr/setup/?module=stock';
     }
 
     function openModal(tab = 'login') {
