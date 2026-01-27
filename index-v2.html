@@ -55,19 +55,20 @@
       background: white;
       border-radius: 45% 45% 5% 5%;
       position: relative;
-      margin-bottom: 1px;
+      margin-bottom: -2px;
       z-index: 2;
       animation: capBounce 2.5s ease-in-out infinite;
     }
     .logo-i-cap::after {
       content: '';
       position: absolute;
-      bottom: -1px;
+      bottom: -2px;
       left: -1px;
       width: 14px;
-      height: 2px;
+      height: 3px;
       background: white;
       border-radius: 0 0 3px 3px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.2);
     }
     @keyframes capBounce {
       0%, 35% { transform: translateY(0) translateX(0) rotate(0deg); }
