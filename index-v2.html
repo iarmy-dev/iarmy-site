@@ -48,16 +48,26 @@
       0%, 40%, 100% { transform: translateY(0); }
       50%, 60% { transform: translateY(-3px); }
     }
-    /* Casque militaire - dôme arrondi */
+    /* Casque militaire combat */
     .logo-i-cap {
-      width: 11px;
-      height: 5px;
+      width: 12px;
+      height: 6px;
       background: white;
-      border-radius: 50% 50% 10% 10%;
+      border-radius: 45% 45% 5% 5%;
       position: relative;
-      margin-bottom: -3px;
+      margin-bottom: 1px;
       z-index: 2;
       animation: capBounce 2.5s ease-in-out infinite;
+    }
+    .logo-i-cap::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: -1px;
+      width: 14px;
+      height: 2px;
+      background: white;
+      border-radius: 0 0 3px 3px;
     }
     @keyframes capBounce {
       0%, 35% { transform: translateY(0) translateX(0) rotate(0deg); }
