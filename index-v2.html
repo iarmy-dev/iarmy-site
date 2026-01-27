@@ -152,14 +152,7 @@
     .glide-container { position: relative; width: 120px; height: 40px; }
     .glide-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); }
     .glide-logo { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; opacity: 0; box-shadow: 0 0 30px rgba(255,107,53,0.6); }
-    .glide-logo.animate { animation: glide 2s ease-in-out forwards; }
-    /* Jambes du soldat qui marche */
-    .glide-legs { display: flex; gap: 2px; margin-top: -2px; }
-    .glide-leg { width: 2px; height: 6px; background: white; border-radius: 1px; }
-    .glide-leg-left { animation: legLeft 0.3s ease-in-out infinite; }
-    .glide-leg-right { animation: legRight 0.3s ease-in-out infinite; }
-    @keyframes legLeft { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
-    @keyframes legRight { 0%, 100% { transform: rotate(20deg); } 50% { transform: rotate(-20deg); } }
+    .glide-logo.animate { animation: glide 2s linear forwards; }
 
     /* Animated logos */
     .animated-logo-ultra-simple { display: flex; align-items: center; justify-content: center; gap: 20px; height: 70px; }
@@ -425,10 +418,6 @@
                 <div class="logo-i-cap" style="animation:none;"></div>
                 <div class="logo-i-dot"></div>
                 <div class="logo-i-body"></div>
-                <div class="glide-legs">
-                  <div class="glide-leg glide-leg-left"></div>
-                  <div class="glide-leg glide-leg-right"></div>
-                </div>
               </div>
             </div>
         </div>
