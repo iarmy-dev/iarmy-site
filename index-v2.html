@@ -35,8 +35,12 @@
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; font-weight: 800; font-size: 20px; color: white; }
     .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
+
+    /* Stock counter animation */
+    .stock-counter { animation: countPulse 0.3s ease-out; }
+    @keyframes countPulse { 0% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
     .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
     .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); opacity: 0; transition: opacity 0.3s; }
@@ -298,18 +302,7 @@
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
-        <div class="logo-i">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <!-- Robot head -->
-            <rect x="5" y="8" width="14" height="12" rx="3" fill="white"/>
-            <!-- Eyes -->
-            <circle cx="9" cy="13" r="2" fill="#FF6B35"/>
-            <circle cx="15" cy="13" r="2" fill="#FF6B35"/>
-            <!-- Antenna (the dot of i) -->
-            <circle cx="12" cy="4" r="2.5" fill="white"/>
-            <rect x="11" y="5" width="2" height="4" fill="white"/>
-          </svg>
-        </div>
+        <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
       <div id="auth-buttons">
@@ -425,12 +418,9 @@
               </div>
             </div>
             <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- Numbers/Stats icon - same size circle -->
-            <div class="logo-spreadsheet-xl">
-              <svg width="44" height="44" viewBox="0 0 240 240">
-                <circle cx="120" cy="120" r="120" fill="#06B6D4"/>
-                <text x="120" y="135" font-family="Arial, sans-serif" font-size="80" font-weight="800" fill="white" text-anchor="middle">12</text>
-              </svg>
+            <!-- Counting animation -->
+            <div class="logo-spreadsheet-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
+              <span class="stock-counter" style="font-size:20px; font-weight:800; color:white;">12</span>
             </div>
           </div>
           <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Stock</h3>
@@ -864,10 +854,33 @@
       showLoggedOutNav();
     }
 
+    // Stock counting animation
+    function runStockCount() {
+      const counter = document.querySelector('.stock-counter');
+      if (!counter) return;
+      let count = 1;
+      counter.textContent = count;
+      const interval = setInterval(() => {
+        count++;
+        counter.textContent = count;
+        counter.style.animation = 'none';
+        counter.offsetHeight; // trigger reflow
+        counter.style.animation = 'countPulse 0.2s ease-out';
+        if (count >= 12) {
+          clearInterval(interval);
+          setTimeout(() => {
+            counter.textContent = '1';
+          }, 2000);
+        }
+      }, 250);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('[INDEX] Page chargee');
       setTimeout(runDemo, 1000);
       setInterval(runDemo, 8000);
+      setTimeout(runStockCount, 500);
+      setInterval(runStockCount, 6000);
 
       const wasCallback = await handleOAuthCallback();
       if (!wasCallback) {
