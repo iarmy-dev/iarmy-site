@@ -132,6 +132,71 @@ cd iarmy-bot && supabase functions deploy <function-name>
 
 ---
 
+## SYSTEME MODULES
+
+### Architecture Multi-Modules
+
+iArmy est conçu pour supporter plusieurs modules. Chaque module a sa propre souscription dans Supabase.
+
+### Config des modules (iarmy-app/index.html)
+
+```javascript
+const MODULES_CONFIG = {
+  compta: {
+    name: 'Compta',
+    color: '#22c55e',           // Vert
+    colorLight: 'rgba(34,197,94,0.15)',
+    price: 29,
+    icon: `<svg>...</svg>`
+  },
+  stock: {
+    name: 'Stock',
+    color: '#06B6D4',           // Cyan
+    colorLight: 'rgba(6,182,212,0.15)',
+    price: 19,
+    icon: `<svg>...</svg>`
+  },
+  paie: {
+    name: 'Paie',
+    color: '#f59e0b',           // Or
+    colorLight: 'rgba(245,158,11,0.15)',
+    price: 39,
+    icon: `<svg>...</svg>`
+  }
+};
+```
+
+### Ajouter un nouveau module
+
+1. **Dans MODULES_CONFIG** (iarmy-app/index.html) :
+   - Ajouter une entrée avec name, color, colorLight, price, icon
+
+2. **Dans la page compte** (iarmy-app/index.html) :
+   - La facturation s'adapte automatiquement via MODULES_CONFIG
+   - Les modules actifs sont chargés depuis `subscriptions` table
+
+3. **Dans Supabase** :
+   - Table `subscriptions` avec colonne `module_name`
+   - Statuts: 'tester', 'active', 'trialing', 'canceled'
+
+4. **Dans la home** (iarmy-site/index.html) :
+   - Ajouter une carte module dans `.modules-grid`
+   - Utiliser les mêmes couleurs que MODULES_CONFIG
+
+### Table subscriptions (Supabase)
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| user_id | uuid | FK vers auth.users |
+| module_name | text | 'compta', 'stock', 'paie', etc. |
+| status | text | 'tester', 'active', 'trialing', 'canceled' |
+| is_tester | boolean | True si testeur gratuit |
+| trial_end | timestamp | Fin de période d'essai |
+| current_period_end | timestamp | Fin de période actuelle |
+| stripe_subscription_id | text | ID Stripe si payant |
+
+---
+
 ## NOTES IMPORTANTES
 
 - Le bot est sur **RENDER** en mode webhook (plus de polling)
