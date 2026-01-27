@@ -714,7 +714,7 @@
         }
       } catch (e) { console.log('[INDEX] Profil deja existant'); }
 
-      setTimeout(() => { window.location.href = 'https://app.iarmy.fr/compta/setup'; }, 2000);
+      setTimeout(() => { window.location.href = 'https://app.iarmy.fr/setup/?module=compta'; }, 2000);
       return true;
     }
 
@@ -740,10 +740,7 @@
               badge.className = 'badge-new green';
               badge.style.background = 'rgba(34,197,94,0.15)';
             }
-            const moduleCard = document.querySelector('.module-card.compta');
-            if (moduleCard) {
-              moduleCard.onclick = () => { window.location.href = 'https://app.iarmy.fr/compta/'; };
-            }
+            // Le onclick reste vers /setup/ qui redirige vers settings si configuré
           }
 
           const { data: stockConfig } = await supabaseClient
@@ -895,7 +892,7 @@
         closeModal();
         showLoggedInNav(data.user);
         showWelcome(data.user?.user_metadata?.name?.split(' ')[0] || 'toi');
-        setTimeout(() => { window.location.href = 'https://app.iarmy.fr/compta/setup'; }, 2000);
+        setTimeout(() => { window.location.href = 'https://app.iarmy.fr/setup/?module=compta'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'Invalid login credentials' ? 'Email ou mot de passe incorrect' : error.message;
         err.classList.add('show');
@@ -921,7 +918,7 @@
         if (error) throw error;
         closeModal();
         showWelcome(name.split(' ')[0]);
-        setTimeout(() => { window.location.href = 'https://app.iarmy.fr/compta/setup'; }, 2000);
+        setTimeout(() => { window.location.href = 'https://app.iarmy.fr/setup/?module=compta'; }, 2000);
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
         err.classList.add('show');
