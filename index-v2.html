@@ -98,7 +98,25 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes glide { 0% { left: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: calc(100% - 36px); opacity: 0; } }
+    @keyframes glide {
+      0% { left: 0; opacity: 0; transform: translateY(-50%); }
+      15% { opacity: 1; }
+      20% { transform: translateY(-52%); }
+      25% { transform: translateY(-48%); }
+      30% { transform: translateY(-52%); }
+      35% { transform: translateY(-48%); }
+      40% { transform: translateY(-52%); }
+      45% { transform: translateY(-48%); }
+      50% { transform: translateY(-52%); }
+      55% { transform: translateY(-48%); }
+      60% { transform: translateY(-52%); }
+      65% { transform: translateY(-48%); }
+      70% { transform: translateY(-52%); }
+      75% { transform: translateY(-48%); }
+      80% { transform: translateY(-52%); }
+      85% { opacity: 1; transform: translateY(-50%); }
+      100% { left: calc(100% - 36px); opacity: 0; transform: translateY(-50%); }
+    }
     .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
     .animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
     .animate-float { animation: floatY 4s ease-in-out infinite; }
@@ -134,7 +152,14 @@
     .glide-container { position: relative; width: 120px; height: 40px; }
     .glide-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); }
     .glide-logo { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; opacity: 0; box-shadow: 0 0 30px rgba(255,107,53,0.6); }
-    .glide-logo.animate { animation: glide 1.5s ease-in-out forwards; }
+    .glide-logo.animate { animation: glide 2s ease-in-out forwards; }
+    /* Jambes du soldat qui marche */
+    .glide-legs { display: flex; gap: 2px; margin-top: -2px; }
+    .glide-leg { width: 2px; height: 6px; background: white; border-radius: 1px; }
+    .glide-leg-left { animation: legLeft 0.3s ease-in-out infinite; }
+    .glide-leg-right { animation: legRight 0.3s ease-in-out infinite; }
+    @keyframes legLeft { 0%, 100% { transform: rotate(-20deg); } 50% { transform: rotate(20deg); } }
+    @keyframes legRight { 0%, 100% { transform: rotate(20deg); } 50% { transform: rotate(-20deg); } }
 
     /* Animated logos */
     .animated-logo-ultra-simple { display: flex; align-items: center; justify-content: center; gap: 20px; height: 70px; }
@@ -396,10 +421,14 @@
         <div class="glide-container hidden md:block">
           <div class="glide-line"></div>
           <div class="glide-logo" id="glide-logo">
-              <div class="logo-i-soldier" style="transform:scale(0.9);">
-                <div class="logo-i-cap"></div>
+              <div class="logo-i-soldier" style="transform:scale(0.9); animation:none;">
+                <div class="logo-i-cap" style="animation:none;"></div>
                 <div class="logo-i-dot"></div>
                 <div class="logo-i-body"></div>
+                <div class="glide-legs">
+                  <div class="glide-leg glide-leg-left"></div>
+                  <div class="glide-leg glide-leg-right"></div>
+                </div>
               </div>
             </div>
         </div>
