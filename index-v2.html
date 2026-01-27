@@ -48,26 +48,16 @@
       0%, 40%, 100% { transform: translateY(0); }
       50%, 60% { transform: translateY(-3px); }
     }
-    /* Casquette militaire - style képi avec physique */
+    /* Casque militaire - dôme arrondi */
     .logo-i-cap {
-      width: 10px;
-      height: 4px;
+      width: 11px;
+      height: 5px;
       background: white;
-      border-radius: 5px 5px 1px 1px;
+      border-radius: 50% 50% 10% 10%;
       position: relative;
-      margin-bottom: 1px;
+      margin-bottom: -3px;
+      z-index: 2;
       animation: capBounce 2.5s ease-in-out infinite;
-    }
-    .logo-i-cap::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: -3px;
-      width: 16px;
-      height: 2px;
-      background: white;
-      border-radius: 1px;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.15);
     }
     @keyframes capBounce {
       0%, 35% { transform: translateY(0) translateX(0) rotate(0deg); }
@@ -76,7 +66,7 @@
       65% { transform: translateY(1px) translateX(-0.5px) rotate(-2deg); }
       75%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
     }
-    .logo-i-dot { width: 8px; height: 8px; background: white; border-radius: 50%; margin-bottom: 2px; }
+    .logo-i-dot { width: 8px; height: 6px; background: white; border-radius: 50%; margin-bottom: 2px; }
     .logo-i-body { width: 6px; height: 11px; background: white; border-radius: 2px; }
 
     /* Stock counter animation */
