@@ -50,25 +50,15 @@
     }
     /* Casque militaire combat */
     .logo-i-cap {
-      width: 10px;
-      height: 4px;
+      width: 11px;
+      height: 5px;
       background: white;
-      border-radius: 50% 50% 10% 10%;
+      border-radius: 40% 40% 8% 8%;
       position: relative;
-      margin-bottom: 1px;
+      margin-bottom: -1px;
       z-index: 2;
       animation: capBounce 2.5s ease-in-out infinite;
-    }
-    .logo-i-cap::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: -1px;
-      width: 12px;
-      height: 2px;
-      background: white;
-      border-radius: 1px;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.25);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
     }
     @keyframes capBounce {
       0%, 35% { transform: translateY(0) translateX(0) rotate(0deg); }
