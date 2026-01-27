@@ -35,8 +35,16 @@
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; font-weight: 800; font-size: 20px; color: white; }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; position: relative; }
     .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
+    .logo-i-dot { width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; top: 8px; animation: salute 2s ease-in-out infinite; }
+    .logo-i-body { width: 6px; height: 14px; background: white; border-radius: 2px; position: absolute; bottom: 8px; }
+    @keyframes salute {
+      0%, 100% { transform: translateY(0); }
+      15% { transform: translateY(-3px) rotate(-15deg); }
+      30% { transform: translateY(-3px) rotate(-15deg); }
+      45% { transform: translateY(0); }
+    }
 
     /* Stock counter animation */
     .stock-counter { animation: countPulse 0.3s ease-out; }
@@ -302,7 +310,10 @@
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
-        <div class="logo-i">i</div>
+        <div class="logo-i">
+          <div class="logo-i-dot"></div>
+          <div class="logo-i-body"></div>
+        </div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
       <div id="auth-buttons">
