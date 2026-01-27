@@ -39,33 +39,24 @@
     .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
     .logo-i-dot { width: 7px; height: 7px; background: white; border-radius: 50%; position: absolute; top: 7px; }
     .logo-i-body { width: 6px; height: 12px; background: white; border-radius: 2px; position: absolute; bottom: 9px; }
-    .logo-i-arm {
-      width: 10px;
-      height: 3px;
-      background: white;
-      border-radius: 2px;
+    /* Casquette militaire sur le i */
+    .logo-i-cap {
       position: absolute;
-      top: 17px;
-      right: 6px;
-      transform-origin: right center;
-      animation: armSalute 3s ease-in-out infinite;
+      top: 5px;
+      width: 11px;
+      height: 4px;
+      background: white;
+      border-radius: 1px;
     }
-    .logo-i-arm::after {
+    .logo-i-cap::after {
       content: '';
       position: absolute;
-      left: -3px;
-      top: -2px;
-      width: 5px;
-      height: 5px;
+      top: 3px;
+      left: -1px;
+      width: 13px;
+      height: 2px;
       background: white;
-      border-radius: 50%;
-    }
-    @keyframes armSalute {
-      0%, 15% { transform: rotate(0deg) translateX(0); opacity: 0; }
-      25% { opacity: 1; transform: rotate(0deg) translateX(0); }
-      40%, 60% { opacity: 1; transform: rotate(-70deg) translateX(-2px); }
-      75% { opacity: 1; transform: rotate(0deg) translateX(0); }
-      85%, 100% { opacity: 0; transform: rotate(0deg) translateX(0); }
+      border-radius: 1px;
     }
 
     /* Stock counter animation */
@@ -333,9 +324,9 @@
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
         <div class="logo-i">
+          <div class="logo-i-cap"></div>
           <div class="logo-i-dot"></div>
           <div class="logo-i-body"></div>
-          <div class="logo-i-arm"></div>
         </div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
