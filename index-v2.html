@@ -193,12 +193,12 @@
     .module-card.paie { border-color: rgba(245,158,11,0.2); background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(245,158,11,0.02)); }
     .module-card.paie:hover { border-color: rgba(245,158,11,0.4); box-shadow: 0 12px 40px rgba(245,158,11,0.15); }
 
-    /* Floating particles */
+    /* Floating particles - only in modules section */
     .particles {
-      position: fixed;
+      position: absolute;
       inset: 0;
       pointer-events: none;
-      z-index: 2;
+      z-index: 1;
       overflow: hidden;
     }
     .particle {
@@ -206,14 +206,14 @@
       width: 4px;
       height: 4px;
       border-radius: 50%;
-      opacity: 0.4;
+      opacity: 0.3;
       animation: particleFloat linear infinite;
     }
     @keyframes particleFloat {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.4; }
-      90% { opacity: 0.4; }
-      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+      0% { transform: translateY(100%) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.3; }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-50px) rotate(360deg); opacity: 0; }
     }
 
     /* Grid section background - Stripe style */
@@ -295,8 +295,6 @@
   <div class="orb orb-3"></div>
   <div class="orb orb-4"></div>
 
-  <!-- Floating particles -->
-  <div class="particles" id="particles"></div>
 
   <!-- Welcome overlay -->
   <div class="welcome-overlay" id="welcome-overlay">
@@ -371,7 +369,9 @@
 
   <!-- Modules -->
   <section class="py-20 px-6 relative z-10 grid-section">
-    <div class="max-w-6xl mx-auto">
+    <!-- Particles only in this section -->
+    <div class="particles" id="particles"></div>
+    <div class="max-w-6xl mx-auto" style="position:relative; z-index:2;">
       <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos modules</span></div>
 
       <div class="modules-grid">
@@ -830,19 +830,21 @@
       showLoggedOutNav();
     }
 
-    // Create floating particles
+    // Create floating particles - only behind modules
     function createParticles() {
       const container = document.getElementById('particles');
+      if (!container) return;
       const colors = ['#FF6B35', '#06B6D4', '#A855F7', '#22c55e', '#fbbf24'];
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 12; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
+        particle.style.left = (10 + Math.random() * 80) + '%';
+        particle.style.bottom = '0';
         particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.animationDuration = (15 + Math.random() * 20) + 's';
-        particle.style.animationDelay = (Math.random() * 15) + 's';
-        particle.style.width = (3 + Math.random() * 4) + 'px';
+        particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+        particle.style.animationDelay = (Math.random() * 10) + 's';
+        particle.style.width = (3 + Math.random() * 3) + 'px';
         particle.style.height = particle.style.width;
         container.appendChild(particle);
       }
