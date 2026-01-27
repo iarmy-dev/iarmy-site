@@ -48,7 +48,7 @@
       0%, 40%, 100% { transform: translateY(0); }
       50%, 60% { transform: translateY(-3px); }
     }
-    /* Casquette militaire - style képi */
+    /* Casquette militaire - style képi avec physique */
     .logo-i-cap {
       width: 12px;
       height: 5px;
@@ -56,6 +56,7 @@
       border-radius: 6px 6px 0 0;
       position: relative;
       margin-bottom: -2px;
+      animation: capBounce 2.5s ease-in-out infinite;
     }
     .logo-i-cap::after {
       content: '';
@@ -66,6 +67,12 @@
       height: 3px;
       background: white;
       border-radius: 1px;
+    }
+    @keyframes capBounce {
+      0%, 40%, 100% { transform: translateY(0) rotate(0deg); }
+      48% { transform: translateY(2px) rotate(-3deg); }
+      55%, 60% { transform: translateY(-2px) rotate(2deg); }
+      68% { transform: translateY(1px) rotate(-1deg); }
     }
     .logo-i-dot { width: 8px; height: 8px; background: white; border-radius: 50%; margin-bottom: 2px; }
     .logo-i-body { width: 6px; height: 11px; background: white; border-radius: 2px; }
