@@ -5,40 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://byqfnpdcnifauhwgetcq.supabase.co;">
   <title>iArmy - Une armée de robots pour ton quotidien</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><text x='50' y='68' font-family='Arial' font-size='55' font-weight='bold' fill='white' text-anchor='middle'>i</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23FF6B35'/><rect x='35' y='18' width='30' height='12' rx='6' fill='white'/><rect x='32' y='26' width='36' height='5' rx='2' fill='white'/><circle cx='50' cy='42' r='10' fill='white'/><rect x='44' y='52' width='12' height='28' rx='3' fill='white'/></svg>">
   <meta name="theme-color" content="#FF6B35">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
-    .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
-    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.18; }
-    .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.18; animation-delay: -7s; }
-    .orb-3 { width: 250px; height: 250px; background: linear-gradient(135deg, #35FFB8, #5EFFD4); top: 50%; left: 30%; opacity: 0.1; animation-delay: -3s; }
+    body { background: #0f0f0f; color: white; min-height: 100vh; overflow-x: hidden; }
+
+    /* Dot grid pattern */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Colorful animated orbs */
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 1; }
+    .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF3D00); top: -200px; right: -100px; opacity: 0.25; }
+    .orb-2 { width: 450px; height: 450px; background: linear-gradient(135deg, #06B6D4, #0891B2); bottom: -150px; left: -150px; opacity: 0.2; animation-delay: -5s; }
+    .orb-3 { width: 350px; height: 350px; background: linear-gradient(135deg, #A855F7, #7C3AED); top: 40%; left: 60%; opacity: 0.15; animation-delay: -10s; }
+    .orb-4 { width: 250px; height: 250px; background: linear-gradient(135deg, #F59E0B, #FBBF24); bottom: 30%; right: 10%; opacity: 0.12; animation-delay: -7s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-    .logo-i:hover { transform: scale(1.2) rotate(-15deg); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
-    .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; }
+
+    /* Glass effect */
+    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden; }
+    .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
+    /* Animation garde-à-vous */
+    .logo-i-soldier {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: gardeAVous 2.5s ease-in-out infinite;
+    }
+    @keyframes gardeAVous {
+      0%, 40%, 100% { transform: translateY(0); }
+      50%, 60% { transform: translateY(-3px); }
+    }
+    /* Casque militaire combat */
+    .logo-i-cap {
+      width: 9px;
+      height: 4px;
+      background: white;
+      border-radius: 5px 5px 1px 1px;
+      position: relative;
+      margin-bottom: 0px;
+      z-index: 2;
+      animation: capBounce 2.5s ease-in-out infinite;
+    }
+    .logo-i-cap::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: -2px;
+      width: 13px;
+      height: 2px;
+      background: white;
+      border-radius: 1px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+    }
+    @keyframes capBounce {
+      0%, 35% { transform: translateY(0) translateX(0) rotate(0deg); }
+      42% { transform: translateY(2px) translateX(-1px) rotate(-4deg); }
+      52%, 58% { transform: translateY(-2px) translateX(1px) rotate(3deg); }
+      65% { transform: translateY(1px) translateX(-0.5px) rotate(-2deg); }
+      75%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    }
+    .logo-i-dot { width: 8px; height: 6px; background: white; border-radius: 50%; margin-bottom: 2px; }
+    .logo-i-body { width: 6px; height: 11px; background: white; border-radius: 2px; }
+
+    /* Stock counter animation */
+    .stock-counter { animation: countPulse 0.3s ease-out; }
+    @keyframes countPulse { 0% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+    .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
+    .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); opacity: 0; transition: opacity 0.3s; }
     .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 40px rgba(255,107,53,0.5); }
-    .btn-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); padding: 12px 24px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: white; cursor: pointer; }
-    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+    .btn-primary:hover::before { opacity: 1; }
+
+    .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 24px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: white; cursor: pointer; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
     .btn-logout { background: none; border: none; padding: 8px; border-radius: 8px; transition: all 0.2s; color: rgba(255,255,255,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-logout:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes glide { 0% { left: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: calc(100% - 36px); opacity: 0; } }
+    @keyframes glide {
+      0% { left: 0; opacity: 0; transform: translateY(-50%); }
+      15% { opacity: 1; }
+      20% { transform: translateY(-52%); }
+      25% { transform: translateY(-48%); }
+      30% { transform: translateY(-52%); }
+      35% { transform: translateY(-48%); }
+      40% { transform: translateY(-52%); }
+      45% { transform: translateY(-48%); }
+      50% { transform: translateY(-52%); }
+      55% { transform: translateY(-48%); }
+      60% { transform: translateY(-52%); }
+      65% { transform: translateY(-48%); }
+      70% { transform: translateY(-52%); }
+      75% { transform: translateY(-48%); }
+      80% { transform: translateY(-52%); }
+      85% { opacity: 1; transform: translateY(-50%); }
+      100% { left: calc(100% - 36px); opacity: 0; transform: translateY(-50%); }
+    }
     .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
     .animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
     .animate-float { animation: floatY 4s ease-in-out infinite; }
     .delay-100 { animation-delay: 0.1s; opacity: 0; }
     .delay-200 { animation-delay: 0.2s; opacity: 0; }
     .delay-300 { animation-delay: 0.3s; opacity: 0; }
+
+    /* iPhone mockup */
     .iphone { width: 220px; background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border-radius: 36px; padding: 10px; box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 30px 60px rgba(0,0,0,0.5); }
     .iphone-screen { background: #000; border-radius: 28px; overflow: hidden; }
     .iphone-notch { width: 90px; height: 24px; background: #000; border-radius: 0 0 16px 16px; margin: 0 auto; }
@@ -51,7 +137,9 @@
     .msg.show { opacity: 1; transform: translateY(0); }
     .msg-user { background: #0a84ff; align-self: flex-end; border-bottom-right-radius: 4px; }
     .msg-bot { background: #2c2c2e; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .sheet { width: 200px; background: rgba(26, 26, 26, 0.9); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+
+    /* Sheet mockup */
+    .sheet { width: 200px; background: rgba(26, 26, 26, 0.9); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); }
     .sheet-header { background: #0d7a3f; padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
     .sheet-icon { width: 20px; height: 20px; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
     .sheet-title { font-size: 13px; font-weight: 500; }
@@ -59,10 +147,20 @@
     .sheet-grid th, .sheet-grid td { padding: 8px 12px; border: 1px solid rgba(255,255,255,0.08); text-align: left; }
     .sheet-grid th { background: rgba(255,255,255,0.03); font-weight: 500; color: rgba(255,255,255,0.5); }
     .sheet-grid .amount { color: #4ade80; font-weight: 600; }
+
+    /* Glide animation */
     .glide-container { position: relative; width: 120px; height: 40px; }
     .glide-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(255,107,53,0.1), rgba(255,107,53,0.3), rgba(255,107,53,0.1)); }
     .glide-logo { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; opacity: 0; box-shadow: 0 0 30px rgba(255,107,53,0.6); }
-    .glide-logo.animate { animation: glide 1.5s ease-in-out forwards; }
+    .glide-logo.animate { animation: glide 2s linear forwards; }
+    .glide-logo .logo-i-cap { animation: capWalk 0.4s ease-in-out infinite; }
+    @keyframes capWalk {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      30% { transform: translateY(2px) rotate(-5deg); }
+      70% { transform: translateY(2px) rotate(5deg); }
+    }
+
+    /* Animated logos */
     .animated-logo-ultra-simple { display: flex; align-items: center; justify-content: center; gap: 20px; height: 70px; }
     .logo-telegram-xl { animation: pulseTelegramXL 2s ease-in-out infinite; }
     @keyframes pulseTelegramXL { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
@@ -75,16 +173,15 @@
     @keyframes pulseWave { 0% { left: 0; opacity: 0; } 15% { opacity: 1; } 100% { left: 40px; opacity: 0; } }
     .logo-spreadsheet-xl { animation: pulseSpreadsheet 2s ease-in-out infinite; }
     @keyframes pulseSpreadsheet { 0%, 30%, 100% { transform: scale(1); } 75%, 85% { transform: scale(1.1); } }
-    .cell-fill { animation-duration: 2s; animation-iteration-count: infinite; }
+    .cell-fill { animation-duration: 2.5s; animation-iteration-count: infinite; animation-timing-function: ease-out; }
     .cell-fill-1 { animation-name: fillCell1; }
     .cell-fill-2 { animation-name: fillCell2; }
     .cell-fill-3 { animation-name: fillCell3; }
-    .cell-fill-4 { animation-name: fillCell4; }
-    @keyframes fillCell1 { 0%, 40% { opacity: 0; } 50%, 100% { opacity: 0.9; } }
-    @keyframes fillCell2 { 0%, 45% { opacity: 0; } 55%, 100% { opacity: 0.9; } }
-    @keyframes fillCell3 { 0%, 50% { opacity: 0; } 60%, 100% { opacity: 0.9; } }
-    @keyframes fillCell4 { 0%, 55% { opacity: 0; } 65%, 100% { opacity: 0.9; } }
-    /* Mini stock animation - liquor bottles */
+    @keyframes fillCell1 { 0%, 30% { opacity: 0; transform: scale(0.8); } 40%, 90% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(0.8); } }
+    @keyframes fillCell2 { 0%, 40% { opacity: 0; transform: scale(0.8); } 50%, 90% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(0.8); } }
+    @keyframes fillCell3 { 0%, 50% { opacity: 0; transform: scale(0.8); } 60%, 90% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(0.8); } }
+
+    /* Stock animation - liquor bottles */
     .mini-stock-xl { width: 48px; height: 38px; display: flex; align-items: flex-end; justify-content: center; gap: 4px; position: relative; }
     .mini-bottle-xl { position: relative; width: 16px; height: 32px; }
     .mini-bottle-body-xl { position: absolute; bottom: 0; width: 16px; height: 22px; background: rgba(255,255,255,0.15); border: 2px solid white; border-radius: 3px 3px 5px 5px; overflow: hidden; }
@@ -97,17 +194,119 @@
     @keyframes bottleFillXL { 0%, 10% { height: 15%; } 45%, 55% { height: 75%; } 90%, 100% { height: 15%; } }
     .mini-stock-count-xl { position: absolute; top: 2px; right: -4px; width: 16px; height: 16px; background: white; border-radius: 50%; font-size: 9px; font-weight: 700; color: #06B6D4; display: flex; align-items: center; justify-content: center; animation: countPopXL 3s ease-in-out infinite; }
     @keyframes countPopXL { 0%, 35% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 60%, 80% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0; transform: scale(0.8); } }
-    .module-card { background: linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.02) 100%); border: 2px solid rgba(255,107,53,0.2); border-radius: 24px; padding: 24px; min-width: 280px; max-width: 320px; transition: all 0.4s; cursor: pointer; }
-    .module-card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,107,53,0.4); box-shadow: 0 16px 48px rgba(255,107,53,0.3); }
-    .badge-new { background: linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,139,94,0.2)); color: #FF8B5E; border: 1px solid rgba(255,107,53,0.5); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; animation: badgeGlow 2s ease-in-out infinite; }
-    @keyframes badgeGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.4); } 50% { box-shadow: 0 0 35px rgba(255,107,53,0.7); } }
+
+    /* Paie animation */
+    .mini-team { width: 40px; height: 32px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .mini-team-people { display: flex; align-items: flex-end; gap: 2px; position: absolute; animation: peopleToEuro 3.5s ease-in-out infinite; }
+    .mini-person { display: flex; flex-direction: column; align-items: center; }
+    .mini-person-head { width: 7px; height: 7px; border-radius: 50%; background: white; margin-bottom: 1px; }
+    .mini-person-body { width: 9px; height: 9px; background: white; border-radius: 3px 3px 1px 1px; }
+    @keyframes peopleToEuro { 0%, 50% { opacity: 1; } 60%, 90% { opacity: 0; } 100% { opacity: 1; } }
+    .mini-team-euro { position: absolute; font-size: 22px; font-weight: 800; color: white; opacity: 0; animation: euroAppear 3.5s ease-in-out infinite; }
+    @keyframes euroAppear { 0%, 50% { opacity: 0; transform: scale(0.5); } 65% { opacity: 1; transform: scale(1.1); } 75%, 85% { opacity: 1; transform: scale(1); } 95%, 100% { opacity: 0; transform: scale(0.8); } }
+
+    /* Module cards - square with distinct colored backgrounds */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .modules-grid { grid-template-columns: repeat(2, 1fr); max-width: 580px; }
+    }
+    @media (max-width: 600px) {
+      .modules-grid { grid-template-columns: 1fr; max-width: 280px; }
+    }
+
+    .module-card {
+      border-radius: 24px;
+      padding: 28px 20px;
+      aspect-ratio: 1;
+      width: 100%;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+    .module-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+    .module-card:hover { border-color: rgba(255,255,255,0.3); }
+
+    /* Compta - Green background */
+    .module-card.compta {
+      background: linear-gradient(145deg, rgba(34,197,94,0.25), rgba(22,163,74,0.15));
+      border-color: rgba(34,197,94,0.4);
+    }
+    .module-card.compta:hover {
+      border-color: rgba(34,197,94,0.6);
+      box-shadow: 0 0 40px rgba(34,197,94,0.25);
+    }
+
+    /* Stock - Cyan background */
+    .module-card.stock {
+      background: linear-gradient(145deg, rgba(6,182,212,0.25), rgba(8,145,178,0.15));
+      border-color: rgba(6,182,212,0.4);
+    }
+    .module-card.stock:hover {
+      border-color: rgba(6,182,212,0.6);
+      box-shadow: 0 0 40px rgba(6,182,212,0.25);
+    }
+
+    /* Paie - Gold/Amber background */
+    .module-card.paie {
+      background: linear-gradient(145deg, rgba(245,158,11,0.25), rgba(217,119,6,0.15));
+      border-color: rgba(245,158,11,0.4);
+    }
+    .module-card.paie:hover {
+      border-color: rgba(245,158,11,0.6);
+      box-shadow: 0 0 40px rgba(245,158,11,0.25);
+    }
+
+
+    /* Grid section background - Stripe style */
+    .grid-section {
+      position: relative;
+    }
+    .grid-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 40%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* Badges with module colors */
+    .badge-new { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+    .badge-new.green { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); }
+    .badge-new.cyan { background: rgba(6,182,212,0.2); color: #22d3ee; border: 1px solid rgba(6,182,212,0.4); }
+    .badge-new.gold { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+
+    /* Modal */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); z-index: 100; opacity: 0; pointer-events: none; transition: all 0.4s ease; }
     .modal-backdrop.active { opacity: 1; pointer-events: all; }
-    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(15, 15, 15, 0.75); backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 40px; width: 90%; max-width: 440px; z-index: 101; opacity: 0; pointer-events: none; transition: all 0.5s; }
+    .modal-content { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(50px); border: 1px solid rgba(255,255,255,0.15); border-radius: 32px; padding: 40px; width: 90%; max-width: 440px; z-index: 101; opacity: 0; pointer-events: none; transition: all 0.5s; }
     .modal-content.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
     .modal-close { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
     .modal-close:hover { background: rgba(255,255,255,0.12); transform: rotate(90deg); }
-    .input-field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; color: white; width: 100%; font-size: 15px; }
+    .input-field { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; color: white; width: 100%; font-size: 15px; }
     .input-field:focus { outline: none; border-color: rgba(255,107,53,0.5); }
     .input-field::placeholder { color: rgba(255,255,255,0.3); }
     .tab-container { display: flex; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 5px; margin-bottom: 28px; position: relative; }
@@ -117,18 +316,16 @@
     .tab-btn.active { color: white; }
     .error-msg { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 12px 16px; color: #ef4444; font-size: 13px; display: none; }
     .error-msg.show { display: block; }
-    .robot-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s; }
-    .robot-card:hover { background: rgba(255, 255, 255, 0.04); transform: translateY(-4px); }
+
+    /* Robot cards */
+    .robot-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.3s; }
+    .robot-card:hover { background: rgba(255, 255, 255, 0.06); transform: translateY(-4px); }
     .robot-emoji { animation: floatRobot 3s ease-in-out infinite; filter: grayscale(0.3) opacity(0.7); }
     @keyframes floatRobot { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-    .robot-plus-card { background: rgba(255, 107, 53, 0.05); border-color: rgba(255, 107, 53, 0.2); }
-    footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
-    footer a:hover { color: #FF8B5E; }
-    .nav-user-section { display: flex; align-items: center; gap: 12px; }
-    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
-    .nav-profile:hover { background: rgba(255,255,255,0.08); }
-    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
-    .welcome-overlay { position: fixed; inset: 0; background: rgba(3, 3, 3, 0.98); backdrop-filter: blur(30px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+    .robot-plus-card { background: rgba(255, 107, 53, 0.08); border-color: rgba(255, 107, 53, 0.25); }
+
+    /* Welcome overlay */
+    .welcome-overlay { position: fixed; inset: 0; background: rgba(15, 15, 15, 0.98); backdrop-filter: blur(30px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
     .welcome-overlay.active { opacity: 1; pointer-events: all; }
     .welcome-logo { width: 100px; height: 100px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 800; margin-bottom: 32px; animation: welcomePulse 2s ease-in-out infinite; }
     @keyframes welcomePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -140,41 +337,50 @@
     .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    /* Mini paie animation - team transforms to euro */
-    .mini-team { width: 40px; height: 32px; display: flex; align-items: center; justify-content: center; position: relative; }
-    .mini-team-people { display: flex; align-items: flex-end; gap: 2px; position: absolute; animation: peopleToEuro 3.5s ease-in-out infinite; }
-    .mini-person { display: flex; flex-direction: column; align-items: center; }
-    .mini-person-head { width: 7px; height: 7px; border-radius: 50%; background: white; margin-bottom: 1px; }
-    .mini-person-body { width: 9px; height: 9px; background: white; border-radius: 3px 3px 1px 1px; }
-    .mini-person-1 { animation: person1Move 3.5s ease-in-out infinite; }
-    .mini-person-2 { animation: person2Move 3.5s ease-in-out infinite; }
-    .mini-person-3 { animation: person3Move 3.5s ease-in-out infinite; }
-    @keyframes peopleToEuro { 0%, 50% { opacity: 1; } 60%, 90% { opacity: 0; } 100% { opacity: 1; } }
-    @keyframes person1Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(12px); } 60%, 90% { transform: translateX(12px); opacity: 0; } 100% { transform: translateX(0); } }
-    @keyframes person2Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(0); } 60%, 90% { transform: translateX(0); opacity: 0; } 100% { transform: translateX(0); } }
-    @keyframes person3Move { 0%, 40% { transform: translateX(0); } 55% { transform: translateX(-12px); } 60%, 90% { transform: translateX(-12px); opacity: 0; } 100% { transform: translateX(0); } }
-    .mini-team-euro { position: absolute; font-size: 22px; font-weight: 800; color: white; opacity: 0; animation: euroAppear 3.5s ease-in-out infinite; }
-    @keyframes euroAppear { 0%, 50% { opacity: 0; transform: scale(0.5); } 65% { opacity: 1; transform: scale(1.1); } 75%, 85% { opacity: 1; transform: scale(1); } 95%, 100% { opacity: 0; transform: scale(0.8); } }
+    .nav-user-section { display: flex; align-items: center; gap: 12px; }
+    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
+    .nav-profile:hover { background: rgba(255,255,255,0.08); }
+    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
+    footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    footer a:hover { color: #FF8B5E; }
 
     @media (max-width: 768px) { .hero-demo { flex-direction: column !important; } .iphone, .sheet { width: 200px; } .module-card { min-width: 260px; } }
   </style>
 </head>
-<body class="bg-gradient-animate">
+<body>
+  <!-- Background -->
+  <div class="bg-grid"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-  
+  <div class="orb orb-4"></div>
+
+
+  <!-- Welcome overlay -->
   <div class="welcome-overlay" id="welcome-overlay">
-    <div class="welcome-logo">i</div>
+    <div class="welcome-logo">
+      <div class="logo-i-soldier" style="transform:scale(2.5);">
+        <div class="logo-i-cap" style="animation:none;"></div>
+        <div class="logo-i-dot"></div>
+        <div class="logo-i-body"></div>
+      </div>
+    </div>
     <h1 class="welcome-title" id="welcome-title">Bienvenue !</h1>
-    <p class="welcome-subtitle" id="welcome-subtitle">Préparation de ton espace...</p>
+    <p class="welcome-subtitle" id="welcome-subtitle">Preparation de ton espace...</p>
     <div class="welcome-dots"><div class="welcome-dot"></div><div class="welcome-dot"></div><div class="welcome-dot"></div></div>
   </div>
-  
+
+  <!-- Nav -->
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
-        <div class="logo-i">i</div>
+        <div class="logo-i">
+          <div class="logo-i-soldier">
+            <div class="logo-i-cap"></div>
+            <div class="logo-i-dot"></div>
+            <div class="logo-i-body"></div>
+          </div>
+        </div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
       <div id="auth-buttons">
@@ -183,19 +389,26 @@
       </div>
     </div>
   </nav>
-  
+
+  <!-- Hero -->
   <section class="min-h-screen flex items-center justify-center px-6 pt-20 relative z-10">
     <div class="max-w-6xl mx-auto text-center">
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 animate-fade-in-up">Une armée de robots<br>pour ton <span style="color:#FF8B5E">quotidien</span></h1>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 animate-fade-in-up">Une armee de robots<br>pour ton <span style="background: linear-gradient(135deg, #FF6B35, #FF3D00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">quotidien</span></h1>
       <p class="text-lg md:text-xl text-white/50 mb-12 animate-fade-in-up delay-100">Gagne du temps. On s'occupe du reste.</p>
-      
+
       <div class="hero-demo flex items-center justify-center gap-8 mb-12 animate-fade-in-up delay-200" style="display:flex; flex-direction:row;">
         <div class="iphone animate-float">
           <div class="iphone-screen">
             <div class="iphone-notch"></div>
             <div class="telegram-header">
-              <span style="color:#0a84ff; font-size:20px;">‹</span>
-              <div class="telegram-avatar">i</div>
+              <span style="color:#0a84ff; font-size:20px;">&lt;</span>
+              <div class="telegram-avatar">
+                <div class="logo-i-soldier" style="transform:scale(0.75);">
+                  <div class="logo-i-cap" style="animation:none;"></div>
+                  <div class="logo-i-dot"></div>
+                  <div class="logo-i-body"></div>
+                </div>
+              </div>
               <div class="text-left">
                 <div class="telegram-name">iArmy Bot</div>
                 <div class="telegram-status">en ligne</div>
@@ -206,7 +419,13 @@
         </div>
         <div class="glide-container hidden md:block">
           <div class="glide-line"></div>
-          <div class="glide-logo" id="glide-logo">i</div>
+          <div class="glide-logo" id="glide-logo">
+              <div class="logo-i-soldier" style="transform:scale(0.9); animation:none;">
+                <div class="logo-i-cap"></div>
+                <div class="logo-i-dot"></div>
+                <div class="logo-i-body"></div>
+              </div>
+            </div>
         </div>
         <div class="sheet animate-float" style="animation-delay: -2s;">
           <div class="sheet-header">
@@ -214,7 +433,7 @@
             <span class="sheet-title">Compta 2026</span>
           </div>
           <table class="sheet-grid" style="width:100%">
-            <thead><tr><th>Date</th><th>Type</th><th>€</th></tr></thead>
+            <thead><tr><th>Date</th><th>Type</th><th>EUR</th></tr></thead>
             <tbody id="spreadsheet-body">
               <tr><td>08/01</td><td>CB</td><td class="amount">850</td></tr>
               <tr><td>08/01</td><td>ESP</td><td class="amount">120</td></tr>
@@ -224,116 +443,122 @@
           </table>
         </div>
       </div>
-      
+
       <div class="animate-fade-in-up delay-300">
-        <button onclick="launchRobot()" class="btn-primary text-lg px-10 py-4">Lancer mon robot →</button>
-        <p class="text-white/30 text-sm mt-4">7 jours d'essai gratuit</p>
+        <button onclick="openModal('register')" class="btn-primary text-lg px-10 py-4">Commencer gratuitement</button>
+        <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-top:16px; flex-wrap:wrap;">
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            7 jours gratuits
+          </span>
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Setup en 2 min
+          </span>
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+            10h gagnees/mois
+          </span>
+        </div>
       </div>
     </div>
   </section>
-  
-  <section class="py-20 px-6 relative z-10">
+
+  <!-- Modules -->
+  <section class="py-20 px-6 relative z-10 grid-section">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12"><span class="text-white/30 text-sm uppercase tracking-widest">✨ Nos modules</span></div>
-      <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
-        <div class="module-card" onclick="launchRobot()">
-          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="module-badge">🎉 NOUVEAU</span></div>
-          <div style="display:flex; justify-content:center; margin-bottom:20px;">
-            <div class="animated-logo-ultra-simple">
-              <div class="logo-telegram-xl"><svg width="56" height="56" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-xl" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-xl)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
-              <div class="pulse-container"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div><div class="pulse-wave wave4"></div></div>
-              <div class="logo-spreadsheet-xl"><svg width="56" height="56" viewBox="0 0 56 56"><defs><linearGradient id="sheet-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#0a7e3e"/></linearGradient></defs><rect x="8" y="8" width="40" height="40" rx="6" fill="url(#sheet-grad)"/><line x1="12" y1="20" x2="44" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="28" x2="44" y2="28" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="12" y1="36" x2="44" y2="36" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="22" y1="12" x2="22" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="34" y1="12" x2="34" y2="44" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><rect class="cell-fill cell-fill-1" x="12" y="28" width="10" height="8" fill="#4ade80" opacity="0"/><rect class="cell-fill cell-fill-2" x="22" y="28" width="12" height="8" fill="#4ade80" opacity="0"/><rect class="cell-fill cell-fill-3" x="34" y="28" width="10" height="8" fill="#4ade80" opacity="0"/><rect class="cell-fill cell-fill-4" x="12" y="36" width="10" height="8" fill="#4ade80" opacity="0"/></svg></div>
-            </div>
+      <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos soldats</span></div>
+
+      <div class="modules-grid">
+        <!-- Compta -->
+        <div class="module-card compta" onclick="openModal('register')">
+          <span class="badge-new green" id="module-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <!-- Telegram icon -->
+            <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-c" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-c)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <!-- Google Sheets icon with animated cells - same size as Telegram -->
+            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="sheet-grad-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#sheet-grad-c)"/><rect x="55" y="55" width="130" height="130" rx="12" fill="rgba(255,255,255,0.15)"/><line x1="55" y1="95" x2="185" y2="95" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="55" y1="135" x2="185" y2="135" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="100" y1="55" x2="100" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="145" y1="55" x2="145" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><rect class="cell-fill cell-fill-1" x="56" y="96" width="43" height="38" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-2" x="101" y="96" width="43" height="38" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-3" x="146" y="96" width="38" height="38" fill="#86efac" opacity="0"/></svg></div>
           </div>
-          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Compta</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Envoie tes recettes via <strong style="color:#0088cc;">Telegram</strong><br>Écrit auto dans <strong style="color:#0f9d58;">Google Sheets</strong></p>
-          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
-            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Comptabilité & Finance</div>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🍕 Restaurant</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🏪 Commerce</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🍸 Bar</span>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Compta</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Envoie ta caisse sur <strong style="color:#0088cc;">Telegram</strong><br>Elle arrive dans <strong style="color:#22c55e;">Sheets</strong></p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Restaurant</span>
+            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Commerce</span>
           </div>
         </div>
-        <div class="module-card" onclick="goToStock()" id="module-stock">
-          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="stock-badge">🎉 NOUVEAU</span></div>
-          <div style="display:flex; justify-content:center; margin-bottom:20px;">
-            <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
-              <div style="width:56px; height:56px; background:linear-gradient(135deg, #06B6D4, #22D3EE); border-radius:14px; display:flex; align-items:center; justify-content:center;">
-                <div class="mini-stock-xl">
-                  <div class="mini-bottle-xl mini-bottle-xl-1">
-                    <div class="mini-bottle-cap-xl"></div>
-                    <div class="mini-bottle-neck-xl"></div>
-                    <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-                  </div>
-                  <div class="mini-bottle-xl mini-bottle-xl-2">
-                    <div class="mini-bottle-cap-xl"></div>
-                    <div class="mini-bottle-neck-xl"></div>
-                    <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-                  </div>
-                  <div class="mini-stock-count-xl">2</div>
+
+        <!-- Stock -->
+        <div class="module-card stock" onclick="goToStock()" id="module-stock">
+          <span class="badge-new cyan" id="stock-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <!-- Bottles icon - round -->
+            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
+              <div class="mini-stock-xl" style="transform:scale(0.85);">
+                <div class="mini-bottle-xl mini-bottle-xl-1">
+                  <div class="mini-bottle-cap-xl"></div>
+                  <div class="mini-bottle-neck-xl"></div>
+                  <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
+                </div>
+                <div class="mini-bottle-xl mini-bottle-xl-2">
+                  <div class="mini-bottle-cap-xl"></div>
+                  <div class="mini-bottle-neck-xl"></div>
+                  <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
                 </div>
               </div>
             </div>
-          </div>
-          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Stock</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Gestion de stock pour bars<br>Tickets Z, inventaires, marges</p>
-          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
-            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Bars & Cocktails</div>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">🍸 Cocktails</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📊 Marges</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📦 Stock</span>
-          </div>
-        </div>
-        <div class="module-card" onclick="goToPaie()" id="module-paie">
-          <div class="flex items-center gap-3 mb-4"><span class="badge-new" id="paie-badge">🎉 NOUVEAU</span></div>
-          <div style="display:flex; justify-content:center; margin-bottom:20px;">
-            <div style="width:112px; height:56px; display:flex; align-items:center; justify-content:center;">
-              <div style="width:56px; height:56px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:14px; display:flex; align-items:center; justify-content:center; position:relative;">
-                <div class="mini-team">
-                  <div class="mini-team-people">
-                    <div class="mini-person mini-person-1">
-                      <div class="mini-person-head"></div>
-                      <div class="mini-person-body"></div>
-                    </div>
-                    <div class="mini-person mini-person-2">
-                      <div class="mini-person-head"></div>
-                      <div class="mini-person-body"></div>
-                    </div>
-                    <div class="mini-person mini-person-3">
-                      <div class="mini-person-head"></div>
-                      <div class="mini-person-body"></div>
-                    </div>
-                  </div>
-                  <div class="mini-team-euro">€</div>
-                </div>
-              </div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <!-- Counting animation -->
+            <div class="logo-spreadsheet-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
+              <span class="stock-counter" style="font-size:20px; font-weight:800; color:white;">12</span>
             </div>
           </div>
-          <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; text-align:center;">Paie</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:14px; line-height:1.6; text-align:center; margin-bottom:16px;">Gère les <strong style="color:#fbbf24;">absences</strong> de ton équipe<br>Via <strong style="color:#0088cc;">Telegram</strong> → recap pour ton comptable</p>
-          <div style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px;">
-            <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:4px;">Pour</div>
-            <div style="font-size:13px; color:rgba(255,255,255,0.6); font-weight:600;">Preparation paie</div>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Stock</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Compte tes <strong style="color:#22d3ee;">bouteilles</strong><br>L'inventaire se met a jour</p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Bar</span>
+            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Inventaire</span>
           </div>
-          <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">👥 Equipe</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">📋 Recap</span>
-            <span style="padding:4px 10px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; font-size:10px; color:rgba(255,255,255,0.35);">💰 Net</span>
+        </div>
+
+        <!-- Paie -->
+        <div class="module-card paie" onclick="goToPaie()" id="module-paie">
+          <span class="badge-new gold" id="paie-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <!-- People/Team icon - round -->
+            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #fbbf24, #f59e0b); display:flex; align-items:center; justify-content:center;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" fill="white"/>
+                <circle cx="17" cy="7" r="2.5" fill="rgba(255,255,255,0.7)"/>
+                <path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M15 13c2.2 0 4 1.8 4 4v2" stroke="rgba(255,255,255,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <!-- PDF icon - same size circle -->
+            <div class="logo-spreadsheet-xl">
+              <svg width="44" height="44" viewBox="0 0 240 240">
+                <circle cx="120" cy="120" r="120" fill="#ef4444"/>
+                <rect x="70" y="50" width="100" height="130" rx="8" fill="white"/>
+                <text x="120" y="130" font-family="Arial, sans-serif" font-size="36" font-weight="800" fill="#ef4444" text-anchor="middle">PDF</text>
+              </svg>
+            </div>
+          </div>
+          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Paie</h3>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Dis qui est <strong style="color:#fbbf24;">absent</strong> sur Telegram<br>Recois le recap PDF en fin de mois</p>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Absences</span>
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Recap</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Coming soon -->
   <section class="py-12 px-6 relative z-10">
     <div class="max-w-4xl mx-auto text-center">
-      <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres modules arrivent bientot</p>
+      <p style="color:rgba(255,255,255,0.5); font-size:16px; margin-bottom:24px;">D'autres soldats rejoignent bientot l'armee</p>
       <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
         <div class="robot-card"><span class="robot-emoji">🤖</span></div>
         <div class="robot-card"><span class="robot-emoji">🤖</span></div>
@@ -342,8 +567,9 @@
       </div>
     </div>
   </section>
-  
-  <footer style="padding:40px 24px; background:rgba(0,0,0,0.3); border-top:1px solid rgba(255,255,255,0.05);">
+
+  <!-- Footer -->
+  <footer style="padding:40px 24px; background:rgba(0,0,0,0.3); border-top:1px solid rgba(255,255,255,0.06);">
     <div class="max-w-4xl mx-auto">
       <div style="display:flex; flex-direction:column; align-items:center; gap:24px;">
         <div style="display:flex; align-items:center; gap:24px; font-size:14px;">
@@ -353,11 +579,12 @@
           <a href="cgu/">CGU</a>
           <a href="mailto:support@iarmy.fr">Contact</a>
         </div>
-        <p style="color:rgba(255,255,255,0.3); font-size:13px;">© 2026 iArmy</p>
+        <p style="color:rgba(255,255,255,0.3); font-size:13px;">2026 iArmy</p>
       </div>
     </div>
   </footer>
-  
+
+  <!-- Modal -->
   <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
   <div class="modal-content" id="modal-content">
     <div class="modal-close" onclick="closeModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
@@ -391,7 +618,7 @@
         <input type="text" id="register-name" class="input-field mb-3" placeholder="Nom complet" required>
         <input type="email" id="register-email" class="input-field mb-3" placeholder="Email" required>
         <input type="password" id="register-password" class="input-field mb-4" placeholder="Mot de passe (6 car. min)" required minlength="6">
-        <button type="submit" class="btn-primary" style="width:100%;" id="register-btn">Créer mon compte</button>
+        <button type="submit" class="btn-primary" style="width:100%;" id="register-btn">Creer mon compte</button>
       </form>
     </div>
   </div>
@@ -400,11 +627,9 @@
     const SUPABASE_URL = 'https://byqfnpdcnifauhwgetcq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
 
-    // Debug mode - désactivé en production
     const DEBUG = window.location.hostname === 'localhost';
     const log = (...args) => DEBUG && console.log(...args);
 
-    // Cookie storage pour partager la session entre iarmy.fr et app.iarmy.fr
     const cookieStorage = {
       getItem: (key) => {
         const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
@@ -422,10 +647,10 @@
       auth: { storage: cookieStorage, storageKey: 'sb-auth-token' }
     });
 
-    log('[INDEX] 🚀 Init');
+    log('[INDEX] Init');
 
     function showWelcome(firstName) {
-      document.getElementById('welcome-title').textContent = `Bienvenue ${firstName} ! 👋`;
+      document.getElementById('welcome-title').textContent = `Bienvenue ${firstName} !`;
       document.getElementById('welcome-overlay').classList.add('active');
     }
 
@@ -439,7 +664,7 @@
             <img src="${userAvatar}" class="nav-avatar" alt="Avatar">
             <span>${userName}</span>
           </a>
-          <button onclick="signOut()" class="btn-logout" title="Déconnexion">
+          <button onclick="signOut()" class="btn-logout" title="Deconnexion">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
@@ -461,22 +686,22 @@
     async function handleOAuthCallback() {
       const hasToken = window.location.hash.includes('access_token');
       if (!hasToken) return false;
-      
-      console.log('[INDEX] 🔄 Callback OAuth détecté');
+
+      console.log('[INDEX] Callback OAuth detecte');
       window.history.replaceState({}, document.title, window.location.pathname);
-      
+
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        console.log('[INDEX] ❌ Pas de session après callback');
+        console.log('[INDEX] Pas de session apres callback');
         return false;
       }
-      
-      console.log('[INDEX] ✅ Session OAuth:', session.user.email);
+
+      console.log('[INDEX] Session OAuth:', session.user.email);
       const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || session.user.user_metadata?.name?.split(' ')[0] || session.user.email?.split('@')[0] || 'toi';
-      
+
       showLoggedInNav(session.user);
       showWelcome(firstName);
-      
+
       try {
         const { error } = await supabaseClient.from('profiles').select('id').eq('id', session.user.id).single();
         if (error && error.code === 'PGRST116') {
@@ -487,21 +712,20 @@
             plan: 'free'
           });
         }
-      } catch (e) { console.log('[INDEX] Profil déjà existant'); }
-      
+      } catch (e) { console.log('[INDEX] Profil deja existant'); }
+
       setTimeout(() => { window.location.href = 'https://app.iarmy.fr/compta/setup'; }, 2000);
       return true;
     }
 
     async function checkSession() {
-      console.log('[INDEX] 🔍 Vérification session...');
+      console.log('[INDEX] Verification session...');
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
-          console.log('[INDEX] ✅ Connecté:', session.user.email);
+          console.log('[INDEX] Connecte:', session.user.email);
           showLoggedInNav(session.user);
 
-          // Vérifier si le module compta est configuré
           const { data: config } = await supabaseClient
             .from('module_configs')
             .select('sheet_id')
@@ -510,44 +734,18 @@
             .maybeSingle();
 
           if (config?.sheet_id) {
-            // Module configuré → badge discret
             const badge = document.getElementById('module-badge');
             if (badge) {
-              badge.innerHTML = '✓ Installé';
+              badge.innerHTML = 'Installe';
+              badge.className = 'badge-new green';
               badge.style.background = 'rgba(34,197,94,0.15)';
-              badge.style.color = '#4ade80';
-              badge.style.borderColor = 'rgba(34,197,94,0.3)';
-              badge.style.animation = 'none';
             }
-            // Changer le onclick pour aller direct aux settings
-            const moduleCard = document.querySelector('.module-card');
+            const moduleCard = document.querySelector('.module-card.compta');
             if (moduleCard) {
               moduleCard.onclick = () => { window.location.href = 'https://app.iarmy.fr/compta/'; };
             }
           }
 
-          // Vérifier si le module planning est configuré (a une subscription active ou is_tester)
-          const { data: planningConfig } = await supabaseClient
-            .from('subscriptions')
-            .select('status, is_tester')
-            .eq('user_id', session.user.id)
-            .eq('module_name', 'planning')
-            .maybeSingle();
-
-          if (planningConfig?.status === 'active' || planningConfig?.is_tester) {
-            planningConfigured = true;
-            // Module configuré → badge discret
-            const planningBadge = document.getElementById('planning-badge');
-            if (planningBadge) {
-              planningBadge.innerHTML = '✓ Installé';
-              planningBadge.style.background = 'rgba(34,197,94,0.15)';
-              planningBadge.style.color = '#4ade80';
-              planningBadge.style.borderColor = 'rgba(34,197,94,0.3)';
-              planningBadge.style.animation = 'none';
-            }
-          }
-
-          // Vérifier si le module stock est configuré
           const { data: stockConfig } = await supabaseClient
             .from('subscriptions')
             .select('status, is_tester')
@@ -559,19 +757,32 @@
             stockConfigured = true;
             const stockBadge = document.getElementById('stock-badge');
             if (stockBadge) {
-              stockBadge.innerHTML = '✓ Installé';
-              stockBadge.style.background = 'rgba(34,197,94,0.15)';
-              stockBadge.style.color = '#4ade80';
-              stockBadge.style.borderColor = 'rgba(34,197,94,0.3)';
-              stockBadge.style.animation = 'none';
+              stockBadge.innerHTML = 'Installe';
+              stockBadge.style.background = 'rgba(6,182,212,0.15)';
+            }
+          }
+
+          const { data: paieConfig } = await supabaseClient
+            .from('subscriptions')
+            .select('status, is_tester')
+            .eq('user_id', session.user.id)
+            .eq('module_name', 'paie')
+            .maybeSingle();
+
+          if (paieConfig?.status === 'active' || paieConfig?.is_tester) {
+            paieConfigured = true;
+            const paieBadge = document.getElementById('paie-badge');
+            if (paieBadge) {
+              paieBadge.innerHTML = 'Installe';
+              paieBadge.style.background = 'rgba(245,158,11,0.15)';
             }
           }
         } else {
-          console.log('[INDEX] ❌ Non connecté');
+          console.log('[INDEX] Non connecte');
           showLoggedOutNav();
         }
       } catch (e) {
-        console.log('[INDEX] ⚠️ Erreur session:', e);
+        console.log('[INDEX] Erreur session:', e);
         showLoggedOutNav();
       }
     }
@@ -582,12 +793,12 @@
       const empty1 = document.getElementById('empty-1');
       const empty2 = document.getElementById('empty-2');
       if (!container) return;
-      
+
       container.innerHTML = '';
       glideLogo?.classList.remove('animate');
       if (empty1) empty1.innerHTML = '<td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td>';
       if (empty2) empty2.innerHTML = '<td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td><td style="color:rgba(255,255,255,0.2)">-</td>';
-      
+
       setTimeout(() => {
         const msg1 = document.createElement('div');
         msg1.className = 'msg msg-user';
@@ -595,17 +806,17 @@
         container.appendChild(msg1);
         setTimeout(() => msg1.classList.add('show'), 50);
       }, 500);
-      
+
       setTimeout(() => glideLogo?.classList.add('animate'), 1500);
-      
+
       setTimeout(() => {
         const msg2 = document.createElement('div');
         msg2.className = 'msg msg-bot';
-        msg2.innerHTML = '✅ Noté !<br>CB: 1 200€<br>Espèces: 350€';
+        msg2.innerHTML = 'Note !<br>CB: 1 200EUR<br>Especes: 350EUR';
         container.appendChild(msg2);
         setTimeout(() => msg2.classList.add('show'), 50);
       }, 2500);
-      
+
       setTimeout(() => {
         if (empty1) empty1.innerHTML = '<td>09/01</td><td>CB</td><td class="amount">1 200</td>';
         setTimeout(() => {
@@ -615,12 +826,9 @@
     }
 
     async function launchRobot() {
-      // Toujours rediriger vers app.iarmy.fr - il gerera l'auth lui-meme
-      // (les sessions ne sont pas partagees entre domaines)
       window.location.href = 'https://app.iarmy.fr';
     }
 
-    // Variables globales pour savoir si les modules sont configures
     let stockConfigured = false;
     let paieConfigured = false;
 
@@ -664,7 +872,7 @@
     }
 
     async function handleGoogleAuth() {
-      console.log('[INDEX] 🚀 Google OAuth...');
+      console.log('[INDEX] Google OAuth...');
       closeModal();
       try {
         const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -707,7 +915,7 @@
       const btn = document.getElementById('register-btn');
       const err = document.getElementById('register-error');
       err.classList.remove('show');
-      btn.textContent = 'Création...';
+      btn.textContent = 'Creation...';
       btn.disabled = true;
       try {
         const name = document.getElementById('register-name').value.trim();
@@ -723,30 +931,52 @@
       } catch (error) {
         err.textContent = error.message === 'User already registered' ? 'Compte existant' : error.message;
         err.classList.add('show');
-        btn.textContent = 'Créer mon compte';
+        btn.textContent = 'Creer mon compte';
         btn.disabled = false;
       }
     }
 
     async function signOut() {
-      console.log('[INDEX] 👋 Déconnexion...');
+      console.log('[INDEX] Deconnexion...');
       try {
         await supabaseClient.auth.signOut();
       } catch (e) {}
       showLoggedOutNav();
     }
 
+    // Stock counting animation
+    function runStockCount() {
+      const counter = document.querySelector('.stock-counter');
+      if (!counter) return;
+      let count = 1;
+      counter.textContent = count;
+      const interval = setInterval(() => {
+        count++;
+        counter.textContent = count;
+        counter.style.animation = 'none';
+        counter.offsetHeight; // trigger reflow
+        counter.style.animation = 'countPulse 0.2s ease-out';
+        if (count >= 12) {
+          clearInterval(interval);
+          setTimeout(() => {
+            counter.textContent = '1';
+          }, 2000);
+        }
+      }, 250);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
-      console.log('[INDEX] 📱 Page chargée');
+      console.log('[INDEX] Page chargee');
       setTimeout(runDemo, 1000);
       setInterval(runDemo, 8000);
-      
+      setTimeout(runStockCount, 500);
+      setInterval(runStockCount, 6000);
+
       const wasCallback = await handleOAuthCallback();
       if (!wasCallback) {
         await checkSession();
       }
     });
   </script>
-  <script src="js/analytics.js"></script>
 </body>
 </html>
