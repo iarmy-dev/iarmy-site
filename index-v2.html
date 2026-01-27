@@ -35,9 +35,8 @@
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
-    .logo-i:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(255,107,53,0.6); }
-    .logo-i svg { width: 24px; height: 24px; }
+    .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: white; transition: all 0.4s ease; cursor: pointer; }
+    .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
 
     .btn-primary { background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); padding: 14px 28px; border-radius: 14px; font-weight: 600; transition: all 0.4s; border: none; color: white; cursor: pointer; position: relative; overflow: hidden; }
     .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); opacity: 0; transition: opacity 0.3s; }
@@ -301,17 +300,7 @@
   <nav class="glass fixed top-0 left-0 right-0 z-50 animate-fade-in-down">
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
-        <div class="logo-i">
-          <svg viewBox="0 0 24 24" fill="white">
-            <!-- Helmet -->
-            <ellipse cx="12" cy="6" rx="6" ry="4" fill="white"/>
-            <rect x="6" y="5" width="12" height="3" fill="white"/>
-            <!-- Face/dot of i -->
-            <circle cx="12" cy="8" r="2.5" fill="white"/>
-            <!-- Body of i -->
-            <rect x="10" y="12" width="4" height="10" rx="1" fill="white"/>
-          </svg>
-        </div>
+        <div class="logo-i">i</div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
       <div id="auth-buttons">
