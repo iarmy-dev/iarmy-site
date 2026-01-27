@@ -210,36 +210,6 @@
       border-color: rgba(245,158,11,0.4);
     }
 
-    /* Floating particles - only in modules section */
-    .particles {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      animation: particleRise linear infinite;
-    }
-    @keyframes particleRise {
-      0% {
-        transform: translateY(0) scale(0);
-        opacity: 0;
-      }
-      5% {
-        opacity: 0.5;
-        transform: translateY(0) scale(1);
-      }
-      95% {
-        opacity: 0.5;
-      }
-      100% {
-        transform: translateY(-500px) scale(0.5);
-        opacity: 0;
-      }
-    }
 
     /* Grid section background - Stripe style */
     .grid-section {
@@ -386,17 +356,28 @@
       </div>
 
       <div class="animate-fade-in-up delay-300">
-        <button onclick="launchRobot()" class="btn-primary text-lg px-10 py-4">Lancer mon robot</button>
-        <p class="text-white/30 text-sm mt-4">7 jours d'essai gratuit</p>
+        <button onclick="launchRobot()" class="btn-primary text-lg px-10 py-4">Commencer gratuitement</button>
+        <div style="display:flex; align-items:center; justify-content:center; gap:24px; margin-top:16px; flex-wrap:wrap;">
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            7 jours gratuits
+          </span>
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Setup en 2 min
+          </span>
+          <span style="color:rgba(255,255,255,0.5); font-size:14px; display:flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+            10h gagnees/mois
+          </span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Modules -->
   <section class="py-20 px-6 relative z-10 grid-section">
-    <!-- Particles only in this section -->
-    <div class="particles" id="particles"></div>
-    <div class="max-w-6xl mx-auto" style="position:relative; z-index:2;">
+    <div class="max-w-6xl mx-auto">
       <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos modules</span></div>
 
       <div class="modules-grid">
@@ -419,47 +400,36 @@
         <!-- Stock -->
         <div class="module-card stock" onclick="goToStock()" id="module-stock">
           <span class="badge-new cyan" id="stock-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
-          <div style="width:64px; height:64px; background:linear-gradient(135deg, #06B6D4, #22D3EE); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
-            <div class="mini-stock-xl">
-              <div class="mini-bottle-xl mini-bottle-xl-1">
-                <div class="mini-bottle-cap-xl"></div>
-                <div class="mini-bottle-neck-xl"></div>
-                <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-              </div>
-              <div class="mini-bottle-xl mini-bottle-xl-2">
-                <div class="mini-bottle-cap-xl"></div>
-                <div class="mini-bottle-neck-xl"></div>
-                <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-              </div>
-              <div class="mini-stock-count-xl">2</div>
-            </div>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <!-- Camera icon -->
+            <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 56 56"><rect x="8" y="12" width="40" height="32" rx="6" fill="#06B6D4"/><circle cx="28" cy="28" r="10" fill="#0e7490" stroke="white" stroke-width="2"/><circle cx="28" cy="28" r="5" fill="white"/><rect x="34" y="16" width="8" height="4" rx="1" fill="white" opacity="0.6"/></svg></div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <!-- Stats/Chart icon -->
+            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 56 56"><rect x="8" y="8" width="40" height="40" rx="6" fill="#0891b2"/><rect x="14" y="30" width="6" height="14" rx="1" fill="white" opacity="0.9"/><rect x="25" y="22" width="6" height="22" rx="1" fill="white" opacity="0.9"/><rect x="36" y="14" width="6" height="30" rx="1" fill="white" opacity="0.9"/></svg></div>
           </div>
           <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Stock</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Compte tes <strong style="color:#22d3ee;">bouteilles</strong><br>Inventaire automatique</p>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Prends en <strong style="color:#22d3ee;">photo</strong><br>L'inventaire se calcule</p>
           <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
             <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Bar</span>
-            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Cocktails</span>
+            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Inventaire</span>
           </div>
         </div>
 
         <!-- Paie -->
         <div class="module-card paie" onclick="goToPaie()" id="module-paie">
           <span class="badge-new gold" id="paie-badge" style="position:absolute; top:16px; right:16px; font-size:9px; padding:4px 10px;">NOUVEAU</span>
-          <div style="width:64px; height:64px; background:linear-gradient(135deg, #f59e0b, #fbbf24); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; position:relative;">
-            <div class="mini-team">
-              <div class="mini-team-people">
-                <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
-                <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
-                <div class="mini-person"><div class="mini-person-head"></div><div class="mini-person-body"></div></div>
-              </div>
-              <div class="mini-team-euro">EUR</div>
-            </div>
+          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
+            <!-- Telegram icon -->
+            <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-paie" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-paie)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
+            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
+            <!-- PDF/Document icon -->
+            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 56 56"><rect x="10" y="6" width="32" height="44" rx="4" fill="#f59e0b"/><rect x="14" y="14" width="18" height="3" rx="1" fill="white" opacity="0.9"/><rect x="14" y="21" width="24" height="2" rx="1" fill="white" opacity="0.6"/><rect x="14" y="26" width="24" height="2" rx="1" fill="white" opacity="0.6"/><rect x="14" y="31" width="20" height="2" rx="1" fill="white" opacity="0.6"/><rect x="14" y="38" width="12" height="6" rx="1" fill="white" opacity="0.9"/><text x="20" y="43" font-size="5" font-weight="bold" fill="#f59e0b">PDF</text></svg></div>
           </div>
           <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Paie</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Gere les <strong style="color:#fbbf24;">absences</strong><br>Recap pour ton comptable</p>
+          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Dis qui est <strong style="color:#fbbf24;">absent</strong><br>Recois le recap PDF</p>
           <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
-            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Equipe</span>
-            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Salaires</span>
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Absences</span>
+            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Recap</span>
           </div>
         </div>
       </div>
@@ -855,31 +825,8 @@
       showLoggedOutNav();
     }
 
-    // Create floating particles - only behind modules
-    function createParticles() {
-      const container = document.getElementById('particles');
-      if (!container) return;
-      const colors = ['#22c55e', '#06B6D4', '#f59e0b', '#FF6B35'];
-
-      for (let i = 0; i < 15; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = (5 + Math.random() * 90) + '%';
-        particle.style.top = (80 + Math.random() * 20) + '%';
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.animationDuration = (10 + Math.random() * 15) + 's';
-        particle.style.animationDelay = (Math.random() * 8) + 's';
-        const size = 4 + Math.random() * 4;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.opacity = '0';
-        container.appendChild(particle);
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', async () => {
       console.log('[INDEX] Page chargee');
-      createParticles();
       setTimeout(runDemo, 1000);
       setInterval(runDemo, 8000);
 
