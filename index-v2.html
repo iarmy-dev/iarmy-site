@@ -37,27 +37,38 @@
 
     .logo-i { width: 40px; height: 40px; background: linear-gradient(135deg, #FF6B35 0%, #FF8B5E 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden; }
     .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
-    .logo-i-dot { width: 7px; height: 7px; background: white; border-radius: 50%; position: absolute; top: 7px; }
-    .logo-i-body { width: 6px; height: 12px; background: white; border-radius: 2px; position: absolute; bottom: 9px; }
-    /* Casquette militaire sur le i */
+    /* Animation garde-à-vous */
+    .logo-i-soldier {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: gardeAVous 2.5s ease-in-out infinite;
+    }
+    @keyframes gardeAVous {
+      0%, 40%, 100% { transform: translateY(0); }
+      50%, 60% { transform: translateY(-3px); }
+    }
+    /* Casquette militaire - style képi */
     .logo-i-cap {
-      position: absolute;
-      top: 5px;
-      width: 11px;
-      height: 4px;
+      width: 12px;
+      height: 5px;
       background: white;
-      border-radius: 1px;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      margin-bottom: -2px;
     }
     .logo-i-cap::after {
       content: '';
       position: absolute;
-      top: 3px;
-      left: -1px;
-      width: 13px;
-      height: 2px;
+      bottom: -2px;
+      left: -2px;
+      width: 16px;
+      height: 3px;
       background: white;
       border-radius: 1px;
     }
+    .logo-i-dot { width: 8px; height: 8px; background: white; border-radius: 50%; margin-bottom: 2px; }
+    .logo-i-body { width: 6px; height: 11px; background: white; border-radius: 2px; }
 
     /* Stock counter animation */
     .stock-counter { animation: countPulse 0.3s ease-out; }
@@ -324,9 +335,11 @@
     <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
       <a href="./" class="flex items-center gap-3">
         <div class="logo-i">
-          <div class="logo-i-cap"></div>
-          <div class="logo-i-dot"></div>
-          <div class="logo-i-body"></div>
+          <div class="logo-i-soldier">
+            <div class="logo-i-cap"></div>
+            <div class="logo-i-dot"></div>
+            <div class="logo-i-body"></div>
+          </div>
         </div>
         <span class="font-semibold text-lg">iArmy</span>
       </a>
