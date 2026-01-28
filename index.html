@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#FF6B35">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/icons.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/header.css">
   <style>
@@ -311,12 +312,7 @@
     .welcome-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes welcomeBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-    .nav-avatar-link { display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease; position: relative; }
-    .nav-avatar-link::before { content: ''; position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(255,107,53,0.5); animation: avatarPulse 2.5s ease-in-out infinite; }
-    @keyframes avatarPulse { 0% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.25); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
-    .nav-avatar-link:hover { transform: scale(1.08); }
-    .nav-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.12); transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-    .nav-avatar-link:hover .nav-avatar { border-color: rgba(255,107,53,0.7); box-shadow: 0 4px 16px rgba(255,107,53,0.35); }
+    /* Avatar styles in /css/header.css */
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
     footer a:hover { color: #FF8B5E; }
 
@@ -480,88 +476,9 @@
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-12"><span class="text-white/40 text-sm uppercase tracking-widest">Nos soldats</span></div>
 
-      <div class="modules-grid">
-        <!-- Compta -->
-        <div class="module-card compta" onclick="window.location.href='https://app.iarmy.fr/setup/?module=compta'">
-          <span class="badge-new green" id="module-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
-          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
-            <!-- Telegram icon -->
-            <div class="logo-telegram-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="tg-grad-c" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#2AABEE"/><stop offset="100%" stop-color="#229ED9"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg-grad-c)"/><path fill="#fff" d="M81.229 128.772l14.237 39.406s1.78 3.687 3.686 3.687 30.255-29.492 30.255-29.492l31.525-60.89L81.737 118.6z"/><path fill="#d5e6f3" d="M100.106 138.878l-2.733 29.046s-1.144 8.9 7.754 0 17.415-15.763 17.415-15.763"/><path fill="#b5cfe4" d="M81.486 130.178l-17.8-5.467s-2.006-.808-1.366-2.671c.143-.42.522-.72 1.773-1.5 5.912-3.686 108.297-41.223 108.297-41.223s1.928-.6 3.277-.138a1.7 1.7 0 011.377 1.152c.118.58.138 1.368.138 2.14 0 .663-.06 1.41-.06 2.292-.469 8.312-14.237 90.178-14.237 90.178s-.803 3.262-3.686 3.372c-1.99.067-5.104-1.29-6.897-2.352-1.467-.874-27.523-17.598-37.06-25.67-.832-.704-1.68-2.026-.06-3.63 3.673-3.64 8.047-8.047 17.05-16.5 2.006-1.89 4.032-6.297-4.365-1.072l-23.27 15.555s-2.667 1.654-7.617.18c-1.69-.505-3.57-1.06-6.347-1.965-2.37-.77-4.902-1.654-4.16-3.464.488-1.222 1.41-2.24 4.838-3.532z"/></svg></div>
-            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- Google Sheets icon with animated cells - same size as Telegram -->
-            <div class="logo-spreadsheet-xl"><svg width="44" height="44" viewBox="0 0 240 240"><defs><linearGradient id="sheet-grad-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#sheet-grad-c)"/><rect x="55" y="55" width="130" height="130" rx="12" fill="rgba(255,255,255,0.15)"/><line x1="55" y1="95" x2="185" y2="95" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="55" y1="135" x2="185" y2="135" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="100" y1="55" x2="100" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><line x1="145" y1="55" x2="145" y2="185" stroke="rgba(255,255,255,0.4)" stroke-width="3"/><rect class="cell-fill cell-fill-1" x="56" y="96" width="43" height="38" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-2" x="101" y="96" width="43" height="38" fill="#86efac" opacity="0"/><rect class="cell-fill cell-fill-3" x="146" y="96" width="38" height="38" fill="#86efac" opacity="0"/></svg></div>
-          </div>
-          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Compta</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Envoie ta caisse sur <strong style="color:#0088cc;">Telegram</strong><br>Elle arrive dans <strong style="color:#22c55e;">Sheets</strong></p>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
-            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Restaurant</span>
-            <span style="padding:4px 8px; background:rgba(34,197,94,0.1); border-radius:8px; font-size:10px; color:#4ade80;">Commerce</span>
-          </div>
-        </div>
-
-        <!-- Stock -->
-        <div class="module-card stock" onclick="goToStock()" id="module-stock">
-          <span class="badge-new cyan" id="stock-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
-          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
-            <!-- Bottles icon - round -->
-            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
-              <div class="mini-stock-xl" style="transform:scale(0.85);">
-                <div class="mini-bottle-xl mini-bottle-xl-1">
-                  <div class="mini-bottle-cap-xl"></div>
-                  <div class="mini-bottle-neck-xl"></div>
-                  <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-                </div>
-                <div class="mini-bottle-xl mini-bottle-xl-2">
-                  <div class="mini-bottle-cap-xl"></div>
-                  <div class="mini-bottle-neck-xl"></div>
-                  <div class="mini-bottle-body-xl"><div class="mini-bottle-fill-xl"></div></div>
-                </div>
-              </div>
-            </div>
-            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- Counting animation -->
-            <div class="logo-spreadsheet-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #22D3EE, #06B6D4); display:flex; align-items:center; justify-content:center;">
-              <span class="stock-counter" style="font-size:20px; font-weight:800; color:white;">12</span>
-            </div>
-          </div>
-          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Stock</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Compte tes <strong style="color:#22d3ee;">bouteilles</strong><br>L'inventaire se met a jour</p>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
-            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Bar</span>
-            <span style="padding:4px 8px; background:rgba(6,182,212,0.1); border-radius:8px; font-size:10px; color:#22d3ee;">Inventaire</span>
-          </div>
-        </div>
-
-        <!-- Paie -->
-        <div class="module-card paie" onclick="goToPaie()" id="module-paie">
-          <span class="badge-new gold" id="paie-badge" style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px;">NOUVEAU</span>
-          <div class="animated-logo-ultra-simple" style="height:60px; gap:12px; margin-bottom:16px;">
-            <!-- People/Team icon - round -->
-            <div class="logo-telegram-xl" style="width:44px; height:44px; border-radius:50%; background:linear-gradient(180deg, #fbbf24, #f59e0b); display:flex; align-items:center; justify-content:center;">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <circle cx="9" cy="7" r="3" fill="white"/>
-                <circle cx="17" cy="7" r="2.5" fill="rgba(255,255,255,0.7)"/>
-                <path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                <path d="M15 13c2.2 0 4 1.8 4 4v2" stroke="rgba(255,255,255,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="pulse-container" style="width:30px;"><div class="pulse-wave wave1"></div><div class="pulse-wave wave2"></div><div class="pulse-wave wave3"></div></div>
-            <!-- PDF icon - same size circle -->
-            <div class="logo-spreadsheet-xl">
-              <svg width="44" height="44" viewBox="0 0 240 240">
-                <circle cx="120" cy="120" r="120" fill="#ef4444"/>
-                <rect x="70" y="50" width="100" height="130" rx="8" fill="white"/>
-                <text x="120" y="130" font-family="Arial, sans-serif" font-size="36" font-weight="800" fill="#ef4444" text-anchor="middle">PDF</text>
-              </svg>
-            </div>
-          </div>
-          <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">Paie</h3>
-          <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">Dis qui est <strong style="color:#fbbf24;">absent</strong> sur Telegram<br>Recois le recap PDF en fin de mois</p>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
-            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Absences</span>
-            <span style="padding:4px 8px; background:rgba(245,158,11,0.1); border-radius:8px; font-size:10px; color:#fbbf24;">Recap</span>
-          </div>
-        </div>
+      <div class="modules-grid" id="modules-grid">
+        <!-- Modules chargés dynamiquement depuis Supabase -->
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Chargement...</div>
       </div>
     </div>
   </section>
@@ -956,6 +873,72 @@
       window.location.href = 'https://app.iarmy.fr/setup/?module=stock';
     }
 
+    // Charger les modules depuis Supabase
+    async function loadModules() {
+      const grid = document.getElementById('modules-grid');
+      if (!grid) return;
+
+      try {
+        const { data: modules, error } = await supabaseClient
+          .from('modules')
+          .select('*')
+          .eq('status', 'available')
+          .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+
+        if (!modules || modules.length === 0) {
+          grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Aucun soldat disponible</div>';
+          return;
+        }
+
+        grid.innerHTML = modules.map(m => {
+          const bgGradient = `linear-gradient(145deg, ${hexToRgba(m.color, 0.25)}, ${hexToRgba(m.color, 0.15)})`;
+          const borderColor = hexToRgba(m.color, 0.4);
+          const hoverBorder = hexToRgba(m.color, 0.6);
+          const hoverShadow = hexToRgba(m.color, 0.25);
+
+          // Badge
+          let badge = '';
+          if (m.badge && m.badge !== 'none') {
+            const badgeColors = { nouveau: '#22c55e', populaire: '#f59e0b', promo: '#ef4444' };
+            badge = `<span style="position:absolute; top:10px; right:10px; font-size:8px; padding:3px 8px; background:${badgeColors[m.badge] || '#fff'}; color:#000; border-radius:4px; font-weight:600; text-transform:uppercase;">${m.badge}</span>`;
+          }
+
+          // Tags
+          const tagsHtml = (m.tags || []).map(tag =>
+            `<span style="padding:4px 8px; background:${hexToRgba(m.color, 0.1)}; border-radius:8px; font-size:10px; color:${m.color};">${tag}</span>`
+          ).join('');
+
+          // Icône avec fond coloré
+          const icon = getModuleIcon(m.icon_type || 'custom', 'white', 28);
+          const iconBg = `linear-gradient(135deg, ${m.color}, ${darkenColor(m.color, 30)})`;
+
+          return `
+            <div class="module-card" style="background:${bgGradient}; border-color:${borderColor};"
+                 onclick="window.location.href='https://app.iarmy.fr/setup/?module=${m.slug}'"
+                 onmouseover="this.style.borderColor='${hoverBorder}'; this.style.boxShadow='0 0 40px ${hoverShadow}';"
+                 onmouseout="this.style.borderColor='${borderColor}'; this.style.boxShadow='none';">
+              ${badge}
+              <div style="height:60px; display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+                <div style="width:56px; height:56px; border-radius:50%; background:${iconBg}; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px ${hexToRgba(m.color, 0.4)};">
+                  ${icon}
+                </div>
+              </div>
+              <h3 style="font-size:20px; font-weight:700; margin-bottom:8px;">${m.name}</h3>
+              <p style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.5; margin-bottom:12px;">${m.description || ''}</p>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+                ${tagsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Erreur chargement modules:', err);
+        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Erreur de chargement</div>';
+      }
+    }
+
     function openModal(tab = 'login') {
       document.getElementById('modal-backdrop').classList.add('active');
       document.getElementById('modal-content').classList.add('active');
@@ -1079,6 +1062,9 @@
       setInterval(runDemo, 8000);
       setTimeout(runStockCount, 500);
       setInterval(runStockCount, 6000);
+
+      // Charger les modules depuis Supabase
+      loadModules();
 
       const wasCallback = await handleOAuthCallback();
       if (!wasCallback) {

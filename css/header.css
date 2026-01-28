@@ -131,26 +131,12 @@ nav {
   gap: 8px !important;
 }
 
-/* Avatar miniature dans le header */
+/* Avatar miniature dans le header - Glow continu */
 .nav-avatar-link {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   position: relative !important;
-}
-.nav-avatar-link::before {
-  content: '';
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,107,53,0.5);
-  animation: avatarPulse 2.5s ease-in-out infinite;
-}
-@keyframes avatarPulse {
-  0% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.25); opacity: 0; }
-  100% { transform: scale(1); opacity: 0; }
 }
 
 .nav-avatar {
@@ -162,13 +148,14 @@ nav {
   max-height: 36px !important;
   border-radius: 50% !important;
   object-fit: cover !important;
-  border: 2px solid rgba(255,255,255,0.1) !important;
-  transition: all 0.2s !important;
+  border: 2px solid rgba(255,107,53,0.4) !important;
+  box-shadow: 0 0 12px rgba(255,107,53,0.3), 0 0 4px rgba(255,107,53,0.15) !important;
+  transition: all 0.25s ease !important;
 }
 
 .nav-avatar:hover {
-  border-color: rgba(255,107,53,0.7) !important;
-  box-shadow: 0 0 20px rgba(255,107,53,0.35), 0 0 6px rgba(255,107,53,0.2) inset !important;
+  border-color: rgba(255,107,53,0.8) !important;
+  box-shadow: 0 0 20px rgba(255,107,53,0.5), 0 0 8px rgba(255,107,53,0.25) !important;
   transform: scale(1.08) !important;
 }
 
