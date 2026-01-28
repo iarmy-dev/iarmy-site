@@ -125,23 +125,34 @@
     .glide-logo.animate { animation: glide 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     .glide-logo svg { width: 100%; height: 100%; }
 
-    /* Corps: Sursaut puis course - penché vers l'avant */
+    /* Corps: Sursaut puis course - penché vers l'avant avec rebond */
     .glide-logo.animate svg { animation: soldierSurpriseThenRun 2.5s ease-out forwards; }
     @keyframes soldierSurpriseThenRun {
       /* Surprise! */
-      0% { transform: rotate(0); }
-      5% { transform: rotate(0); }
-      8% { transform: rotate(8deg) scale(1.15); } /* Sursaut arrière */
-      12% { transform: rotate(-5deg) scale(0.9); }
-      15% { transform: rotate(0) scale(1); }
+      0% { transform: rotate(0) translateY(0); }
+      5% { transform: rotate(0) translateY(0); }
+      8% { transform: rotate(8deg) scale(1.15) translateY(-3px); } /* Sursaut arrière */
+      12% { transform: rotate(-5deg) scale(0.95) translateY(0); }
+      15% { transform: rotate(0) scale(1) translateY(0); }
       /* Petite pause "oh merde" */
-      18% { transform: rotate(0); }
-      /* COURS! Penché vers l'avant, rebond naturel */
-      20% { transform: rotate(-8deg); } /* Penche vers l'avant pour courir */
-      100% { transform: rotate(-8deg); } /* Reste penché */
+      18% { transform: rotate(0) translateY(0); }
+      /* COURS! Penché + rebond naturel de course */
+      22% { transform: rotate(-10deg) translateY(-2px); }
+      26% { transform: rotate(-6deg) translateY(1px); }
+      30% { transform: rotate(-10deg) translateY(-2px); }
+      34% { transform: rotate(-6deg) translateY(1px); }
+      38% { transform: rotate(-10deg) translateY(-2px); }
+      42% { transform: rotate(-6deg) translateY(1px); }
+      46% { transform: rotate(-10deg) translateY(-2px); }
+      50% { transform: rotate(-6deg) translateY(1px); }
+      54% { transform: rotate(-10deg) translateY(-2px); }
+      58% { transform: rotate(-6deg) translateY(1px); }
+      62% { transform: rotate(-10deg) translateY(-2px); }
+      66% { transform: rotate(-8deg) translateY(0); }
+      100% { transform: rotate(-8deg) translateY(0); }
     }
 
-    /* Casque: Vacille (surprise) puis bouge avec la course */
+    /* Casque: Vacille (surprise) puis rebondit avec la course */
     .glide-logo.animate #i-helmet {
       transform-origin: 70px 60px;
       animation: helmetSurpriseThenBounce 2.5s ease-out forwards;
@@ -155,9 +166,20 @@
       13% { transform: rotate(10deg) translateY(1px); }
       16% { transform: rotate(-5deg); }
       18% { transform: rotate(0); }
-      /* Course - casque rebondit doucement */
-      20% { transform: rotate(-5deg); }
-      100% { transform: rotate(-5deg); }
+      /* Course - casque rebondit avec le corps */
+      22% { transform: rotate(-8deg) translateY(-1px); }
+      26% { transform: rotate(-3deg) translateY(1px); }
+      30% { transform: rotate(-8deg) translateY(-1px); }
+      34% { transform: rotate(-3deg) translateY(1px); }
+      38% { transform: rotate(-8deg) translateY(-1px); }
+      42% { transform: rotate(-3deg) translateY(1px); }
+      46% { transform: rotate(-8deg) translateY(-1px); }
+      50% { transform: rotate(-3deg) translateY(1px); }
+      54% { transform: rotate(-8deg) translateY(-1px); }
+      58% { transform: rotate(-3deg) translateY(1px); }
+      62% { transform: rotate(-8deg) translateY(-1px); }
+      66% { transform: rotate(-5deg) translateY(0); }
+      100% { transform: rotate(-5deg) translateY(0); }
     }
 
     /* Trainee de vitesse - apparait seulement pendant la course */
