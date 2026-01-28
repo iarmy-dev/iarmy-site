@@ -4,87 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Politique de Confidentialite - iArmy</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23FF6B35'/%3E%3Crect x='35' y='18' width='30' height='12' rx='6' fill='white'/%3E%3Crect x='32' y='26' width='36' height='5' rx='2' fill='white'/%3E%3Ccircle cx='50' cy='42' r='10' fill='white'/%3E%3Crect x='44' y='52' width='12' height='28' rx='3' fill='white'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+  <meta name="theme-color" content="#FF6B35">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/header.css">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #030303; color: white; min-height: 100vh; overflow-x: hidden; }
-    .bg-gradient-animate { background: linear-gradient(135deg, #030303 0%, #0a0508 25%, #050808 50%, #080805 75%, #030303 100%); background-size: 400% 400%; animation: gradientShift 20s ease infinite; }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    body { background: #0f0f0f; color: white; min-height: 100vh; overflow-x: hidden; }
 
+    .bg-grid { position: fixed; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0); background-size: 32px 32px; pointer-events: none; z-index: 0; }
     .orb { position: fixed; border-radius: 50%; filter: blur(100px); animation: float 15s ease-in-out infinite; pointer-events: none; z-index: 0; }
     .orb-1 { width: 500px; height: 500px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); top: -250px; right: -150px; opacity: 0.15; }
     .orb-2 { width: 400px; height: 400px; background: linear-gradient(135deg, #6B35FF, #8B5EFF); bottom: -200px; left: -150px; opacity: 0.12; animation-delay: -7s; }
     @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
 
-    .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-    /* Logo soldat animé */
-    .logo-i { width: 42px; height: 42px; min-width: 42px; min-height: 42px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
-    .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
-    .logo-i svg { width: 75%; height: 75%; object-fit: contain; animation: soldierIdle 2.5s ease-in-out infinite; }
-    @keyframes soldierIdle { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-3deg); } 70% { transform: rotate(3deg); } }
-    .logo-i #i-helmet { transform-origin: 70px 70px; animation: helmetWatch 2.5s ease-in-out infinite; }
-    @keyframes helmetWatch { 0%, 100% { transform: rotate(0deg) translateX(0); } 25% { transform: rotate(-8deg) translateX(-1px); } 75% { transform: rotate(8deg) translateX(1px); } }
-    .logo-i:hover svg { animation: soldierSurprise 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
-    .logo-i:hover #i-helmet { animation: helmetWobble 0.8s ease-out forwards; }
-    @keyframes soldierSurprise { 0% { transform: rotate(0deg) scale(1); } 15% { transform: rotate(3deg) scale(0.98); } 30% { transform: rotate(-2deg) scale(1.02); } 100% { transform: rotate(0deg) scale(1); } }
-    @keyframes helmetWobble { 0% { transform: rotate(0deg) translateY(0); } 15% { transform: rotate(15deg) translateY(2px); } 30% { transform: rotate(-10deg) translateY(1px); } 45% { transform: rotate(8deg) translateY(0); } 60% { transform: rotate(-4deg); } 75% { transform: rotate(2deg); } 100% { transform: rotate(0deg) translateY(0); } }
-    .logo-i::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s ease; pointer-events: none; }
-    .logo-i:hover::after { left: 100%; }
+    .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 12px; font-weight: 500; transition: all 0.3s; color: white; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .btn-primary { background: linear-gradient(135deg, #FF6B35, #FF8B5E); padding: 10px 20px; border-radius: 12px; font-weight: 600; transition: all 0.3s; border: none; color: white; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
 
-    .nav-user-section { display: flex; align-items: center; gap: 12px; }
-    .nav-profile { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; text-decoration: none; color: white; font-weight: 500; }
-    .nav-profile:hover { background: rgba(255,255,255,0.08); }
-    .nav-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.3); }
-    .btn-logout { background: none; border: none; padding: 6px; cursor: pointer; color: rgba(255,255,255,0.3); transition: all 0.2s; display: flex; align-items: center; border-radius: 6px; }
+    .nav-user-section { display: flex; align-items: center; gap: 8px; }
+    .nav-avatar-link { display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+    .nav-avatar-link:hover { transform: scale(1.1); }
+    .nav-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,107,53,0.4); transition: border-color 0.2s; }
+    .nav-avatar-link:hover .nav-avatar { border-color: #FF6B35; }
+    .btn-logout { background: none; border: none; padding: 8px; cursor: pointer; color: rgba(255,255,255,0.3); transition: all 0.2s; display: flex; align-items: center; border-radius: 8px; }
     .btn-logout:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
-    .btn-login { padding: 10px 20px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border: none; border-radius: 10px; color: white; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
-    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.4); }
 
     .page-container { max-width: 800px; margin: 0 auto; padding: 100px 20px 40px; position: relative; z-index: 10; }
-
     .content-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px; }
 
     h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .subtitle { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; }
-
     h2 { font-size: 18px; font-weight: 600; margin-top: 32px; margin-bottom: 16px; color: #FF8B5E; }
     h2:first-of-type { margin-top: 0; }
-
     p, li { font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
-
     ul { padding-left: 20px; margin-bottom: 16px; }
     li { margin-bottom: 8px; }
-
     a { color: #FF6B35; text-decoration: none; }
     a:hover { text-decoration: underline; }
-
     .highlight { background: rgba(255,107,53,0.1); border-left: 3px solid #FF6B35; padding: 16px 20px; border-radius: 0 12px 12px 0; margin: 20px 0; }
     .highlight p { margin-bottom: 0; }
 
+    footer { padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px; }
     footer a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: #FF8B5E; }
   </style>
 </head>
-<body class="bg-gradient-animate">
+<body>
+  <div class="bg-grid"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <nav class="glass" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
-    <div style="max-width: 800px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
-      <a href="../" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;">
+  <nav>
+    <div class="nav-inner">
+      <a href="/" style="text-decoration: none; color: white; display: flex; align-items: center; gap: 10px;">
         <div class="logo-i">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139.61 327.81">
-            <defs><style>.logo-body{fill:#fff;stroke:#fff;stroke-miterlimit:10}.logo-shadow{fill:#cecdd1;stroke-miterlimit:10}.logo-shadow-stroke{fill:#cecdd1;stroke:#cecdd1;stroke-miterlimit:10}.logo-helmet{fill:#47330f;stroke:#47330f;stroke-miterlimit:10}</style></defs>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139.61 327.81" style="width: 100%; height: 100%;">
+            <defs>
+              <style>.logo-body{fill:#fff;stroke:#fff;stroke-miterlimit:10}.logo-shadow{fill:#cecdd1;stroke-miterlimit:10}.logo-helmet{fill:#47330f;stroke:#47330f;stroke-miterlimit:10}</style>
+            </defs>
             <g id="i-body"><path class="logo-body" d="M85.32,142.54c-2.41.32-5.05.57-7.21.96-8.54,1.56-33.88,6.95-43.99,9.8-12.24,3.46-13.3,11.97-14.1,17.56-.8,5.59,1.41,17.88,11.17,17.88,8.54,0,8.25,10.59,8.25,10.59,0,0,.14,68.63,0,84.86-.16,17.89-10.64,17.82-10.64,17.82,0,0-7.71,0-7.71,12.24,0,13.39,14.1,13.03,14.1,13.03h85.12c10.91,0,11.7-14.63,11.7-14.63,0,0,1.6-13.83-10.64-13.83-8.78,0-8.25-15.69-8.25-15.69v-112.79s1.05-15.65-4.69-20.55c-7.08-6.86-15.9-8.21-23.11-7.24Z"/><path class="logo-shadow" d="M51.63,148.52c-15.07,6.79-15.86,21.93-15.86,21.93,0,0-1.5,12.05,11.76,14.95,6.69,1.42,6.63,13.69,6.63,13.69v85.37c0,16.21-8.04,17.97-8.04,17.97,0,0-7.31.55-7.31,12.31,0,13.47,11.31,13.07,11.31,13.07h-14.97s-14.9.36-14.89-13.11c0-12.31,7.71-13.2,7.71-13.2,0,0,10.92.15,10.92-17.04v-85.37s.24-9.76-7.67-9.76c-10.37,0-12.68-13.36-11.88-18.98.8-5.62,2.46-14.33,14.77-17.81l17.49-4.02Z"/></g>
-            <g id="i-head"><circle class="logo-body" cx="71.97" cy="86.29" r="47.78"/><path class="logo-shadow-stroke" d="M28.09,105.24c-2.51-5.81-3.9-12.22-3.9-18.95,0-26.39,21.39-47.78,47.78-47.78,21.31,0,39.36,13.95,45.52,33.22,0,0-57.76-3.29-89.39,33.5Z"/><path class="logo-shadow" d="M11.18,94.6c7.57,0,22.75-16.13,22.75-16.13,0,0,9.63-8.94,22.45-13.62,0,0-15.61,5.19-20.22,5.09-5.54-.13-18.51-29.21,3.34-53.81-18.29,6.35-31.42,23.73-31.42,44.18,0,0,.43,7.31,1.24,10.76,0,0,2.7,9.61,1.85,23.53Z"/><path class="logo-shadow" d="M90.21,58.98c22.66-6.38,45.01-.4,37.63-3.02-8.45-2.99-7.62-11.85-7.62-11.85,0,0-3.34,4.39-30,14.86Z"/></g>
-            <g id="i-helmet"><path class="logo-body" d="M.66,106s-1.06-3.33,2.22-6.38c4.51-4.19-.15-23.54-.15-23.54-1.07-4.54-1.64-9.28-1.64-14.14C1.09,28.01,28.6.5,62.53.5c28.39,0,52.29,19.26,59.33,45.43,0,0,.69,6.19,7.75,9.4,4.72,2.14,9.06,4.39,9.43,7.55,0,0-22.99-6.11-65.67,3.07-25.04,4.53-39.22,19.55-39.22,19.55,0,0-23.43,24.08-33.47,20.51Z"/><path class="logo-helmet" d="M.66,106c.84,4.08,18.82,3.64,28.44,2.78,44.27-4.52,100.5-34,107.13-40.41,2.2-2.13,2.98-3.92,2.8-5.49,0,0-22.99-6.11-65.67,3.07-25.04,4.53-39.22,19.55-39.22,19.55,0,0-23.43,24.08-33.47,20.51"/><path class="logo-helmet" d="M.66,106c10.04,3.58,33.47-20.51,33.47-20.51,0,0,14.19-15.02,39.22-19.55,42.68-9.18,65.67-3.07,65.67-3.07.14,1.18-.2,2.38-1.34,3.86l-.02.03c-5.59-1.12-27.75-4.42-64.31,3.45-25.04,4.53-39.22,19.55-39.22,19.55,0,0-13.82,14.38-24.79,19.32,0,0-8.43-.46-8.68-3.09Z"/></g>
+            <path class="logo-helmet" d="M.66,106c.84,4.08,18.82,3.64,28.44,2.78,44.27-4.52,100.5-34,107.13-40.41,2.2-2.13,2.98-3.92,2.8-5.49,0,0-22.99-6.11-65.67,3.07-25.04,4.53-39.22,19.55-39.22,19.55,0,0-23.43,24.08-33.47,20.51"/>
+            <g id="i-head"><circle class="logo-body" cx="71.97" cy="86.29" r="47.78"/><path class="logo-shadow" d="M28.09,105.24c-2.51-5.81-3.9-12.22-3.9-18.95,0-26.39,21.39-47.78,47.78-47.78,21.31,0,39.36,13.95,45.52,33.22,0,0-57.76-3.29-89.39,33.5Z"/></g>
+            <g id="i-helmet"><path class="logo-body" d="M.66,106s-1.06-3.33,2.22-6.38c4.51-4.19-.15-23.54-.15-23.54-1.07-4.54-1.64-9.28-1.64-14.14C1.09,28.01,28.6.5,62.53.5c28.39,0,52.29,19.26,59.33,45.43,0,0,.69,6.19,7.75,9.4,4.72,2.14,9.06,4.39,9.43,7.55,0,0-22.99-6.11-65.67,3.07-25.04,4.53-39.22,19.55-39.22,19.55,0,0-23.43,24.08-33.47,20.51Z"/><path class="logo-helmet" d="M.66,106c10.04,3.58,33.47-20.51,33.47-20.51,0,0,14.19-15.02,39.22-19.55,42.68-9.18,65.67-3.07,65.67-3.07.14,1.18-.2,2.38-1.34,3.86l-.02.03c-5.59-1.12-27.75-4.42-64.31,3.45-25.04,4.53-39.22,19.55-39.22,19.55,0,0-13.82,14.38-24.79,19.32,0,0-8.43-.46-8.68-3.09Z"/></g>
+            <path class="logo-shadow" d="M90.21,58.98c22.66-6.38,45.01-.4,37.63-3.02-8.45-2.99-7.62-11.85-7.62-11.85,0,0-3.34,4.39-30,14.86Z"/>
+            <path class="logo-shadow" d="M11.18,94.6c7.57,0,22.75-16.13,22.75-16.13,0,0,9.63-8.94,22.45-13.62,0,0-15.61,5.19-20.22,5.09-5.54-.13-18.51-29.21,3.34-53.81-18.29,6.35-31.42,23.73-31.42,44.18,0,0,.43,7.31,1.24,10.76,0,0,2.7,9.61,1.85,23.53Z"/>
           </svg>
         </div>
         <span style="font-weight: 700; font-size: 18px; letter-spacing: -0.5px;">iArmy</span>
       </a>
-      <div id="auth-buttons"></div>
+      <div id="auth-buttons" class="nav-right">
+        <a href="/" class="btn-secondary">Connexion</a>
+        <a href="/" class="btn-primary">Inscription</a>
+      </div>
     </div>
   </nav>
 
@@ -161,12 +155,12 @@
     </div>
   </div>
 
-  <footer style="padding: 32px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 32px;">
+  <footer>
     <div style="display: flex; justify-content: center; gap: 24px; font-size: 14px;">
-      <a href="../">Accueil</a>
+      <a href="/">Accueil</a>
       <a href="https://app.iarmy.fr">Compte</a>
-      <a href="./">Confidentialite</a>
-      <a href="../cgu/">CGU</a>
+      <a href="/privacy/">Confidentialite</a>
+      <a href="/cgu/">CGU</a>
       <a href="mailto:support@iarmy.fr">Contact</a>
     </div>
     <p style="color: rgba(255,255,255,0.25); font-size: 12px; text-align: center; margin-top: 12px;">© 2026 iArmy</p>
@@ -177,32 +171,34 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5cWZucGRjbmlmYXVod2dldGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODY1MTIsImV4cCI6MjA4MzQ2MjUxMn0.1W2OaRb0sApMvrG_28AoV2zUFAzrptzpwbR1c65tOPo';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    async function signOut() {
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-
       if (session) {
         const user = session.user;
         const userName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
         const userAvatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=FF6B35&color=fff`;
-        const firstName = userName.split(' ')[0];
-
         document.getElementById('auth-buttons').innerHTML = `
           <div class="nav-user-section">
-            <a href="https://app.iarmy.fr" class="nav-profile">
-              <img src="${userAvatar}" class="nav-avatar">
-              <span>${firstName}</span>
+            <a href="https://app.iarmy.fr" class="nav-avatar-link" title="Mon compte">
+              <img src="${userAvatar}" class="nav-avatar" alt="Avatar">
             </a>
+            <button onclick="signOut()" class="btn-logout" title="Deconnexion">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </button>
           </div>
-        `;
-      } else {
-        document.getElementById('auth-buttons').innerHTML = `
-          <a href="../" class="btn-login">Connexion</a>
         `;
       }
     }
-
     document.addEventListener('DOMContentLoaded', init);
   </script>
-  <script src="../js/analytics.js"></script>
 </body>
 </html>
