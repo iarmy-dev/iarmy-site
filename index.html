@@ -58,38 +58,27 @@
       /* Phase 1: Surprise - reste sur place */
       0% { left: 0; opacity: 0; transform: translateY(-50%); }
       5% { left: 0; opacity: 1; transform: translateY(-50%); }
-      8% { left: 0; transform: translateY(-58%) scale(1.1); } /* Sursaut! */
-      12% { left: 0; transform: translateY(-42%) scale(0.95); }
-      15% { left: 0; transform: translateY(-50%) scale(1); }
-      18% { left: 0; transform: translateY(-50%); }
-      /* Phase 2: Course! Rebond fluide de course */
-      20% { left: 3%; transform: translateY(-50%); }
-      22% { left: 8%; transform: translateY(-54%); }
-      24% { left: 13%; transform: translateY(-50%); }
-      26% { left: 18%; transform: translateY(-54%); }
-      28% { left: 23%; transform: translateY(-50%); }
-      30% { left: 28%; transform: translateY(-54%); }
-      32% { left: 33%; transform: translateY(-50%); }
-      34% { left: 38%; transform: translateY(-54%); }
-      36% { left: 43%; transform: translateY(-50%); }
-      38% { left: 48%; transform: translateY(-54%); }
-      40% { left: 52%; transform: translateY(-50%); }
-      42% { left: 56%; transform: translateY(-54%); }
-      44% { left: 60%; transform: translateY(-50%); }
-      46% { left: 64%; transform: translateY(-54%); }
-      48% { left: 68%; transform: translateY(-50%); }
-      50% { left: 71%; transform: translateY(-54%); }
-      52% { left: 74%; transform: translateY(-50%); }
-      54% { left: 77%; transform: translateY(-54%); }
-      56% { left: 80%; transform: translateY(-50%); }
-      58% { left: 82%; transform: translateY(-54%); }
-      60% { left: 84%; transform: translateY(-50%); }
-      65% { left: 87%; transform: translateY(-53%); }
-      70% { left: 89%; transform: translateY(-50%); }
-      75% { left: 91%; transform: translateY(-52%); }
-      80% { left: 93%; opacity: 1; transform: translateY(-50%); }
-      90% { left: 96%; opacity: 0.5; transform: translateY(-50%); }
-      100% { left: calc(100% - 36px); opacity: 0; transform: translateY(-50%); }
+      8% { left: 0; opacity: 1; transform: translateY(-58%) scale(1.1); } /* Sursaut! */
+      12% { left: 0; opacity: 1; transform: translateY(-42%) scale(0.95); }
+      15% { left: 0; opacity: 1; transform: translateY(-50%) scale(1); }
+      18% { left: 0; opacity: 1; transform: translateY(-50%); }
+      /* Phase 2: Course! Rebond fluide - disparait derriere le tableau */
+      20% { left: 5%; opacity: 1; transform: translateY(-50%); }
+      23% { left: 12%; opacity: 1; transform: translateY(-54%); }
+      26% { left: 19%; opacity: 1; transform: translateY(-50%); }
+      29% { left: 26%; opacity: 1; transform: translateY(-54%); }
+      32% { left: 33%; opacity: 1; transform: translateY(-50%); }
+      35% { left: 40%; opacity: 1; transform: translateY(-54%); }
+      38% { left: 47%; opacity: 1; transform: translateY(-50%); }
+      41% { left: 54%; opacity: 1; transform: translateY(-54%); }
+      44% { left: 61%; opacity: 1; transform: translateY(-50%); }
+      47% { left: 68%; opacity: 1; transform: translateY(-54%); }
+      50% { left: 75%; opacity: 1; transform: translateY(-50%); }
+      53% { left: 82%; opacity: 1; transform: translateY(-54%); }
+      56% { left: 89%; opacity: 1; transform: translateY(-50%); }
+      59% { left: 96%; opacity: 1; transform: translateY(-54%); }
+      62% { left: 103%; opacity: 1; transform: translateY(-50%); } /* Sort du cadre */
+      100% { left: 103%; opacity: 1; transform: translateY(-50%); }
     }
     .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
     .animate-fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
@@ -123,7 +112,7 @@
     .sheet-grid .amount { color: #4ade80; font-weight: 600; }
 
     /* Glide animation - Soldat surpris puis court */
-    .glide-container { position: relative; width: 120px; height: 55px; }
+    .glide-container { position: relative; width: 120px; height: 55px; overflow: hidden; }
     .glide-line { position: absolute; top: 85%; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,107,53,0.4), transparent); }
     .glide-logo {
       position: absolute; top: 50%; left: 0; transform: translateY(-50%);
@@ -186,16 +175,13 @@
     @keyframes speedTrailDelayed {
       0%, 18% { opacity: 0; width: 0; }
       20% { opacity: 0.9; width: 30px; }
-      25% { opacity: 0.5; width: 20px; }
-      30% { opacity: 0.9; width: 35px; }
-      35% { opacity: 0.5; width: 20px; }
-      40% { opacity: 0.9; width: 30px; }
+      26% { opacity: 0.6; width: 22px; }
+      32% { opacity: 0.9; width: 35px; }
+      38% { opacity: 0.6; width: 20px; }
+      44% { opacity: 0.9; width: 32px; }
       50% { opacity: 0.7; width: 25px; }
-      60% { opacity: 0.9; width: 35px; }
-      70% { opacity: 0.6; width: 20px; }
-      80% { opacity: 0.8; width: 30px; }
-      90% { opacity: 0.4; width: 15px; }
-      100% { opacity: 0; width: 0; }
+      56% { opacity: 0.9; width: 35px; }
+      62%, 100% { opacity: 0; width: 0; }
     }
 
     /* Petites particules de poussière pendant la course */
@@ -220,7 +206,7 @@
       42% { opacity: 0; transform: translate(-10px, -12px) scale(0.2); }
       50% { opacity: 0.5; transform: translate(0, 0) scale(0.6); }
       55% { opacity: 0; }
-      100% { opacity: 0; }
+      62%, 100% { opacity: 0; }
     }
 
     /* Animated logos */
