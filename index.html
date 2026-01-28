@@ -35,15 +35,15 @@
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    /* Nav header - same as app */
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .nav-inner { max-width: 768px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-    .nav-right { display: flex; align-items: center; gap: 8px; }
+    /* Nav header - same as app (with !important to override Tailwind) */
+    nav { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 50 !important; background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+    .nav-inner { max-width: 768px !important; margin: 0 auto !important; padding: 16px 20px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
+    .nav-right { display: flex !important; align-items: center !important; gap: 8px !important; }
 
     /* Logo soldat animé */
-    .logo-i { width: 42px; height: 42px; min-width: 42px; min-height: 42px; background: linear-gradient(135deg, #FF6B35, #FF8B5E); border-radius: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
-    .logo-i:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(255,107,53,0.5); }
-    .logo-i svg { width: 75%; height: 75%; object-fit: contain; }
+    .logo-i { width: 42px !important; height: 42px !important; min-width: 42px !important; min-height: 42px !important; background: linear-gradient(135deg, #FF6B35, #FF8B5E) !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; cursor: pointer !important; position: relative !important; overflow: hidden !important; }
+    .logo-i:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(255,107,53,0.5) !important; }
+    .logo-i svg { width: 75% !important; height: 75% !important; object-fit: contain !important; }
     /* Animation idle - le soldat balance */
     .logo-i svg { animation: soldierIdle 2.5s ease-in-out infinite; }
     @keyframes soldierIdle { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-3deg); } 70% { transform: rotate(3deg); } }
