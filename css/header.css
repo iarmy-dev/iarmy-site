@@ -167,8 +167,9 @@ nav {
 }
 
 .nav-avatar:hover {
-  border-color: rgba(255,107,53,0.5) !important;
-  transform: scale(1.05) !important;
+  border-color: rgba(255,107,53,0.7) !important;
+  box-shadow: 0 0 20px rgba(255,107,53,0.35), 0 0 6px rgba(255,107,53,0.2) inset !important;
+  transform: scale(1.08) !important;
 }
 
 .btn-icon {
