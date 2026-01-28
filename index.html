@@ -10,6 +10,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/header.css">
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0f0f0f; color: white; min-height: 100vh; overflow-x: hidden; }
@@ -34,32 +35,6 @@
 
     /* Glass effect */
     .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-
-    /* Nav header - same as app (with !important to override Tailwind) */
-    nav { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 50 !important; background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
-    .nav-inner { max-width: 768px !important; margin: 0 auto !important; padding: 16px 20px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
-    .nav-right { display: flex !important; align-items: center !important; gap: 8px !important; }
-
-    /* Logo soldat animé */
-    .logo-i { width: 42px !important; height: 42px !important; min-width: 42px !important; min-height: 42px !important; background: linear-gradient(135deg, #FF6B35, #FF8B5E) !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; cursor: pointer !important; position: relative !important; overflow: hidden !important; }
-    .logo-i:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(255,107,53,0.5) !important; }
-    .logo-i svg { width: 75% !important; height: 75% !important; object-fit: contain !important; }
-    /* Animation idle - le soldat balance */
-    .logo-i svg { animation: soldierIdle 2.5s ease-in-out infinite; }
-    @keyframes soldierIdle { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-3deg); } 70% { transform: rotate(3deg); } }
-    /* Le casque bouge - surveille à gauche/droite */
-    .logo-i #i-helmet { transform-origin: 70px 70px; animation: helmetWatch 2.5s ease-in-out infinite; }
-    @keyframes helmetWatch { 0%, 100% { transform: rotate(0deg) translateX(0); } 25% { transform: rotate(-8deg) translateX(-1px); } 75% { transform: rotate(8deg) translateX(1px); } }
-    /* Animation au hover - casque wobble */
-    .logo-i:hover svg { animation: soldierSurprise 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
-    .logo-i:hover #i-helmet { animation: helmetWobble 0.8s ease-out forwards; }
-    @keyframes soldierSurprise { 0% { transform: rotate(0deg) scale(1); } 15% { transform: rotate(3deg) scale(0.98); } 30% { transform: rotate(-2deg) scale(1.02); } 100% { transform: rotate(0deg) scale(1); } }
-    @keyframes helmetWobble { 0% { transform: rotate(0deg) translateY(0); } 15% { transform: rotate(15deg) translateY(2px); } 30% { transform: rotate(-10deg) translateY(1px); } 45% { transform: rotate(8deg) translateY(0); } 60% { transform: rotate(-4deg); } 75% { transform: rotate(2deg); } 100% { transform: rotate(0deg) translateY(0); } }
-    /* Petit brillant sur le casque au hover */
-    .logo-i::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s ease; pointer-events: none; }
-    .logo-i:hover::after { left: 100%; }
-    /* Fallback ancien logo CSS (deprecated) */
-    .logo-i-soldier, .logo-i-cap, .logo-i-dot, .logo-i-body { display: none; }
 
     /* Stock counter animation */
     .stock-counter { animation: countPulse 0.3s ease-out; }
