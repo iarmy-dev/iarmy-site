@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block OAuth error URLs
+Disallow: /*?error=
+Disallow: /*?error_code=
+Disallow: /*?error_description=
+
+# Sitemap
+Sitemap: https://iarmy.fr/sitemap.xml
